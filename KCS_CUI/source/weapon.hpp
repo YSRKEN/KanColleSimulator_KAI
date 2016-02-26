@@ -1,6 +1,6 @@
-#pragma once
+ï»¿#pragma once
 
-// í•Ê
+// ç¨®åˆ¥
 enum WeaponClass {
 	kWeaponClassGun, kWeaponClassAP, kWeaponClassSubGun, kWeaponClassTorpedo, kWeaponClassSpecialSS,
 	kWeaponClassPF, kWeaponClassPB, kWeaponClassPBF, kWeaponClassWB, kWeaponClassPA, kWeaponClassPS,
@@ -10,39 +10,39 @@ enum WeaponClass {
 	kWeaponClassCR, kWeaponClassOS, kWeaponClassOther
 };
 const vector<string> kWeaponClassStr = {
-	"å–C", "‘ÎŠÍ‹­‰»’e", "•›–C", "‹›—‹", "“Áêöq’ø", "ŠÍãí“¬‹@", "ŠÍã”šŒ‚‹@","ŠÍã”šŒ‚‹@(”ší)", "…ã”šŒ‚‹@",
-	"ŠÍãUŒ‚‹@", "ŠÍã’ã@‹@", "ŠÍã’ã@‹@(Ê‰_)", "‘åŒ^”òs’ø", "…ã’ã@‹@", "…ã’ã@‹@(–é’ã)", "‘Îö£‰ú‹@",
-	"ƒI[ƒgƒWƒƒƒCƒ", "¬Œ^“d’T","‘åŒ^“d’T", "‘Î‹ó‹@e", "‘Î‹ó‹­‰»’e", "‚Ë‘•’u", "”š—‹", "ƒ\ƒi[", "‰‹}C——vˆõ",
-	"’TÆ“”", "Æ–¾’e", "ŠÍ‘ài—ß•”{İ", "…ãŠÍ—vˆõ", "í“¬—ÆH", "—mã•â‹‹", "‚»‚Ì‘¼"
+	"ä¸»ç ²", "å¯¾è‰¦å¼·åŒ–å¼¾", "å‰¯ç ²", "é­šé›·", "ç‰¹æ®Šæ½œèˆªè‰‡", "è‰¦ä¸Šæˆ¦é—˜æ©Ÿ", "è‰¦ä¸Šçˆ†æ’ƒæ©Ÿ","è‰¦ä¸Šçˆ†æ’ƒæ©Ÿ(çˆ†æˆ¦)", "æ°´ä¸Šçˆ†æ’ƒæ©Ÿ",
+	"è‰¦ä¸Šæ”»æ’ƒæ©Ÿ", "è‰¦ä¸Šåµå¯Ÿæ©Ÿ", "è‰¦ä¸Šåµå¯Ÿæ©Ÿ(å½©é›²)", "å¤§å‹é£›è¡Œè‰‡", "æ°´ä¸Šåµå¯Ÿæ©Ÿ", "æ°´ä¸Šåµå¯Ÿæ©Ÿ(å¤œåµ)", "å¯¾æ½œå“¨æˆ’æ©Ÿ",
+	"ã‚ªãƒ¼ãƒˆã‚¸ãƒ£ã‚¤ãƒ­", "å°å‹é›»æ¢","å¤§å‹é›»æ¢", "å¯¾ç©ºæ©ŸéŠƒ", "å¯¾ç©ºå¼·åŒ–å¼¾", "é«˜å°„è£…ç½®", "çˆ†é›·", "ã‚½ãƒŠãƒ¼", "å¿œæ€¥ä¿®ç†è¦å“¡",
+	"æ¢ç…§ç¯", "ç…§æ˜å¼¾", "è‰¦éšŠå¸ä»¤éƒ¨æ–½è¨­", "æ°´ä¸Šè‰¦è¦å“¡", "æˆ¦é—˜ç³§é£Ÿ", "æ´‹ä¸Šè£œçµ¦", "ãã®ä»–"
 };
 
-//‘•”õƒNƒ‰ƒX
+//è£…å‚™ã‚¯ãƒ©ã‚¹
 class Weapon {
-	int id_;					//‘•”õID
-	string name_;				//‘•”õ–¼
-	WeaponClass weapon_class_;	//í•Ê
-	int defense_;				//‘•b
-	int attack_;				//‰Î—Í
-	int torpedo_;				//—‹Œ‚
-	int bomb_;					//”š‘•
-	int anti_air_;				//‘Î‹ó
-	int anti_sub_;				//‘Îö
-	int hit_;					//–½’†
-	int evade_;					//‰ñ”ğ
-	int search_;				//õ“G
-	Range range_;				//Ë’ö
-	int level_;					//‘•”õ‰üC“x(0-10)A“à•”n—û“x(0-120)
+	int id_;					//è£…å‚™ID
+	string name_;				//è£…å‚™å
+	WeaponClass weapon_class_;	//ç¨®åˆ¥
+	int defense_;				//è£…ç”²
+	int attack_;				//ç«åŠ›
+	int torpedo_;				//é›·æ’ƒ
+	int bomb_;					//çˆ†è£…
+	int anti_air_;				//å¯¾ç©º
+	int anti_sub_;				//å¯¾æ½œ
+	int hit_;					//å‘½ä¸­
+	int evade_;					//å›é¿
+	int search_;				//ç´¢æ•µ
+	Range range_;				//å°„ç¨‹
+	int level_;					//è£…å‚™æ”¹ä¿®åº¦(0-10)ã€å†…éƒ¨ç†Ÿç·´åº¦(0-120)
 public:
-	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	Weapon();
 	Weapon(
 		const int, const string, const WeaponClass, const int, const int, const int, const int,
 		const int, const int, const int, const int, const int, const Range, const int);
-	// ’†g‚ğ•\¦‚·‚é
+	// ä¸­èº«ã‚’è¡¨ç¤ºã™ã‚‹
 	void Put();
 	// getter
 	string Name() { return name_; }
 };
-
-// •¶š—ñ‚ğí•Ê‚É•ÏŠ·‚·‚é
+class WeaponDB;
+// æ–‡å­—åˆ—ã‚’ç¨®åˆ¥ã«å¤‰æ›ã™ã‚‹
 WeaponClass ToWC(const string);

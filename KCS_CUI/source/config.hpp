@@ -1,19 +1,19 @@
-#pragma once
+ï»¿#pragma once
 
-// wŒ`
+// é™£å½¢
 enum Formation { kFormationTrail, kFormationSubTrail, kFormationCircle, kFormationEchelon, kFormationAbreast };
-const string kFormationStr[] = { "’Pcw", "•¡cw", "—ÖŒ`w", "’òŒ`w", "’P‰¡w" };
+const string kFormationStr[] = { "å˜ç¸¦é™£", "è¤‡ç¸¦é™£", "è¼ªå½¢é™£", "æ¢¯å½¢é™£", "å˜æ¨ªé™£" };
 
-// İ’èƒNƒ‰ƒX
+// è¨­å®šã‚¯ãƒ©ã‚¹
 class Config {
-	vector<string> input_filename_;	//“ü—Íƒtƒ@ƒCƒ‹–¼
-	vector<Formation> formation_;	//wŒ`w’è
-	int times_;		//s‰ñ”
-	int threads_;	//ƒXƒŒƒbƒh”
-	string output_filename_;	//o—Íƒtƒ@ƒCƒ‹–¼
+	vector<string> input_filename_;	//å…¥åŠ›ãƒ•ã‚¡ã‚¤ãƒ«å
+	vector<Formation> formation_;	//é™£å½¢æŒ‡å®š
+	int times_;		//è©¦è¡Œå›æ•°
+	int threads_;	//ã‚¹ãƒ¬ãƒƒãƒ‰æ•°
+	string output_filename_;	//å‡ºåŠ›ãƒ•ã‚¡ã‚¤ãƒ«å
 public:
-	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	Config(int argc, char *argv[]);
-	// ’†g‚ğ•\¦‚·‚é
+	// ä¸­èº«ã‚’è¡¨ç¤ºã™ã‚‹
 	void Put() const;
 };
