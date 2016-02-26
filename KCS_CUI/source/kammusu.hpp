@@ -22,7 +22,7 @@ const string kShipClassStr[] = { "", "魚雷艇", "駆逐艦", "軽巡洋艦", "
 // 速力
 enum Speed { kSpeedNone, kSpeedLow, kSpeedHigh };
 const string kSpeedStr[] = { "無", "低速", "高速" };
-
+class WeaponDB;
 // 艦娘クラス
 class Kammusu {
 	// 変更しないもの

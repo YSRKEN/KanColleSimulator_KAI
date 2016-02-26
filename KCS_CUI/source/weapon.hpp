@@ -43,6 +43,6 @@ public:
 	// getter
 	string Name() { return name_; }
 };
-class WeaponDB;
+//class WeaponDB;
 // 文字列を種別に変換する
 WeaponClass ToWC(const string);
