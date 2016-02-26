@@ -1,41 +1,41 @@
-#include "base.hpp"
+ï»¿#include "base.hpp"
 #include "other.hpp"
 
-// ‘•”õDB‚ÌƒRƒ“ƒXƒgƒ‰ƒNƒ^
+// è£…å‚™DBã®ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 WeaponDB::WeaponDB() {
-	// ƒtƒ@ƒCƒ‹‚ğŠJ‚­
+	// ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ã
 	ifstream ifs("slotitems.csv");
-	if (!ifs.is_open()) throw "slotitems.csv‚ª³í‚É“Ç‚İ‚ß‚Ü‚¹‚ñ‚Å‚µ‚½.";
-	// 1s‚Ã‚Â“Ç‚İ‚ñ‚Å‚¢‚­
+	if (!ifs.is_open()) throw "slotitems.csvãŒæ­£å¸¸ã«èª­ã¿è¾¼ã‚ã¾ã›ã‚“ã§ã—ãŸ.";
+	// 1è¡Œã¥ã¤èª­ã¿è¾¼ã‚“ã§ã„ã
 	string temp_str;
 	getline(ifs, temp_str);
 	auto header = ToHash(Split(temp_str, ','));
 	while (getline(ifs, temp_str)) {
 		auto list         = Split(temp_str, ',');
-		auto id           = stoi(list[header.at("‘•”õID")]);
-		auto name         = list[header.at("‘•”õ–¼")];
-		auto weapon_class = ToWC(list[header.at("í•Ê")]);
-		auto defense      = stoi(list[header.at("‘•b")]);
-		auto attack       = stoi(list[header.at("‰Î—Í")]);
-		auto torpedo      = stoi(list[header.at("—‹Œ‚")]);
-		auto bomb         = stoi(list[header.at("”š‘•")]);
-		auto anti_air     = stoi(list[header.at("‘Î‹ó")]);
-		auto anti_sub     = stoi(list[header.at("‘Îö")]);
-		auto hit          = stoi(list[header.at("–½’†")]);
-		auto evade        = stoi(list[header.at("‰ñ”ğ")]);
-		auto search       = stoi(list[header.at("õ“G")]);
-		auto range        = static_cast<Range>(stoi(list[header.at("Ë’ö")]));
+		auto id           = stoi(list[header.at("è£…å‚™ID")]);
+		auto name         = list[header.at("è£…å‚™å")];
+		auto weapon_class = ToWC(list[header.at("ç¨®åˆ¥")]);
+		auto defense      = stoi(list[header.at("è£…ç”²")]);
+		auto attack       = stoi(list[header.at("ç«åŠ›")]);
+		auto torpedo      = stoi(list[header.at("é›·æ’ƒ")]);
+		auto bomb         = stoi(list[header.at("çˆ†è£…")]);
+		auto anti_air     = stoi(list[header.at("å¯¾ç©º")]);
+		auto anti_sub     = stoi(list[header.at("å¯¾æ½œ")]);
+		auto hit          = stoi(list[header.at("å‘½ä¸­")]);
+		auto evade        = stoi(list[header.at("å›é¿")]);
+		auto search       = stoi(list[header.at("ç´¢æ•µ")]);
+		auto range        = static_cast<Range>(stoi(list[header.at("å°„ç¨‹")]));
 		auto level        = 0;
 		Weapon temp_w(
 			id, name, weapon_class, defense, attack, torpedo, bomb, anti_air,
 			anti_sub, hit, evade, search, range, level);
 		hash_[id] = temp_w;
 	}
-	// ƒ_ƒ~[ƒf[ƒ^‚ğ‘ã“ü‚·‚é
+	// ãƒ€ãƒŸãƒ¼ãƒ‡ãƒ¼ã‚¿ã‚’ä»£å…¥ã™ã‚‹
 	hash_[-1] = Weapon();
 }
 
-// ‘•”õDB‚©‚çƒf[ƒ^‚ğ“Ç‚İ‚¾‚·
+// è£…å‚™DBã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿ã ã™
 Weapon WeaponDB::Get(const int id) const{
 	if (hash_.find(id) != hash_.end()) {
 		return hash_.at(id);
@@ -45,93 +45,129 @@ Weapon WeaponDB::Get(const int id) const{
 	}
 }
 
-// ŠÍ–ºDB‚ÌƒRƒ“ƒXƒgƒ‰ƒNƒ^
+// è‰¦å¨˜DBã®ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 KammusuDB::KammusuDB() {
-	// ƒtƒ@ƒCƒ‹‚ğŠJ‚­
+	// ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ã
 	ifstream ifs("ships.csv");
-	if (!ifs.is_open()) throw "ships.csv‚ª³í‚É“Ç‚İ‚ß‚Ü‚¹‚ñ‚Å‚µ‚½.";
-	// 1s‚Ã‚Â“Ç‚İ‚ñ‚Å‚¢‚­
+	if (!ifs.is_open()) throw "ships.csvãŒæ­£å¸¸ã«èª­ã¿è¾¼ã‚ã¾ã›ã‚“ã§ã—ãŸ.";
+	// 1è¡Œã¥ã¤èª­ã¿è¾¼ã‚“ã§ã„ã
 	string temp_str;
 	getline(ifs, temp_str);
 	auto header = ToHash(Split(temp_str, ','));
 	while (getline(ifs, temp_str)) {
-		// ‚Ü‚¸Lv1‚Ì•û‚ğ‘ã“ü‚·‚é
+		// ã¾ãšLv1ã®æ–¹ã‚’ä»£å…¥ã™ã‚‹
 		auto list = Split(temp_str, ',');
-		auto id = stoi(list[header.at("ŠÍ‘DID")]);
-		auto name = list[header.at("ŠÍ–¼")];
-		auto shipclass = static_cast<ShipClass>(stoi(list[header.at("ŠÍí")]));
-		auto max_hp = stoi(Split(list[header.at("‘Ï‹v")], '.')[0]);
-		auto defense = stoi(Split(list[header.at("‘•b")], '.')[0]);
-		auto attack = stoi(Split(list[header.at("‰Î—Í")], '.')[0]);
-		auto torpedo = stoi(Split(list[header.at("—‹Œ‚")], '.')[0]);
-		auto anti_air = stoi(Split(list[header.at("‘Î‹ó")], '.')[0]);
-		auto luck = stoi(Split(list[header.at("‰^")], '.')[0]);
-		auto speed = ToSpeed(list[header.at("‘¬—Í")]);
-		auto range = static_cast<Range>(stoi(list[header.at("Ë’ö")]));
-		auto slots = stoi(list[header.at("ƒXƒƒbƒg”")]);
-		auto max_airs = ToInt(Split(list[header.at("“‹Ú”")], '.'));
-		auto evade = stoi(Split(list[header.at("‰ñ”ğ")], '.')[0]);
-		auto anti_sub = stoi(Split(list[header.at("‘Îö")], '.')[0]);
-		auto search = stoi(Split(list[header.at("õ“G")], '.')[0]);
-		auto first_weapons = ToInt(Split(list[header.at("‰Šú‘•”õ")], '.'));
-		auto kammusu_flg = (stoi(list[header.at("ŠÍ–ºƒtƒ‰ƒO")]) == 1);
+		auto id = stoi(list[header.at("è‰¦èˆ¹ID")]);
+		auto name = list[header.at("è‰¦å")];
+		auto shipclass = static_cast<ShipClass>(stoi(list[header.at("è‰¦ç¨®")]));
+		auto max_hp = stoi(Split(list[header.at("è€ä¹…")], '.')[0]);
+		auto defense = stoi(Split(list[header.at("è£…ç”²")], '.')[0]);
+		auto attack = stoi(Split(list[header.at("ç«åŠ›")], '.')[0]);
+		auto torpedo = stoi(Split(list[header.at("é›·æ’ƒ")], '.')[0]);
+		auto anti_air = stoi(Split(list[header.at("å¯¾ç©º")], '.')[0]);
+		auto luck = stoi(Split(list[header.at("é‹")], '.')[0]);
+		auto speed = ToSpeed(list[header.at("é€ŸåŠ›")]);
+		auto range = static_cast<Range>(stoi(list[header.at("å°„ç¨‹")]));
+		auto slots = stoi(list[header.at("ã‚¹ãƒ­ãƒƒãƒˆæ•°")]);
+		auto max_airs = ToInt(Split(list[header.at("æ­è¼‰æ•°")], '.'));
+		auto evade = stoi(Split(list[header.at("å›é¿")], '.')[0]);
+		auto anti_sub = stoi(Split(list[header.at("å¯¾æ½œ")], '.')[0]);
+		auto search = stoi(Split(list[header.at("ç´¢æ•µ")], '.')[0]);
+		auto first_weapons = ToInt(Split(list[header.at("åˆæœŸè£…å‚™")], '.'));
+		auto kammusu_flg = (stoi(list[header.at("è‰¦å¨˜ãƒ•ãƒ©ã‚°")]) == 1);
 		Kammusu temp_k1(id, name, shipclass, max_hp, defense, attack, torpedo, anti_air, luck, speed,
 			range, slots, max_airs, evade, anti_sub, search, first_weapons, kammusu_flg, 1);
 		hash_lv1_[id] = move(temp_k1);
-		// Ÿ‚ÉLv99‚Ì•û‚ğˆ—‚·‚é
-		defense = stoi(Split(list[header.at("‘•b")], '.')[1]);
-		attack = stoi(Split(list[header.at("‰Î—Í")], '.')[1]);
-		torpedo = stoi(Split(list[header.at("—‹Œ‚")], '.')[1]);
-		anti_air = stoi(Split(list[header.at("‘Î‹ó")], '.')[1]);
-		evade = stoi(Split(list[header.at("‰ñ”ğ")], '.')[1]);
-		anti_sub = stoi(Split(list[header.at("‘Îö")], '.')[1]);
-		search = stoi(Split(list[header.at("õ“G")], '.')[1]);
+		// æ¬¡ã«Lv99ã®æ–¹ã‚’å‡¦ç†ã™ã‚‹
+		max_hp = stoi(Split(list[header.at("è€ä¹…")], '.')[1]);
+		defense = stoi(Split(list[header.at("è£…ç”²")], '.')[1]);
+		attack = stoi(Split(list[header.at("ç«åŠ›")], '.')[1]);
+		torpedo = stoi(Split(list[header.at("é›·æ’ƒ")], '.')[1]);
+		anti_air = stoi(Split(list[header.at("å¯¾ç©º")], '.')[1]);
+		evade = stoi(Split(list[header.at("å›é¿")], '.')[1]);
+		anti_sub = stoi(Split(list[header.at("å¯¾æ½œ")], '.')[1]);
+		search = stoi(Split(list[header.at("ç´¢æ•µ")], '.')[1]);
 		Kammusu temp_k2(id, name, shipclass, max_hp, defense, attack, torpedo, anti_air, luck, speed,
 			range, slots, max_airs, evade, anti_sub, search, first_weapons, kammusu_flg, 99);
 		hash_lv99_[id] = move(temp_k2);
 	}
-	// ƒ_ƒ~[ƒf[ƒ^‚ğ‘ã“ü‚·‚é
+	// ãƒ€ãƒŸãƒ¼ãƒ‡ãƒ¼ã‚¿ã‚’ä»£å…¥ã™ã‚‹
 	hash_lv1_[-1] = Kammusu();
 	hash_lv99_[-1] = Kammusu();
 }
 
-// ŠÍ–ºDB‚©‚çƒf[ƒ^‚ğ“Ç‚İ‚¾‚·
-// id‚Åw’è‚µ‚½ŠÍíID‚ÌŠÍ–º‚ğAƒŒƒxƒ‹‚ªlevel‚Ìó‘Ô‚É‚µ‚Ä•Ô‚·
+// è‰¦å¨˜DBã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿ã ã™
+// idã§æŒ‡å®šã—ãŸè‰¦æˆ¦IDã®è‰¦å¨˜ã‚’ã€ãƒ¬ãƒ™ãƒ«ãŒlevelã®çŠ¶æ…‹ã«ã—ã¦è¿”ã™
 Kammusu KammusuDB::Get(const int id, const int level) const {
-	if (hash_lv99_.find(id) != hash_lv99_.end()) {
-		return hash_lv99_.at(id);
+	if(hash_lv1_.find(id) == hash_lv1_.end()) return hash_lv1_.at(-1);
+	Kammusu temp_k = hash_lv1_.at(id);
+	// ç·´åº¦ã§ä¸Šæ˜‡ã™ã‚‹ç®‡æ‰€ã‚’è£œå®Œã™ã‚‹
+	const Kammusu &kammusu_lv1 = hash_lv1_.at(id), &kammusu_lv99 = hash_lv99_.at(id);
+	temp_k.SetEvade(DoubleToInt(1.0 * (kammusu_lv99.Evade() -kammusu_lv1.Evade()) * level / 99 + kammusu_lv1.Evade()));
+	temp_k.SetAntiSub(DoubleToInt(1.0 * (kammusu_lv99.AntiSub() - kammusu_lv1.AntiSub()) * level / 99 + kammusu_lv1.AntiSub()));
+	temp_k.SetSearch(DoubleToInt(1.0 * (kammusu_lv99.Search() - kammusu_lv1.Search()) * level / 99 + kammusu_lv1.Search()));
+	temp_k.SetLevel(level);
+	// ã‚±ãƒƒã‚³ãƒ³ã«ã‚ˆã‚‹è€ä¹…ä¸Šæ˜‡ã¯ã‚„ã‚„ã“ã—ã„
+	if (level >= 100) {
+		int new_max_hp = temp_k.MaxHP();
+		if (new_max_hp < 10) {
+			new_max_hp += 3;
+		}
+		else if (new_max_hp < 30) {
+			new_max_hp += 4;
+		}
+		else if (new_max_hp < 40) {
+			new_max_hp += 5;
+		}
+		else if (new_max_hp < 50) {
+			new_max_hp += 6;
+		}
+		else if (new_max_hp < 70) {
+			new_max_hp += 7;
+		}
+		else if (new_max_hp <= 90) {
+			new_max_hp += 8;
+		}
+		else {
+			new_max_hp += 9;
+		}
+		if (new_max_hp > kammusu_lv99.MaxHP()) new_max_hp = kammusu_lv99.MaxHP();
+		temp_k.SetMaxHP(new_max_hp);
 	}
-	else {
-		return hash_lv99_.at(-1);
-	}
+	return temp_k;
 }
 
-// •¶š—ñ‚ğƒfƒŠƒ~ƒ^‚Å‹æØ‚è•ªŠ„‚·‚é
-vector<string> Split(const string str, const char delim) {
+// æ–‡å­—åˆ—ã‚’ãƒ‡ãƒªãƒŸã‚¿ã§åŒºåˆ‡ã‚Šåˆ†å‰²ã™ã‚‹
+vector<string> Split(const string &str, const char &delim) {
 	vector<string> list;
 	std::istringstream iss(str);
 	string temp;
 	while (getline(iss, temp, delim)) {
 		list.push_back(temp);
 	}
-	return move(list);
+	return list;
 }
 
-// •¶š—ñ”z—ñ‚ğ”š”z—ñ‚É•ÏŠ·‚·‚é
-vector<int> ToInt(const vector<string> arr_str) {
+// æ–‡å­—åˆ—é…åˆ—ã‚’æ•°å­—é…åˆ—ã«å¤‰æ›ã™ã‚‹
+vector<int> ToInt(const vector<string> &arr_str) {
 	vector<int> arr_int;
 	for (auto &it : arr_str) {
 		arr_int.push_back(stoi(it));
 	}
-	return move(arr_int);
+	return arr_int;
 }
 
-// ”z—ñ‚ğƒnƒbƒVƒ…‚É•ÏŠ·‚·‚é
+// static_cast<int>ã®çŸ­ç¸®è¡¨ç¾
+int DoubleToInt(const double &val) {
+	return static_cast<int>(val);
+}
+
+// é…åˆ—ã‚’ãƒãƒƒã‚·ãƒ¥ã«å¤‰æ›ã™ã‚‹
 template<typename T>
 unordered_map<T, size_t> ToHash(const vector<T> &vec) {
 	unordered_map<T, size_t> hash;
 	for (auto i = 0u; i < vec.size(); ++i) {
 		hash[vec[i]] = i;
 	}
-	return move(hash);
+	return hash;
 }

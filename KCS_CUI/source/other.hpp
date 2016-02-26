@@ -1,35 +1,38 @@
-#pragma once
+ï»¿#pragma once
 
 #include "weapon.hpp"
 #include "kammusu.hpp"
 
-// ‘•”õDB
+// è£…å‚™DB
 class WeaponDB {
 	unordered_map<int, Weapon> hash_;
 public:
-	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	WeaponDB();
-	// ƒnƒbƒVƒ…‚©‚çƒf[ƒ^‚ğ“Ç‚İ‚¾‚·
+	// ãƒãƒƒã‚·ãƒ¥ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿ã ã™
 	Weapon Get(const int) const;
 };
 
-// ŠÍ–ºDB
+// è‰¦å¨˜DB
 class KammusuDB {
 	unordered_map<int, Kammusu> hash_lv1_;
 	unordered_map<int, Kammusu> hash_lv99_;
 public:
-	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	KammusuDB();
-	// ƒnƒbƒVƒ…‚©‚çƒf[ƒ^‚ğ“Ç‚İ‚¾‚·
+	// ãƒãƒƒã‚·ãƒ¥ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿ã ã™
 	Kammusu Get(const int, const int) const;
 };
 
-// •¶š—ñ‚ğƒfƒŠƒ~ƒ^‚Å‹æØ‚è•ªŠ„‚·‚é
-vector<string> Split(const string, const char);
+// æ–‡å­—åˆ—ã‚’ãƒ‡ãƒªãƒŸã‚¿ã§åŒºåˆ‡ã‚Šåˆ†å‰²ã™ã‚‹
+vector<string> Split(const string&, const char&);
 
-// •¶š—ñ”z—ñ‚ğ”š”z—ñ‚É•ÏŠ·‚·‚é
-vector<int> ToInt(const vector<string>);
+// æ–‡å­—åˆ—é…åˆ—ã‚’æ•°å­—é…åˆ—ã«å¤‰æ›ã™ã‚‹
+vector<int> ToInt(const vector<string>&);
 
-// ”z—ñ‚ğƒnƒbƒVƒ…‚É•ÏŠ·‚·‚é
+// static_cast<int>ã®çŸ­ç¸®è¡¨ç¾
+int DoubleToInt(const double&);
+
+// é…åˆ—ã‚’ãƒãƒƒã‚·ãƒ¥ã«å¤‰æ›ã™ã‚‹
 template<typename T>
 unordered_map<T, size_t> ToHash(const vector<T>&);

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <algorithm>
 #include <cstdint>
@@ -23,8 +23,8 @@ using std::tuple;
 using std::unordered_map;
 using std::vector;
 
-const uint_fast8_t kBattleSize = 2;	//í“¬‚Åí‚¤‚Ì‚Í“G‚Æ–¡•û‚Ìu2‚Âv
+const uint_fast8_t kBattleSize = 2;	//æˆ¦é—˜ã§æˆ¦ã†ã®ã¯æ•µã¨å‘³æ–¹ã®ã€Œ2ã¤ã€
 
-// Ë’ö
+// å°„ç¨‹
 enum Range { kRangeNone, kRangeShort, kRangeMiddle, kRangeLong, kRangeVeryLong };
-const string kRangeStr[] = { "–³", "’Z", "’†", "’·", "’´’·" };
+const string kRangeStr[] = { "ç„¡", "çŸ­", "ä¸­", "é•·", "è¶…é•·" };

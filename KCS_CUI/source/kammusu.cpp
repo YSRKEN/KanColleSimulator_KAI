@@ -1,9 +1,10 @@
-#include "base.hpp"
+ï»¿#include "base.hpp"
 #include "kammusu.hpp"
+#include "other.hpp"
 
-// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 Kammusu::Kammusu() :
-	id_(-1), name_("‚È‚µ"), shipclass_(kShipClassDD), max_hp_(0), defense_(0), attack_(0),
+	id_(-1), name_("ãªã—"), shipclass_(kShipClassDD), max_hp_(0), defense_(0), attack_(0),
 	torpedo_(0), anti_air_(0), luck_(0), speed_(kSpeedNone), range_(kRangeNone), slots_(0),
 	max_airs_({ 0, 0, 0, 0, 0 }), evade_(0), anti_sub_(0), search_(0), first_weapons_({ -1, -1, -1, -1, -1 }),
 	kammusu_flg_(true), level_(1) {}
@@ -18,29 +19,29 @@ Kammusu::Kammusu(
 	max_airs_(max_airs), evade_(evade), anti_sub_(anti_sub), search_(search), first_weapons_(first_weapons),
 	kammusu_flg_(kammusu_flg), level_(level) {}
 
-// ’†g‚ğ•\¦‚·‚é
+// ä¸­èº«ã‚’è¡¨ç¤ºã™ã‚‹
 void Kammusu::Put() {
-	cout << "ŠÍ‘DIDF" << id_ << "\n";
-	cout << "@ŠÍ–¼F" << name_ << "@ŠÍíF" << kShipClassStr[shipclass_] << "\n";
-	cout << "@Å‘å‘Ï‹vF" << max_hp_ << "@‘•bF" << defense_ << "@‰Î—ÍF" << attack_ << "@—‹Œ‚F" << torpedo_ << "\n";
-	cout << "@‘Î‹óF" << anti_air_ << "@‰^F" << luck_ << "@‘¬—ÍF" << kSpeedStr[speed_] << "@Ë’öF" << kRangeStr[range_] << "\n";
-	cout << "@ƒXƒƒbƒg”F" << slots_ << "@Å‘å“‹Ú”F";
+	cout << "è‰¦èˆ¹IDï¼š" << id_ << "\n";
+	cout << "ã€€è‰¦åï¼š" << name_ << "ã€€è‰¦ç¨®ï¼š" << kShipClassStr[shipclass_] << "\n";
+	cout << "ã€€æœ€å¤§è€ä¹…ï¼š" << max_hp_ << "ã€€è£…ç”²ï¼š" << defense_ << "ã€€ç«åŠ›ï¼š" << attack_ << "ã€€é›·æ’ƒï¼š" << torpedo_ << "\n";
+	cout << "ã€€å¯¾ç©ºï¼š" << anti_air_ << "ã€€é‹ï¼š" << luck_ << "ã€€é€ŸåŠ›ï¼š" << kSpeedStr[speed_] << "ã€€å°„ç¨‹ï¼š" << kRangeStr[range_] << "\n";
+	cout << "ã€€ã‚¹ãƒ­ãƒƒãƒˆæ•°ï¼š" << slots_ << "ã€€æœ€å¤§æ­è¼‰æ•°ï¼š";
 	for (auto i = 0; i < slots_; ++i) {
 		if (i != 0) cout << ",";
 		cout << max_airs_[i];
 	}
-	cout << "@‰ñ”ğF" << evade_ << "@‘ÎöF" << anti_sub_ << "\n";
-	cout << "@õ“GF" << search_ << "@ŠÍ–º‚©HF" << (kammusu_flg_ ? "‚Í‚¢" : "‚¢‚¢‚¦") << "@ƒŒƒxƒ‹F" << level_ << "@Œ»‘Ï‹vF" << hp_ << "\n";
-	cout << "@‘•”õF";
+	cout << "ã€€å›é¿ï¼š" << evade_ << "ã€€å¯¾æ½œï¼š" << anti_sub_ << "\n";
+	cout << "ã€€ç´¢æ•µï¼š" << search_ << "ã€€è‰¦å¨˜ã‹ï¼Ÿï¼š" << (kammusu_flg_ ? "ã¯ã„" : "ã„ã„ãˆ") << "ã€€ãƒ¬ãƒ™ãƒ«ï¼š" << level_ << "ã€€ç¾è€ä¹…ï¼š" << hp_ << "\n";
+	cout << "ã€€è£…å‚™ï¼š";
 	for (auto i = 0; i < slots_; ++i) {
 		if (i != 0) cout << ",";
 		cout << weapons_[i].Name() << "(" << airs_[i] << ")";
 	}
 	cout << "\n";
-	cout << "@cond’lF" << cond_ << "@c’e–ò(“)F" << ammo_ << "@c”R—¿(“)" << fuel_ << "\n";
+	cout << "ã€€condå€¤ï¼š" << cond_ << "ã€€æ®‹å¼¾è–¬(ï¼…)ï¼š" << ammo_ << "ã€€æ®‹ç‡ƒæ–™(ï¼…)" << fuel_ << "\n";
 }
 
-// •ÏX‰Â‚È•”•ª‚ğƒŠƒZƒbƒg‚·‚é
+// å¤‰æ›´å¯ãªéƒ¨åˆ†ã‚’ãƒªã‚»ãƒƒãƒˆã™ã‚‹
 Kammusu Kammusu::Reset() {
 	hp_ = max_hp_;
 	airs_ = max_airs_;
@@ -51,15 +52,15 @@ Kammusu Kammusu::Reset() {
 	return *this;
 }
 
-/*Kammusu Kammusu::Reset(const WeaponDB &weapon_db) {
+Kammusu Kammusu::Reset(const WeaponDB &weapon_db) {
 	this->Reset();
 	for (auto i = 0; i < slots_; ++i) {
 		weapons_[i] = weapon_db.Get(first_weapons_[i]);
 	}
 	return *this;
-}*/
+}
 
-// •¶š—ñ‚ğ‘¬—Í‚É•ÏŠ·‚·‚é
+// æ–‡å­—åˆ—ã‚’é€ŸåŠ›ã«å¤‰æ›ã™ã‚‹
 Speed ToSpeed(const string &str) {
 	if (str == "10") return kSpeedHigh;
 	if (str == "5") return kSpeedLow;

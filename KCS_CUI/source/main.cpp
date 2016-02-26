@@ -1,29 +1,26 @@
-/* KanColleSimulator Ver.1.0 */
+ï»¿/* KanColleSimulator Ver.1.0 */
 
 #include "base.hpp"
 #include "config.hpp"
-#include "weapon.hpp"
-#include "kammusu.hpp"
 #include "other.hpp"
 
 int main(int argc, char *argv[]) {
 	try {
-		// Œ»İ‚Ìİ’è‚ğæ“¾‚·‚é
+		// ç¾åœ¨ã®è¨­å®šã‚’å–å¾—ã™ã‚‹
 		Config config(argc, argv);
 		config.Put();
-		// ƒf[ƒ^ƒx[ƒX‚ğ“Ç‚İ‚Ş
+		// ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹ã‚’èª­ã¿è¾¼ã‚€
 		WeaponDB weapon_db;
 		weapon_db.Get(-1).Put();
 		weapon_db.Get(1).Put();
 		KammusuDB kammusu_db;
-		kammusu_db.Get(-1, 1).Reset().Put();
-		kammusu_db.Get(1, 1).Reset().Put();
-//		kammusu_db.Get(1, 1).Reset(weapon_db).Put();
-		kammusu_db.Get(1, 99).Reset().Put();
-		kammusu_db.Get(1, 155).Reset().Put();
+		kammusu_db.Get(434, 1).Reset(weapon_db).Put();
+		kammusu_db.Get(434, 50).Reset(weapon_db).Put();
+		kammusu_db.Get(434, 99).Reset(weapon_db).Put();
+		kammusu_db.Get(434, 155).Reset(weapon_db).Put();
 	}
 	catch (char *e) {
-		std::cerr << "ƒGƒ‰[F" << e << std::endl;
+		std::cerr << "ã‚¨ãƒ©ãƒ¼ï¼š" << e << std::endl;
 	}
 	return 0;
 }

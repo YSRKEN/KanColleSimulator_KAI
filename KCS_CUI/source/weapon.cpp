@@ -1,9 +1,9 @@
-#include "base.hpp"
+ï»¿#include "base.hpp"
 #include "weapon.hpp"
 
-// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 Weapon::Weapon() :
-	id_(-1), name_("‚È‚µ"), weapon_class_(kWeaponClassOther), defense_(0), attack_(0),
+	id_(-1), name_("ãªã—"), weapon_class_(kWeaponClassOther), defense_(0), attack_(0),
 	torpedo_(0), bomb_(0), anti_air_(0), anti_sub_(0), hit_(0),
 	evade_(0), search_(0), range_(kRangeNone), level_(0) {}
 Weapon::Weapon(
@@ -14,16 +14,16 @@ Weapon::Weapon(
 	torpedo_(torpedo), bomb_(bomb), anti_air_(anti_air), anti_sub_(anti_sub), hit_(hit),
 	evade_(evade), search_(search), range_(range), level_(level) {}
 
-// ’†g‚ğ•\¦‚·‚é
+// ä¸­èº«ã‚’è¡¨ç¤ºã™ã‚‹
 void Weapon::Put() {
-	cout << "‘•”õIDF" << id_ << "\n";
-	cout << "@‘•”õ–¼F" << name_ << "@í•ÊF" << weapon_class_ << "\n";
-	cout << "@‘•bF" << defense_ << "@‰Î—ÍF" << attack_ << "@—‹Œ‚F" << torpedo_ << "@”š‘•F" << bomb_ << "\n";
-	cout << "@‘Î‹óF" << anti_air_ << "@‘ÎöF" << anti_sub_ << "@–½’†F" << hit_ << "@‰ñ”ğF" << evade_ << "\n";
-	cout << "@õ“GF" << search_ << "@Ë’öF" << kRangeStr[range_] << "@‰üC/n—ûF" << level_ << "\n";
+	cout << "è£…å‚™IDï¼š" << id_ << "\n";
+	cout << "ã€€è£…å‚™åï¼š" << name_ << "ã€€ç¨®åˆ¥ï¼š" << weapon_class_ << "\n";
+	cout << "ã€€è£…ç”²ï¼š" << defense_ << "ã€€ç«åŠ›ï¼š" << attack_ << "ã€€é›·æ’ƒï¼š" << torpedo_ << "ã€€çˆ†è£…ï¼š" << bomb_ << "\n";
+	cout << "ã€€å¯¾ç©ºï¼š" << anti_air_ << "ã€€å¯¾æ½œï¼š" << anti_sub_ << "ã€€å‘½ä¸­ï¼š" << hit_ << "ã€€å›é¿ï¼š" << evade_ << "\n";
+	cout << "ã€€ç´¢æ•µï¼š" << search_ << "ã€€å°„ç¨‹ï¼š" << kRangeStr[range_] << "ã€€æ”¹ä¿®/ç†Ÿç·´ï¼š" << level_ << "\n";
 }
 
-// •¶š—ñ‚ğí•Ê‚É•ÏŠ·‚·‚é
+// æ–‡å­—åˆ—ã‚’ç¨®åˆ¥ã«å¤‰æ›ã™ã‚‹
 WeaponClass ToWC(const string str) {
 	for (auto i = 0u; i < kWeaponClassStr.size(); ++i) {
 		if (str == kWeaponClassStr[i]) return static_cast<WeaponClass>(i);

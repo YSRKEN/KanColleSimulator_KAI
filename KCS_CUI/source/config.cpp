@@ -1,74 +1,74 @@
-#include "base.hpp"
+ï»¿#include "base.hpp"
 #include "config.hpp"
 
-// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 Config::Config(int argc, char *argv[]) {
 	if (argc < 4) {
-		throw "ˆø”‚Ì”‚ª‘«‚è‚Ä‚¢‚Ü‚¹‚ñ.";
+		throw "å¼•æ•°ã®æ•°ãŒè¶³ã‚Šã¦ã„ã¾ã›ã‚“.";
 	}
-	// ŠeƒIƒvƒVƒ‡ƒ“‚ÌƒfƒtƒHƒ‹ƒg’l‚ğİ’è‚·‚é
+	// å„ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã‚’è¨­å®šã™ã‚‹
 	input_filename_.resize(kBattleSize);
 	formation_.resize(kBattleSize);
 	fill(formation_.begin(), formation_.end(), kFormationTrail);
 	times_ = 1;
 	threads_ = 1;
-	// ƒIƒvƒVƒ‡ƒ“‚Ì•¶š—ñ‚ğ“Ç‚İ‚Ş
+	// ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã®æ–‡å­—åˆ—ã‚’èª­ã¿è¾¼ã‚€
 	for (auto i = 1; i < argc; ++i) {
-		// ˆê’Ustring‚É—‚Æ‚µ‚±‚Ş
+		// ä¸€æ—¦stringã«è½ã¨ã—ã“ã‚€
 		string temp(argv[i]);
-		// ƒIƒvƒVƒ‡ƒ“—p•¶š—ñ‚È‚çAŠeƒIƒvƒVƒ‡ƒ“‚É”½‰f‚³‚¹‚é
+		// ã‚ªãƒ—ã‚·ãƒ§ãƒ³ç”¨æ–‡å­—åˆ—ãªã‚‰ã€å„ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã«åæ˜ ã•ã›ã‚‹
 		if (temp == "-i") {
-			// “ü—Íƒtƒ@ƒCƒ‹–¼
-			if (argc - i <= 2) throw "ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ˆø”‚ªˆÙí‚Å‚·.";
+			// å…¥åŠ›ãƒ•ã‚¡ã‚¤ãƒ«å
+			if (argc - i <= 2) throw "ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³å¼•æ•°ãŒç•°å¸¸ã§ã™.";
 			input_filename_[0] = argv[i + 1];
 			input_filename_[1] = argv[i + 2];
 			i += 2;
 		}
 		else if (temp == "-f") {
-			// wŒ`
-			if (argc - i <= 2) throw "ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ˆø”‚ªˆÙí‚Å‚·.";
+			// é™£å½¢
+			if (argc - i <= 2) throw "ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³å¼•æ•°ãŒç•°å¸¸ã§ã™.";
 			formation_[0] = static_cast<Formation>(stoi(argv[i + 1]));
 			formation_[1] = static_cast<Formation>(stoi(argv[i + 2]));
 			i += 2;
 		}
 		else if (temp == "-n") {
-			// s‰ñ”
-			if (argc - i <= 1) throw "ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ˆø”‚ªˆÙí‚Å‚·.";
+			// è©¦è¡Œå›æ•°
+			if (argc - i <= 1) throw "ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³å¼•æ•°ãŒç•°å¸¸ã§ã™.";
 			times_ = stoi(argv[i + 1]);
 			if (times_ <= 0) times_ = 1;
 			++i;
 		}
 		else if (temp == "-t") {
-			// ÀsƒXƒŒƒbƒh”
-			if (argc - i <= 1) throw "ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ˆø”‚ªˆÙí‚Å‚·.";
+			// å®Ÿè¡Œã‚¹ãƒ¬ãƒƒãƒ‰æ•°
+			if (argc - i <= 1) throw "ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³å¼•æ•°ãŒç•°å¸¸ã§ã™.";
 			threads_ = stoi(argv[i + 1]);
 			if (threads_ <= 0) threads_ = 1;
 			++i;
 		}
 		else if (temp == "-o") {
-			// o—Íƒtƒ@ƒCƒ‹–¼
-			if (argc - i <= 1) throw "ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ˆø”‚ªˆÙí‚Å‚·.";
+			// å‡ºåŠ›ãƒ•ã‚¡ã‚¤ãƒ«å
+			if (argc - i <= 1) throw "ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³å¼•æ•°ãŒç•°å¸¸ã§ã™.";
 			output_filename_ = argv[i + 1];
 			++i;
 		}
 	}
-	// “ü—Íƒtƒ@ƒCƒ‹–¼‚Í•K{‚Å‚ ‚é‚±‚Æ‚É’ˆÓ‚·‚é
+	// å…¥åŠ›ãƒ•ã‚¡ã‚¤ãƒ«åã¯å¿…é ˆã§ã‚ã‚‹ã“ã¨ã«æ³¨æ„ã™ã‚‹
 	if (input_filename_[0] == "" && input_filename_[1] == "") {
-		throw "“ü—Íƒtƒ@ƒCƒ‹–¼‚Í•K‚¸w’è‚µ‚Ä‚­‚¾‚³‚¢.";
+		throw "å…¥åŠ›ãƒ•ã‚¡ã‚¤ãƒ«åã¯å¿…ãšæŒ‡å®šã—ã¦ãã ã•ã„.";
 	}
 }
 
-// ’†g‚ğ•\¦‚·‚é
+// ä¸­èº«ã‚’è¡¨ç¤ºã™ã‚‹
 void Config::Put() const{
-	cout << "“ü—Íƒtƒ@ƒCƒ‹–¼F\n";
+	cout << "å…¥åŠ›ãƒ•ã‚¡ã‚¤ãƒ«åï¼š\n";
 	for (auto &it : input_filename_) {
-		cout << "@" << it << "\n";
+		cout << "ã€€" << it << "\n";
 	}
-	cout << "wŒ`w’èF\n";
+	cout << "é™£å½¢æŒ‡å®šï¼š\n";
 	for (auto &it : formation_) {
-		cout << "@" << kFormationStr[it] << "\n";
+		cout << "ã€€" << kFormationStr[it] << "\n";
 	}
-	cout << "s‰ñ”F" << times_ << "\n";
-	cout << "ƒXƒŒƒbƒh”F" << threads_ << "\n";
-	cout << "o—Íƒtƒ@ƒCƒ‹–¼F\n@" << (output_filename_ != "" ? output_filename_ : "<‚È‚µ>") << "\n";
+	cout << "è©¦è¡Œå›æ•°ï¼š" << times_ << "\n";
+	cout << "ã‚¹ãƒ¬ãƒƒãƒ‰æ•°ï¼š" << threads_ << "\n";
+	cout << "å‡ºåŠ›ãƒ•ã‚¡ã‚¤ãƒ«åï¼š\nã€€" << (output_filename_ != "" ? output_filename_ : "<ãªã—>") << "\n";
 }
