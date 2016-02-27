@@ -53,7 +53,7 @@ public:
 WeaponClass ToWC(const string);
 
 // 外部熟練度(Simple)を内部熟練度(Detail)に変換する
-int ConvertStoD(const int);
+int ConvertStoD(const int&);
 
 // 内部熟練度を外部熟練度に変換する
-int ConvertDtoS(const int);
+int ConvertDtoS(const int&);
