@@ -3,6 +3,7 @@
 #include "base.hpp"
 #include "config.hpp"
 #include "other.hpp"
+#include "fleet.hpp"
 
 int main(int argc, char *argv[]) {
 	try {
@@ -18,6 +19,11 @@ int main(int argc, char *argv[]) {
 			kammusu_db.Get(-1, 1).Reset(weapon_db).Put();
 			kammusu_db.Get(178, 99).Reset(weapon_db).Put();
 			// ファイルから艦隊を読み込む
+			vector<Fleet> fleet(kBattleSize);
+			for (auto i = 0; i < kBattleSize; ++i) {
+				fleet[i] = Fleet(config.InputFilename(i), config.GetFormation(i), weapon_db, kammusu_db);
+				fleet[i].Put();
+			}
 		);
 	}
 	catch (char *e) {

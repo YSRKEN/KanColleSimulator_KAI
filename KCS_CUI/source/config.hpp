@@ -1,9 +1,5 @@
 ﻿#pragma once
 
-// 陣形
-enum Formation { kFormationTrail, kFormationSubTrail, kFormationCircle, kFormationEchelon, kFormationAbreast };
-const string kFormationStr[] = { "単縦陣", "複縦陣", "輪形陣", "梯形陣", "単横陣" };
-
 // 設定クラス
 class Config {
 	vector<string> input_filename_;	//入力ファイル名
@@ -16,4 +12,7 @@ public:
 	Config(int argc, char *argv[]);
 	// 中身を表示する
 	void Put() const;
+	// getter
+	string InputFilename(const int n) { return input_filename_[n]; }
+	Formation GetFormation(const int n) { return formation_[n]; }
 };
