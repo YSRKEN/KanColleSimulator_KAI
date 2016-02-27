@@ -74,6 +74,11 @@ void Config::Put() const{
 	cout << "出力ファイル名：\n　" << (output_filename_ != "" ? output_filename_ : "<なし>") << endl;
 }
 
+std::wstring Config::InputFilenameW(const int n) const
+{
+	return char_cvt::shift_jis_to_utf_16(this->input_filename_[n]);
+}
+
 std::ostream & operator<<(std::ostream & os, const Config & conf)
 {
 	os << "入力ファイル名：" << endl;
