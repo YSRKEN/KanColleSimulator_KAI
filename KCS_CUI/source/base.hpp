@@ -20,6 +20,7 @@ using std::ifstream;
 using std::move;
 using std::stoi;
 using std::string;
+using std::wstring;
 using std::to_string;
 using std::tuple;
 using std::unordered_map;
@@ -39,11 +40,11 @@ const uint_fast8_t kBattleSize = 2;	//戦闘で戦うのは敵と味方の「2�
 
 // 射程
 enum Range { kRangeNone, kRangeShort, kRangeMiddle, kRangeLong, kRangeVeryLong };
-const string kRangeStr[] = { "無", "短", "中", "長", "超長" };
+const wstring kRangeStr[] = { L"無", L"短", L"中", L"長", L"超長" };
 
 // 陣形
 enum Formation { kFormationTrail, kFormationSubTrail, kFormationCircle, kFormationEchelon, kFormationAbreast };
-const string kFormationStr[] = { "単縦陣", "複縦陣", "輪形陣", "梯形陣", "単横陣" };
+const wstring kFormationStr[] = { L"単縦陣", L"複縦陣", L"輪形陣", L"梯形陣", L"単横陣" };
 
 // 値を制限する
 template<typename T>

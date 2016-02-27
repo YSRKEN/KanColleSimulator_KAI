@@ -1,5 +1,5 @@
 ﻿#pragma once
-
+#include <iostream>
 // 種別
 enum WeaponClass {
 	kWeaponClassGun, kWeaponClassAP, kWeaponClassSubGun, kWeaponClassTorpedo, kWeaponClassSpecialSS,
@@ -19,7 +19,7 @@ const vector<string> kWeaponClassStr = {
 //装備クラス
 class Weapon {
 	int id_;					//装備ID
-	string name_;				//装備名
+	std::wstring name_;				//装備名
 	WeaponClass weapon_class_;	//種別
 	int defense_;				//装甲
 	int attack_;				//火力
@@ -37,17 +37,21 @@ public:
 	// コンストラクタ
 	Weapon();
 	Weapon(
-		const int, const string, const WeaponClass, const int, const int, const int, const int,
+		const int, wstring, const WeaponClass, const int, const int, const int, const int,
 		const int, const int, const int, const int, const int, const Range, const int, const int);
 	// getter
-	string Name() const { return name_; }
+	std::wstring Name() const { return name_; }
 	// setter
 	void SetLevel(const int level) { level_ = level; }
 	void SetLevelDetail(const int level_detail) { level_detail_ = level_detail; }
 	// その他
 	void Put() const;	// 中身を表示する
 	bool IsAir();		// (熟練度が存在する)艦載機ならtrue
+	friend std::ostream& operator<<(std::ostream& os, const Weapon& conf);
+	friend std::wostream& operator<<(std::wostream& os, const Weapon& conf);
 };
+std::ostream& operator<<(std::ostream& os, const Weapon& conf);
+std::wostream& operator<<(std::wostream& os, const Weapon& conf);
 
 // 文字列を種別に変換する
 WeaponClass ToWC(const string);
