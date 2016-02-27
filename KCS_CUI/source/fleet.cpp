@@ -100,6 +100,7 @@ std::ostream & operator<<(std::ostream & os, const Fleet & conf)
 		}
 	}
 	os << endl;
+	return os;
 }
 
 std::wostream & operator<<(std::wostream & os, const Fleet & conf)
@@ -112,4 +113,5 @@ std::wostream & operator<<(std::wostream & os, const Fleet & conf)
 		}
 	}
 	os << endl;
+	return os;
 }

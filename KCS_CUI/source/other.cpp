@@ -1,6 +1,6 @@
 ﻿#include "base.hpp"
 #include "other.hpp"
-
+#include "char_convert.hpp"
 // 装備DBのコンストラクタ
 WeaponDB::WeaponDB() {
 	// ファイルを開く
@@ -14,7 +14,7 @@ WeaponDB::WeaponDB() {
 	while (getline(ifs, temp_str)) {
 		auto list         = Split(temp_str, ',');
 		auto id           = stoi(list[header.at("装備ID")]);
-		auto name         = list[header.at("装備名")];
+		auto name         = char_cvt::shift_jis_to_utf_16(list[header.at("装備名")]);
 		auto weapon_class = ToWC(list[header.at("種別")]);
 		auto defense      = stoi(list[header.at("装甲")]);
 		auto attack       = stoi(list[header.at("火力")]);
@@ -61,7 +61,7 @@ KammusuDB::KammusuDB() {
 		// まずLv1の方を代入する
 		auto list = Split(temp_str, ',');
 		auto id = stoi(list[header.at("艦船ID")]);
-		auto name = list[header.at("艦名")];
+		auto name = char_cvt::shift_jis_to_utf_16(list[header.at("艦名")]);
 		auto shipclass = static_cast<ShipClass>(stoi(list[header.at("艦種")]));
 		auto max_hp = stoi(Split(list[header.at("耐久")], '.')[0]);
 		auto defense = stoi(Split(list[header.at("装甲")], '.')[0]);
