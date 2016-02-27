@@ -98,5 +98,5 @@ void Fleet::Put() const {
 			cout << "　　" << it_k.PutName() << "\n";
 		}
 	}
-	cout << std::flush;
+	cout << "\n";
 }

@@ -38,7 +38,7 @@ void Kammusu::Put() const {
 		cout << weapons_[i].Name() << "(" << airs_[i] << ")";
 	}
 	cout << "\n";
-	cout << "　cond値：" << cond_ << "　残弾薬(％)：" << ammo_ << "　残燃料(％)" << fuel_ << endl;
+	cout << "　cond値：" << cond_ << "　残弾薬(％)：" << ammo_ << "　残燃料(％)" << fuel_ << "\n\n";
 }
 
 // 簡易的な名称を返す

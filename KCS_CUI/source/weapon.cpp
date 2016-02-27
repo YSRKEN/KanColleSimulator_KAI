@@ -20,7 +20,7 @@ void Weapon::Put() const {
 	cout << "　装備名：" << name_ << "　種別：" << weapon_class_ << "\n";
 	cout << "　装甲：" << defense_ << "　火力：" << attack_ << "　雷撃：" << torpedo_ << "　爆装：" << bomb_ << "\n";
 	cout << "　対空：" << anti_air_ << "　対潜：" << anti_sub_ << "　命中：" << hit_ << "　回避：" << evade_ << "\n";
-	cout << "　索敵：" << search_ << "　射程：" << kRangeStr[range_] << "　改修/熟練：" << level_ << endl;
+	cout << "　索敵：" << search_ << "　射程：" << kRangeStr[range_] << "　改修/熟練：" << level_ << "\n\n";
 }
 
 // (熟練度が存在する)艦載機ならtrue
