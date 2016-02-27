@@ -4,13 +4,13 @@
 #include "weapon.hpp"
 #include "kammusu.hpp"
 #include "other.hpp"
-
+#include <iostream>
 using picojson::object;
 using picojson::value;
 
 // 艦隊の形式
 enum FleetType {kFleetTypeNormal = 1, kFleetTypeCombined};
-const string kFleetTypeStr[] = {"通常艦隊", "連合艦隊"};
+const wstring kFleetTypeStr[] = {L"通常艦隊", L"連合艦隊"};
 
 class Fleet {
 	Formation formation_;			//陣形
@@ -23,4 +23,8 @@ public:
 	Fleet(const string&, const Formation&, const WeaponDB&, const KammusuDB&);
 	// 中身を表示する
 	void Put() const;
+	friend std::ostream& operator<<(std::ostream& os, const Fleet& conf);
+	friend std::wostream& operator<<(std::wostream& os, const Fleet& conf);
 };
+std::ostream& operator<<(std::ostream& os, const Fleet& conf);
+std::wostream& operator<<(std::wostream& os, const Fleet& conf);

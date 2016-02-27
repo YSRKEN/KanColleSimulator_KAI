@@ -1,6 +1,6 @@
 ﻿#include "base.hpp"
 #include "fleet.hpp"
-
+#include "char_convert.hpp"
 // コンストラクタ
 Fleet::Fleet(const string &file_name, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db) {
 	// 陣形はそのまま反映させる
@@ -87,12 +87,29 @@ Fleet::Fleet(const string &file_name, const Formation &formation, const WeaponDB
 
 // 中身を表示する
 void Fleet::Put() const {
-	cout << "陣形：" << kFormationStr[formation_] << "　司令部レベル：" << level_ << "　形式：" << kFleetTypeStr[fleet_type_ - 1] << "\n";
-	for (auto fi = 0; fi < fleet_type_; ++fi) {
-		cout << "　第" << (fi + 1) << "艦隊：\n";
-		for (auto &it_k : unit_[fi]) {
-			cout << "　　" << it_k.PutName() << "\n";
+	cout << *this;
+}
+
+std::ostream & operator<<(std::ostream & os, const Fleet & conf)
+{
+	os << "陣形：" << char_cvt::utf_16_to_shift_jis(kFormationStr[conf.formation_]) << "　司令部レベル：" << conf.level_ << "　形式：" << char_cvt::utf_16_to_shift_jis(kFleetTypeStr[conf.fleet_type_ - 1]) << endl;
+	for (auto fi = 0; fi < conf.fleet_type_; ++fi) {
+		os << "　第" << (fi + 1) << "艦隊：" << endl;
+		for (auto &it_k : conf.unit_[fi]) {
+			os << "　　" << char_cvt::utf_16_to_shift_jis(it_k.GetName()) << endl;
 		}
 	}
-	cout << std::flush;
+	os << endl;
+}
+
+std::wostream & operator<<(std::wostream & os, const Fleet & conf)
+{
+	os << L"陣形：" << kFormationStr[conf.formation_] << L"　司令部レベル：" << conf.level_ << L"　形式：" << kFleetTypeStr[conf.fleet_type_ - 1] << endl;
+	for (auto fi = 0; fi < conf.fleet_type_; ++fi) {
+		os << L"　第" << (fi + 1) << L"艦隊：" << endl;
+		for (auto &it_k : conf.unit_[fi]) {
+			os << L"　　" << it_k.GetName() << endl;
+		}
+	}
+	os << endl;
 }
