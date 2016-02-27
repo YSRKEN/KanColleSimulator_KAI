@@ -7,24 +7,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KCS_CUI", "KCS_CUI.vcxproj"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		clang_Debug|x64 = clang_Debug|x64
-		clang_Debug|x86 = clang_Debug|x86
-		clang_Release|x64 = clang_Release|x64
-		clang_Release|x86 = clang_Release|x86
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.clang_Debug|x64.ActiveCfg = clang_Debug|x64
-		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.clang_Debug|x64.Build.0 = clang_Debug|x64
-		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.clang_Debug|x86.ActiveCfg = clang_Debug|Win32
-		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.clang_Debug|x86.Build.0 = clang_Debug|Win32
-		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.clang_Release|x64.ActiveCfg = clang_Release|x64
-		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.clang_Release|x64.Build.0 = clang_Release|x64
-		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.clang_Release|x86.ActiveCfg = clang_Release|Win32
-		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.clang_Release|x86.Build.0 = clang_Release|Win32
 		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.Debug|x64.ActiveCfg = Debug|x64
 		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.Debug|x64.Build.0 = Debug|x64
 		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.Debug|x86.ActiveCfg = Debug|Win32

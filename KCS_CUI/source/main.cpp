@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
 			}
 			// シミュレータを構築し、並列演算を行う
 			vector<Result> result_db(config.Times());
-			#pragma omp parallel for num_threads(config.Threads())
+			//#pragma omp parallel for num_threads(config.Threads())
 			for (int n = 0; n < config.Times(); ++n) {
 				Simulator simulator(config, fleet);
 				result_db[n] = simulator.Calc();
