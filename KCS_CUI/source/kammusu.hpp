@@ -61,22 +61,23 @@ public:
 		const int, const string, const ShipClass, const int, const int, const int, const int,
 		const int, const int, const Speed, const Range, const int, const vector<int>, const int,
 		const int, const int, const vector<int>, const bool, const int);
-	// 中身を表示する
-	void Put();
-	// 変更可な部分をリセットする
-	Kammusu Reset();
 	// getter
 	int MaxHP() const { return max_hp_; }
+	int Luck() const { return luck_; }
 	int Evade() const { return evade_; }
 	int AntiSub() const { return anti_sub_; }
 	int Search() const { return search_; }
 	// setter
 	void SetMaxHP(const int max_hp) { max_hp_ = max_hp; }
+	void SetLuck(const int luck) { luck_ = luck; }
 	void SetEvade(const int evade) { evade_ = evade; }
 	void SetAntiSub(const int anti_sub) { anti_sub_ = anti_sub; }
 	void SetSearch(const int search) { search_ = search; }
 	void SetLevel(const int level) { level_ = level; }
-	Kammusu Reset(const WeaponDB&);
+	// その他
+	void Put();						// 中身を表示する
+	Kammusu Reset();				// 変更可な部分をリセットする
+	Kammusu Reset(const WeaponDB&);	// 変更可な部分をリセットする(初期装備)
 };
 
 // 文字列を速力に変換する

@@ -164,6 +164,7 @@
     <ClInclude Include="source\other.hpp" />
     <ClInclude Include="source\picojson.h" />
     <ClInclude Include="source\simulator.hpp" />
+    <ClInclude Include="source\TimeElapsed.hpp" />
     <ClInclude Include="source\weapon.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

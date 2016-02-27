@@ -61,3 +61,5 @@ http://www.fujlog.net/2014/04/command-line-getopt-usage-format.html
 http://tatesuke.github.io/KanTanMarkdown/ktm-full.html
 - C++コードの書式は「Google C++ スタイルガイド」に準じている  
 http://www.textdrop.net/google-styleguide-ja/cppguide.xml
+- 時間測定にはh2suzukiのコードを少し改造して使用した  
+http://qiita.com/h2suzuki/items/be367edcc8834b508a78

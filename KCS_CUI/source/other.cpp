@@ -98,17 +98,19 @@ KammusuDB::KammusuDB() {
 
 // 艦娘DBからデータを読みだす
 // idで指定した艦戦IDの艦娘を、レベルがlevelの状態にして返す
+// ただし装甲・火力・雷撃・対空は改修MAXの状態とする
 Kammusu KammusuDB::Get(const int id, const int level) const {
-	if(hash_lv1_.find(id) == hash_lv1_.end()) return hash_lv1_.at(-1);
-	Kammusu temp_k = hash_lv1_.at(id);
-	// 練度で上昇する箇所を補完する
+	if(hash_lv99_.find(id) == hash_lv99_.end()) return Kammusu();
+	Kammusu temp_k = hash_lv99_.at(id);
 	const Kammusu &kammusu_lv1 = hash_lv1_.at(id), &kammusu_lv99 = hash_lv99_.at(id);
-	temp_k.SetEvade(DoubleToInt(1.0 * (kammusu_lv99.Evade() -kammusu_lv1.Evade()) * level / 99 + kammusu_lv1.Evade()));
-	temp_k.SetAntiSub(DoubleToInt(1.0 * (kammusu_lv99.AntiSub() - kammusu_lv1.AntiSub()) * level / 99 + kammusu_lv1.AntiSub()));
-	temp_k.SetSearch(DoubleToInt(1.0 * (kammusu_lv99.Search() - kammusu_lv1.Search()) * level / 99 + kammusu_lv1.Search()));
+	// 練度で上昇する箇所を補完する
+	temp_k.SetMaxHP(kammusu_lv1.MaxHP());
+	temp_k.SetEvade(int(1.0 * (kammusu_lv99.Evade() -kammusu_lv1.Evade()) * level / 99 + kammusu_lv1.Evade()));
+	temp_k.SetAntiSub(int(1.0 * (kammusu_lv99.AntiSub() - kammusu_lv1.AntiSub()) * level / 99 + kammusu_lv1.AntiSub()));
+	temp_k.SetSearch(int(1.0 * (kammusu_lv99.Search() - kammusu_lv1.Search()) * level / 99 + kammusu_lv1.Search()));
 	temp_k.SetLevel(level);
-	// ケッコンによる耐久上昇はややこしい
 	if (level >= 100) {
+		// ケッコンによる耐久上昇はややこしい
 		int new_max_hp = temp_k.MaxHP();
 		if (new_max_hp < 10) {
 			new_max_hp += 3;
@@ -133,6 +135,8 @@ Kammusu KammusuDB::Get(const int id, const int level) const {
 		}
 		if (new_max_hp > kammusu_lv99.MaxHP()) new_max_hp = kammusu_lv99.MaxHP();
 		temp_k.SetMaxHP(new_max_hp);
+		// ケッコンによる運上昇は+3～+6までランダムなのでとりあえず+4とした
+		temp_k.SetLuck(temp_k.Luck() + 4);
 	}
 	return temp_k;
 }
@@ -155,11 +159,6 @@ vector<int> ToInt(const vector<string> &arr_str) {
 		arr_int.push_back(stoi(it));
 	}
 	return arr_int;
-}
-
-// static_cast<int>の短縮表現
-int DoubleToInt(const double &val) {
-	return static_cast<int>(val);
 }
 
 // 配列をハッシュに変換する

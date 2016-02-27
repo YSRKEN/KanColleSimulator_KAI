@@ -41,7 +41,7 @@ void Kammusu::Put() {
 	cout << "　cond値：" << cond_ << "　残弾薬(％)：" << ammo_ << "　残燃料(％)" << fuel_ << "\n";
 }
 
-// 変更可な部分をリセットする
+// 変更可な部分をリセットする(装備なし)
 Kammusu Kammusu::Reset() {
 	hp_ = max_hp_;
 	airs_ = max_airs_;
@@ -51,7 +51,7 @@ Kammusu Kammusu::Reset() {
 	fuel_ = 100;
 	return *this;
 }
-
+// 変更可な部分をリセットする(初期装備)
 Kammusu Kammusu::Reset(const WeaponDB &weapon_db) {
 	this->Reset();
 	for (auto i = 0; i < slots_; ++i) {
