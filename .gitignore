@@ -194,3 +194,7 @@ ModelManifest.xml
 #other
 Log.txt
 *.VC.opendb
+html/
+/Readme.html
+/ships_null.csv
+/設計方針.txt
