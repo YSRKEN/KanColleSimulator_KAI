@@ -46,8 +46,6 @@ const string kFormationStr[] = { "単縦陣", "複縦陣", "輪形陣", "梯形�
 
 // 値を制限する
 template<typename T>
-T limit(const T &val, const T &val_min, const T &val_max) {
-	if (val < val_min) return val_min;
-	if (val > val_max) return val_max;
-	return val;
+constexpr T limit(const T &val, const T &val_min, const T &val_max) {
+	return (val < val_min) ? val_min : (val_max < val) ? val_max : val;
 }
