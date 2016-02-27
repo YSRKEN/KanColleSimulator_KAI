@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "weapon.hpp"
-
+#include <iostream>
 class WeaponDB;
 
 // 艦種(厳密な綴りはShip Classificationsである)
@@ -15,21 +15,21 @@ enum ShipClass {
 	kShipClassLST, kShipClassAV, kShipClassLHA, kShipClassACV, kShipClassAR,
 	kShipClassAS, kShipClassCP, kShipClassAO
 };
-const string kShipClassStr[] = { "", "魚雷艇", "駆逐艦", "軽巡洋艦", "重雷装巡洋艦",
-"重巡洋艦", "航空巡洋艦", "軽空母", "巡洋戦艦", "戦艦", "航空戦艦", "正規空母",
-"陸上型", "潜水艦", "潜水空母", "輸送艦", "水上機母艦", "揚陸艦", "装甲空母",
-"工作艦", "潜水母艦", "練習巡洋艦", "給油艦"
+const wstring kShipClassStr[] = { L"", L"魚雷艇", L"駆逐艦", L"軽巡洋艦", L"重雷装巡洋艦",
+L"重巡洋艦", L"航空巡洋艦", L"軽空母", L"巡洋戦艦", L"戦艦", L"航空戦艦", L"正規空母",
+L"陸上型", L"潜水艦", L"潜水空母", L"輸送艦", L"水上機母艦", L"揚陸艦", L"装甲空母",
+L"工作艦", L"潜水母艦", L"練習巡洋艦", L"給油艦"
 };
 
 // 速力
 enum Speed { kSpeedNone, kSpeedLow, kSpeedHigh };
-const string kSpeedStr[] = { "無", "低速", "高速" };
+const wstring kSpeedStr[] = { L"無", L"低速", L"高速" };
 
 // 艦娘クラス
 class Kammusu {
 	// 変更しないもの
 	int id_;						//艦船ID
-	string name_;					//艦名
+	wstring name_;					//艦名
 	ShipClass shipclass_;			//艦種
 	int max_hp_;					//最大耐久
 	int defense_;					//装甲
@@ -58,9 +58,11 @@ public:
 	// コンストラクタ
 	Kammusu();
 	Kammusu(
-		const int, const string, const ShipClass, const int, const int, const int, const int,
-		const int, const int, const Speed, const Range, const int, const vector<int>, const int,
-		const int, const int, const vector<int>, const bool, const int);
+		const int id, wstring name, const ShipClass shipclass, const int max_hp, const int defense,
+		const int attack, const int torpedo, const int anti_air, const int luck, const Speed speed,
+		const Range range, const int slots, vector<int> max_airs, const int evade, const int anti_sub,
+		const int search, vector<int> first_weapons, const bool kammusu_flg, const int level
+	);
 	// getter
 	int MaxHP() const { return max_hp_; }
 	int Luck() const { return luck_; }
@@ -79,10 +81,14 @@ public:
 	void SetCond(const int cond) { cond_ = cond; }
 	// その他
 	void Put() const;				// 中身を表示する
-	string PutName() const;			// 簡易的な名称を返す
+	wstring GetName() const;			// 簡易的な名称を返す
 	Kammusu Reset();				// 変更可な部分をリセットする
 	Kammusu Reset(const WeaponDB&);	// 変更可な部分をリセットする(初期装備)
+	friend std::ostream& operator<<(std::ostream& os, const Kammusu& conf);
+	friend std::wostream& operator<<(std::wostream& os, const Kammusu& conf);
 };
+std::ostream& operator<<(std::ostream& os, const Kammusu& conf);
+std::wostream& operator<<(std::wostream& os, const Kammusu& conf);
 
 // 文字列を速力に変換する
 Speed ToSpeed(const string&);
