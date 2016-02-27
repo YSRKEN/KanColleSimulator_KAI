@@ -61,17 +61,7 @@ Config::Config(int argc, char *argv[]) {
 
 // 中身を表示する
 void Config::Put() const{
-	cout << "入力ファイル名：\n";
-	for (auto &it : input_filename_) {
-		cout << "　" << it << "\n";
-	}
-	cout << "陣形指定：\n";
-	for (auto &it : formation_) {
-		cout << "　" << kFormationStr[it] << "\n";
-	}
-	cout << "試行回数：" << times_ << "\n";
-	cout << "スレッド数：" << threads_ << "\n";
-	cout << "出力ファイル名：\n　" << (output_filename_ != "" ? output_filename_ : "<なし>") << endl;
+	cout << *this;
 }
 
 std::wstring Config::InputFilenameW(const int n) const
@@ -84,7 +74,7 @@ std::ostream & operator<<(std::ostream & os, const Config & conf)
 	os << "入力ファイル名：" << endl;
 	os << "陣形指定：" << endl;
 	for (auto &it : conf.formation_) {
-		os << "　" << kFormationStr[it] << endl;
+		os << "　" << char_cvt::utf_16_to_shift_jis(kFormationStr[it]) << endl;
 	}
 	os
 		<< "試行回数：" << conf.times_ << endl
@@ -98,7 +88,7 @@ std::wostream & operator<<(std::wostream & os, const Config & conf)
 	os << L"入力ファイル名：" << endl;
 	os << L"陣形指定：" << endl;
 	for (auto &it : conf.formation_) {
-		os << L"　" << char_cvt::shift_jis_to_utf_16(kFormationStr[it]) << endl;
+		os << L"　" << kFormationStr[it] << endl;
 	}
 	os
 		<< L"試行回数：" << conf.times_ << endl
