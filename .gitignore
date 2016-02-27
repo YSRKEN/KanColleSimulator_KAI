@@ -1,0 +1,13 @@
+/ships_null.csv
+/設計方針.txt
+/*.exe
+*.bak*
+*.html
+
+html/
+KCS_CUI/Debug/
+KCS_CUI/Release/
+KCS_CUI/x64/
+KCS_CUI/.vs/
+KCS_CUI/KCS_CUI.vcxproj.*
+KCS_CUI/*.sdf
