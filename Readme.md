@@ -32,6 +32,8 @@
 - 通常艦隊だと第1艦隊、連合艦隊だと第1・第2艦隊しか参照しない
 - 「version」と同じ階層で「lv」(司令部レベル)を設置した  
 (これが存在しない場合は司令部レベル120とする)
+- 「version」と同じ階層で「type」(艦隊)を設置した。1なら通常艦隊、2なら連合艦隊  
+(これが存在しない場合は通常艦隊とする)
 - 「luck」と同じ階層で「cond」(cond値)を設置した  
 (これが存在しない場合はcond値49とする)
 - 「rf」と同じ階層で「rf_detail」(内部熟練度)を設置した  
@@ -48,6 +50,11 @@
 
 ## 注意点
 - 補強増設には対応していません。
+- 航空戦マス、および空襲戦マスには対応していません。
+- 支援艦隊には対応していません。
+
+## ライセンス
+MITライセンスとします。
 
 ## 参考資料
 - ほっぽアルファのデータライブラリからships0209.csvとslotitems0209.csvを頂いた  
@@ -63,3 +70,9 @@ http://tatesuke.github.io/KanTanMarkdown/ktm-full.html
 http://www.textdrop.net/google-styleguide-ja/cppguide.xml
 - 時間測定にはh2suzukiのコードを少し改造して使用した  
 http://qiita.com/h2suzuki/items/be367edcc8834b508a78
+- JSON読み込みにはpicojsonを使用した
+https://github.com/kazuho/picojson
+- 艦これの仕様は通常wiki・検証wikiなどを参考にした
+http://wikiwiki.jp/kancolle/
+http://ja.kancolle.wikia.com/wiki/%E8%89%A6%E3%81%93%E3%82%8C_%E6%A4%9C%E8%A8%BCWiki
+https://github.com/andanteyk/ElectronicObserver/blob/master/ElectronicObserver/Other/Information/kcmemo.md#%E8%89%A6%E3%81%93%E3%82%8C%E3%81%AE%E4%BB%95%E6%A7%98%E3%81%AB%E9%96%A2%E3%81%99%E3%82%8B%E9%9B%91%E5%A4%9A%E3%81%AA%E3%83%A1%E3%83%A2

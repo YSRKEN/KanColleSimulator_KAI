@@ -31,18 +31,29 @@ class Weapon {
 	int evade_;					//回避
 	int search_;				//索敵
 	Range range_;				//射程
-	int level_;					//装備改修度(0-10)、内部熟練度(0-120)
+	int level_;					//装備改修度(0-10)、外部熟練度(0-7)
+	int level_detail_;			//内部熟練度(0-120)
 public:
 	// コンストラクタ
 	Weapon();
 	Weapon(
 		const int, const string, const WeaponClass, const int, const int, const int, const int,
-		const int, const int, const int, const int, const int, const Range, const int);
-	// 中身を表示する
-	void Put();
+		const int, const int, const int, const int, const int, const Range, const int, const int);
 	// getter
-	string Name() { return name_; }
+	string Name() const { return name_; }
+	// setter
+	void SetLevel(const int level) { level_ = level; }
+	void SetLevelDetail(const int level_detail) { level_detail_ = level_detail; }
+	// その他
+	void Put() const;	// 中身を表示する
+	bool IsAir();		// (熟練度が存在する)艦載機ならtrue
 };
 
 // 文字列を種別に変換する
 WeaponClass ToWC(const string);
+
+// 外部熟練度(Simple)を内部熟練度(Detail)に変換する
+int ConvertStoD(const int);
+
+// 内部熟練度を外部熟練度に変換する
+int ConvertDtoS(const int);

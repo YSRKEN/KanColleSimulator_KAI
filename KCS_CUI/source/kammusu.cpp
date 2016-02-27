@@ -20,7 +20,7 @@ Kammusu::Kammusu(
 	kammusu_flg_(kammusu_flg), level_(level) {}
 
 // 中身を表示する
-void Kammusu::Put() {
+void Kammusu::Put() const {
 	cout << "艦船ID：" << id_ << "\n";
 	cout << "　艦名：" << name_ << "　艦種：" << kShipClassStr[shipclass_] << "\n";
 	cout << "　最大耐久：" << max_hp_ << "　装甲：" << defense_ << "　火力：" << attack_ << "　雷撃：" << torpedo_ << "\n";
@@ -39,6 +39,11 @@ void Kammusu::Put() {
 	}
 	cout << "\n";
 	cout << "　cond値：" << cond_ << "　残弾薬(％)：" << ammo_ << "　残燃料(％)" << fuel_ << "\n";
+}
+
+// 簡易的な名称を返す
+string Kammusu::PutName() const {
+	return name_ + "(Lv" + to_string(level_) + ")";
 }
 
 // 変更可な部分をリセットする(装備なし)

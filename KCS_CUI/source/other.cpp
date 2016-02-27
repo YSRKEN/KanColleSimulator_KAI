@@ -26,9 +26,10 @@ WeaponDB::WeaponDB() {
 		auto search       = stoi(list[header.at("索敵")]);
 		auto range        = static_cast<Range>(stoi(list[header.at("射程")]));
 		auto level        = 0;
+		auto level_detail = 0;
 		Weapon temp_w(
 			id, name, weapon_class, defense, attack, torpedo, bomb, anti_air,
-			anti_sub, hit, evade, search, range, level);
+			anti_sub, hit, evade, search, range, level, level_detail);
 		hash_[id] = temp_w;
 	}
 	// ダミーデータを代入する

@@ -7,7 +7,7 @@
 
 int main(int argc, char *argv[]) {
 	try {
-		TIME_ELAPSED(
+//		TIME_ELAPSED(
 			// 現在の設定を取得する
 			Config config(argc, argv);
 			config.Put();
@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
 				fleet[i] = Fleet(config.InputFilename(i), config.GetFormation(i), weapon_db, kammusu_db);
 				fleet[i].Put();
 			}
-		);
+//		);
 	}
 	catch (char *e) {
 		std::cerr << "エラー：" << e << std::endl;

@@ -64,6 +64,7 @@ public:
 	// getter
 	int MaxHP() const { return max_hp_; }
 	int Luck() const { return luck_; }
+	int Slots() const { return slots_; }
 	int Evade() const { return evade_; }
 	int AntiSub() const { return anti_sub_; }
 	int Search() const { return search_; }
@@ -74,8 +75,11 @@ public:
 	void SetAntiSub(const int anti_sub) { anti_sub_ = anti_sub; }
 	void SetSearch(const int search) { search_ = search; }
 	void SetLevel(const int level) { level_ = level; }
+	void SetWeapon(const int index, const Weapon &weapon) { weapons_[index] = weapon; }
+	void SetCond(const int cond) { cond_ = cond; }
 	// その他
-	void Put();						// 中身を表示する
+	void Put() const;				// 中身を表示する
+	string PutName() const;			// 簡易的な名称を返す
 	Kammusu Reset();				// 変更可な部分をリセットする
 	Kammusu Reset(const WeaponDB&);	// 変更可な部分をリセットする(初期装備)
 };
