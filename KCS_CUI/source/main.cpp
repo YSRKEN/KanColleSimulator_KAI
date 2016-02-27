@@ -22,6 +22,9 @@ int main(int argc, char *argv[]) {
 			}
 		);
 	}
+	catch (const std::exception& er) {
+		std::cerr << er.what() << std::endl;
+	}
 	catch (char *e) {
 		std::cerr << "エラー：" << e << std::endl;
 	}
