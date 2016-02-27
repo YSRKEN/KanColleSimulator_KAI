@@ -1,6 +1,7 @@
 ﻿#include "base.hpp"
 #include "config.hpp"
-
+#include <codecvt>
+#include "char_convert.hpp"
 // コンストラクタ
 Config::Config(int argc, char *argv[]) {
 	if (argc < 4) {
@@ -71,4 +72,33 @@ void Config::Put() const{
 	cout << "試行回数：" << times_ << "\n";
 	cout << "スレッド数：" << threads_ << "\n";
 	cout << "出力ファイル名：\n　" << (output_filename_ != "" ? output_filename_ : "<なし>") << endl;
+}
+
+std::ostream & operator<<(std::ostream & os, const Config & conf)
+{
+	os << "入力ファイル名：" << endl;
+	os << "陣形指定：" << endl;
+	for (auto &it : conf.formation_) {
+		os << "　" << kFormationStr[it] << endl;
+	}
+	os
+		<< "試行回数：" << conf.times_ << endl
+		<< "スレッド数：" << conf.threads_ << endl
+		<< "出力ファイル名：\n　" << (conf.output_filename_ != "" ? conf.output_filename_ : "<なし>") << endl;
+	return os;
+}
+
+std::wostream & operator<<(std::wostream & os, const Config & conf)
+{
+	os << L"入力ファイル名：" << endl;
+	os << L"陣形指定：" << endl;
+	for (auto &it : conf.formation_) {
+		os << L"　" << char_cvt::shift_jis_to_utf_16(kFormationStr[it]) << endl;
+	}
+	os
+		<< L"試行回数：" << conf.times_ << endl
+		<< L"スレッド数：" << conf.threads_ << endl
+		<< L"出力ファイル名：" << endl
+		<< L"　" << (conf.output_filename_ != "" ? char_cvt::shift_jis_to_utf_16(conf.output_filename_) : L"<なし>") << endl;
+	return os;
 }

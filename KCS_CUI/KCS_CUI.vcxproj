@@ -209,7 +209,9 @@
     <ClCompile Include="source\weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="source\arithmetic_convert.hpp" />
     <ClInclude Include="source\base.hpp" />
+    <ClInclude Include="source\char_convert.hpp" />
     <ClInclude Include="source\config.hpp" />
     <ClInclude Include="source\fleet.hpp" />
     <ClInclude Include="source\kammusu.hpp" />

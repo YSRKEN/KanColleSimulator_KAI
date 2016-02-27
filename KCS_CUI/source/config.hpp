@@ -1,5 +1,5 @@
 ﻿#pragma once
-
+#include <iostream>
 // 設定クラス
 class Config {
 	vector<string> input_filename_;	//入力ファイル名
@@ -15,4 +15,8 @@ public:
 	// getter
 	string InputFilename(const int n) { return input_filename_[n]; }
 	Formation GetFormation(const int n) { return formation_[n]; }
+	friend std::ostream& operator<<(std::ostream& os, const Config& conf);
+	friend std::wostream& operator<<(std::wostream& os, const Config& conf);
 };
+std::ostream& operator<<(std::ostream& os, const Config& conf);
+std::wostream& operator<<(std::wostream& os, const Config& conf);
