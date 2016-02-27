@@ -4,6 +4,7 @@
 // 装備DBのコンストラクタ
 WeaponDB::WeaponDB() {
 	// ファイルを開く
+	std::locale::global(std::locale("japanese"));
 	ifstream ifs("slotitems.csv");
 	if (!ifs.is_open()) throw "slotitems.csvが正常に読み込めませんでした.";
 	// 1行づつ読み込んでいく
@@ -49,6 +50,7 @@ Weapon WeaponDB::Get(const int id) const{
 // 艦娘DBのコンストラクタ
 KammusuDB::KammusuDB() {
 	// ファイルを開く
+	std::locale::global(std::locale("japanese"));
 	ifstream ifs("ships.csv");
 	if (!ifs.is_open()) throw "ships.csvが正常に読み込めませんでした.";
 	// 1行づつ読み込んでいく

@@ -30,8 +30,13 @@ Fleet::Fleet(const string &file_name, const Formation &formation, const WeaponDB
 	//艦娘・深海棲艦
 	int fi = 0;	//読み込む際のインデックス
 	for (auto &temp_f : o) {
-		// 連合艦隊ではない場合、第2艦隊以降を読む必要はない
-		if (fi >= 1 && fleet_type_ == kFleetTypeNormal) break;
+		// 艦隊の形式によって、読まなければならない艦隊数は異なる
+		if (fleet_type_ == kFleetTypeNormal) {
+			if (fi >= 1) break;
+		}
+		else {
+			if (fi >= 2) break;
+		}
 		// 艦隊を1つづつ読み込んでいく
 		auto& fleet = temp_f.second.get<object>();
 		for (auto &temp_u : fleet) {
@@ -78,7 +83,6 @@ Fleet::Fleet(const string &file_name, const Formation &formation, const WeaponDB
 		}
 		++fi;
 	}
-
 }
 
 // 中身を表示する
@@ -90,4 +94,5 @@ void Fleet::Put() const {
 			cout << "　　" << it_k.PutName() << "\n";
 		}
 	}
+	cout << std::flush;
 }

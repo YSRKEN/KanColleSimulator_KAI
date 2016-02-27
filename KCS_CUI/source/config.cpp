@@ -70,5 +70,5 @@ void Config::Put() const{
 	}
 	cout << "試行回数：" << times_ << "\n";
 	cout << "スレッド数：" << threads_ << "\n";
-	cout << "出力ファイル名：\n　" << (output_filename_ != "" ? output_filename_ : "<なし>") << "\n";
+	cout << "出力ファイル名：\n　" << (output_filename_ != "" ? output_filename_ : "<なし>") << endl;
 }

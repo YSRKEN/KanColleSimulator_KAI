@@ -20,7 +20,7 @@ void Weapon::Put() const {
 	cout << "　装備名：" << name_ << "　種別：" << weapon_class_ << "\n";
 	cout << "　装甲：" << defense_ << "　火力：" << attack_ << "　雷撃：" << torpedo_ << "　爆装：" << bomb_ << "\n";
 	cout << "　対空：" << anti_air_ << "　対潜：" << anti_sub_ << "　命中：" << hit_ << "　回避：" << evade_ << "\n";
-	cout << "　索敵：" << search_ << "　射程：" << kRangeStr[range_] << "　改修/熟練：" << level_ << "\n";
+	cout << "　索敵：" << search_ << "　射程：" << kRangeStr[range_] << "　改修/熟練：" << level_ << endl;
 }
 
 // (熟練度が存在する)艦載機ならtrue
@@ -51,19 +51,11 @@ WeaponClass ToWC(const string str) {
 }
 
 // 外部熟練度(Simple)を内部熟練度(Detail)に変換する
-int ConvertStoD(const int level) {
-	const static int kToLevelDetail[] = { 0,10,25,40,55,70,85,100 };
-	return kToLevelDetail[level];
+int ConvertStoD(const int &level) {
+	return limit(level * 15 - 5, 0, 100);
 }
 
 // 内部熟練度を外部熟練度に変換する
-int ConvertDtoS(const int level_detail) {
-	if (level_detail < 10) return 0;
-	if (level_detail < 25) return 1;
-	if (level_detail < 40) return 2;
-	if (level_detail < 55) return 3;
-	if (level_detail < 70) return 4;
-	if (level_detail < 85) return 5;
-	if (level_detail < 100) return 6;
-	return 7;
+int ConvertDtoS(const int &level_detail) {
+	return limit((level_detail + 5) / 15, 0, 7);
 }
