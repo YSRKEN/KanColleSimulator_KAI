@@ -22,6 +22,10 @@ Fleet::Fleet(const string &file_name, const Formation &formation, const WeaponDB
 	//艦隊の形式
 	if (o.find("type") != o.end()) {
 		fleet_type_ = limit(FleetType(stoi(o["type"].to_str())), kFleetTypeNormal, kFleetTypeCombined);
+		if (fleet_type_ == kFleetTypeCombined && formation_ == kFormationEchelon) {
+			// 連合艦隊に梯形陣は存在しないので、とりあえず単横陣(第一警戒航行序列)に変更しておく
+			formation_ = kFormationAbreast;
+		}
 	}
 	else {
 		fleet_type_ = kFleetTypeNormal;
