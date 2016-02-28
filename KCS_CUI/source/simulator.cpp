@@ -14,7 +14,7 @@ Result Simulator::Calc() {
 	for (auto i = 0; i < kBattleSize; ++i) {
 		search_value[i] = fleet_[i].SearchValue();
 	}
-	cout << search_value[0] << " " << search_value[1] << "\n";
+	cout << search_value[0] << " " << search_value[1] << "\n\n";
 
 	// 結果を出力する
 	for (auto bi = 0; bi < kBattleSize; ++bi) {

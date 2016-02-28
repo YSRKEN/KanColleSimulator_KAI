@@ -102,5 +102,47 @@ void Fleet::Put() const {
 }
 
 double Fleet::SearchValue() const {
-	return 0.0;
+	// 2-5式(秋)を採用。将来的には複数形式を切り替えられるようにする
+	double search_sum = 0.0;
+	//司令部レベル(5の倍数で切り上げた)による補正
+	int round_up5_level = ((level_ - 1) / 5 + 1) * 5;
+	search_sum += round_up5_level * (-0.6142467);
+	//艦娘・装備による補正
+	for (auto fi = 0; fi < fleet_type_; ++fi) {
+		for (auto &it_k : unit_[fi]) {
+			search_sum += sqrt(it_k.GetSearch()) * 1.6841056;
+			for (auto &it_w : it_k.GetWeapon()) {
+				switch (it_w.GetWeaponClass()) {
+				case kWeaponClassPB:	//艦爆
+				case kWeaponClassPBF:	//艦爆
+					search_sum += it_w.GetSearch() * 1.0376255;
+					break;
+				case kWeaponClassWB:	//水爆
+					search_sum += it_w.GetSearch() * 1.7787282;
+					break;
+				case kWeaponClassPA:	//艦攻
+					search_sum += it_w.GetSearch() * 1.3677954;
+					break;
+				case kWeaponClassPS:	//艦偵
+					search_sum += it_w.GetSearch() * 1.6592780;
+					break;
+				case kWeaponClassWS:	//水偵
+					search_sum += it_w.GetSearch() * 2.0000000;
+					break;
+				case kWeaponClassSmallR:	//小型電探
+					search_sum += it_w.GetSearch() * 1.0045358;
+					break;
+				case kWeaponClassLargeR:	//大型電探
+					search_sum += it_w.GetSearch() * 0.9906638;
+					break;
+				case kWeaponClassSL:	//探照灯
+					search_sum += it_w.GetSearch() * 0.9067950;
+					break;
+				default:
+					break;
+				}
+			}
+		}
+	}
+	return floor(search_sum * 10.0 + 0.5) / 10.0;	//小数第2位を四捨五入
 }

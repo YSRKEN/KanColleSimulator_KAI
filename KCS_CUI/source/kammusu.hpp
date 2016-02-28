@@ -69,6 +69,7 @@ public:
 	int GetAntiSub() const { return anti_sub_; }
 	int GetSearch() const { return search_; }
 	int GetHP() const { return hp_; }
+	vector<Weapon> GetWeapon() const { return weapons_; }
 	// setter
 	void SetMaxHP(const int max_hp) { max_hp_ = max_hp; }
 	void SetLuck(const int luck) { luck_ = luck; }
