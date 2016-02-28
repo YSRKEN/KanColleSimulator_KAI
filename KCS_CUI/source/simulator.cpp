@@ -6,27 +6,35 @@
 
 // 計算用メソッド
 Result Simulator::Calc() {
-	Result result;
+	result_ = Result();
 
 	// 索敵フェイズ
 	auto search_result = SearchPhase();
-	//まず索敵値を計算する
-	vector<double> search_value(kBattleSize);
+
 	for (auto i = 0; i < kBattleSize; ++i) {
 		cout << search_result[i] << " " << fleet_[i].SearchValue() << " " << fleet_[i].HasAir() << "\n";
 	}
 	cout << "\n";
 
+	// 航空戦フェイズ
+	// 交戦形態の決定
+	// 支援艦隊攻撃フェイズ(未実装)
+	// 開幕雷撃フェイズ
+	// 砲撃戦フェイズ(1巡目)
+	// 砲撃戦フェイズ(2巡目)
+	// 雷撃フェイズ
+	// 夜戦フェイズ
+
 	// 結果を出力する
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
 		for (auto fi = 0u; fi < fleet_[bi].FleetSize(); ++fi) {
 			for (auto ui = 0u; ui < fleet_[bi].UnitSize(fi); ++ui){
-				result.SetHP(bi, fi, ui, fleet_[bi].GetUnit(fi, ui).GetHP());
+				result_.SetHP(bi, fi, ui, fleet_[bi].GetUnit(fi, ui).GetHP());
 //				result.AddDamage(bi, fi, ui, RandInt(100));
 			}
 		}
 	}
-	return result;
+	return result_;
 }
 
 vector<bool> Simulator::SearchPhase() {
