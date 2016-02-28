@@ -2,10 +2,8 @@
 #include "weapon.hpp"
 
 // コンストラクタ
-Weapon::Weapon() :
-	id_(-1), name_("なし"), weapon_class_(kWeaponClassOther), defense_(0), attack_(0),
-	torpedo_(0), bomb_(0), anti_air_(0), anti_sub_(0), hit_(0),
-	evade_(0), search_(0), range_(kRangeNone), level_(0) {}
+Weapon::Weapon() : Weapon(-1, "なし", kWeaponClassOther, 0, 0, 0, 0, 0, 0, 0, 0, 0, kRangeNone, 0) {}
+
 Weapon::Weapon(
 	const int id, const string name, const WeaponClass weapon_class, const int defense,
 	const int attack, const int torpedo, const int bomb, const int anti_air, const int anti_sub,
