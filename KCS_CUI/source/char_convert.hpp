@@ -168,8 +168,15 @@ namespace char_cvt {
 		}
 	}
 	inline std::string to_string(const std::wstring& s, char_enc type) { return wstring2string(s, type); }
+#ifdef _MSC_VER
+#pragma warning( push )
+#pragma warning( disable : 4100 )//warning C4100: 'type': 引数は関数の本体部で 1 度も参照されません。
+#endif
 	inline std::string to_string(const std::string& s, char_enc type = char_enc::unknown) { return s; }
 	inline std::wstring to_wstring(const std::wstring& s, char_enc type = char_enc::unknown) { return s; }
+#ifdef _MSC_VER
+#pragma warning( pop )
+#endif
 	inline std::wstring to_wstring(const std::string& s, char_enc type) { return string2wstring(s, type); }
 }
 #endif //CHAR_CONVERT_INC_ARITHMETIC_CHAR_CONVERT_HPP_

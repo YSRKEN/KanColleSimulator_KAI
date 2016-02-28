@@ -4,9 +4,9 @@
 #include "char_convert.hpp"
 // コンストラクタ
 Kammusu::Kammusu() :
-	id_(-1), name_(L"なし"), shipclass_(kShipClassDD), max_hp_(0), defense_(0), attack_(0),
-	torpedo_(0), anti_air_(0), luck_(0), speed_(kSpeedNone), range_(kRangeNone), slots_(0),
-	max_airs_({ 0, 0, 0, 0, 0 }), evade_(0), anti_sub_(0), search_(0), first_weapons_({ -1, -1, -1, -1, -1 }),
+	id_(-1), name_(L"なし"), ship_class_(kShipClassDD), max_hp_(), defense_(), attack_(),
+	torpedo_(), anti_air_(), luck_(), speed_(kSpeedNone), range_(kRangeNone), slots_(),
+	max_airs_({ 0, 0, 0, 0, 0 }), evade_(), anti_sub_(), search_(), first_weapons_({ -1, -1, -1, -1, -1 }),
 	kammusu_flg_(true), level_(1) {}
 
 Kammusu::Kammusu(
@@ -14,7 +14,7 @@ Kammusu::Kammusu(
 	const int attack, const int torpedo, const int anti_air, const int luck, const Speed speed,
 	const Range range, const int slots, vector<int> max_airs, const int evade, const int anti_sub,
 	const int search, vector<int> first_weapons, const bool kammusu_flg, const int level) :
-	id_(id), name_(move(name)), shipclass_(shipclass), max_hp_(max_hp), defense_(defense), attack_(attack),
+	id_(id), name_(move(name)), ship_class_(shipclass), max_hp_(max_hp), defense_(defense), attack_(attack),
 	torpedo_(torpedo), anti_air_(anti_air), luck_(luck), speed_(speed), range_(range), slots_(slots),
 	max_airs_(move(max_airs)), evade_(evade), anti_sub_(anti_sub), search_(search), first_weapons_(move(first_weapons)),
 	kammusu_flg_(kammusu_flg), level_(level) {}
@@ -52,7 +52,7 @@ std::ostream & operator<<(std::ostream & os, const Kammusu & conf)
 {
 	os 
 		<< "艦船ID：" << conf.id_ << endl
-		<< "　艦名：" << char_cvt::utf_16_to_shift_jis(conf.name_) << "　艦種：" << char_cvt::utf_16_to_shift_jis(kShipClassStr[conf.shipclass_]) << endl
+		<< "　艦名：" << char_cvt::utf_16_to_shift_jis(conf.name_) << "　艦種：" << char_cvt::utf_16_to_shift_jis(kShipClassStr[conf.ship_class_]) << endl
 		<< "　最大耐久：" << conf.max_hp_ << "　装甲：" << conf.defense_ << "　火力：" << conf.attack_ << "　雷撃：" << conf.torpedo_ << endl
 		<< "　対空：" << conf.anti_air_ << "　運：" << conf.luck_ << "　速力：" << char_cvt::utf_16_to_shift_jis(kSpeedStr[conf.speed_]) << "　射程：" << char_cvt::utf_16_to_shift_jis(kRangeStr[conf.range_]) << endl
 		<< "　スロット数：" << conf.slots_ << "　最大搭載数：";
@@ -78,7 +78,7 @@ std::wostream & operator<<(std::wostream & os, const Kammusu & conf)
 {
 	os
 		<< L"艦船ID：" << conf.id_ << endl
-		<< L"　艦名：" << conf.name_ << L"　艦種：" << kShipClassStr[conf.shipclass_] << endl
+		<< L"　艦名：" << conf.name_ << L"　艦種：" << kShipClassStr[conf.ship_class_] << endl
 		<< L"　最大耐久：" << conf.max_hp_ << L"　装甲：" << conf.defense_ << L"　火力：" << conf.attack_ << L"　雷撃：" << conf.torpedo_ << endl
 		<< L"　対空：" << conf.anti_air_ << L"　運：" << conf.luck_ << L"　速力：" << kSpeedStr[conf.speed_] << L"　射程：" << kRangeStr[conf.range_] << endl
 		<< L"　スロット数：" << conf.slots_ << L"　最大搭載数：";

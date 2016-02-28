@@ -7,7 +7,7 @@ template<typename CharType>void skip_utf8_bom(std::basic_ifstream<CharType>& fs)
 	constexpr int utf8[] = { 0xEF, 0xBB, 0xBF };
 	if (!std::equal(std::begin(dst), std::end(dst), utf8)) fs.seekg(0);
 }
-void Fleet::LoadJson(std::istream & file, const Formation & formation, const WeaponDB & weapon_db, const KammusuDB & kammusu_db, char_cvt::char_enc fileenc)
+void Fleet::LoadJson(std::istream & file, const WeaponDB & weapon_db, const KammusuDB & kammusu_db, char_cvt::char_enc fileenc)
 {
 	using picojson::object;
 	using picojson::value;
@@ -26,6 +26,10 @@ void Fleet::LoadJson(std::istream & file, const Formation & formation, const Wea
 	//艦隊の形式
 	if (o.find("type") != o.end()) {
 		fleet_type_ = limit(FleetType(stoi(o["type"].to_str())), kFleetTypeNormal, kFleetTypeCombined);
+		if (fleet_type_ == kFleetTypeCombined && formation_ == kFormationEchelon) {
+			// 連合艦隊に梯形陣は存在しないので、とりあえず単横陣(第一警戒航行序列)に変更しておく
+			formation_ = kFormationAbreast;
+		}
 	}
 	else {
 		fleet_type_ = kFleetTypeNormal;
@@ -80,7 +84,7 @@ void Fleet::LoadJson(std::istream & file, const Formation & formation, const Wea
 				// 艦娘に装備させる
 				temp_k.SetWeapon(wi, temp_w);
 				++wi;
-				if (wi >= temp_k.Slots()) break;
+				if (wi >= temp_k.GetSlots()) break;
 			}
 			// リストに加える
 			unit_[fi].push_back(temp_k);
@@ -89,23 +93,22 @@ void Fleet::LoadJson(std::istream & file, const Formation & formation, const Wea
 	}
 }
 // コンストラクタ
-Fleet::Fleet(const string &file_name, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, char_cvt::char_enc fileenc) {
+Fleet::Fleet(const string &file_name, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, char_cvt::char_enc fileenc) 
+	: formation_(formation)// 陣形はそのまま反映させる
+{
 	if (fileenc == char_cvt::char_enc::unknown) throw std::runtime_error("unknown char enc type.");//文字コード自動判別なんてやらない
-	// 陣形はそのまま反映させる
-	formation_ = formation;
 	// ファイルを読み込む
 	ifstream fin(file_name);
 	if (!fin.is_open()) throw "艦隊データが正常に読み込めませんでした.";
 	if(char_cvt::char_enc::utf8 == fileenc) skip_utf8_bom(fin);
-	this->LoadJson(fin, formation, weapon_db, kammusu_db, fileenc);
+	this->LoadJson(fin, weapon_db, kammusu_db, fileenc);
 }
 
 Fleet::Fleet(std::istream & file, const Formation & formation, const WeaponDB & weapon_db, const KammusuDB & kammusu_db, char_cvt::char_enc fileenc)
+	: formation_(formation)// 陣形はそのまま反映させる
 {
 	if (fileenc == char_cvt::char_enc::unknown) throw std::runtime_error("unknown char enc type.");//文字コード自動判別なんてやらない
-	// 陣形はそのまま反映させる
-	formation_ = formation;
-	this->LoadJson(file, formation, weapon_db, kammusu_db, fileenc);
+	this->LoadJson(file, weapon_db, kammusu_db, fileenc);
 }
 
 // 中身を表示する

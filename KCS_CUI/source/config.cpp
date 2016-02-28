@@ -64,7 +64,7 @@ void Config::Put() const{
 	cout << *this;
 }
 
-std::wstring Config::InputFilenameW(const int n) const
+std::wstring Config::GetInputFilenameW(const int n) const
 {
 	return char_cvt::shift_jis_to_utf_16(this->input_filename_[n]);
 }
