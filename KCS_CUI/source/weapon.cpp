@@ -17,7 +17,7 @@ void Weapon::Put() const {
 }
 
 // (熟練度が存在する)艦載機ならtrue
-bool Weapon::IsAir() {
+bool Weapon::IsAir() const {
 	switch (weapon_class_) {
 	case kWeaponClassPF:
 	case kWeaponClassPBF:

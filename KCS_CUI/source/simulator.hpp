@@ -4,6 +4,8 @@ class Simulator {
 	vector<Fleet> fleet_;
 	std::mt19937 mt;
 	std::uniform_real_distribution<double> rand;
+	// 計算用メソッド(内部)
+	vector<bool> SearchPhase();
 public:
 	// コンストラクタ
 	Simulator(){}

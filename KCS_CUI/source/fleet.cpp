@@ -116,32 +116,7 @@ void Fleet::Put() const {
 	cout << *this;
 }
 
-std::ostream & operator<<(std::ostream & os, const Fleet & conf)
-{
-	os << "陣形：" << char_cvt::utf_16_to_shift_jis(kFormationStr[conf.formation_]) << "　司令部レベル：" << conf.level_ << "　形式：" << char_cvt::utf_16_to_shift_jis(kFleetTypeStr[conf.fleet_type_ - 1]) << endl;
-	for (auto fi = 0; fi < conf.fleet_type_; ++fi) {
-		os << "　第" << (fi + 1) << "艦隊：" << endl;
-		for (auto &it_k : conf.unit_[fi]) {
-			os << "　　" << char_cvt::utf_16_to_shift_jis(it_k.GetName()) << endl;
-		}
-	}
-	os << endl;
-	return os;
-}
-
-std::wostream & operator<<(std::wostream & os, const Fleet & conf)
-{
-	os << L"陣形：" << kFormationStr[conf.formation_] << L"　司令部レベル：" << conf.level_ << L"　形式：" << kFleetTypeStr[conf.fleet_type_ - 1] << endl;
-	for (auto fi = 0; fi < conf.fleet_type_; ++fi) {
-		os << L"　第" << (fi + 1) << L"艦隊：" << endl;
-		for (auto &it_k : conf.unit_[fi]) {
-			os << L"　　" << it_k.GetName() << endl;
-		}
-	}
-	os << endl;
-	return os;
-}
-
+// 索敵値を計算する
 double Fleet::SearchValue() const {
 	// 2-5式(秋)を採用。将来的には複数形式を切り替えられるようにする
 	double search_sum = 0.0;
@@ -149,8 +124,8 @@ double Fleet::SearchValue() const {
 	int round_up5_level = ((level_ - 1) / 5 + 1) * 5;
 	search_sum += round_up5_level * (-0.6142467);
 	//艦娘・装備による補正
-	for (auto fi = 0; fi < fleet_type_; ++fi) {
-		for (auto &it_k : unit_[fi]) {
+	for (auto &it_u : unit_) {
+		for (auto &it_k : it_u) {
 			search_sum += sqrt(it_k.GetSearch()) * 1.6841056;
 			for (auto &it_w : it_k.GetWeapon()) {
 				switch (it_w.GetWeaponClass()) {
@@ -186,4 +161,40 @@ double Fleet::SearchValue() const {
 		}
 	}
 	return floor(search_sum * 10.0 + 0.5) / 10.0;	//小数第2位を四捨五入
+}
+
+// 艦載機をいずれかの艦が保有していた場合はtrue
+bool Fleet::HasAir() const {
+	for (auto &it_u : unit_) {
+		for (auto &it_k : it_u) {
+			if (it_k.HasAir()) return true;
+		}
+	}
+	return false;
+}
+
+std::ostream & operator<<(std::ostream & os, const Fleet & conf)
+{
+	os << "陣形：" << char_cvt::utf_16_to_shift_jis(kFormationStr[conf.formation_]) << "　司令部レベル：" << conf.level_ << "　形式：" << char_cvt::utf_16_to_shift_jis(kFleetTypeStr[conf.fleet_type_ - 1]) << endl;
+	for (auto fi = 0; fi < conf.fleet_type_; ++fi) {
+		os << "　第" << (fi + 1) << "艦隊：" << endl;
+		for (auto &it_k : conf.unit_[fi]) {
+			os << "　　" << char_cvt::utf_16_to_shift_jis(it_k.GetName()) << endl;
+		}
+	}
+	os << endl;
+	return os;
+}
+
+std::wostream & operator<<(std::wostream & os, const Fleet & conf)
+{
+	os << L"陣形：" << kFormationStr[conf.formation_] << L"　司令部レベル：" << conf.level_ << L"　形式：" << kFleetTypeStr[conf.fleet_type_ - 1] << endl;
+	for (auto fi = 0; fi < conf.fleet_type_; ++fi) {
+		os << L"　第" << (fi + 1) << L"艦隊：" << endl;
+		for (auto &it_k : conf.unit_[fi]) {
+			os << L"　　" << it_k.GetName() << endl;
+		}
+	}
+	os << endl;
+	return os;
 }

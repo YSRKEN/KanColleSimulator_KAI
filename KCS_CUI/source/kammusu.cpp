@@ -47,6 +47,14 @@ Kammusu Kammusu::Reset(const WeaponDB &weapon_db) {
 	return *this;
 }
 
+// 艦載機を保有していた場合はtrue
+bool Kammusu::HasAir() const {
+	for (auto &it_w : weapons_) {
+		if (it_w.IsAir()) return true;
+	}
+	return false;
+}
+
 std::ostream & operator<<(std::ostream & os, const Kammusu & conf)
 {
 	os 
