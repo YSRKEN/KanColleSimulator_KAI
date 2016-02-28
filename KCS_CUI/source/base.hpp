@@ -34,6 +34,7 @@ using std::vector;
 const int kBattleSize = 2;		//戦闘で戦うのは敵と味方の「2つ」
 const int kMaxFleetSize = 2;	//
 const int kMaxUnitSize = 6;		//艦隊に含まれる最大艦数
+const int kFriendSide = 0, kEnemySide = 1;	//味方および敵陣営の番号付け
 
 // 射程
 enum Range { kRangeNone, kRangeShort, kRangeMiddle, kRangeLong, kRangeVeryLong };

@@ -61,7 +61,7 @@ Config::Config(int argc, char *argv[]) {
 
 // 中身を表示する
 void Config::Put() const{
-	cout << *this;
+	cout << *this << "\n";
 }
 
 std::wstring Config::GetInputFilenameW(const int n) const

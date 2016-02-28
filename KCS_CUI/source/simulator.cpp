@@ -11,6 +11,7 @@ Result Simulator::Calc() {
 	// 索敵フェイズ
 	auto search_result = SearchPhase();
 
+	cout << "索敵結果・索敵値・艦載機を持っているか：\n";
 	for (auto i = 0; i < kBattleSize; ++i) {
 		cout << search_result[i] << " " << fleet_[i].SearchValue() << " " << fleet_[i].HasAir() << "\n";
 	}
@@ -19,6 +20,7 @@ Result Simulator::Calc() {
 	// 航空戦フェイズ
 	auto air_war_result = AirWarPhase(search_result);
 
+	cout << "制空状態・自艦隊倍率・敵艦隊倍率：\n";
 	cout << get<0>(air_war_result) << " " << get<1>(air_war_result)[0] << " " << get<1>(air_war_result)[1] << "\n\n";
 
 	// 交戦形態の決定
@@ -63,7 +65,44 @@ bitset<kBattleSize> Simulator::SearchPhase() {
 // 航空戦フェイズ
 tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleSize> &search_result) {
 	// 制空状態の決定
-
+	//制空値を計算する
+	vector<int> anti_air_score(2);
+	for (auto i = 0; i < kBattleSize; ++i) {
+		anti_air_score[i] = fleet_[i].AntiAirScore();
+	}
+	cout << "制空値：" << anti_air_score[0] << " " << anti_air_score[1] << "\n\n";
+	//制空状態を判断する
+	AirWarStatus air_war_status;
+	{
+		// どちらも航空戦に参加する艦載機を持っていなかった場合は航空均衡
+		if (!fleet_[kFriendSide].HasAirFight() && !fleet_[kEnemySide].HasAirFight()){
+			air_war_status = kAirWarStatusNormal;
+		}
+		// 敵が制空値0か索敵失敗していた場合は制空権確保
+		else if(anti_air_score[kEnemySide] == 0 || !search_result[kEnemySide]){
+			air_war_status = kAirWarStatusBest;
+		}
+		// 味方が索敵失敗していた場合は制空権喪失
+		else if (!search_result[kFriendSide]) {
+			air_war_status = kAirWarStatusWorst;
+		}
+		// 後は普通に判定する
+		else if (anti_air_score[kFriendSide] * 3 <= anti_air_score[kEnemySide]) {
+			air_war_status = kAirWarStatusWorst;
+		}
+		else if (anti_air_score[kFriendSide] * 3 <= anti_air_score[kEnemySide] * 2) {
+			air_war_status = kAirWarStatusBad;
+		}
+		else if (anti_air_score[kFriendSide] * 2 < anti_air_score[kEnemySide] * 3) {
+			air_war_status = kAirWarStatusNormal;
+		}
+		else if (anti_air_score[kFriendSide] < anti_air_score[kEnemySide] * 3) {
+			air_war_status = kAirWarStatusGood;
+		}
+		else {
+			air_war_status = kAirWarStatusBest;
+		}
+	}
 	// 触接判定
 
 	// 空中戦
@@ -72,5 +111,5 @@ tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleS
 
 	// 開幕爆撃
 
-	return tuple <AirWarStatus, vector<double>>(kAirWarStatusNormal, { 1.0, 1.0 }) ;
+	return tuple <AirWarStatus, vector<double>>(air_war_status, { 1.0, 1.0 }) ;
 }

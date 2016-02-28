@@ -47,8 +47,11 @@ public:
 	void SetLevel(const int level) { level_ = level; }
 	void SetLevelDetail(const int level_detail) { level_detail_ = level_detail; }
 	// その他
-	void Put() const;	// 中身を表示する
-	bool IsAir() const;	// (熟練度が存在する)艦載機ならtrue
+	void Put() const;					//中身を表示する
+	int AntiAirScore(const int&) const;	//制空値を計算する
+	bool IsAir() const;				//(熟練度が存在する)艦載機ならtrue
+	bool IsAirFight() const;		//航空戦に参加する艦載機ならtrue
+	bool Weapon::IsAirBomb() const;	//開幕爆撃に参加する艦載機ならtrue
 	friend std::ostream& operator<<(std::ostream& os, const Weapon& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Weapon& conf);
 };

@@ -164,11 +164,35 @@ double Fleet::SearchValue() const {
 	return floor(search_sum * 10.0 + 0.5) / 10.0;	//小数第2位を四捨五入
 }
 
+// 制空値を計算する
+int Fleet::AntiAirScore() const{
+	int anti_air_score = 0;
+	for (auto &it_u : unit_) {
+		for (auto &it_k : it_u) {
+			for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
+				if (!it_k.GetWeapon()[wi].IsAirFight()) continue;
+				anti_air_score += it_k.GetWeapon()[wi].AntiAirScore(it_k.GetAir()[wi]);
+			}
+		}
+	}
+	return anti_air_score;
+}
+
 // 艦載機をいずれかの艦が保有していた場合はtrue
 bool Fleet::HasAir() const {
 	for (auto &it_u : unit_) {
 		for (auto &it_k : it_u) {
 			if (it_k.HasAir()) return true;
+		}
+	}
+	return false;
+}
+
+// 航空戦に参加する艦載機をいずれかの艦が保有していた場合はtrue
+bool Fleet::HasAirFight() const {
+	for (auto &it_u : unit_) {
+		for (auto &it_k : it_u) {
+			if (it_k.HasAirFight()) return true;
 		}
 	}
 	return false;

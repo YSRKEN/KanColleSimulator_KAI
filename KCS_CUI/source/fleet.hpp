@@ -30,7 +30,9 @@ public:
 	size_t UnitSize(const size_t fi) const { return unit_[fi].size(); }	//「艦隊」における艦数
 	void Put() const;			// 中身を表示する
 	double SearchValue() const;	//索敵値を計算する
+	int AntiAirScore() const;	//制空値を計算する
 	bool HasAir() const;		//艦載機をいずれかの艦が保有していた場合はtrue
+	bool HasAirFight() const;	//航空戦に参加する艦載機をいずれかの艦が保有していた場合はtrue
 	friend std::ostream& operator<<(std::ostream& os, const Fleet& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Fleet& conf);
 };

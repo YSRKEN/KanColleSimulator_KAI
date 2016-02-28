@@ -55,6 +55,14 @@ bool Kammusu::HasAir() const {
 	return false;
 }
 
+// 航空戦に参加する艦載機を保有していた場合はtrue
+bool Kammusu::HasAirFight() const {
+	for (auto &it_w : weapons_) {
+		if (it_w.IsAirFight()) return true;
+	}
+	return false;
+}
+
 std::ostream & operator<<(std::ostream & os, const Kammusu & conf)
 {
 	os 
