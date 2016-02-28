@@ -49,16 +49,25 @@ Kammusu Kammusu::Reset(const WeaponDB &weapon_db) {
 
 // 艦載機を保有していた場合はtrue
 bool Kammusu::HasAir() const {
-	for (auto &it_w : weapons_) {
-		if (it_w.IsAir()) return true;
+	for (auto i = 0; i < slots_; ++i) {
+		if (weapons_[i].IsAir() && airs_[i] > 0) return true;
 	}
 	return false;
 }
 
 // 航空戦に参加する艦載機を保有していた場合はtrue
 bool Kammusu::HasAirFight() const {
-	for (auto &it_w : weapons_) {
-		if (it_w.IsAirFight()) return true;
+	for (auto i = 0; i < slots_; ++i) {
+		if (weapons_[i].IsAirFight() && airs_[i] > 0) return true;
+	}
+	return false;
+}
+
+
+// 触接に参加する艦載機を保有していた場合はtrue
+bool Kammusu::HasAirTrailer() const {
+	for (auto i = 0; i < slots_; ++i) {
+		if (weapons_[i].IsAirTrailer() && airs_[i] > 0) return true;
 	}
 	return false;
 }

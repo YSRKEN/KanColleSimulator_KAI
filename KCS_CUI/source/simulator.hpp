@@ -11,9 +11,11 @@ class Simulator {
 	std::uniform_real_distribution<double> rand;			//
 	double RandReal() { return rand(mt); }					//一様実数乱数を取り出す
 	int RandInt(const int n) { return int(rand(mt) * n); }	//一様整数乱数を取り出す
-	// 計算用メソッド(内部)
+	// 各フェーズ
 	bitset<kBattleSize> SearchPhase();
 	tuple<AirWarStatus, vector<double>> AirWarPhase(const bitset<kBattleSize>&);
+	// 計算用メソッド(内部)
+	AirWarStatus JudgeAirWarStatus(const bitset<kBattleSize>&, const vector<int>&);	//制空状態を判断する
 public:
 	// コンストラクタ
 	Simulator(){}

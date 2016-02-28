@@ -198,6 +198,16 @@ bool Fleet::HasAirFight() const {
 	return false;
 }
 
+// 触接に参加する艦載機をいずれかの艦が保有していた場合はtrue
+bool Fleet::HasAirTrailer() const {
+	for (auto &it_u : unit_) {
+		for (auto &it_k : it_u) {
+			if (it_k.HasAirTrailer()) return true;
+		}
+	}
+	return false;
+}
+
 std::ostream & operator<<(std::ostream & os, const Fleet & conf)
 {
 	os << "陣形：" << char_cvt::utf_16_to_shift_jis(kFormationStr[conf.formation_]) << "　司令部レベル：" << conf.level_ << "　形式：" << char_cvt::utf_16_to_shift_jis(kFleetTypeStr[conf.fleet_type_ - 1]) << endl;

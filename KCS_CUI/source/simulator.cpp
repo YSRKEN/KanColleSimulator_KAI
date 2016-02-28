@@ -72,38 +72,21 @@ tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleS
 	}
 	cout << "制空値：" << anti_air_score[0] << " " << anti_air_score[1] << "\n\n";
 	//制空状態を判断する
-	AirWarStatus air_war_status;
-	{
-		// どちらも航空戦に参加する艦載機を持っていなかった場合は航空均衡
-		if (!fleet_[kFriendSide].HasAirFight() && !fleet_[kEnemySide].HasAirFight()){
-			air_war_status = kAirWarStatusNormal;
-		}
-		// 敵が制空値0か索敵失敗していた場合は制空権確保
-		else if(anti_air_score[kEnemySide] == 0 || !search_result[kEnemySide]){
-			air_war_status = kAirWarStatusBest;
-		}
-		// 味方が索敵失敗していた場合は制空権喪失
-		else if (!search_result[kFriendSide]) {
-			air_war_status = kAirWarStatusWorst;
-		}
-		// 後は普通に判定する
-		else if (anti_air_score[kFriendSide] * 3 <= anti_air_score[kEnemySide]) {
-			air_war_status = kAirWarStatusWorst;
-		}
-		else if (anti_air_score[kFriendSide] * 3 <= anti_air_score[kEnemySide] * 2) {
-			air_war_status = kAirWarStatusBad;
-		}
-		else if (anti_air_score[kFriendSide] * 2 < anti_air_score[kEnemySide] * 3) {
-			air_war_status = kAirWarStatusNormal;
-		}
-		else if (anti_air_score[kFriendSide] < anti_air_score[kEnemySide] * 3) {
-			air_war_status = kAirWarStatusGood;
-		}
-		else {
-			air_war_status = kAirWarStatusBest;
-		}
-	}
+	auto air_war_status = JudgeAirWarStatus(search_result, anti_air_score);
+
 	// 触接判定
+	vector<double> all_attack_plus(2, 1.0);
+	for (auto i = 0; i < kBattleSize; ++i) {
+		// 触接発生条件
+		if (!search_result[i]) continue;
+		if((i == kFriendSide && air_war_status == kAirWarStatusWorst)
+		|| (i == kEnemySide && air_war_status == kAirWarStatusBest)) continue;
+		if (!fleet_[i].HasAirTrailer()) continue;
+		// 触接の開始率を計算する
+
+		// 触接の選択率を計算する
+
+	}
 
 	// 空中戦
 
@@ -111,5 +94,37 @@ tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleS
 
 	// 開幕爆撃
 
-	return tuple <AirWarStatus, vector<double>>(air_war_status, { 1.0, 1.0 }) ;
+	return tuple <AirWarStatus, vector<double>>(air_war_status, all_attack_plus) ;
+}
+
+//制空状態を判断する
+AirWarStatus Simulator::JudgeAirWarStatus(const bitset<kBattleSize> &search_result, const vector<int> &anti_air_score) {
+	// どちらも航空戦に参加する艦載機を持っていなかった場合は航空均衡
+	if (!fleet_[kFriendSide].HasAirFight() && !fleet_[kEnemySide].HasAirFight()) {
+		return kAirWarStatusNormal;
+	}
+	// 敵が制空値0か索敵失敗していた場合は制空権確保
+	else if (anti_air_score[kEnemySide] == 0 || !search_result[kEnemySide]) {
+		return kAirWarStatusBest;
+	}
+	// 味方が索敵失敗していた場合は制空権喪失
+	else if (!search_result[kFriendSide]) {
+		return kAirWarStatusWorst;
+	}
+	// 後は普通に判定する
+	else if (anti_air_score[kFriendSide] * 3 <= anti_air_score[kEnemySide]) {
+		return kAirWarStatusWorst;
+	}
+	else if (anti_air_score[kFriendSide] * 3 <= anti_air_score[kEnemySide] * 2) {
+		return kAirWarStatusBad;
+	}
+	else if (anti_air_score[kFriendSide] * 2 < anti_air_score[kEnemySide] * 3) {
+		return kAirWarStatusNormal;
+	}
+	else if (anti_air_score[kFriendSide] < anti_air_score[kEnemySide] * 3) {
+		return kAirWarStatusGood;
+	}
+	else {
+		return kAirWarStatusBest;
+	}
 }

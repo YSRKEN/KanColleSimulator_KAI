@@ -89,6 +89,7 @@ public:
 	Kammusu Reset(const WeaponDB&);	// 変更可な部分をリセットする(初期装備)
 	bool HasAir() const;			// 艦載機を保有していた場合はtrue
 	bool HasAirFight() const;		// 航空戦に参加する艦載機を保有していた場合はtrue
+	bool HasAirTrailer() const;		// 触接に参加する艦載機を保有していた場合はtrue
 	friend std::ostream& operator<<(std::ostream& os, const Kammusu& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Kammusu& conf);
 };

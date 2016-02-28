@@ -62,6 +62,22 @@ bool Weapon::IsAirFight() const {
 	}
 }
 
+// 触接に参加する艦載機ならtrue
+bool Weapon::IsAirTrailer() const {
+	switch (weapon_class_) {
+	case kWeaponClassPF:
+	case kWeaponClassPA:
+	case kWeaponClassPS:
+	case kWeaponClassPSS:
+	case kWeaponClassDaiteiChan:
+	case kWeaponClassWS:
+	case kWeaponClassWSN:
+		return true;
+	default:
+		return false;
+	}
+}
+
 // 開幕爆撃に参加する艦載機ならtrue
 bool Weapon::IsAirBomb() const {
 	switch (weapon_class_) {
