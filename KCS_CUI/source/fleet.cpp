@@ -100,3 +100,7 @@ void Fleet::Put() const {
 	}
 	cout << "\n";
 }
+
+double Fleet::SearchValue() const {
+	return 0.0;
+}

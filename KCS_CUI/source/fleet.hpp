@@ -27,5 +27,6 @@ public:
 	// その他
 	size_t FleetSize() const { return unit_.size(); }	//「艦隊数」(通常艦隊だと1、連合艦隊だと2)
 	size_t UnitSize(const size_t fi) const { return unit_[fi].size(); }	//「艦隊」における艦数
-	void Put() const;	// 中身を表示する
+	void Put() const;			// 中身を表示する
+	double SearchValue() const;	//索敵値を計算する
 };
