@@ -1,11 +1,12 @@
 ﻿#include "base.hpp"
 #include "fleet.hpp"
 
-template<typename CharType>void skip_utf8_bom(std::basic_ifstream<CharType>& fs) {
+void skip_utf8_bom(std::ifstream& fs, char_cvt::char_enc& enc) {
 	int dst[3];
 	for (auto& i : dst) i = fs.get();
 	constexpr int utf8[] = { 0xEF, 0xBB, 0xBF };
 	if (!std::equal(std::begin(dst), std::end(dst), utf8)) fs.seekg(0);
+	else enc = char_cvt::char_enc::utf8;
 }
 void Fleet::LoadJson(std::istream & file, const WeaponDB & weapon_db, const KammusuDB & kammusu_db, char_cvt::char_enc fileenc)
 {
@@ -100,7 +101,7 @@ Fleet::Fleet(const string &file_name, const Formation &formation, const WeaponDB
 	// ファイルを読み込む
 	ifstream fin(file_name);
 	if (!fin.is_open()) throw "艦隊データが正常に読み込めませんでした.";
-	if(char_cvt::char_enc::utf8 == fileenc) skip_utf8_bom(fin);
+	if(char_cvt::char_enc::shift_jis != fileenc) skip_utf8_bom(fin, fileenc);
 	this->LoadJson(fin, weapon_db, kammusu_db, fileenc);
 }
 
