@@ -1,15 +1,19 @@
 ﻿#include "base.hpp"
 #include "fleet.hpp"
-#include "char_convert.hpp"
-// コンストラクタ
-Fleet::Fleet(const string &file_name, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db) {
-	// 陣形はそのまま反映させる
-	formation_ = formation;
-	// ファイルを読み込む
-	ifstream fin(file_name);
-	if (!fin.is_open()) throw "艦隊データが正常に読み込めませんでした.";
+
+template<typename CharType>void skip_utf8_bom(std::basic_ifstream<CharType>& fs) {
+	int dst[3];
+	for (auto& i : dst) i = fs.get();
+	constexpr int utf8[] = { 0xEF, 0xBB, 0xBF };
+	if (!std::equal(std::begin(dst), std::end(dst), utf8)) fs.seekg(0);
+}
+void Fleet::LoadJson(std::istream & file, const Formation & formation, const WeaponDB & weapon_db, const KammusuDB & kammusu_db, char_cvt::char_enc fileenc)
+{
+	using picojson::object;
+	using picojson::value;
+	if (fileenc == char_cvt::char_enc::unknown) throw std::runtime_error("unknown char enc type.");//文字コード自動判別なんてやらない
 	value v;
-	fin >> v;
+	file >> v;
 	// 読み込んだJSONデータを解析する
 	auto& o = v.get<object>();
 	//司令部レベル
@@ -83,6 +87,25 @@ Fleet::Fleet(const string &file_name, const Formation &formation, const WeaponDB
 		}
 		++fi;
 	}
+}
+// コンストラクタ
+Fleet::Fleet(const string &file_name, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, char_cvt::char_enc fileenc) {
+	if (fileenc == char_cvt::char_enc::unknown) throw std::runtime_error("unknown char enc type.");//文字コード自動判別なんてやらない
+	// 陣形はそのまま反映させる
+	formation_ = formation;
+	// ファイルを読み込む
+	ifstream fin(file_name);
+	if (!fin.is_open()) throw "艦隊データが正常に読み込めませんでした.";
+	if(char_cvt::char_enc::utf8 == fileenc) skip_utf8_bom(fin);
+	this->LoadJson(fin, formation, weapon_db, kammusu_db, fileenc);
+}
+
+Fleet::Fleet(std::istream & file, const Formation & formation, const WeaponDB & weapon_db, const KammusuDB & kammusu_db, char_cvt::char_enc fileenc)
+{
+	if (fileenc == char_cvt::char_enc::unknown) throw std::runtime_error("unknown char enc type.");//文字コード自動判別なんてやらない
+	// 陣形はそのまま反映させる
+	formation_ = formation;
+	this->LoadJson(file, formation, weapon_db, kammusu_db, fileenc);
 }
 
 // 中身を表示する
