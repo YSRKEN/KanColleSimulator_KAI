@@ -1,10 +1,10 @@
-#pragma once
+Ôªø#pragma once
 
 class Result {
 	vector<vector<vector<int>>> hp_;
 	vector<vector<vector<int>>> damage_;
 public:
-	// ÉRÉìÉXÉgÉâÉNÉ^
+	// „Ç≥„É≥„Çπ„Éà„É©„ÇØ„Çø
 	Result() {
 		hp_.resize(kBattleSize, vector<vector<int>>(kMaxFleetSize, vector<int>(kMaxUnitSize)));
 		damage_.resize(kBattleSize, vector<vector<int>>(kMaxFleetSize, vector<int>(kMaxUnitSize, 0)));
@@ -12,10 +12,10 @@ public:
 	// setter
 	void SetHP(const int bi, const int fi, const int ui, const int hp) { hp_[bi][fi][ui] = hp; }
 	void AddDamage(const int bi, const int fi, const int ui, const int damage) { damage_[bi][fi][ui] += damage; }
-	// ÇªÇÃëº
+	// „Åù„ÅÆ‰ªñ
 	string Put() const{
 		std::stringstream output;
-		output << "écÇËHPÅF\n";
+		output << "ÊÆã„ÇäHPÔºö\n";
 		for (auto bi = 0; bi < kBattleSize; ++bi) {
 			for (auto fi = 0u; fi < kMaxFleetSize; ++fi) {
 				for (auto ui = 0u; ui < kMaxUnitSize; ++ui) {
@@ -24,7 +24,7 @@ public:
 			}
 			output << "\n";
 		}
-		output << "É_ÉÅÅ[ÉWó ÅF\n";
+		output << "„ÉÄ„É°„Éº„Ç∏ÈáèÔºö\n";
 		for (auto bi = 0; bi < kBattleSize; ++bi) {
 			for (auto fi = 0u; fi < kMaxFleetSize; ++fi) {
 				for (auto ui = 0u; ui < kMaxUnitSize; ++ui) {
