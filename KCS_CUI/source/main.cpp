@@ -21,14 +21,16 @@ int main(int argc, char *argv[]) {
 			// ファイルから艦隊を読み込む
 			vector<Fleet> fleet(kBattleSize);
 			for (auto i = 0; i < kBattleSize; ++i) {
-				fleet[i] = Fleet(config.InputFilename(i), config.GetFormation(i), weapon_db, kammusu_db);
+				fleet[i] = Fleet(config.GetInputFilename(i), config.GetFormation(i), weapon_db, kammusu_db);
 				fleet[i].Put();
 			}
 			// シミュレータを構築し、並列演算を行う
-			vector<Result> result_db(config.Times());
+			std::random_device rd;
+			auto seed = rd();
+			vector<Result> result_db(config.GetTimes());
 			//#pragma omp parallel for num_threads(config.Threads())
-			for (int n = 0; n < config.Times(); ++n) {
-				Simulator simulator(config, fleet);
+			for (int n = 0; n < config.GetTimes(); ++n) {
+				Simulator simulator(fleet, seed + n);
 				result_db[n] = simulator.Calc();
 				cout << n << "\n";
 			}

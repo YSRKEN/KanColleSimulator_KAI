@@ -37,7 +37,7 @@ void time_elapsed_lambda(inner_loop body)
 }
 
 const int kBattleSize = 2;		//戦闘で戦うのは敵と味方の「2つ」
-const int kMaxFleetSize = 12;	//1艦隊に含まれる最大艦数
+const int kMaxFleetSize = 6;	//艦隊に含まれる最大艦数
 
 // 射程
 enum Range { kRangeNone, kRangeShort, kRangeMiddle, kRangeLong, kRangeVeryLong };

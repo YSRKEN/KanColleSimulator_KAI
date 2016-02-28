@@ -4,7 +4,7 @@
 
 // コンストラクタ
 Kammusu::Kammusu() :
-	id_(-1), name_("なし"), shipclass_(kShipClassDD), max_hp_(0), defense_(0), attack_(0),
+	id_(-1), name_("なし"), ship_class_(kShipClassDD), max_hp_(0), defense_(0), attack_(0),
 	torpedo_(0), anti_air_(0), luck_(0), speed_(kSpeedNone), range_(kRangeNone), slots_(0),
 	max_airs_({ 0, 0, 0, 0, 0 }), evade_(0), anti_sub_(0), search_(0), first_weapons_({ -1, -1, -1, -1, -1 }),
 	kammusu_flg_(true), level_(1) {}
@@ -14,7 +14,7 @@ Kammusu::Kammusu(
 	const int attack, const int torpedo, const int anti_air, const int luck, const Speed speed,
 	const Range range, const int slots, vector<int> max_airs, const int evade, const int anti_sub,
 	const int search, vector<int> first_weapons, const bool kammusu_flg, const int level) :
-	id_(id), name_(move(name)), shipclass_(shipclass), max_hp_(max_hp), defense_(defense), attack_(attack),
+	id_(id), name_(move(name)), ship_class_(shipclass), max_hp_(max_hp), defense_(defense), attack_(attack),
 	torpedo_(torpedo), anti_air_(anti_air), luck_(luck), speed_(speed), range_(range), slots_(slots),
 	max_airs_(move(max_airs)), evade_(evade), anti_sub_(anti_sub), search_(search), first_weapons_(move(first_weapons)),
 	kammusu_flg_(kammusu_flg), level_(level) {}
@@ -22,7 +22,7 @@ Kammusu::Kammusu(
 // 中身を表示する
 void Kammusu::Put() const {
 	cout << "艦船ID：" << id_ << "\n";
-	cout << "　艦名：" << name_ << "　艦種：" << kShipClassStr[shipclass_] << "\n";
+	cout << "　艦名：" << name_ << "　艦種：" << kShipClassStr[ship_class_] << "\n";
 	cout << "　最大耐久：" << max_hp_ << "　装甲：" << defense_ << "　火力：" << attack_ << "　雷撃：" << torpedo_ << "\n";
 	cout << "　対空：" << anti_air_ << "　運：" << luck_ << "　速力：" << kSpeedStr[speed_] << "　射程：" << kRangeStr[range_] << "\n";
 	cout << "　スロット数：" << slots_ << "　最大搭載数：";

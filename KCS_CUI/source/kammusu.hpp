@@ -30,7 +30,7 @@ class Kammusu {
 	// 変更しないもの
 	int id_;						//艦船ID
 	string name_;					//艦名
-	ShipClass shipclass_;			//艦種
+	ShipClass ship_class_;			//艦種
 	int max_hp_;					//最大耐久
 	int defense_;					//装甲
 	int attack_;					//火力
@@ -62,12 +62,13 @@ public:
 		const int, const int, const Speed, const Range, const int, const vector<int>, const int,
 		const int, const int, const vector<int>, const bool, const int);
 	// getter
-	int MaxHP() const { return max_hp_; }
-	int Luck() const { return luck_; }
-	int Slots() const { return slots_; }
-	int Evade() const { return evade_; }
-	int AntiSub() const { return anti_sub_; }
-	int Search() const { return search_; }
+	int GetMaxHP() const { return max_hp_; }
+	int GetLuck() const { return luck_; }
+	int GetSlots() const { return slots_; }
+	int GetEvade() const { return evade_; }
+	int GetAntiSub() const { return anti_sub_; }
+	int GetSearch() const { return search_; }
+	int GetHP() const { return hp_; }
 	// setter
 	void SetMaxHP(const int max_hp) { max_hp_ = max_hp; }
 	void SetLuck(const int luck) { luck_ = luck; }

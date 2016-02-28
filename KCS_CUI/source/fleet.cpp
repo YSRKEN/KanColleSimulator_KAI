@@ -80,7 +80,7 @@ Fleet::Fleet(const string &file_name, const Formation &formation, const WeaponDB
 				// 艦娘に装備させる
 				temp_k.SetWeapon(wi, temp_w);
 				++wi;
-				if (wi >= temp_k.Slots()) break;
+				if (wi >= temp_k.GetSlots()) break;
 			}
 			// リストに加える
 			unit_[fi].push_back(temp_k);
