@@ -37,11 +37,11 @@ Result Simulator::Calc() {
 	return result_;
 }
 
-vector<bool> Simulator::SearchPhase() {
+bitset<kBattleSize> Simulator::SearchPhase() {
 	// 索敵の成功条件がよく分からないので、とりあえず次のように定めた
 	// ・艦載機があれば無条件で成功
 	// ・艦載機が存在しない場合、索敵値が0より大なら成功
-	vector<bool> search_result(kBattleSize);
+	bitset<kBattleSize> search_result(kBattleSize);
 	for (auto i = 0; i < kBattleSize; ++i) {
 		auto search_value = fleet_[i].SearchValue();
 		search_result[i] = (search_value > 0.0 || fleet_[i].HasAir());

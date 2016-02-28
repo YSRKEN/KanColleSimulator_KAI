@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <algorithm>
+#include <bitset>
 #include <chrono>
 #include <cmath>
 #include <cstdint>
@@ -16,6 +17,7 @@
 #pragma warning( disable : 4592)
 
 using std::cout;
+using std::bitset;
 using std::endl;
 using std::fill;
 using std::ifstream;

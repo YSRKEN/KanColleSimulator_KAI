@@ -9,7 +9,7 @@ class Simulator {
 	double RandReal() { return rand(mt); }					//一様実数乱数を取り出す
 	int RandInt(const int n) { return int(rand(mt) * n); }	//一様整数乱数を取り出す
 	// 計算用メソッド(内部)
-	vector<bool> SearchPhase();
+	bitset<kBattleSize> SearchPhase();
 public:
 	// コンストラクタ
 	Simulator(){}
