@@ -179,7 +179,7 @@
     <ClCompile>
       <ExceptionHandling>Enabled</ExceptionHandling>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CONSOLE;</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='clang_Release|Win32'">
@@ -193,7 +193,7 @@
     <ClCompile>
       <ExceptionHandling>Enabled</ExceptionHandling>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CONSOLE;</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='clang_Release|x64'">
