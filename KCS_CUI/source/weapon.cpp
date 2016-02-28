@@ -1,32 +1,76 @@
-#include "base.hpp"
+ï»¿#include "base.hpp"
 #include "weapon.hpp"
-
-// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-Weapon::Weapon() :
-	id_(-1), name_("‚È‚µ"), weapon_class_(kWeaponClassOther), defense_(0), attack_(0),
-	torpedo_(0), bomb_(0), anti_air_(0), anti_sub_(0), hit_(0),
-	evade_(0), search_(0), range_(kRangeNone), level_(0) {}
+#include "char_convert.hpp"
+// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+Weapon::Weapon() : Weapon(-1, L"ãªã—", kWeaponClassOther, 0, 0, 0, 0, 0, 0, 0, 0, 0, kRangeNone, 0, 0){}
 Weapon::Weapon(
-	const int id, const string name, const WeaponClass weapon_class, const int defense,
+	const int id, wstring name, const WeaponClass weapon_class, const int defense,
 	const int attack, const int torpedo, const int bomb, const int anti_air, const int anti_sub,
-	const int hit, const int evade, const int search, const Range range, const int level):
-	id_(id), name_(name), weapon_class_(weapon_class), defense_(defense), attack_(attack),
+	const int hit, const int evade, const int search, const Range range, const int level, const int level_detail):
+	id_(id), name_(move(name)), weapon_class_(weapon_class), defense_(defense), attack_(attack),
 	torpedo_(torpedo), bomb_(bomb), anti_air_(anti_air), anti_sub_(anti_sub), hit_(hit),
-	evade_(evade), search_(search), range_(range), level_(level) {}
+	evade_(evade), search_(search), wrange_(range), level_(level), level_detail_(level_detail){}
 
-// ’†g‚ğ•\¦‚·‚é
-void Weapon::Put() {
-	cout << "‘•”õIDF" << id_ << "\n";
-	cout << "@‘•”õ–¼F" << name_ << "@í•ÊF" << weapon_class_ << "\n";
-	cout << "@‘•bF" << defense_ << "@‰Î—ÍF" << attack_ << "@—‹Œ‚F" << torpedo_ << "@”š‘•F" << bomb_ << "\n";
-	cout << "@‘Î‹óF" << anti_air_ << "@‘ÎöF" << anti_sub_ << "@–½’†F" << hit_ << "@‰ñ”ğF" << evade_ << "\n";
-	cout << "@õ“GF" << search_ << "@Ë’öF" << kRangeStr[range_] << "@‰üC/n—ûF" << level_ << "\n";
+// ä¸­èº«ã‚’è¡¨ç¤ºã™ã‚‹
+void Weapon::Put() const {
+	cout << *this;
 }
 
-// •¶š—ñ‚ğí•Ê‚É•ÏŠ·‚·‚é
+// (ç†Ÿç·´åº¦ãŒå­˜åœ¨ã™ã‚‹)è‰¦è¼‰æ©Ÿãªã‚‰true
+bool Weapon::IsAir() const {
+	switch (weapon_class_) {
+	case kWeaponClassPF:
+	case kWeaponClassPBF:
+	case kWeaponClassPB:
+	case kWeaponClassWB:
+	case kWeaponClassPA:
+	case kWeaponClassPS:
+	case kWeaponClassPSS:
+	case kWeaponClassDaiteiChan:
+	case kWeaponClassWS:
+	case kWeaponClassWSN:
+		return true;
+	default:
+		return false;
+	}
+}
+
+std::ostream & operator<<(std::ostream & os, const Weapon & conf)
+{
+	os
+		<< "è£…å‚™IDï¼š" << conf.id_ << endl
+		<< "ã€€è£…å‚™åï¼š" << char_cvt::utf_16_to_shift_jis(conf.name_) << "ã€€ç¨®åˆ¥ï¼š" << conf.weapon_class_ << endl
+		<< "ã€€è£…ç”²ï¼š" << conf.defense_ << "ã€€ç«åŠ›ï¼š" << conf.attack_ << "ã€€é›·æ’ƒï¼š" << conf.torpedo_ << "ã€€çˆ†è£…ï¼š" << conf.bomb_ << endl
+		<< "ã€€å¯¾ç©ºï¼š" << conf.anti_air_ << "ã€€å¯¾æ½œï¼š" << conf.anti_sub_ << "ã€€å‘½ä¸­ï¼š" << conf.hit_ << "ã€€å›é¿ï¼š" << conf.evade_ << endl
+		<< "ã€€ç´¢æ•µï¼š" << conf.search_ << "ã€€å°„ç¨‹ï¼š" << char_cvt::utf_16_to_shift_jis(kRangeStr[conf.wrange_]) << "ã€€æ”¹ä¿®/ç†Ÿç·´ï¼š" << conf.level_ << endl;
+	return os;
+}
+
+std::wostream & operator<<(std::wostream & os, const Weapon & conf)
+{
+	os
+		<< L"è£…å‚™IDï¼š" << conf.id_ << endl
+		<< L"ã€€è£…å‚™åï¼š" << conf.name_ << L"ã€€ç¨®åˆ¥ï¼š" << conf.weapon_class_ << endl
+		<< L"ã€€è£…ç”²ï¼š" << conf.defense_ << L"ã€€ç«åŠ›ï¼š" << conf.attack_ << L"ã€€é›·æ’ƒï¼š" << conf.torpedo_ << L"ã€€çˆ†è£…ï¼š" << conf.bomb_ << endl
+		<< L"ã€€å¯¾ç©ºï¼š" << conf.anti_air_ << L"ã€€å¯¾æ½œï¼š" << conf.anti_sub_ << L"ã€€å‘½ä¸­ï¼š" << conf.hit_ << L"ã€€å›é¿ï¼š" << conf.evade_ << endl
+		<< L"ã€€ç´¢æ•µï¼š" << conf.search_ << L"ã€€å°„ç¨‹ï¼š" << kRangeStr[conf.wrange_] << L"ã€€æ”¹ä¿®/ç†Ÿç·´ï¼š" << conf.level_ << endl;
+	return os;
+}
+
+// æ–‡å­—åˆ—ã‚’ç¨®åˆ¥ã«å¤‰æ›ã™ã‚‹
 WeaponClass ToWC(const string str) {
 	for (auto i = 0u; i < kWeaponClassStr.size(); ++i) {
 		if (str == kWeaponClassStr[i]) return static_cast<WeaponClass>(i);
 	}
 	return kWeaponClassOther;
+}
+
+// å¤–éƒ¨ç†Ÿç·´åº¦(Simple)ã‚’å†…éƒ¨ç†Ÿç·´åº¦(Detail)ã«å¤‰æ›ã™ã‚‹
+int ConvertStoD(const int &level) {
+	return limit(level * 15 - 5, 0, 100);
+}
+
+// å†…éƒ¨ç†Ÿç·´åº¦ã‚’å¤–éƒ¨ç†Ÿç·´åº¦ã«å¤‰æ›ã™ã‚‹
+int ConvertDtoS(const int &level_detail) {
+	return limit((level_detail + 5) / 15, 0, 7);
 }

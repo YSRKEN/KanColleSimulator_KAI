@@ -1,11 +1,13 @@
-#pragma once
+ï»¿#pragma once
 
 #include "weapon.hpp"
+#include <iostream>
+class WeaponDB;
 
-// ŠÍí(Œµ–§‚È’Ô‚è‚ÍShip Classifications‚Å‚ ‚é)
-// ‚½‚¾‚µA•‚—V—vÇEŒì‰q—vÇE”‘’n±‹S/•PE“ì•û±‹S‚Íud„—mŠÍvA
-// “ì•û±í‹S‚Íuq‹ó„—mŠÍvA‘•b‹ó•ê‹S/•PEíŠÍƒŒ‹‰‚Íuq‹óíŠÍvA
-// H’ÃF‚Íu…ã‹@•êŠÍvƒJƒeƒSƒŠ‚É“ü‚ê‚Ä‚¢‚é
+// è‰¦ç¨®(å³å¯†ãªç¶´ã‚Šã¯Ship Classificationsã§ã‚ã‚‹)
+// ãŸã ã—ã€æµ®éŠè¦å¡ãƒ»è­·è¡›è¦å¡ãƒ»æ³Šåœ°æ£²é¬¼/å§«ãƒ»å—æ–¹æ£²é¬¼ã¯ã€Œé‡å·¡æ´‹è‰¦ã€ã€
+// å—æ–¹æ£²æˆ¦é¬¼ã¯ã€Œèˆªç©ºå·¡æ´‹è‰¦ã€ã€è£…ç”²ç©ºæ¯é¬¼/å§«ãƒ»æˆ¦è‰¦ãƒ¬ç´šã¯ã€Œèˆªç©ºæˆ¦è‰¦ã€ã€
+// ç§‹æ´¥æ´²ã¯ã€Œæ°´ä¸Šæ©Ÿæ¯è‰¦ã€ã‚«ãƒ†ã‚´ãƒªã«å…¥ã‚Œã¦ã„ã‚‹
 enum ShipClass {
 	kShipClassPT = 1, kShipClassDD, kShipClassCL, kShipClassCLT,
 	kShipClassCA, kShipClassCAV, kShipClassCVL, kShipClassCC, kShipClassBB,
@@ -13,58 +15,83 @@ enum ShipClass {
 	kShipClassLST, kShipClassAV, kShipClassLHA, kShipClassACV, kShipClassAR,
 	kShipClassAS, kShipClassCP, kShipClassAO
 };
-const string kShipClassStr[] = { "", "‹›—‹’ø", "‹ì’€ŠÍ", "Œy„—mŠÍ", "d—‹‘•„—mŠÍ",
-"d„—mŠÍ", "q‹ó„—mŠÍ", "Œy‹ó•ê", "„—míŠÍ", "íŠÍ", "q‹óíŠÍ", "³‹K‹ó•ê",
-"—¤ãŒ^", "ö…ŠÍ", "ö…‹ó•ê", "—A‘—ŠÍ", "…ã‹@•êŠÍ", "—g—¤ŠÍ", "‘•b‹ó•ê",
-"HìŠÍ", "ö…•êŠÍ", "—ûK„—mŠÍ", "‹‹–ûŠÍ"
+const wstring kShipClassStr[] = { L"", L"é­šé›·è‰‡", L"é§†é€è‰¦", L"è»½å·¡æ´‹è‰¦", L"é‡é›·è£…å·¡æ´‹è‰¦",
+L"é‡å·¡æ´‹è‰¦", L"èˆªç©ºå·¡æ´‹è‰¦", L"è»½ç©ºæ¯", L"å·¡æ´‹æˆ¦è‰¦", L"æˆ¦è‰¦", L"èˆªç©ºæˆ¦è‰¦", L"æ­£è¦ç©ºæ¯",
+L"é™¸ä¸Šå‹", L"æ½œæ°´è‰¦", L"æ½œæ°´ç©ºæ¯", L"è¼¸é€è‰¦", L"æ°´ä¸Šæ©Ÿæ¯è‰¦", L"æšé™¸è‰¦", L"è£…ç”²ç©ºæ¯",
+L"å·¥ä½œè‰¦", L"æ½œæ°´æ¯è‰¦", L"ç·´ç¿’å·¡æ´‹è‰¦", L"çµ¦æ²¹è‰¦"
 };
 
-// ‘¬—Í
+// é€ŸåŠ›
 enum Speed { kSpeedNone, kSpeedLow, kSpeedHigh };
-const string kSpeedStr[] = { "–³", "’á‘¬", "‚‘¬" };
+const wstring kSpeedStr[] = { L"ç„¡", L"ä½é€Ÿ", L"é«˜é€Ÿ" };
 
-// ŠÍ–ºƒNƒ‰ƒX
+// è‰¦å¨˜ã‚¯ãƒ©ã‚¹
 class Kammusu {
-	// •ÏX‚µ‚È‚¢‚à‚Ì
-	int id_;						//ŠÍ‘DID
-	string name_;					//ŠÍ–¼
-	ShipClass shipclass_;			//ŠÍí
-	int max_hp_;					//Å‘å‘Ï‹v
-	int defense_;					//‘•b
-	int attack_;					//‰Î—Í
-	int torpedo_;					//—‹Œ‚
-	int anti_air_;					//‘Î‹ó
-	int luck_;						//‰^
-	Speed speed_;					//‘¬—Í
-	Range range_;					//Ë’ö
-	int slots_;						//ƒXƒƒbƒg”
-	vector<int> max_airs_;			//Å‘å“‹Ú”
-	int evade_;						//‰ñ”ğ
-	int anti_sub_;					//‘Îö
-	int search_;					//õ“G
-	vector<int> first_weapons_;		//‰Šú‘•”õ
-	bool kammusu_flg_;				//ŠÍ–ºƒtƒ‰ƒO
-	int level_;						//ƒŒƒxƒ‹(—û“x)
-	// •ÏX‚·‚é‚à‚Ì
-	int hp_;					//Œ»‘Ï‹v
-	vector<int> airs_;			//Œ»“‹Ú”
-	vector<Weapon> weapons_;	//Œ»‘•”õ
-	int cond_;					//cond’l
-	int ammo_;					//c’e–òŠ„‡
-	int fuel_;					//c”R—¿Š„‡
+	// å¤‰æ›´ã—ãªã„ã‚‚ã®
+	int id_;						//è‰¦èˆ¹ID
+	wstring name_;					//è‰¦å
+	ShipClass ship_class_;			//è‰¦ç¨®
+	int max_hp_;					//æœ€å¤§è€ä¹…
+	int defense_;					//è£…ç”²
+	int attack_;					//ç«åŠ›
+	int torpedo_;					//é›·æ’ƒ
+	int anti_air_;					//å¯¾ç©º
+	int luck_;						//é‹
+	Speed speed_;					//é€ŸåŠ›
+	Range range_;					//å°„ç¨‹
+	int slots_;						//ã‚¹ãƒ­ãƒƒãƒˆæ•°
+	vector<int> max_airs_;			//æœ€å¤§æ­è¼‰æ•°
+	int evade_;						//å›é¿
+	int anti_sub_;					//å¯¾æ½œ
+	int search_;					//ç´¢æ•µ
+	vector<int> first_weapons_;		//åˆæœŸè£…å‚™
+	bool kammusu_flg_;				//è‰¦å¨˜ãƒ•ãƒ©ã‚°
+	int level_;						//ãƒ¬ãƒ™ãƒ«(ç·´åº¦)
+	// å¤‰æ›´ã™ã‚‹ã‚‚ã®
+	int hp_;					//ç¾è€ä¹…
+	vector<int> airs_;			//ç¾æ­è¼‰æ•°
+	vector<Weapon> weapons_;	//ç¾è£…å‚™
+	int cond_;					//condå€¤
+	int ammo_;					//æ®‹å¼¾è–¬å‰²åˆ
+	int fuel_;					//æ®‹ç‡ƒæ–™å‰²åˆ
 public:
-	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	Kammusu();
 	Kammusu(
-		const int, const string, const ShipClass, const int, const int, const int, const int,
-		const int, const int, const Speed, const Range, const int, const vector<int>, const int,
-		const int, const int, const vector<int>, const bool, const int);
-	// ’†g‚ğ•\¦‚·‚é
-	void Put();
-	// •ÏX‰Â‚È•”•ª‚ğƒŠƒZƒbƒg‚·‚é
-	Kammusu Reset();
-//	Kammusu Reset(const WeaponDB&);
+		const int id, wstring name, const ShipClass shipclass, const int max_hp, const int defense,
+		const int attack, const int torpedo, const int anti_air, const int luck, const Speed speed,
+		const Range range, const int slots, vector<int> max_airs, const int evade, const int anti_sub,
+		const int search, vector<int> first_weapons, const bool kammusu_flg, const int level
+	);
+	// getter
+	int GetMaxHP() const { return max_hp_; }
+	int GetLuck() const { return luck_; }
+	int GetSlots() const { return slots_; }
+	int GetEvade() const { return evade_; }
+	int GetAntiSub() const { return anti_sub_; }
+	int GetSearch() const { return search_; }
+	int GetHP() const { return hp_; }
+	vector<Weapon> GetWeapon() const { return weapons_; }
+	// setter
+	void SetMaxHP(const int max_hp) { max_hp_ = max_hp; }
+	void SetLuck(const int luck) { luck_ = luck; }
+	void SetEvade(const int evade) { evade_ = evade; }
+	void SetAntiSub(const int anti_sub) { anti_sub_ = anti_sub; }
+	void SetSearch(const int search) { search_ = search; }
+	void SetLevel(const int level) { level_ = level; }
+	void SetWeapon(const int index, const Weapon &weapon) { weapons_[index] = weapon; }
+	void SetCond(const int cond) { cond_ = cond; }
+	// ãã®ä»–
+	void Put() const;				// ä¸­èº«ã‚’è¡¨ç¤ºã™ã‚‹
+	wstring GetName() const;		// ç°¡æ˜“çš„ãªåç§°ã‚’è¿”ã™
+	Kammusu Reset();				// å¤‰æ›´å¯ãªéƒ¨åˆ†ã‚’ãƒªã‚»ãƒƒãƒˆã™ã‚‹
+	Kammusu Reset(const WeaponDB&);	// å¤‰æ›´å¯ãªéƒ¨åˆ†ã‚’ãƒªã‚»ãƒƒãƒˆã™ã‚‹(åˆæœŸè£…å‚™)
+	bool HasAir() const;			// è‰¦è¼‰æ©Ÿã‚’ä¿æœ‰ã—ã¦ã„ãŸå ´åˆã¯true
+	friend std::ostream& operator<<(std::ostream& os, const Kammusu& conf);
+	friend std::wostream& operator<<(std::wostream& os, const Kammusu& conf);
 };
+std::ostream& operator<<(std::ostream& os, const Kammusu& conf);
+std::wostream& operator<<(std::wostream& os, const Kammusu& conf);
 
-// •¶š—ñ‚ğ‘¬—Í‚É•ÏŠ·‚·‚é
+// æ–‡å­—åˆ—ã‚’é€ŸåŠ›ã«å¤‰æ›ã™ã‚‹
 Speed ToSpeed(const string&);

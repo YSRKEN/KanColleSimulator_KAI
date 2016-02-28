@@ -1,6 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="clang_Debug|Win32">
+      <Configuration>clang_Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="clang_Debug|x64">
+      <Configuration>clang_Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="clang_Release|Win32">
+      <Configuration>clang_Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="clang_Release|x64">
+      <Configuration>clang_Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
@@ -29,14 +45,14 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -50,6 +66,18 @@
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='clang_Debug|Win32'">
+    <PlatformToolset>v140_clang_3_7</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='clang_Release|Win32'" Label="Configuration">
+    <PlatformToolset>v140_clang_3_7</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='clang_Debug|x64'">
+    <PlatformToolset>v140_Clang_3_7</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='clang_Release|x64'" Label="Configuration">
+    <PlatformToolset>v140_Clang_3_7</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -147,22 +175,50 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='clang_Debug|Win32'">
+    <ClCompile>
+      <ExceptionHandling>Enabled</ExceptionHandling>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='clang_Release|Win32'">
+    <ClCompile>
+      <ExceptionHandling>Enabled</ExceptionHandling>
+      <Optimization>MaxSpeed</Optimization>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='clang_Debug|x64'">
+    <ClCompile>
+      <ExceptionHandling>Enabled</ExceptionHandling>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='clang_Release|x64'">
+    <ClCompile>
+      <ExceptionHandling>Enabled</ExceptionHandling>
+      <Optimization>MaxSpeed</Optimization>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="source\config.cpp" />
     <ClCompile Include="source\fleet.cpp" />
     <ClCompile Include="source\kammusu.cpp" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\other.cpp" />
+    <ClCompile Include="source\result.cpp" />
     <ClCompile Include="source\simulator.cpp" />
     <ClCompile Include="source\weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="source\arithmetic_convert.hpp" />
     <ClInclude Include="source\base.hpp" />
+    <ClInclude Include="source\char_convert.hpp" />
     <ClInclude Include="source\config.hpp" />
     <ClInclude Include="source\fleet.hpp" />
     <ClInclude Include="source\kammusu.hpp" />
     <ClInclude Include="source\other.hpp" />
     <ClInclude Include="source\picojson.h" />
+    <ClInclude Include="source\result.hpp" />
     <ClInclude Include="source\simulator.hpp" />
     <ClInclude Include="source\weapon.hpp" />
   </ItemGroup>
