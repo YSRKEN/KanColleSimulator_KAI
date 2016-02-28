@@ -2,7 +2,11 @@
 #include "kammusu.hpp"
 
 // コンストラクタ
-Kammusu::Kammusu() : Kammusu(-1, "なし", kShipClassDD, 0, 0, 0, 0, 0, 0, kSpeedNone, kRangeNone, 0, { 0,  0,  0,  0,  0 }, 0, 0, 0, { -1,  -1,  -1,  -1,  -1 }, true, 1) {}
+Kammusu::Kammusu() :
+	id_(-1), name_("なし"), shipclass_(kShipClassDD), max_hp_(0), defense_(0), attack_(0),
+	torpedo_(0), anti_air_(0), luck_(0), speed_(kSpeedNone), range_(kRangeNone), slots_(0),
+	max_airs_({ 0, 0, 0, 0, 0 }), evade_(0), anti_sub_(0), search_(0), first_weapons_({ -1, -1, -1, -1, -1 }),
+	kammusu_flg_(true), level_(1) {}
 
 Kammusu::Kammusu(
 	const int id, const string name, const ShipClass shipclass, const int max_hp, const int defense,
