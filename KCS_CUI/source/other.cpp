@@ -1,6 +1,7 @@
 ﻿#include "base.hpp"
 #include "other.hpp"
 #include "char_convert.hpp"
+#include <algorithm>
 // 装備DBのコンストラクタ
 WeaponDB::WeaponDB() {
 	// ファイルを開く
@@ -98,21 +99,9 @@ KammusuDB::KammusuDB() {
 	hash_lv1_[-1] = Kammusu();
 	hash_lv99_[-1] = Kammusu();
 }
-
-// 艦娘DBからデータを読みだす
-// idで指定した艦戦IDの艦娘を、レベルがlevelの状態にして返す
-// ただし装甲・火力・雷撃・対空は改修MAXの状態とする
-Kammusu KammusuDB::Get(const int id, const int level) const {
-	if(hash_lv99_.find(id) == hash_lv99_.end()) return Kammusu();
-	Kammusu temp_k = hash_lv99_.at(id);
-	const Kammusu &kammusu_lv1 = hash_lv1_.at(id), &kammusu_lv99 = hash_lv99_.at(id);
-	// 練度で上昇する箇所を補完する
-	temp_k.SetMaxHP(kammusu_lv1.GetMaxHP());
-	temp_k.SetEvade(int(1.0 * (kammusu_lv99.GetEvade() -kammusu_lv1.GetEvade()) * level / 99 + kammusu_lv1.GetEvade()));
-	temp_k.SetAntiSub(int(1.0 * (kammusu_lv99.GetAntiSub() - kammusu_lv1.GetAntiSub()) * level / 99 + kammusu_lv1.GetAntiSub()));
-	temp_k.SetSearch(int(1.0 * (kammusu_lv99.GetSearch() - kammusu_lv1.GetSearch()) * level / 99 + kammusu_lv1.GetSearch()));
-	temp_k.SetLevel(level);
-	if (level >= 100) {
+namespace detail {
+	int CalcHPWhenMarriage(const Kammusu& temp_k, const Kammusu &kammusu_lv99)
+	{
 		// ケッコンによる耐久上昇はややこしい
 		int new_max_hp = temp_k.GetMaxHP();
 		if (new_max_hp < 10) {
@@ -136,8 +125,25 @@ Kammusu KammusuDB::Get(const int id, const int level) const {
 		else {
 			new_max_hp += 9;
 		}
-		if (new_max_hp > kammusu_lv99.GetMaxHP()) new_max_hp = kammusu_lv99.GetMaxHP();
-		temp_k.SetMaxHP(new_max_hp);
+		return std::min(kammusu_lv99.GetMaxHP(), new_max_hp);
+	}
+}
+// 艦娘DBからデータを読みだす
+// idで指定した艦戦IDの艦娘を、レベルがlevelの状態にして返す
+// ただし装甲・火力・雷撃・対空は改修MAXの状態とする
+Kammusu KammusuDB::Get(const int id, const int level) const {
+	if(hash_lv99_.find(id) == hash_lv99_.end()) return Kammusu();
+	Kammusu temp_k = hash_lv99_.at(id);
+	const Kammusu &kammusu_lv1 = hash_lv1_.at(id);
+	const Kammusu &kammusu_lv99 = hash_lv99_.at(id);
+	// 練度で上昇する箇所を補完する
+	temp_k.SetMaxHP(kammusu_lv1.GetMaxHP());
+	temp_k.SetEvade(int(1.0 * (kammusu_lv99.GetEvade() -kammusu_lv1.GetEvade()) * level / 99 + kammusu_lv1.GetEvade()));
+	temp_k.SetAntiSub(int(1.0 * (kammusu_lv99.GetAntiSub() - kammusu_lv1.GetAntiSub()) * level / 99 + kammusu_lv1.GetAntiSub()));
+	temp_k.SetSearch(int(1.0 * (kammusu_lv99.GetSearch() - kammusu_lv1.GetSearch()) * level / 99 + kammusu_lv1.GetSearch()));
+	temp_k.SetLevel(level);
+	if (level >= 100) {
+		temp_k.SetMaxHP(detail::CalcHPWhenMarriage(temp_k, kammusu_lv99));
 		// ケッコンによる運上昇は+3～+6までランダムなのでとりあえず+4とした
 		temp_k.SetLuck(temp_k.GetLuck() + 4);
 	}
