@@ -3,25 +3,33 @@
 #include "char_convert.hpp"
 // コンストラクタ
 Weapon::Weapon() :
-	id_(-1), name_(L"なし"), wclass_(kWeaponClassOther), defense_(), attack_(),
+	id_(-1), name_(L"なし"), weapon_class_(kWeaponClassOther), defense_(), attack_(),
 	torpedo_(), bomb_(), anti_air_(), anti_sub_(), hit_(),
 	evade_(), search_(), wrange_(kRangeNone), level_(), level_detail_(){}
 Weapon::Weapon(
 	const int id, wstring name, const WeaponClass weapon_class, const int defense,
 	const int attack, const int torpedo, const int bomb, const int anti_air, const int anti_sub,
 	const int hit, const int evade, const int search, const Range range, const int level, const int level_detail):
-	id_(id), name_(move(name)), wclass_(weapon_class), defense_(defense), attack_(attack),
+	id_(id), name_(move(name)), weapon_class_(weapon_class), defense_(defense), attack_(attack),
 	torpedo_(torpedo), bomb_(bomb), anti_air_(anti_air), anti_sub_(anti_sub), hit_(hit),
 	evade_(evade), search_(search), wrange_(range), level_(level), level_detail_(level_detail){}
 
 // 中身を表示する
 void Weapon::Put() const {
+<<<<<<< HEAD
 	cout << *this;
+=======
+	cout << "装備ID：" << id_ << "\n";
+	cout << "　装備名：" << name_ << "　種別：" << weapon_class_ << "\n";
+	cout << "　装甲：" << defense_ << "　火力：" << attack_ << "　雷撃：" << torpedo_ << "　爆装：" << bomb_ << "\n";
+	cout << "　対空：" << anti_air_ << "　対潜：" << anti_sub_ << "　命中：" << hit_ << "　回避：" << evade_ << "\n";
+	cout << "　索敵：" << search_ << "　射程：" << kRangeStr[wrange_] << "　改修/熟練：" << level_ << "\n\n";
+>>>>>>> master
 }
 
 // (熟練度が存在する)艦載機ならtrue
 bool Weapon::IsAir() {
-	switch (wclass_) {
+	switch (weapon_class_) {
 	case kWeaponClassPF:
 	case kWeaponClassPBF:
 	case kWeaponClassPB:

@@ -18,21 +18,21 @@ const vector<string> kWeaponClassStr = {
 
 //装備クラス
 class Weapon {
-	int id_;				//装備ID
-	wstring name_;			//装備名
-	WeaponClass wclass_;	//種別
-	int defense_;			//装甲
-	int attack_;			//火力
-	int torpedo_;			//雷撃
-	int bomb_;				//爆装
-	int anti_air_;			//対空
-	int anti_sub_;			//対潜
-	int hit_;				//命中
-	int evade_;				//回避
-	int search_;			//索敵
-	Range wrange_;			//射程
-	int level_;				//装備改修度(0-10)、外部熟練度(0-7)
-	int level_detail_;		//内部熟練度(0-120)
+	int id_;					//装備ID
+	wstring name_;				//装備名
+	WeaponClass weapon_class_;	//種別
+	int defense_;				//装甲
+	int attack_;				//火力
+	int torpedo_;				//雷撃
+	int bomb_;					//爆装
+	int anti_air_;				//対空
+	int anti_sub_;				//対潜
+	int hit_;					//命中
+	int evade_;					//回避
+	int search_;				//索敵
+	Range wrange_;				//射程
+	int level_;					//装備改修度(0-10)、外部熟練度(0-7)
+	int level_detail_;			//内部熟練度(0-120)
 public:
 	// コンストラクタ
 	Weapon();
@@ -41,6 +41,8 @@ public:
 		const int, const int, const int, const int, const int, const Range, const int, const int);
 	// getter
 	std::wstring Name() const { return name_; }
+	WeaponClass GetWeaponClass() const { return weapon_class_; }
+	int GetSearch() const { return search_; }
 	// setter
 	void SetLevel(const int level) { level_ = level; }
 	void SetLevelDetail(const int level_detail) { level_detail_ = level_detail; }
