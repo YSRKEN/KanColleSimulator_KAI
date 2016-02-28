@@ -3,11 +3,10 @@
 #include "other.hpp"
 #include "char_convert.hpp"
 // コンストラクタ
-Kammusu::Kammusu() :
-	id_(-1), name_(L"なし"), ship_class_(kShipClassDD), max_hp_(), defense_(), attack_(),
-	torpedo_(), anti_air_(), luck_(), speed_(kSpeedNone), range_(kRangeNone), slots_(),
-	max_airs_({ 0, 0, 0, 0, 0 }), evade_(), anti_sub_(), search_(), first_weapons_({ -1, -1, -1, -1, -1 }),
-	kammusu_flg_(true), level_(1) {}
+Kammusu::Kammusu() 
+	:	Kammusu(-1, L"なし", kShipClassDD, 0, 0, 0, 0, 0, 0, kSpeedNone, kRangeNone,
+		0, { 0, 0, 0, 0, 0 }, 0, 0, 0, { -1, -1, -1, -1, -1 }, true, 1) 
+{}
 
 Kammusu::Kammusu(
 	const int id, wstring name, const ShipClass shipclass, const int max_hp, const int defense,

@@ -2,10 +2,7 @@
 #include "weapon.hpp"
 #include "char_convert.hpp"
 // コンストラクタ
-Weapon::Weapon() :
-	id_(-1), name_(L"なし"), weapon_class_(kWeaponClassOther), defense_(), attack_(),
-	torpedo_(), bomb_(), anti_air_(), anti_sub_(), hit_(),
-	evade_(), search_(), wrange_(kRangeNone), level_(), level_detail_(){}
+Weapon::Weapon() : Weapon(-1, L"なし", kWeaponClassOther, 0, 0, 0, 0, 0, 0, 0, 0, 0, kRangeNone, 0, 0){}
 Weapon::Weapon(
 	const int id, wstring name, const WeaponClass weapon_class, const int defense,
 	const int attack, const int torpedo, const int bomb, const int anti_air, const int anti_sub,
@@ -16,15 +13,7 @@ Weapon::Weapon(
 
 // 中身を表示する
 void Weapon::Put() const {
-<<<<<<< HEAD
 	cout << *this;
-=======
-	cout << "装備ID：" << id_ << "\n";
-	cout << "　装備名：" << name_ << "　種別：" << weapon_class_ << "\n";
-	cout << "　装甲：" << defense_ << "　火力：" << attack_ << "　雷撃：" << torpedo_ << "　爆装：" << bomb_ << "\n";
-	cout << "　対空：" << anti_air_ << "　対潜：" << anti_sub_ << "　命中：" << hit_ << "　回避：" << evade_ << "\n";
-	cout << "　索敵：" << search_ << "　射程：" << kRangeStr[wrange_] << "　改修/熟練：" << level_ << "\n\n";
->>>>>>> master
 }
 
 // (熟練度が存在する)艦載機ならtrue
@@ -50,7 +39,7 @@ std::ostream & operator<<(std::ostream & os, const Weapon & conf)
 {
 	os
 		<< "装備ID：" << conf.id_ << endl
-		<< "　装備名：" << char_cvt::utf_16_to_shift_jis(conf.name_) << "　種別：" << conf.wclass_ << endl
+		<< "　装備名：" << char_cvt::utf_16_to_shift_jis(conf.name_) << "　種別：" << conf.weapon_class_ << endl
 		<< "　装甲：" << conf.defense_ << "　火力：" << conf.attack_ << "　雷撃：" << conf.torpedo_ << "　爆装：" << conf.bomb_ << endl
 		<< "　対空：" << conf.anti_air_ << "　対潜：" << conf.anti_sub_ << "　命中：" << conf.hit_ << "　回避：" << conf.evade_ << endl
 		<< "　索敵：" << conf.search_ << "　射程：" << char_cvt::utf_16_to_shift_jis(kRangeStr[conf.wrange_]) << "　改修/熟練：" << conf.level_ << endl;
@@ -61,7 +50,7 @@ std::wostream & operator<<(std::wostream & os, const Weapon & conf)
 {
 	os
 		<< L"装備ID：" << conf.id_ << endl
-		<< L"　装備名：" << conf.name_ << L"　種別：" << conf.wclass_ << endl
+		<< L"　装備名：" << conf.name_ << L"　種別：" << conf.weapon_class_ << endl
 		<< L"　装甲：" << conf.defense_ << L"　火力：" << conf.attack_ << L"　雷撃：" << conf.torpedo_ << L"　爆装：" << conf.bomb_ << endl
 		<< L"　対空：" << conf.anti_air_ << L"　対潜：" << conf.anti_sub_ << L"　命中：" << conf.hit_ << L"　回避：" << conf.evade_ << endl
 		<< L"　索敵：" << conf.search_ << L"　射程：" << kRangeStr[conf.wrange_] << L"　改修/熟練：" << conf.level_ << endl;
