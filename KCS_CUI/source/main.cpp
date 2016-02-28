@@ -32,7 +32,10 @@ int main(int argc, char *argv[]) {
 			for (int n = 0; n < config.GetTimes(); ++n) {
 				Simulator simulator(fleet, seed + n);
 				result_db[n] = simulator.Calc();
-				cout << n << "\n";
+			}
+			// 集計を行う
+			for (int n = 0; n < config.GetTimes(); ++n) {
+				cout << result_db[n].Put() << "\n";
 			}
 //		);
 	}

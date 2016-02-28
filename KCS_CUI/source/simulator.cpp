@@ -8,9 +8,10 @@
 Result Simulator::Calc() {
 	Result result;
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
-		for (auto fi = 0u; fi < sfleet_[bi].FleetSize(); ++fi) {
-			for (auto ui = 0u; ui < sfleet_[bi].UnitSize(fi); ++ui){
-				result.SetHP(bi, fi, ui, sfleet_[bi].GetUnit(fi, ui).GetHP());
+		for (auto fi = 0u; fi < fleet_[bi].FleetSize(); ++fi) {
+			for (auto ui = 0u; ui < fleet_[bi].UnitSize(fi); ++ui){
+				result.SetHP(bi, fi, ui, fleet_[bi].GetUnit(fi, ui).GetHP());
+				result.AddDamage(bi, fi, ui, RandInt(100));
 			}
 		}
 	}
