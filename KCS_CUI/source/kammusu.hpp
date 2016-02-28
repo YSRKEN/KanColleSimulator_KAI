@@ -83,9 +83,10 @@ public:
 	void SetCond(const int cond) { cond_ = cond; }
 	// その他
 	void Put() const;				// 中身を表示する
-	wstring GetName() const;			// 簡易的な名称を返す
+	wstring GetName() const;		// 簡易的な名称を返す
 	Kammusu Reset();				// 変更可な部分をリセットする
 	Kammusu Reset(const WeaponDB&);	// 変更可な部分をリセットする(初期装備)
+	bool HasAir() const;			// 艦載機を保有していた場合はtrue
 	friend std::ostream& operator<<(std::ostream& os, const Kammusu& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Kammusu& conf);
 };

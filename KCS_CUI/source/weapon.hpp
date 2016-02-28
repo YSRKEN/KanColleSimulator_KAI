@@ -48,7 +48,7 @@ public:
 	void SetLevelDetail(const int level_detail) { level_detail_ = level_detail; }
 	// その他
 	void Put() const;	// 中身を表示する
-	bool IsAir();		// (熟練度が存在する)艦載機ならtrue
+	bool IsAir() const;	// (熟練度が存在する)艦載機ならtrue
 	friend std::ostream& operator<<(std::ostream& os, const Weapon& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Weapon& conf);
 };
