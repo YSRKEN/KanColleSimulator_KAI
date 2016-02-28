@@ -20,6 +20,7 @@ using std::cout;
 using std::bitset;
 using std::endl;
 using std::fill;
+using std::get;
 using std::ifstream;
 using std::move;
 using std::stoi;
