@@ -22,8 +22,8 @@ public:
 	Fleet() { formation_ = kFormationTrail; level_ = 120; fleet_type_ = kFleetTypeNormal; }
 	Fleet(const string &file_name, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, char_cvt::char_enc fileenc = char_cvt::char_enc::utf8);
 	Fleet(std::istream &file, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, char_cvt::char_enc fileenc = char_cvt::char_enc::utf8);
-	// 中身を表示する
-	void Put() const;
+	void Put() const;			// 中身を表示する
+	double SearchValue() const;	//索敵値を計算する
 	// getter
 	auto GetUnit(const size_t fi, const size_t ui) const { return unit_[fi][ui]; }
 	FleetType GetFleetType() { return fleet_type_; }

@@ -141,3 +141,7 @@ std::wostream & operator<<(std::wostream & os, const Fleet & conf)
 	os << endl;
 	return os;
 }
+
+double Fleet::SearchValue() const {
+	return 0.0;
+}
