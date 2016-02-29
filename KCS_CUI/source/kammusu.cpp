@@ -42,7 +42,7 @@ Kammusu Kammusu::Reset() {
 Kammusu Kammusu::Reset(const WeaponDB &weapon_db) {
 	this->Reset();
 	for (auto i = 0; i < slots_; ++i) {
-		weapons_[i] = weapon_db.Get(first_weapons_[i]);
+		weapons_[i] = weapon_db.Get(first_weapons_[i], std::nothrow);
 	}
 	return *this;
 }

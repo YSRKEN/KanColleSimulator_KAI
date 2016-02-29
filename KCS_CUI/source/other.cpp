@@ -39,12 +39,15 @@ WeaponDB::WeaponDB() {
 }
 
 // 装備DBからデータを読みだす
-Weapon WeaponDB::Get(const int id) const{
-	if (hash_.find(id) != hash_.end()) {
+Weapon WeaponDB::Get(const int id) const {
+	return hash_.at(id);
+}
+Weapon WeaponDB::Get(const int id, std::nothrow_t) const noexcept {
+	try {
 		return hash_.at(id);
 	}
-	else {
-		return hash_.at(-1);
+	catch (...) {
+		return{};
 	}
 }
 

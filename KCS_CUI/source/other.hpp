@@ -11,6 +11,7 @@ public:
 	WeaponDB();
 	// ハッシュからデータを読みだす
 	Weapon Get(const int) const;
+	Weapon Get(const int id, std::nothrow_t) const noexcept;
 };
 
 // 艦娘DB
