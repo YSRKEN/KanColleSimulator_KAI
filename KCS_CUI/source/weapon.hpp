@@ -38,7 +38,7 @@ public:
 	Weapon();
 	Weapon(
 		const int, wstring, const WeaponClass, const int, const int, const int, const int,
-		const int, const int, const int, const int, const int, const Range, const int, const int);
+		const int, const int, const int, const int, const int, const Range, const int, const int) noexcept;
 	// getter
 	const std::wstring& Name() const noexcept { return name_; }
 	WeaponClass GetWeaponClass() const noexcept { return weapon_class_; }
