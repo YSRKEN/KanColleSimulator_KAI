@@ -2,6 +2,7 @@
 
 #include "weapon.hpp"
 #include <iostream>
+#include "random.hpp"
 class WeaponDB;
 
 // 艦種(厳密な綴りはShip Classificationsである)
@@ -47,6 +48,7 @@ class Kammusu {
 	vector<int> first_weapons_;		//初期装備
 	bool kammusu_flg_;				//艦娘フラグ
 	int level_;						//レベル(練度)
+	SharedRand rand_;
 	// 変更するもの
 	int hp_;					//現耐久
 	vector<int> airs_;			//現搭載数
@@ -62,14 +64,14 @@ public:
 		const int id, wstring name, const ShipClass shipclass, const int max_hp, const int defense,
 		const int attack, const int torpedo, const int anti_air, const int luck, const Speed speed,
 		const Range range, const int slots, vector<int> max_airs, const int evade, const int anti_sub,
-		const int search, vector<int> first_weapons, const bool kammusu_flg, const int level
+		const int search, vector<int> first_weapons, const bool kammusu_flg, const int level, const SharedRand& rand = {}
 	);
 	Kammusu(
 		const DependOnLv info, const int id, wstring name, const ShipClass shipclass, 
 		const int luck, const Speed speed, const Range range, const int slots, vector<int> max_airs, 
-		vector<int> first_weapons, const bool kammusu_flg
+		vector<int> first_weapons, const bool kammusu_flg, const SharedRand& rand = {}
 	);
-
+	void SetRandGenerator(const SharedRand& rand);
 	// getter
 	wstring GetName() const { return name_; }
 	int GetMaxHP() const noexcept { return max_hp_; }

@@ -6,7 +6,7 @@
 #include "other.hpp"
 #include "char_convert.hpp"
 #include "simulator.hpp"
-
+#include "random.hpp"
 // 艦隊の形式
 enum FleetType {kFleetTypeNormal = 1, kFleetTypeCombined};
 const wstring kFleetTypeStr[] = {L"通常艦隊", L"連合艦隊"};
@@ -16,12 +16,15 @@ class Fleet {
 	vector<vector<Kammusu>> unit_;	//艦娘・深海棲艦
 	int level_;						//司令部レベル
 	FleetType fleet_type_;			//艦隊の形式
+	SharedRand rand_;
 	void LoadJson(std::istream &file, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, char_cvt::char_enc fileenc);
 public:
 	// コンストラクタ
 	Fleet() { formation_ = kFormationTrail; level_ = 120; fleet_type_ = kFleetTypeNormal; }
-	Fleet(const string &file_name, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, char_cvt::char_enc fileenc = char_cvt::char_enc::utf8);
-	Fleet(std::istream &file, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, char_cvt::char_enc fileenc = char_cvt::char_enc::utf8);
+	Fleet(const string &file_name, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, const SharedRand& rand = {}, char_cvt::char_enc fileenc = char_cvt::char_enc::utf8);
+	Fleet(std::istream &file, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, const SharedRand& rand = {}, char_cvt::char_enc fileenc = char_cvt::char_enc::utf8);
+	// setter
+	void SetRandGenerator(const SharedRand& rand);
 	// getter
 	auto GetUnit() const { return unit_; }
 	FleetType GetFleetType() noexcept{ return fleet_type_; }

@@ -108,8 +108,8 @@ void Fleet::LoadJson(std::istream & file, const WeaponDB & weapon_db, const Kamm
 	}
 }
 // コンストラクタ
-Fleet::Fleet(const string &file_name, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, char_cvt::char_enc fileenc) 
-	: formation_(formation)// 陣形はそのまま反映させる
+Fleet::Fleet(const string &file_name, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, const SharedRand& rand, char_cvt::char_enc fileenc)
+	: formation_(formation), rand_(rand)// 陣形はそのまま反映させる
 {
 	if (fileenc == char_cvt::char_enc::unknown) throw std::runtime_error("unknown char enc type.");//文字コード自動判別なんてやらない
 	// ファイルを読み込む
@@ -119,11 +119,17 @@ Fleet::Fleet(const string &file_name, const Formation &formation, const WeaponDB
 	this->LoadJson(fin, weapon_db, kammusu_db, fileenc);
 }
 
-Fleet::Fleet(std::istream & file, const Formation & formation, const WeaponDB & weapon_db, const KammusuDB & kammusu_db, char_cvt::char_enc fileenc)
-	: formation_(formation)// 陣形はそのまま反映させる
+Fleet::Fleet(std::istream & file, const Formation & formation, const WeaponDB & weapon_db, const KammusuDB & kammusu_db, const SharedRand& rand, char_cvt::char_enc fileenc)
+	: formation_(formation), rand_(rand)// 陣形はそのまま反映させる
 {
 	if (fileenc == char_cvt::char_enc::unknown) throw std::runtime_error("unknown char enc type.");//文字コード自動判別なんてやらない
 	this->LoadJson(file, weapon_db, kammusu_db, fileenc);
+}
+
+// setter
+
+void Fleet::SetRandGenerator(const SharedRand & rand) {
+	this->rand_ = rand;
 }
 
 // 中身を表示する

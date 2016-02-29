@@ -87,10 +87,11 @@ WeaponDB::WeaponDB() {
 		auto range        = static_cast<Range>(list[header.at("射程")] | to_i());
 		auto level        = 0;
 		auto level_detail = 0;
-		Weapon temp_w(
+		
+		hash_[id] = Weapon(
 			id, name, weapon_class, defense, attack, torpedo, bomb, anti_air,
-			anti_sub, hit, evade, search, range, level, level_detail);
-		hash_[id] = temp_w;
+			anti_sub, hit, evade, search, range, level, level_detail
+		);
 	}
 	// ダミーデータを代入する
 	hash_[-1] = Weapon();
