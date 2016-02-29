@@ -211,6 +211,7 @@
     <ClCompile Include="source\kammusu.cpp" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\other.cpp" />
+    <ClCompile Include="source\random.cpp" />
     <ClCompile Include="source\result.cpp" />
     <ClCompile Include="source\simulator.cpp" />
     <ClCompile Include="source\weapon.cpp" />
