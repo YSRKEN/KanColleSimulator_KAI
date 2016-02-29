@@ -11,22 +11,22 @@ WeaponDB::WeaponDB() {
 	// 1行づつ読み込んでいく
 	string temp_str;
 	getline(ifs, temp_str);
-	auto header = ToHash(Split(temp_str, ','));
+	auto header = temp_str | Split(',') | ToHash();
 	while (getline(ifs, temp_str)) {
-		auto list         = Split(temp_str, ',');
-		auto id           = stoi(list[header.at("装備ID")]);
+		auto list         = temp_str | Split(',');
+		auto id           = list[header.at("装備ID")] | to_i();
 		auto name         = char_cvt::shift_jis_to_utf_16(list[header.at("装備名")]);
 		auto weapon_class = ToWC(list[header.at("種別")]);
-		auto defense      = stoi(list[header.at("装甲")]);
-		auto attack       = stoi(list[header.at("火力")]);
-		auto torpedo      = stoi(list[header.at("雷撃")]);
-		auto bomb         = stoi(list[header.at("爆装")]);
-		auto anti_air     = stoi(list[header.at("対空")]);
-		auto anti_sub     = stoi(list[header.at("対潜")]);
-		auto hit          = stoi(list[header.at("命中")]);
-		auto evade        = stoi(list[header.at("回避")]);
-		auto search       = stoi(list[header.at("索敵")]);
-		auto range        = static_cast<Range>(stoi(list[header.at("射程")]));
+		auto defense      = list[header.at("装甲")] | to_i();
+		auto attack       = list[header.at("火力")] | to_i();
+		auto torpedo      = list[header.at("雷撃")] | to_i();
+		auto bomb         = list[header.at("爆装")] | to_i();
+		auto anti_air     = list[header.at("対空")] | to_i();
+		auto anti_sub     = list[header.at("対潜")] | to_i();
+		auto hit          = list[header.at("命中")] | to_i();
+		auto evade        = list[header.at("回避")] | to_i();
+		auto search       = list[header.at("索敵")] | to_i();
+		auto range        = static_cast<Range>(list[header.at("射程")] | to_i());
 		auto level        = 0;
 		auto level_detail = 0;
 		Weapon temp_w(
@@ -60,40 +60,40 @@ KammusuDB::KammusuDB() {
 	// 1行づつ読み込んでいく
 	string temp_str;
 	getline(ifs, temp_str);
-	auto header = ToHash(Split(temp_str, ','));
+	auto header = temp_str | Split(',') | ToHash();
 	while (getline(ifs, temp_str)) {
 		// まずLv1の方を代入する
-		auto list = Split(temp_str, ',');
-		auto id = stoi(list[header.at("艦船ID")]);
-		auto name = char_cvt::shift_jis_to_utf_16(list[header.at("艦名")]);
-		auto shipclass = static_cast<ShipClass>(stoi(list[header.at("艦種")]));
-		auto max_hp = stoi(Split(list[header.at("耐久")], '.')[0]);
-		auto defense = stoi(Split(list[header.at("装甲")], '.')[0]);
-		auto attack = stoi(Split(list[header.at("火力")], '.')[0]);
-		auto torpedo = stoi(Split(list[header.at("雷撃")], '.')[0]);
-		auto anti_air = stoi(Split(list[header.at("対空")], '.')[0]);
-		auto luck = stoi(Split(list[header.at("運")], '.')[0]);
-		auto speed = ToSpeed(list[header.at("速力")]);
-		auto range = static_cast<Range>(stoi(list[header.at("射程")]));
-		auto slots = stoi(list[header.at("スロット数")]);
-		auto max_airs = ToInt(Split(list[header.at("搭載数")], '.'));
-		auto evade = stoi(Split(list[header.at("回避")], '.')[0]);
-		auto anti_sub = stoi(Split(list[header.at("対潜")], '.')[0]);
-		auto search = stoi(Split(list[header.at("索敵")], '.')[0]);
-		auto first_weapons = ToInt(Split(list[header.at("初期装備")], '.'));
-		auto kammusu_flg = (stoi(list[header.at("艦娘フラグ")]) == 1);
+		auto list          = temp_str | Split(',');
+		auto id            = list[header.at("艦船ID")] | to_i();
+		auto name          = char_cvt::shift_jis_to_utf_16(list[header.at("艦名")]);
+		auto shipclass     = static_cast<ShipClass>(list[header.at("艦種")] | to_i()));
+		auto max_hp        = list[header.at("耐久")] | Split('.')[0] | to_i();
+		auto defense       = list[header.at("装甲")] | Split('.')[0] | to_i();
+		auto attack        = list[header.at("火力")] | Split('.')[0] | to_i();
+		auto torpedo       = list[header.at("雷撃")] | Split('.')[0] | to_i();
+		auto anti_air      = list[header.at("対空")] | Split('.')[0] | to_i();
+		auto luck          = list[header.at("運")] | Split('.')[0] | to_i();
+		auto speed         = ToSpeed(list[header.at("速力")]);
+		auto range         = static_cast<Range>(list[header.at("射程")] | to_i());
+		auto slots         = list[header.at("スロット数")] | to_i();
+		auto max_airs      = list[header.at("搭載数")] | Split('.') | to_i();
+		auto evade         = list[header.at("回避")] | Split('.')[0] | to_i();
+		auto anti_sub      = list[header.at("対潜")] | Split('.')[0] | to_i();
+		auto search        = list[header.at("索敵")] | Split('.')[0] | to_i();
+		auto first_weapons = list[header.at("初期装備")] | Split('.') | to_i();
+		auto kammusu_flg   = 1 == (list[header.at("艦娘フラグ")] | to_i());
 		Kammusu temp_k1(id, name, shipclass, max_hp, defense, attack, torpedo, anti_air, luck, speed,
 			range, slots, max_airs, evade, anti_sub, search, first_weapons, kammusu_flg, 1);
 		hash_lv1_[id] = move(temp_k1);
 		// 次にLv99の方を処理する
-		max_hp = stoi(Split(list[header.at("耐久")], '.')[1]);
-		defense = stoi(Split(list[header.at("装甲")], '.')[1]);
-		attack = stoi(Split(list[header.at("火力")], '.')[1]);
-		torpedo = stoi(Split(list[header.at("雷撃")], '.')[1]);
-		anti_air = stoi(Split(list[header.at("対空")], '.')[1]);
-		evade = stoi(Split(list[header.at("回避")], '.')[1]);
-		anti_sub = stoi(Split(list[header.at("対潜")], '.')[1]);
-		search = stoi(Split(list[header.at("索敵")], '.')[1]);
+		max_hp   = list[header.at("耐久")] | Split('.')[1] | to_i();
+		defense  = list[header.at("装甲")] | Split('.')[1] | to_i();
+		attack   = list[header.at("火力")] | Split('.')[1] | to_i();
+		torpedo  = list[header.at("雷撃")] | Split('.')[1] | to_i();
+		anti_air = list[header.at("対空")] | Split('.')[1] | to_i();
+		evade    = list[header.at("回避")] | Split('.')[1] | to_i();
+		anti_sub = list[header.at("対潜")] | Split('.')[1] | to_i();
+		search   = list[header.at("索敵")] | Split('.')[1] | to_i();
 		Kammusu temp_k2(id, name, shipclass, max_hp, defense, attack, torpedo, anti_air, luck, speed,
 			range, slots, max_airs, evade, anti_sub, search, first_weapons, kammusu_flg, 99);
 		hash_lv99_[id] = move(temp_k2);
@@ -156,31 +156,68 @@ Kammusu KammusuDB::Get(const int id, const int level) const {
 }
 
 // 文字列をデリミタで区切り分割する
-vector<string> Split(const string &str, const char &delim) {
-	vector<string> list;
-	std::istringstream iss(str);
-	string temp;
-	while (getline(iss, temp, delim)) {
-		list.push_back(temp);
+vector<string> Split(const string &str, char delim) {
+	vector<string> re;
+	size_t current = 0;
+	for (size_t found; (found = str.find_first_of(delim, current)) != string::npos; current = found + 1) {
+		re.emplace_back(str, current, found - current);
 	}
-	return list;
+	re.emplace_back(str, current, str.size() - current);
+	return re;
 }
-
-// 文字列配列を数字配列に変換する
-vector<int> ToInt(const vector<string> &arr_str) {
-	vector<int> arr_int;
-	for (auto &it : arr_str) {
-		arr_int.push_back(stoi(it));
+namespace detail {
+	struct Split_helper_index { char delim; std::size_t index; };
+	struct Split_helper {
+		char delim;
+		Split_helper_index operator[](std::size_t n) const noexcept {return{ delim, n };}
+	};
+	string operator| (const std::string& str, Split_helper_index info) {
+		std::size_t pre = 0, pos = 0;
+		for (size_t i = 0; i < info.index + 1; ++i) {
+			pre = pos;
+			pos = str.find_first_of(info.delim, pos) + 1;
+		}
+		return str.substr(pre, pos - pre - 1);
 	}
-	return arr_int;
-}
-
-// 配列をハッシュに変換する
-template<typename T>
-unordered_map<T, size_t> ToHash(const vector<T> &vec) {
-	unordered_map<T, size_t> hash;
-	for (auto i = 0u; i < vec.size(); ++i) {
-		hash[vec[i]] = i;
+	vector<string> operator| (const std::string& str, Split_helper info) {
+		vector<string> re;
+		size_t current = 0;
+		for (size_t found; (found = str.find_first_of(info.delim, current)) != string::npos; current = found + 1) {
+			re.emplace_back(str, current, found - current);
+		}
+		re.emplace_back(str, current, str.size() - current);
+		return re;
 	}
-	return hash;
+	vector<string> operator| (std::string&& str, Split_helper info) {
+		vector<string> re;
+		size_t current = 0;
+		for (size_t found; (found = str.find_first_of(info.delim, current)) != string::npos; current = found + 1) {
+			re.emplace_back(str, current, found - current);
+		}
+		str.erase(0, current);
+		re.emplace_back(std::move(str));
+		return re;
+	}
 }
+detail::Split_helper Split(char delim) noexcept { return{ delim }; }
+namespace detail {
+	// 文字列配列を数字配列に変換する
+	inline vector<int> operator|(const vector<string> &arr_str, to_i_helper) {
+		vector<int> arr_int;
+		for (auto &it : arr_str) {
+			arr_int.push_back(it | to_i());
+		}
+		return arr_int;
+	}
+	struct ToHash_helper {};
+	// 配列をハッシュに変換する
+	template<typename T>
+	inline unordered_map<T, size_t> operator|(const vector<T> &vec, ToHash_helper) {
+		unordered_map<T, size_t> hash;
+		for (auto i = 0u; i < vec.size(); ++i) {
+			hash[vec[i]] = i;
+		}
+		return hash;
+	}
+}
+detail::ToHash_helper ToHash() noexcept { return{}; }

@@ -26,7 +26,7 @@ public:
 };
 
 // 文字列をデリミタで区切り分割する
-vector<string> Split(const string&, const char&);
+vector<string> Split(const string&, const char);
 
 // 文字列配列を数字配列に変換する
 vector<int> ToInt(const vector<string>&);
