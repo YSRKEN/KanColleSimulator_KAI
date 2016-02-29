@@ -32,6 +32,8 @@ public:
 	double SearchValue() const noexcept;			//索敵値を計算する
 	int AntiAirScore() const noexcept;			//制空値を計算する
 	double TrailerAircraftProb(const AirWarStatus&) const;	//触接開始率を計算する
+	int AntiAirBonus() const;			//艦隊対空ボーナス値を計算する
+	Kammusu& RandomKammusu();			//生存艦から艦娘をランダムに指定する
 	bool HasAir() const noexcept;		//艦載機をいずれかの艦が保有していた場合はtrue
 	bool HasAirFight() const noexcept;	//航空戦に参加する艦載機をいずれかの艦が保有していた場合はtrue
 	bool HasAirTrailer() const noexcept;	//触接に参加する艦載機をいずれかの艦が保有していた場合はtrue

@@ -233,6 +233,38 @@ double Fleet::TrailerAircraftProb(const AirWarStatus &air_war_status) const {
 	return trailer_aircraft_prob;
 }
 
+// 艦隊対空ボーナス値を計算する
+int Fleet::AntiAirBonus() const {
+	const static vector<vector<double>> kAntiAirBonusPer = { { 0.77, 0.91, 1.2, 0.77, 0.77 },{ 1.0, 1.2, 1.6, 1.0, 1.0 } };
+	int fleets_anti_air_bonus = 0;
+	for (auto &it_u : unit_) {
+		for (auto &it_k : it_u) {
+			double anti_air_bonus = 0.0;
+			for (auto &it_w : it_k.GetWeapon()) {
+				if (it_w.GetName().find(L"高角砲") != wstring::npos || it_w.GetName().find(L"高射装置") != wstring::npos) {
+					anti_air_bonus += 0.35 * it_w.GetAntiAir();
+				}
+				else if (it_w.GetWeaponClass() == kWeaponClassSmallR || it_w.GetWeaponClass() == kWeaponClassLargeR) {
+					anti_air_bonus += 0.4 * it_w.GetAntiAir();
+				}
+				else if (it_w.GetWeaponClass() == kWeaponClassAAA) {
+					anti_air_bonus += 0.6 * it_w.GetAntiAir();
+				}
+				else {
+					anti_air_bonus += 0.2 * it_w.GetAntiAir();
+				}
+			}
+			fleets_anti_air_bonus += int(anti_air_bonus);
+		}
+	}
+	return int(2 * kAntiAirBonusPer[(unit_[0][0].IsKammusu() ? 0 : 1)][formation_] * fleets_anti_air_bonus);
+}
+
+// 生存艦から艦娘をランダムに指定する
+Kammusu& Fleet::RandomKammusu() {
+	return unit_[0][0];
+}
+
 // 艦載機をいずれかの艦が保有していた場合はtrue
 bool Fleet::HasAir() const noexcept {
 	for (auto &it_u : unit_) {
