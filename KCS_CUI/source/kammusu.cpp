@@ -24,7 +24,7 @@ void Kammusu::Put() const {
 }
 
 // 簡易的な名称を返す
-wstring Kammusu::GetName() const {
+wstring Kammusu::GetNameLv() const {
 	return name_ + L"(Lv" + std::to_wstring(level_) + L")";
 }
 
@@ -90,7 +90,7 @@ std::ostream & operator<<(std::ostream & os, const Kammusu & conf)
 		<< "　装備：";
 	for (auto i = 0; i < conf.slots_; ++i) {
 		if (i != 0) os << ",";
-		os << char_cvt::utf_16_to_shift_jis(conf.weapons_[i].Name()) << "(" << conf.airs_[i] << ")";
+		os << char_cvt::utf_16_to_shift_jis(conf.weapons_[i].GetName()) << "(" << conf.airs_[i] << ")";
 	}
 	os 
 		<< endl
@@ -116,7 +116,7 @@ std::wostream & operator<<(std::wostream & os, const Kammusu & conf)
 		<< L"　装備：";
 	for (auto i = 0; i < conf.slots_; ++i) {
 		if (i != 0) os << ",";
-		os << conf.weapons_[i].Name() << L"(" << conf.airs_[i] << ")";
+		os << conf.weapons_[i].GetName() << L"(" << conf.airs_[i] << ")";
 	}
 	os
 		<< endl

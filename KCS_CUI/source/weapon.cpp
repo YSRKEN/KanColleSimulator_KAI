@@ -18,7 +18,7 @@ void Weapon::Put() const {
 
 //制空値を計算する
 int Weapon::AntiAirScore(const int &airs) const {
-	static double kBonusPF[] = { 0,0,2,5,9,14,14,22 }, kBonusWB[] = { 0,0,1,1,1,3,3,6 };
+	const static double kBonusPF[] = { 0,0,2,5,9,14,14,22 }, kBonusWB[] = { 0,0,1,1,1,3,3,6 };
 	double anti_air_score = anti_air_ * sqrt(airs) + sqrt(1.0 * level_detail_ / 10);
 	if (weapon_class_ == kWeaponClassPF) {
 		anti_air_score += kBonusPF[level_];
@@ -65,7 +65,6 @@ bool Weapon::IsAirFight() const {
 // 触接に参加する艦載機ならtrue
 bool Weapon::IsAirTrailer() const {
 	switch (weapon_class_) {
-	case kWeaponClassPF:
 	case kWeaponClassPA:
 	case kWeaponClassPS:
 	case kWeaponClassPSS:

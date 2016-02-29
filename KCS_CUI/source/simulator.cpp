@@ -1,7 +1,6 @@
 ﻿#include "base.hpp"
 #include "config.hpp"
 #include "fleet.hpp"
-#include "result.hpp"
 #include "simulator.hpp"
 
 // 計算用メソッド
@@ -41,7 +40,7 @@ Result Simulator::Calc() {
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
 		for (auto fi = 0u; fi < fleet_[bi].FleetSize(); ++fi) {
 			for (auto ui = 0u; ui < fleet_[bi].UnitSize(fi); ++ui){
-				result_.SetHP(bi, fi, ui, fleet_[bi].GetUnit(fi, ui).GetHP());
+				result_.SetHP(bi, fi, ui, fleet_[bi].GetUnit()[fi][ui].GetHP());
 //				result.AddDamage(bi, fi, ui, RandInt(100));
 			}
 		}
@@ -75,6 +74,7 @@ tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleS
 	auto air_war_status = JudgeAirWarStatus(search_result, anti_air_score);
 
 	// 触接判定
+	// TODO:simulatorクラス内のRandReal関数を別の関数に「渡す」には？
 	vector<double> all_attack_plus(2, 1.0);
 	for (auto i = 0; i < kBattleSize; ++i) {
 		// 触接発生条件
@@ -83,16 +83,33 @@ tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleS
 		|| (i == kEnemySide && air_war_status == kAirWarStatusBest)) continue;
 		if (!fleet_[i].HasAirTrailer()) continue;
 		// 触接の開始率を計算する
-
+		auto trailer_aircraft_prob = fleet_[i].TrailerAircraftProb(air_war_status);
+		if (trailer_aircraft_prob < RandReal()) continue;	//触接は確率的に開始される
 		// 触接の選択率を計算する
-
+		const double all_attack_plus_list[] = { 1.12, 1.12, 1.17, 1.20 };
+		[&] {
+			for (auto &it_u : fleet_[i].GetUnit()) {
+				for (auto &it_k : it_u) {
+					for (auto &it_w : it_k.GetWeapon()) {
+						if (!it_w.IsAirTrailer()) continue;
+						if (0.07 * it_w.GetSearch() >= RandReal()) {
+							all_attack_plus[i] = all_attack_plus_list[it_w.GetHit()];
+							return;
+						}
+					}
+				}
+			}
+		}();
 	}
 
 	// 空中戦
 
+
 	// 対空砲火
 
+
 	// 開幕爆撃
+
 
 	return tuple <AirWarStatus, vector<double>>(air_war_status, all_attack_plus) ;
 }

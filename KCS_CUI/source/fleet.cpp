@@ -178,6 +178,47 @@ int Fleet::AntiAirScore() const{
 	return anti_air_score;
 }
 
+//触接開始率を計算する
+double Fleet::TrailerAircraftProb(const AirWarStatus &air_war_status) const {
+	// 制空権確保時の確率を計算する
+	double trailer_aircraft_prob = 0.0;
+	for (auto &it_u : unit_) {
+		for (auto &it_k : it_u) {
+			for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
+				auto it_w = it_k.GetWeapon()[wi];
+				switch (it_w.GetWeaponClass()) {
+				case kWeaponClassPS:
+				case kWeaponClassPSS:
+				case kWeaponClassDaiteiChan:
+				case kWeaponClassWS:
+				case kWeaponClassWSN:
+					trailer_aircraft_prob += 0.04 * it_w.GetSearch() * sqrt(it_k.GetAir()[wi]);
+				default:
+					break;
+				}
+			}
+		}
+	}
+	// 制空段階によって補正を掛ける(航空優勢以外は試験実装)
+	switch (air_war_status) {
+	case kAirWarStatusBest:
+		break;
+	case kAirWarStatusGood:
+		trailer_aircraft_prob *= 0.6;
+		break;
+	case kAirWarStatusNormal:
+		trailer_aircraft_prob *= 0.4;
+		break;
+	case kAirWarStatusBad:
+		trailer_aircraft_prob *= 0.2;
+		break;
+	case kAirWarStatusWorst:
+		trailer_aircraft_prob *= 0.0;
+		break;
+	}
+	return trailer_aircraft_prob;
+}
+
 // 艦載機をいずれかの艦が保有していた場合はtrue
 bool Fleet::HasAir() const {
 	for (auto &it_u : unit_) {
@@ -214,7 +255,7 @@ std::ostream & operator<<(std::ostream & os, const Fleet & conf)
 	for (auto fi = 0; fi < conf.fleet_type_; ++fi) {
 		os << "　第" << (fi + 1) << "艦隊：" << endl;
 		for (auto &it_k : conf.unit_[fi]) {
-			os << "　　" << char_cvt::utf_16_to_shift_jis(it_k.GetName()) << endl;
+			os << "　　" << char_cvt::utf_16_to_shift_jis(it_k.GetNameLv()) << endl;
 		}
 	}
 	os << endl;
@@ -227,7 +268,7 @@ std::wostream & operator<<(std::wostream & os, const Fleet & conf)
 	for (auto fi = 0; fi < conf.fleet_type_; ++fi) {
 		os << L"　第" << (fi + 1) << L"艦隊：" << endl;
 		for (auto &it_k : conf.unit_[fi]) {
-			os << L"　　" << it_k.GetName() << endl;
+			os << L"　　" << it_k.GetNameLv() << endl;
 		}
 	}
 	os << endl;

@@ -99,6 +99,7 @@ KammusuDB::KammusuDB() {
 	hash_lv1_[-1] = Kammusu();
 	hash_lv99_[-1] = Kammusu();
 }
+
 namespace detail {
 	int CalcHPWhenMarriage(const Kammusu& temp_k, const Kammusu &kammusu_lv99)
 	{
@@ -128,6 +129,7 @@ namespace detail {
 		return std::min(kammusu_lv99.GetMaxHP(), new_max_hp);
 	}
 }
+
 // 艦娘DBからデータを読みだす
 // idで指定した艦戦IDの艦娘を、レベルがlevelの状態にして返す
 // ただし装甲・火力・雷撃・対空は改修MAXの状態とする

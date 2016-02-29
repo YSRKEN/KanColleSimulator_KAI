@@ -30,6 +30,7 @@ using std::to_string;
 using std::tuple;
 using std::unordered_map;
 using std::vector;
+using std::wcout;
 
 const int kBattleSize = 2;		//戦闘で戦うのは敵と味方の「2つ」
 const int kMaxFleetSize = 2;	//

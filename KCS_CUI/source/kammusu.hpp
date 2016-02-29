@@ -64,6 +64,7 @@ public:
 		const int search, vector<int> first_weapons, const bool kammusu_flg, const int level
 	);
 	// getter
+	wstring GetName() const { return name_; }
 	int GetMaxHP() const { return max_hp_; }
 	int GetLuck() const { return luck_; }
 	int GetSlots() const { return slots_; }
@@ -84,7 +85,7 @@ public:
 	void SetCond(const int cond) { cond_ = cond; }
 	// その他
 	void Put() const;				// 中身を表示する
-	wstring GetName() const;		// 簡易的な名称を返す
+	wstring GetNameLv() const;		// 簡易的な名称を返す
 	Kammusu Reset();				// 変更可な部分をリセットする
 	Kammusu Reset(const WeaponDB&);	// 変更可な部分をリセットする(初期装備)
 	bool HasAir() const;			// 艦載機を保有していた場合はtrue
