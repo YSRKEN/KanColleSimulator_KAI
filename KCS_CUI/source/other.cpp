@@ -2,6 +2,62 @@
 #include "other.hpp"
 #include "char_convert.hpp"
 #include <algorithm>
+namespace detail {
+	struct Split_helper_index { char delim; std::size_t index; };
+	struct Split_helper {
+		char delim;
+		Split_helper_index operator[](std::size_t n) const noexcept { return{ delim, n }; }
+	};
+	string operator| (const std::string& str, Split_helper_index info) {
+		std::size_t pre = 0, pos = 0;
+		for (size_t i = 0; i < info.index + 1; ++i) {
+			pre = pos;
+			pos = str.find_first_of(info.delim, pos) + 1;
+		}
+		return str.substr(pre, pos - pre - 1);
+	}
+	vector<string> operator| (const std::string& str, Split_helper info) {
+		vector<string> re;
+		size_t current = 0;
+		for (size_t found; (found = str.find_first_of(info.delim, current)) != string::npos; current = found + 1) {
+			re.emplace_back(str, current, found - current);
+		}
+		re.emplace_back(str, current, str.size() - current);
+		return re;
+	}
+	vector<string> operator| (std::string&& str, Split_helper info) {
+		vector<string> re;
+		size_t current = 0;
+		for (size_t found; (found = str.find_first_of(info.delim, current)) != string::npos; current = found + 1) {
+			re.emplace_back(str, current, found - current);
+		}
+		str.erase(0, current);
+		re.emplace_back(std::move(str));
+		return re;
+	}
+}
+detail::Split_helper Split(char delim) noexcept { return{ delim }; }
+namespace detail {
+	// 文字列配列を数字配列に変換する
+	inline vector<int> operator|(const vector<string> &arr_str, to_i_helper) {
+		vector<int> arr_int;
+		for (auto &it : arr_str) {
+			arr_int.push_back(it | to_i());
+		}
+		return arr_int;
+	}
+	struct ToHash_helper {};
+	// 配列をハッシュに変換する
+	template<typename T>
+	inline unordered_map<T, size_t> operator|(const vector<T> &vec, ToHash_helper) {
+		unordered_map<T, size_t> hash;
+		for (auto i = 0u; i < vec.size(); ++i) {
+			hash[vec[i]] = i;
+		}
+		return hash;
+	}
+}
+detail::ToHash_helper ToHash() noexcept { return{}; }
 // 装備DBのコンストラクタ
 WeaponDB::WeaponDB() {
 	// ファイルを開く
@@ -66,7 +122,7 @@ KammusuDB::KammusuDB() {
 		auto list          = temp_str | Split(',');
 		auto id            = list[header.at("艦船ID")] | to_i();
 		auto name          = char_cvt::shift_jis_to_utf_16(list[header.at("艦名")]);
-		auto shipclass     = static_cast<ShipClass>(list[header.at("艦種")] | to_i()));
+		auto shipclass     = static_cast<ShipClass>(list[header.at("艦種")] | to_i());
 		auto max_hp        = list[header.at("耐久")] | Split('.')[0] | to_i();
 		auto defense       = list[header.at("装甲")] | Split('.')[0] | to_i();
 		auto attack        = list[header.at("火力")] | Split('.')[0] | to_i();
@@ -156,68 +212,12 @@ Kammusu KammusuDB::Get(const int id, const int level) const {
 }
 
 // 文字列をデリミタで区切り分割する
-vector<string> Split(const string &str, char delim) {
-	vector<string> re;
-	size_t current = 0;
-	for (size_t found; (found = str.find_first_of(delim, current)) != string::npos; current = found + 1) {
-		re.emplace_back(str, current, found - current);
-	}
-	re.emplace_back(str, current, str.size() - current);
-	return re;
-}
-namespace detail {
-	struct Split_helper_index { char delim; std::size_t index; };
-	struct Split_helper {
-		char delim;
-		Split_helper_index operator[](std::size_t n) const noexcept {return{ delim, n };}
-	};
-	string operator| (const std::string& str, Split_helper_index info) {
-		std::size_t pre = 0, pos = 0;
-		for (size_t i = 0; i < info.index + 1; ++i) {
-			pre = pos;
-			pos = str.find_first_of(info.delim, pos) + 1;
-		}
-		return str.substr(pre, pos - pre - 1);
-	}
-	vector<string> operator| (const std::string& str, Split_helper info) {
-		vector<string> re;
-		size_t current = 0;
-		for (size_t found; (found = str.find_first_of(info.delim, current)) != string::npos; current = found + 1) {
-			re.emplace_back(str, current, found - current);
-		}
-		re.emplace_back(str, current, str.size() - current);
-		return re;
-	}
-	vector<string> operator| (std::string&& str, Split_helper info) {
-		vector<string> re;
-		size_t current = 0;
-		for (size_t found; (found = str.find_first_of(info.delim, current)) != string::npos; current = found + 1) {
-			re.emplace_back(str, current, found - current);
-		}
-		str.erase(0, current);
-		re.emplace_back(std::move(str));
-		return re;
-	}
-}
-detail::Split_helper Split(char delim) noexcept { return{ delim }; }
-namespace detail {
-	// 文字列配列を数字配列に変換する
-	inline vector<int> operator|(const vector<string> &arr_str, to_i_helper) {
-		vector<int> arr_int;
-		for (auto &it : arr_str) {
-			arr_int.push_back(it | to_i());
-		}
-		return arr_int;
-	}
-	struct ToHash_helper {};
-	// 配列をハッシュに変換する
-	template<typename T>
-	inline unordered_map<T, size_t> operator|(const vector<T> &vec, ToHash_helper) {
-		unordered_map<T, size_t> hash;
-		for (auto i = 0u; i < vec.size(); ++i) {
-			hash[vec[i]] = i;
-		}
-		return hash;
-	}
-}
-detail::ToHash_helper ToHash() noexcept { return{}; }
+//vector<string> Split(const string &str, char delim) {
+//	vector<string> re;
+//	size_t current = 0;
+//	for (size_t found; (found = str.find_first_of(delim, current)) != string::npos; current = found + 1) {
+//		re.emplace_back(str, current, found - current);
+//	}
+//	re.emplace_back(str, current, str.size() - current);
+//	return re;
+//}
