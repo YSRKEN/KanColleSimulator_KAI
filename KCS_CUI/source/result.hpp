@@ -10,8 +10,8 @@ public:
 		damage_.resize(kBattleSize, vector<vector<int>>(kMaxFleetSize, vector<int>(kMaxUnitSize, 0)));
 	}
 	// setter
-	void SetHP(const int bi, const int fi, const int ui, const int hp) { hp_[bi][fi][ui] = hp; }
-	void AddDamage(const int bi, const int fi, const int ui, const int damage) { damage_[bi][fi][ui] += damage; }
+	void SetHP(const int bi, const int fi, const int ui, const int hp) noexcept { hp_[bi][fi][ui] = hp; }
+	void AddDamage(const int bi, const int fi, const int ui, const int damage) noexcept { damage_[bi][fi][ui] += damage; }
 	// その他
 	string Put() const{
 		std::stringstream output;

@@ -48,7 +48,7 @@ Kammusu Kammusu::Reset(const WeaponDB &weapon_db) {
 }
 
 // 艦載機を保有していた場合はtrue
-bool Kammusu::HasAir() const {
+bool Kammusu::HasAir() const noexcept {
 	for (auto i = 0; i < slots_; ++i) {
 		if (weapons_[i].IsAir() && airs_[i] > 0) return true;
 	}
@@ -56,7 +56,7 @@ bool Kammusu::HasAir() const {
 }
 
 // 航空戦に参加する艦載機を保有していた場合はtrue
-bool Kammusu::HasAirFight() const {
+bool Kammusu::HasAirFight() const noexcept {
 	for (auto i = 0; i < slots_; ++i) {
 		if (weapons_[i].IsAirFight() && airs_[i] > 0) return true;
 	}
@@ -65,7 +65,7 @@ bool Kammusu::HasAirFight() const {
 
 
 // 触接に参加する艦載機を保有していた場合はtrue
-bool Kammusu::HasAirTrailer() const {
+bool Kammusu::HasAirTrailer() const noexcept {
 	for (auto i = 0; i < slots_; ++i) {
 		if (weapons_[i].IsAirTrailer() && airs_[i] > 0) return true;
 	}

@@ -65,32 +65,34 @@ public:
 	);
 	// getter
 	wstring GetName() const { return name_; }
-	int GetMaxHP() const { return max_hp_; }
-	int GetLuck() const { return luck_; }
-	int GetSlots() const { return slots_; }
-	int GetEvade() const { return evade_; }
-	int GetAntiSub() const { return anti_sub_; }
-	int GetSearch() const { return search_; }
-	int GetHP() const { return hp_; }
-	vector<int> GetAir() const { return airs_; }
-	vector<Weapon> GetWeapon() const { return weapons_; }
+	int GetMaxHP() const noexcept { return max_hp_; }
+	int GetLuck() const noexcept { return luck_; }
+	int GetSlots() const noexcept { return slots_; }
+	int GetEvade() const noexcept { return evade_; }
+	int GetAntiSub() const noexcept { return anti_sub_; }
+	int GetSearch() const noexcept { return search_; }
+	int GetHP() const noexcept { return hp_; }
+	vector<int>& GetAir() noexcept { return airs_; }
+	const vector<int>& GetAir() const noexcept { return airs_; }
+	vector<Weapon>& GetWeapon() noexcept { return weapons_; }
+	const vector<Weapon>& GetWeapon() const noexcept { return weapons_; }
 	// setter
-	void SetMaxHP(const int max_hp) { max_hp_ = max_hp; }
-	void SetLuck(const int luck) { luck_ = luck; }
-	void SetEvade(const int evade) { evade_ = evade; }
-	void SetAntiSub(const int anti_sub) { anti_sub_ = anti_sub; }
-	void SetSearch(const int search) { search_ = search; }
-	void SetLevel(const int level) { level_ = level; }
+	void SetMaxHP(const int max_hp) noexcept { max_hp_ = max_hp; }
+	void SetLuck(const int luck) noexcept { luck_ = luck; }
+	void SetEvade(const int evade) noexcept { evade_ = evade; }
+	void SetAntiSub(const int anti_sub) noexcept { anti_sub_ = anti_sub; }
+	void SetSearch(const int search) noexcept { search_ = search; }
+	void SetLevel(const int level) noexcept { level_ = level; }
 	void SetWeapon(const int index, const Weapon &weapon) { weapons_[index] = weapon; }
-	void SetCond(const int cond) { cond_ = cond; }
+	void SetCond(const int cond) noexcept { cond_ = cond; }
 	// その他
 	void Put() const;				// 中身を表示する
 	wstring GetNameLv() const;		// 簡易的な名称を返す
 	Kammusu Reset();				// 変更可な部分をリセットする
 	Kammusu Reset(const WeaponDB&);	// 変更可な部分をリセットする(初期装備)
-	bool HasAir() const;			// 艦載機を保有していた場合はtrue
-	bool HasAirFight() const;		// 航空戦に参加する艦載機を保有していた場合はtrue
-	bool HasAirTrailer() const;		// 触接に参加する艦載機を保有していた場合はtrue
+	bool HasAir() const noexcept;			// 艦載機を保有していた場合はtrue
+	bool HasAirFight() const noexcept;		// 航空戦に参加する艦載機を保有していた場合はtrue
+	bool HasAirTrailer() const noexcept;		// 触接に参加する艦載機を保有していた場合はtrue
 	friend std::ostream& operator<<(std::ostream& os, const Kammusu& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Kammusu& conf);
 };

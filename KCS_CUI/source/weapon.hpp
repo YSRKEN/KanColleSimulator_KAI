@@ -35,25 +35,25 @@ class Weapon {
 	int level_detail_;			//内部熟練度(0-120)
 public:
 	// コンストラクタ
-	Weapon();
+	Weapon() noexcept;
 	Weapon(
 		const int, wstring, const WeaponClass, const int, const int, const int, const int,
-		const int, const int, const int, const int, const int, const Range, const int, const int);
+		const int, const int, const int, const int, const int, const Range, const int, const int) noexcept;
 	// getter
-	std::wstring GetName() const { return name_; }
-	WeaponClass GetWeaponClass() const { return weapon_class_; }
-	int GetHit() const { return hit_; }
-	int GetSearch() const { return search_; }
+	const std::wstring& GetName() const noexcept { return name_; }
+	WeaponClass GetWeaponClass() const noexcept { return weapon_class_; }
+	int GetHit() const noexcept { return hit_; }
+	int GetSearch() const noexcept { return search_; }
 	// setter
 	void SetLevel(const int level) { level_ = level; }
 	void SetLevelDetail(const int level_detail) { level_detail_ = level_detail; }
 	// その他
 	void Put() const;					//中身を表示する
-	int AntiAirScore(const int&) const;	//制空値を計算する
-	bool IsAir() const;				//(熟練度が存在する)艦載機ならtrue
-	bool IsAirFight() const;		//航空戦に参加する艦載機ならtrue
-	bool IsAirTrailer() const;		//触接に参加する艦載機ならtrue
-	bool Weapon::IsAirBomb() const;	//開幕爆撃に参加する艦載機ならtrue
+	int AntiAirScore(const int&) const noexcept;	//制空値を計算する
+	bool IsAir() const noexcept;				//(熟練度が存在する)艦載機ならtrue
+	bool IsAirFight() const noexcept;		//航空戦に参加する艦載機ならtrue
+	bool IsAirTrailer() const noexcept;		//触接に参加する艦載機ならtrue
+	bool IsAirBomb() const noexcept;	//開幕爆撃に参加する艦載機ならtrue
 	friend std::ostream& operator<<(std::ostream& os, const Weapon& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Weapon& conf);
 };

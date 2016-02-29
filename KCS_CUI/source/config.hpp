@@ -14,12 +14,12 @@ public:
 	// 中身を表示する
 	void Put() const;
 	// getter
-	string GetInputFilename(const int n) const { return input_filename_[n]; }
+	const string& GetInputFilename(const int n) const noexcept { return input_filename_[n]; }
 	std::wstring GetInputFilenameW(const int n) const;
-	Formation GetFormation(const int n) const { return formation_[n]; }
-	int GetTimes() const { return times_; }
-	int GetThreads() const { return threads_; }
-	string GetOutputFilename() { return output_filename_; }
+	Formation GetFormation(const int n) const noexcept { return formation_[n]; }
+	int GetTimes() const noexcept { return times_; }
+	int GetThreads() const noexcept { return threads_; }
+	const string& GetOutputFilename() noexcept { return output_filename_; }
 	friend std::ostream& operator<<(std::ostream& os, const Config& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Config& conf);
 };
