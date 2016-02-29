@@ -35,6 +35,12 @@ public:
 	bool is_generatable() const noexcept {
 		return generator_.use_count() && generator_.get();
 	}
+	explicit operator bool() const noexcept {
+		return this->is_generatable();
+	}
+	bool operator!() const noexcept {
+		return this->is_generatable();
+	}
 	double RandReal() {
 		if (this->is_generatable()) {
 			return this->defalut_dist_(*this->generator_);
