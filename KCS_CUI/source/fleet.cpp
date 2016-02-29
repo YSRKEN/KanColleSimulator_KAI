@@ -268,9 +268,9 @@ int Fleet::AntiAirBonus() const {
 
 // 生存艦から艦娘をランダムに指定する
 Kammusu& Fleet::RandomKammusu() {
-	return unit_[0][0];
+	return unit_[this->rand_(0U, unit_.size())][this->rand_(0U, unit_[0].size())];
 }
-
+ 
 // 艦載機をいずれかの艦が保有していた場合はtrue
 bool Fleet::HasAir() const noexcept {
 	for (auto &it_u : unit_) {
