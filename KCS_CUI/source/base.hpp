@@ -69,6 +69,6 @@ namespace detail {
 		return (val < info.min) ? info.min : (info.max < val) ? info.max : val;
 	}
 }
-inline detail::to_i_helper to_i() { return{}; }
+inline detail::to_i_helper to_i() noexcept { return{}; }
 template<typename T>
-inline constexpr detail::limit_helper<T> limit(const T &val_min, const T &val_max) { return{ val_min, val_max }; }
+inline constexpr detail::limit_helper<T> limit(const T &val_min, const T &val_max) noexcept { return{ val_min, val_max }; }

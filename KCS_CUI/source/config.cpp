@@ -28,21 +28,21 @@ Config::Config(int argc, char *argv[]) {
 		else if (temp == "-f") {
 			// 陣形
 			if (argc - i <= 2) throw "コマンドライン引数が異常です.";
-			formation_[0] = static_cast<Formation>(stoi(argv[i + 1]));
-			formation_[1] = static_cast<Formation>(stoi(argv[i + 2]));
+			formation_[0] = static_cast<Formation>(argv[i + 1] | to_i());
+			formation_[1] = static_cast<Formation>(argv[i + 2] | to_i());
 			i += 2;
 		}
 		else if (temp == "-n") {
 			// 試行回数
 			if (argc - i <= 1) throw "コマンドライン引数が異常です.";
-			times_ = stoi(argv[i + 1]);
+			times_ = argv[i + 1] | to_i();
 			if (times_ <= 0) times_ = 1;
 			++i;
 		}
 		else if (temp == "-t") {
 			// 実行スレッド数
 			if (argc - i <= 1) throw "コマンドライン引数が異常です.";
-			threads_ = stoi(argv[i + 1]);
+			threads_ = argv[i + 1] | to_i();
 			if (threads_ <= 0) threads_ = 1;
 			++i;
 		}

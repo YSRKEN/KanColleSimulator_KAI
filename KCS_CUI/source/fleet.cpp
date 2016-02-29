@@ -15,7 +15,7 @@ namespace detail {
 	}
 }
 template<typename T>
-inline constexpr detail::to_i_limit_helper<T> to_i_limit(const T &val_min, const T &val_max) { return{ val_min, val_max }; }
+inline constexpr detail::to_i_limit_helper<T> to_i_limit(const T &val_min, const T &val_max) noexcept { return{ val_min, val_max }; }
 namespace detail {
 	template<typename ResultType> struct picojson_object_get_with_limit_or_default {
 		std::string key; ResultType min; ResultType max; ResultType Default;
@@ -28,7 +28,7 @@ namespace detail {
 	}
 }
 template<typename ResultType>
-detail::picojson_object_get_with_limit_or_default<ResultType> GetWithLimitOrDefault(std::string key, ResultType min, ResultType max, ResultType Default) {
+detail::picojson_object_get_with_limit_or_default<ResultType> GetWithLimitOrDefault(std::string key, ResultType min, ResultType max, ResultType Default) noexcept {
 	return{ key, min, max, Default };
 }
 
