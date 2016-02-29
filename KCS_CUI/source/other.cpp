@@ -109,7 +109,7 @@ Weapon WeaponDB::Get(const int id, std::nothrow_t) const noexcept {
 	}
 }
 namespace detail{
-	template<CsvParseLevel KammusuLv>Kammusu::NoDependOnLv PaeseCsvToKammusu(const std::unordered_map<string, std::size_t>& header, const vector<string>& list){
+	template<CsvParseLevel KammusuLv>Kammusu::DependOnLv PaeseCsvToKammusu(const std::unordered_map<string, std::size_t>& header, const vector<string>& list){
 		const int max_hp   = list[header.at("耐久")] | Split('.')[KammusuLv] | to_i();
 		const int defense  = list[header.at("装甲")] | Split('.')[KammusuLv] | to_i();
 		const int attack   = list[header.at("火力")] | Split('.')[KammusuLv] | to_i();

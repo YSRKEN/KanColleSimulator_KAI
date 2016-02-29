@@ -5,16 +5,11 @@ enum AirWarStatus { kAirWarStatusBest, kAirWarStatusGood, kAirWarStatusNormal, k
 
 class Fleet;
 #include "result.hpp"
-
+#include "random.hpp"
 class Simulator {
 	vector<Fleet> fleet_;	//シミュレーションに使用する艦隊
 	Result result_;			//シミュレーション結果を保存するクラス
-	// 乱数用メンバ関数
-	std::mt19937 mt;										//
-	std::uniform_real_distribution<double> rand;			//
-	double RandReal() { return rand(mt); }					//[0, 1)の一様実数乱数を取り出す
-	int RandInt(const int n) { return int(rand(mt) * n); }	//[0, n - 1]の一様整数乱数を取り出す
-	int RandInt(const int a, const int b) { return int(rand(mt) * (b - a + 1) + a); }	//[a, b]の一様整数乱数を取り出す
+	SharedRand rand;
 	// 各フェーズ
 	bitset<kBattleSize> SearchPhase();
 	tuple<AirWarStatus, vector<double>> AirWarPhase(const bitset<kBattleSize>&);
@@ -23,11 +18,10 @@ class Simulator {
 public:
 	// コンストラクタ
 	Simulator(){}
-	Simulator(const vector<Fleet> &fleet, const unsigned int &seed) {
-		fleet_ = fleet;
-		mt = std::mt19937(seed);
-		rand = std::uniform_real_distribution<double>(0.0, 1.0);
-	}
+	Simulator(const vector<Fleet> &fleet, const unsigned int seed)
+		: fleet_(fleet), rand(seed)
+	{}
+	SharedRand GetGenerator() noexcept { return this->rand; }
 	// 計算用メソッド
 	Result Calc();
 };

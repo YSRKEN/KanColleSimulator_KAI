@@ -124,7 +124,7 @@ struct Kammusu::DependOnLv {
 namespace detail {
 	struct ToSpeed_helper {};
 	// 文字列を速力に変換する
-	Speed operator| (const string& str, ToSpeed_helper) {
+	inline Speed operator| (const string& str, ToSpeed_helper) {
 		switch (str | to_i()) {
 		case 10: return kSpeedHigh;
 		case 5:  return kSpeedLow;

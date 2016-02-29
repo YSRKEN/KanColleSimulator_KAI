@@ -60,6 +60,10 @@ namespace detail {
 	inline int operator|(const std::basic_string<CharType>& str, to_i_helper) {
 		return atithmetic_cvt::from_str<int>(str);
 	}
+	template<typename CharType>
+	inline int operator|(const CharType* str, to_i_helper) {
+		return atithmetic_cvt::from_str<int>(std::basic_string<CharType>(str));
+	}
 	template<typename T>
 	struct limit_helper{
 		constexpr limit_helper(const T &val_min, const T &val_max) : min(val_min), max(val_max) {}

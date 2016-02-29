@@ -224,6 +224,7 @@
     <ClInclude Include="source\kammusu.hpp" />
     <ClInclude Include="source\other.hpp" />
     <ClInclude Include="source\picojson.h" />
+    <ClInclude Include="source\random.hpp" />
     <ClInclude Include="source\result.hpp" />
     <ClInclude Include="source\simulator.hpp" />
     <ClInclude Include="source\utf8bomskip.hpp" />

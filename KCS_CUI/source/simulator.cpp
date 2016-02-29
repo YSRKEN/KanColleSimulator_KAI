@@ -76,7 +76,7 @@ tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleS
 	auto air_war_status = JudgeAirWarStatus(search_result, anti_air_score);
 
 	// 触接判定
-	// TODO:simulatorクラス内のRandReal関数を別の関数に「渡す」には？
+	// TODO:simulatorクラス内のrand.RandReal関数を別の関数に「渡す」には？
 	vector<double> all_attack_plus(2, 1.0);
 	for (auto i = 0; i < kBattleSize; ++i) {
 		// 触接発生条件
@@ -86,7 +86,7 @@ tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleS
 		if (!fleet_[i].HasAirTrailer()) continue;
 		// 触接の開始率を計算する
 		auto trailer_aircraft_prob = fleet_[i].TrailerAircraftProb(air_war_status);
-		if (trailer_aircraft_prob < RandReal()) continue;	//触接は確率的に開始される
+		if (trailer_aircraft_prob < rand.RandReal()) continue;	//触接は確率的に開始される
 		// 触接の選択率を計算する
 		const double all_attack_plus_list[] = { 1.12, 1.12, 1.17, 1.20 };
 		[&] {
@@ -94,7 +94,7 @@ tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleS
 				for (auto &it_k : it_u) {
 					for (auto &it_w : it_k.GetWeapon()) {
 						if (!it_w.IsAirTrailer()) continue;
-						if (0.07 * it_w.GetSearch() >= RandReal()) {
+						if (0.07 * it_w.GetSearch() >= rand.RandReal()) {
 							all_attack_plus[i] = all_attack_plus_list[it_w.GetHit()];
 							return;
 						}
@@ -108,24 +108,24 @@ tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleS
 	double killed_airs_per[kBattleSize];
 	switch (air_war_status) {
 	case kAirWarStatusBest:
-		killed_airs_per[kFriendSide] = 1.0 * RandInt(7, 15) / 256;
-		killed_airs_per[kEnemySide] = RandReal() * 1.0;
+		killed_airs_per[kFriendSide] = rand.RandReal(7, 15) / 256;
+		killed_airs_per[kEnemySide] = rand.RandReal();
 		break;
 	case kAirWarStatusGood:
-		killed_airs_per[kFriendSide] = 1.0 * RandInt(20, 45) / 256;
-		killed_airs_per[kEnemySide] = RandReal() * 0.8;
+		killed_airs_per[kFriendSide] = rand.RandReal(20, 45) / 256;
+		killed_airs_per[kEnemySide] = rand.RandReal() * 0.8;
 		break;
 	case kAirWarStatusNormal:
-		killed_airs_per[kFriendSide] = 1.0 * RandInt(30, 75) / 256;
-		killed_airs_per[kEnemySide] = RandReal() * 0.6;
+		killed_airs_per[kFriendSide] = rand.RandReal(30, 75) / 256;
+		killed_airs_per[kEnemySide] = rand.RandReal() * 0.6;
 		break;
 	case kAirWarStatusBad:
-		killed_airs_per[kFriendSide] = 1.0 * RandInt(45, 105) / 256;
-		killed_airs_per[kEnemySide] = RandReal() * 0.4;
+		killed_airs_per[kFriendSide] = rand.RandReal(45, 105) / 256;
+		killed_airs_per[kEnemySide] = rand.RandReal() * 0.4;
 		break;
 	case kAirWarStatusWorst:
-		killed_airs_per[kFriendSide] = 1.0 * RandInt(65, 150) / 256;
-		killed_airs_per[kEnemySide] = RandReal() * 0.1;
+		killed_airs_per[kFriendSide] = rand.RandReal(65, 150) / 256;
+		killed_airs_per[kEnemySide] = rand.RandReal() * 0.1;
 		break;
 	}
 	for (auto i = 0; i < kBattleSize; ++i) {
@@ -152,7 +152,7 @@ tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleS
 				for (auto &it_k : it_u) {
 					auto aac_type_ = it_k.GetAacType();
 					if (aac_type_ <= 3) continue;
-					if (it_k.GetAacProb(aac_type_) < RandReal()) continue;
+					if (it_k.GetAacProb(aac_type_) < rand.RandReal()) continue;
 					aac_type = aac_type_;
 					return;
 				}
@@ -162,7 +162,7 @@ tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleS
 				for (auto &it_k : it_u) {
 					auto aac_type_ = it_k.GetAacType();
 					if (aac_type_ != limit(aac_type_, 1, 3)) continue;
-					if (it_k.GetAacProb(aac_type_) < RandReal()) continue;
+					if (it_k.GetAacProb(aac_type_) < rand.RandReal()) continue;
 					aac_type = aac_type_;
 					return;
 				}
@@ -182,7 +182,7 @@ tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleS
 					auto all_anti_air = intercept_kammusu.GetAllAntiAir();	//加重対空値
 					int killed_airs = 0;
 					//固定撃墜
-					if (RandInt(2)) {
+					if (rand.RandBool()) {
 						if (intercept_kammusu.IsKammusu()) {
 							killed_airs += int(0.1 * (all_anti_air + anti_air_bonus));
 						}
@@ -202,7 +202,7 @@ tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleS
 						}
 					}
 					//割合撃墜
-					if (RandInt(2)) killed_airs += int(int(0.9 * all_anti_air) * target_airs / 360);
+					if (rand.RandBool()) killed_airs += int(int(0.9 * all_anti_air) * target_airs / 360);
 					//対空カットイン成功時の固定ボーナス
 					killed_airs += aac_bonus_add1[aac_type];
 					//艦娘限定ボーナス
