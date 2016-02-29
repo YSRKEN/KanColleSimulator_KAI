@@ -105,7 +105,40 @@ tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleS
 	}
 
 	// 空中戦
-
+	double killed_airs_per[kBattleSize];
+	switch (air_war_status) {
+	case kAirWarStatusBest:
+		killed_airs_per[kFriendSide] = 1.0 * RandInt(7, 15) / 256;
+		killed_airs_per[kEnemySide] = RandReal() * 1.0;
+		break;
+	case kAirWarStatusGood:
+		killed_airs_per[kFriendSide] = 1.0 * RandInt(20, 45) / 256;
+		killed_airs_per[kEnemySide] = RandReal() * 0.8;
+		break;
+	case kAirWarStatusNormal:
+		killed_airs_per[kFriendSide] = 1.0 * RandInt(30, 75) / 256;
+		killed_airs_per[kEnemySide] = RandReal() * 0.6;
+		break;
+	case kAirWarStatusBad:
+		killed_airs_per[kFriendSide] = 1.0 * RandInt(45, 105) / 256;
+		killed_airs_per[kEnemySide] = RandReal() * 0.4;
+		break;
+	case kAirWarStatusWorst:
+		killed_airs_per[kFriendSide] = 1.0 * RandInt(65, 150) / 256;
+		killed_airs_per[kEnemySide] = RandReal() * 0.1;
+		break;
+	}
+	for (auto i = 0; i < kBattleSize; ++i) {
+		for (auto &it_u : fleet_[i].GetUnit()) {
+			for (auto &it_k : it_u) {
+				for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
+					auto &it_w = it_k.GetWeapon()[wi];
+					if (!it_w.IsAirFight()) continue;
+					it_k.GetAir()[wi] -= int(it_k.GetAir()[wi] * killed_airs_per[i]);
+				}
+			}
+		}
+	}
 
 	// 対空砲火
 
