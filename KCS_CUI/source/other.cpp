@@ -2,11 +2,13 @@
 #include "other.hpp"
 #include "char_convert.hpp"
 #include <algorithm>
+enum class CsvParseLevel : std::size_t { kLevel1 = 0, kLevel99 = 1 };
 namespace detail {
 	struct Split_helper_index { char delim; std::size_t index; };
 	struct Split_helper {
 		char delim;
 		Split_helper_index operator[](std::size_t n) const noexcept { return{ delim, n }; }
+		Split_helper_index operator[](CsvParseLevel n) const noexcept { return this->operator[](static_cast<std::size_t>(n)); }
 	};
 	string operator| (const std::string& str, Split_helper_index info) {
 		std::size_t pre = 0, pos = 0;
@@ -106,7 +108,19 @@ Weapon WeaponDB::Get(const int id, std::nothrow_t) const noexcept {
 		return{};
 	}
 }
-
+namespace detail{
+	template<CsvParseLevel KammusuLv>Kammusu::NoDependOnLv PaeseCsvToKammusu(const std::unordered_map<string, std::size_t>& header, const vector<string>& list){
+		const int max_hp   = list[header.at("耐久")] | Split('.')[KammusuLv] | to_i();
+		const int defense  = list[header.at("装甲")] | Split('.')[KammusuLv] | to_i();
+		const int attack   = list[header.at("火力")] | Split('.')[KammusuLv] | to_i();
+		const int torpedo  = list[header.at("雷撃")] | Split('.')[KammusuLv] | to_i();
+		const int anti_air = list[header.at("対空")] | Split('.')[KammusuLv] | to_i();
+		const int evade    = list[header.at("回避")] | Split('.')[KammusuLv] | to_i();
+		const int anti_sub = list[header.at("対潜")] | Split('.')[KammusuLv] | to_i();
+		const int search   = list[header.at("索敵")] | Split('.')[KammusuLv] | to_i();
+		return { max_hp, defense, attack, torpedo, anti_air, evade, anti_sub, search, static_cast<std::size_t>(KammusuLv) };
+	}
+}
 // 艦娘DBのコンストラクタ
 KammusuDB::KammusuDB() {
 	// ファイルを開く
@@ -118,41 +132,29 @@ KammusuDB::KammusuDB() {
 	getline(ifs, temp_str);
 	auto header = temp_str | Split(',') | ToHash();
 	while (getline(ifs, temp_str)) {
+		auto list           = temp_str | Split(',');
+
+		const int id              = list[header.at("艦船ID")] | to_i();
+		const ShipClass shipclass = static_cast<ShipClass>(list[header.at("艦種")] | to_i());
+		const Speed speed         = list[header.at("速力")] | ToSpeed();
+		const Range range         = static_cast<Range>(list[header.at("射程")] | to_i());
+		const int slots           = list[header.at("スロット数")] | to_i();
+		const bool kammusu_flg    = 0 != (list[header.at("艦娘フラグ")] | to_i());
+		const int luck            = list[header.at("運")] | Split('.')[0] | to_i();
+		
+		wstring name              = char_cvt::shift_jis_to_utf_16(list[header.at("艦名")]);
+		vector<int> max_airs      = list[header.at("搭載数")] | Split('.') | to_i();
+		vector<int> first_weapons = list[header.at("初期装備")] | Split('.') | to_i();
 		// まずLv1の方を代入する
-		auto list          = temp_str | Split(',');
-		auto id            = list[header.at("艦船ID")] | to_i();
-		auto name          = char_cvt::shift_jis_to_utf_16(list[header.at("艦名")]);
-		auto shipclass     = static_cast<ShipClass>(list[header.at("艦種")] | to_i());
-		auto max_hp        = list[header.at("耐久")] | Split('.')[0] | to_i();
-		auto defense       = list[header.at("装甲")] | Split('.')[0] | to_i();
-		auto attack        = list[header.at("火力")] | Split('.')[0] | to_i();
-		auto torpedo       = list[header.at("雷撃")] | Split('.')[0] | to_i();
-		auto anti_air      = list[header.at("対空")] | Split('.')[0] | to_i();
-		auto luck          = list[header.at("運")] | Split('.')[0] | to_i();
-		auto speed         = ToSpeed(list[header.at("速力")]);
-		auto range         = static_cast<Range>(list[header.at("射程")] | to_i());
-		auto slots         = list[header.at("スロット数")] | to_i();
-		auto max_airs      = list[header.at("搭載数")] | Split('.') | to_i();
-		auto evade         = list[header.at("回避")] | Split('.')[0] | to_i();
-		auto anti_sub      = list[header.at("対潜")] | Split('.')[0] | to_i();
-		auto search        = list[header.at("索敵")] | Split('.')[0] | to_i();
-		auto first_weapons = list[header.at("初期装備")] | Split('.') | to_i();
-		auto kammusu_flg   = 1 == (list[header.at("艦娘フラグ")] | to_i());
-		Kammusu temp_k1(id, name, shipclass, max_hp, defense, attack, torpedo, anti_air, luck, speed,
-			range, slots, max_airs, evade, anti_sub, search, first_weapons, kammusu_flg, 1);
-		hash_lv1_[id] = move(temp_k1);
+		hash_lv1_[id]  = Kammusu(
+			detail::PaeseCsvToKammusu<CsvParseLevel::kLevel1>(header, list),
+			id, name, shipclass, luck, speed, range, slots, max_airs, first_weapons, kammusu_flg
+		);
 		// 次にLv99の方を処理する
-		max_hp   = list[header.at("耐久")] | Split('.')[1] | to_i();
-		defense  = list[header.at("装甲")] | Split('.')[1] | to_i();
-		attack   = list[header.at("火力")] | Split('.')[1] | to_i();
-		torpedo  = list[header.at("雷撃")] | Split('.')[1] | to_i();
-		anti_air = list[header.at("対空")] | Split('.')[1] | to_i();
-		evade    = list[header.at("回避")] | Split('.')[1] | to_i();
-		anti_sub = list[header.at("対潜")] | Split('.')[1] | to_i();
-		search   = list[header.at("索敵")] | Split('.')[1] | to_i();
-		Kammusu temp_k2(id, name, shipclass, max_hp, defense, attack, torpedo, anti_air, luck, speed,
-			range, slots, max_airs, evade, anti_sub, search, first_weapons, kammusu_flg, 99);
-		hash_lv99_[id] = move(temp_k2);
+		hash_lv99_[id] = Kammusu(
+			detail::PaeseCsvToKammusu<CsvParseLevel::kLevel99>(header, list),
+			id, move(name), shipclass, luck, speed, range, slots, move(max_airs), move(first_weapons), kammusu_flg
+		);
 	}
 	// ダミーデータを代入する
 	hash_lv1_[-1] = Kammusu();

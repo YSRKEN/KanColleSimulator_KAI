@@ -18,6 +18,17 @@ Kammusu::Kammusu(
 	max_airs_(move(max_airs)), evade_(evade), anti_sub_(anti_sub), search_(search), first_weapons_(move(first_weapons)),
 	kammusu_flg_(kammusu_flg), level_(level) {}
 
+Kammusu::Kammusu(
+	const DependOnLv info, const int id, wstring name, const ShipClass shipclass, 
+	const int luck, const Speed speed, const Range range, const int slots, vector<int> max_airs, 
+	vector<int> first_weapons, const bool kammusu_flg
+)
+	: Kammusu(
+		id, move(name), shipclass, info.max_hp, info.defense, info.attack, info.torpedo, info.anti_air, luck, speed, range, slots, 
+		move(max_airs), info.evade, info.anti_sub, info.search, move(first_weapons), kammusu_flg, info.level
+	)
+{}
+
 // 中身を表示する
 void Kammusu::Put() const {
 	cout << *this;
@@ -122,11 +133,4 @@ std::wostream & operator<<(std::wostream & os, const Kammusu & conf)
 		<< endl
 		<< L"　cond値：" << conf.cond_ << L"　残弾薬(％)：" << conf.ammo_ << L"　残燃料(％)" << conf.fuel_ << endl;
 	return os;
-}
-
-// 文字列を速力に変換する
-Speed ToSpeed(const string &str) {
-	if (str == "10") return kSpeedHigh;
-	if (str == "5") return kSpeedLow;
-	return kSpeedNone;
 }
