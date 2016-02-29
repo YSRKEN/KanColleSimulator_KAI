@@ -141,10 +141,24 @@ tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleS
 	}
 
 	// 対空砲火
+	for (auto i = 0; i < kBattleSize; ++i) {
+		// 艦隊対空ボーナス値を決定
 
+		// 対空カットイン判定を行う
+
+		// 迎撃！
+
+	}
 
 	// 開幕爆撃
+	for (auto i = 0; i < kBattleSize; ++i) {
+		// 敵の中での水上艦だけをピックアップする
 
+		// 水上艦だけに開幕爆撃が行われる
+
+		// ダメージ処理
+
+	}
 
 	return tuple <AirWarStatus, vector<double>>(air_war_status, all_attack_plus) ;
 }
