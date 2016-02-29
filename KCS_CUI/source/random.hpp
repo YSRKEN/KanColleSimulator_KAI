@@ -3,12 +3,17 @@
 #include <memory>
 #include <stdexcept>
 #include <type_traits>
+#include <vector>
+#include <cstdint>
 class missing_rand_generator : public std::runtime_error {
 public:
 	explicit missing_rand_generator() : std::runtime_error("missing_rand_generator") {}
 	explicit missing_rand_generator(const std::string& what_arg) : std::runtime_error("missing_rand_generator : " + what_arg) {}
 	explicit missing_rand_generator(const char* what_arg) : std::runtime_error(std::string("missing_rand_generator : ") + what_arg) {}
 };
+
+using seed_v_t = std::vector<std::uint_least32_t>;
+seed_v_t create_seed_v();
 
 class SharedRand {
 private:
