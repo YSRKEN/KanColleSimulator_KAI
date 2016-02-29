@@ -181,12 +181,10 @@ double Fleet::SearchValue() const noexcept {
 // 制空値を計算する
 int Fleet::AntiAirScore() const noexcept {
 	int anti_air_score = 0;
-	for (auto &it_u : unit_) {
-		for (auto &it_k : it_u) {
-			for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
-				if (!it_k.GetWeapon()[wi].IsAirFight()) continue;
-				anti_air_score += it_k.GetWeapon()[wi].AntiAirScore(it_k.GetAir()[wi]);
-			}
+	for (auto &it_k : unit_[0]) {
+		for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
+			if (!it_k.GetWeapon()[wi].IsAirFight()) continue;
+			anti_air_score += it_k.GetWeapon()[wi].AntiAirScore(it_k.GetAir()[wi]);
 		}
 	}
 	return anti_air_score;
@@ -196,20 +194,18 @@ int Fleet::AntiAirScore() const noexcept {
 double Fleet::TrailerAircraftProb(const AirWarStatus &air_war_status) const {
 	// 制空権確保時の確率を計算する
 	double trailer_aircraft_prob = 0.0;
-	for (auto &it_u : unit_) {
-		for (auto &it_k : it_u) {
-			for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
-				auto it_w = it_k.GetWeapon()[wi];
-				switch (it_w.GetWeaponClass()) {
-				case kWeaponClassPS:
-				case kWeaponClassPSS:
-				case kWeaponClassDaiteiChan:
-				case kWeaponClassWS:
-				case kWeaponClassWSN:
-					trailer_aircraft_prob += 0.04 * it_w.GetSearch() * sqrt(it_k.GetAir()[wi]);
-				default:
-					break;
-				}
+	for (auto &it_k : unit_[0]) {
+		for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
+			auto it_w = it_k.GetWeapon()[wi];
+			switch (it_w.GetWeaponClass()) {
+			case kWeaponClassPS:
+			case kWeaponClassPSS:
+			case kWeaponClassDaiteiChan:
+			case kWeaponClassWS:
+			case kWeaponClassWSN:
+				trailer_aircraft_prob += 0.04 * it_w.GetSearch() * sqrt(it_k.GetAir()[wi]);
+			default:
+				break;
 			}
 		}
 	}
@@ -233,6 +229,43 @@ double Fleet::TrailerAircraftProb(const AirWarStatus &air_war_status) const {
 	return trailer_aircraft_prob;
 }
 
+// 攻撃力補正を計算する
+double Fleet::TrailerAircraftPlus(Simulator *sim) const{
+	const static double all_attack_plus_list[] = { 1.12, 1.12, 1.17, 1.20 };
+	for (auto &it_k :unit_[0] ) {
+		for (auto &it_w : it_k.GetWeapon()) {
+			if (!it_w.IsAirTrailer()) continue;
+			if (0.07 * it_w.GetSearch() >= sim->RandReal()) {
+				return all_attack_plus_list[it_w.GetHit()];
+			}
+		}
+	}
+	return 1.0;
+}
+
+// 発動する対空カットインの種類を判断する
+int Fleet::AacType(Simulator *sim) const {
+	// まず、秋月型カットイン以外の判定を行う
+	for (auto &it_u : unit_) {
+		for (auto &it_k : it_u) {
+			auto aac_type = it_k.AacType();
+			if (aac_type <= 3) continue;
+			if (it_k.AacProb(aac_type) < sim->RandReal()) continue;
+			return aac_type;
+		}
+	}
+	// まず、秋月型カットイン以外の判定を行う
+	for (auto &it_u : unit_) {
+		for (auto &it_k : it_u) {
+			auto aac_type = it_k.AacType();
+			if (aac_type != limit(aac_type, 1, 3)) continue;
+			if (it_k.AacProb(aac_type) < sim->RandReal()) continue;
+			return aac_type;
+		}
+	}
+	return 0;
+}
+
 // 艦隊対空ボーナス値を計算する
 int Fleet::AntiAirBonus() const {
 	const static vector<vector<double>> kAntiAirBonusPer = { { 0.77, 0.91, 1.2, 0.77, 0.77 },{ 1.0, 1.2, 1.6, 1.0, 1.0 } };
@@ -241,7 +274,7 @@ int Fleet::AntiAirBonus() const {
 		for (auto &it_k : it_u) {
 			double anti_air_bonus = 0.0;
 			for (auto &it_w : it_k.GetWeapon()) {
-				if (it_w.GetName().find(L"高角砲") != wstring::npos || it_w.GetName().find(L"高射装置") != wstring::npos) {
+				if (it_w.IsHAG() || it_w.GetName().find(L"高射装置") != wstring::npos) {
 					anti_air_bonus += 0.35 * it_w.GetAntiAir();
 				}
 				else if (it_w.GetWeaponClass() == kWeaponClassSmallR || it_w.GetWeaponClass() == kWeaponClassLargeR) {
@@ -261,8 +294,30 @@ int Fleet::AntiAirBonus() const {
 }
 
 // 生存艦から艦娘をランダムに指定する
-Kammusu& Fleet::RandomKammusu() {
-	return unit_[0][0];
+int Fleet::RandomKammusu(Simulator *sim) {
+	//生存艦をリストアップ
+	vector<int> alived_list;
+	for (auto ui = 0u; ui < unit_[0].size(); ++ui) {
+		if (unit_[0][ui].Status() != kStatusLost) alived_list.push_back(ui);
+	}
+	if (alived_list.size() == 0) return -1;
+	return alived_list[sim->RandInt(alived_list.size())];
+}
+
+// 生存する水上艦から艦娘をランダムに指定する
+// ただしhas_bombがtrueの際は陸上型棲姫を避けるようになる
+int Fleet::RandomKammusuNonSS(Simulator *sim, const bool &has_bomb) {
+	//生存する水上艦をリストアップ
+	vector<int> alived_list;
+	for (auto ui = 0u; ui < unit_[0].size(); ++ui) {
+		auto &it_k = unit_[0][ui];
+		if (it_k.Status() == kStatusLost) continue;
+		if (it_k.IsSubmarine()) continue;
+		if (has_bomb && it_k.GetShipClass() == kShipClassAF) continue;
+		alived_list.push_back(ui);
+	}
+	if (alived_list.size() == 0) return -1;
+	return alived_list[sim->RandInt(alived_list.size())];
 }
 
 // 艦載機をいずれかの艦が保有していた場合はtrue
@@ -287,10 +342,8 @@ bool Fleet::HasAirFight() const noexcept {
 
 // 触接に参加する艦載機をいずれかの艦が保有していた場合はtrue
 bool Fleet::HasAirTrailer() const noexcept {
-	for (auto &it_u : unit_) {
-		for (auto &it_k : it_u) {
-			if (it_k.HasAirTrailer()) return true;
-		}
+	for (auto &it_k : unit_[0]) {
+		if (it_k.HasAirTrailer()) return true;
 	}
 	return false;
 }

@@ -25,6 +25,9 @@ L"工作艦", L"潜水母艦", L"練習巡洋艦", L"給油艦"
 enum Speed { kSpeedNone, kSpeedLow, kSpeedHigh };
 const wstring kSpeedStr[] = { L"無", L"低速", L"高速" };
 
+// ステータス(無傷・小破・中破・大破・撃沈)
+enum Status {kStatusNoDamage, kStatusVeryLightDamage, kStatusLightDamage, kStatusMiddleDamage, kStatusHeavyDamage, kStatusLost};
+
 // 艦娘クラス
 class Kammusu {
 	// 変更しないもの
@@ -65,6 +68,7 @@ public:
 	);
 	// getter
 	wstring GetName() const { return name_; }
+	ShipClass GetShipClass() const noexcept { return ship_class_; }
 	int GetMaxHP() const noexcept { return max_hp_; }
 	int GetLuck() const noexcept { return luck_; }
 	int GetSlots() const noexcept { return slots_; }
@@ -84,6 +88,7 @@ public:
 	void SetAntiSub(const int anti_sub) noexcept { anti_sub_ = anti_sub; }
 	void SetSearch(const int search) noexcept { search_ = search; }
 	void SetLevel(const int level) noexcept { level_ = level; }
+	void SetHP(const int hp) noexcept { hp_ = hp; }
 	void SetWeapon(const int index, const Weapon &weapon) { weapons_[index] = weapon; }
 	void SetCond(const int cond) noexcept { cond_ = cond; }
 	// その他
@@ -91,12 +96,15 @@ public:
 	wstring GetNameLv() const;		//簡易的な名称を返す
 	Kammusu Reset();				//変更可な部分をリセットする
 	Kammusu Reset(const WeaponDB&);	//変更可な部分をリセットする(初期装備)
-	int GetAacType() const noexcept;				//対空カットインの種類を判別する
-	double GetAacProb(const int&) const noexcept;	//対空カットインの発動確率を計算する
-	double GetAllAntiAir() const noexcept;			//加重対空値を計算する
+	int AacType() const noexcept;					//対空カットインの種類を判別する
+	double AacProb(const int&) const noexcept;		//対空カットインの発動確率を計算する
+	double AllAntiAir() const noexcept;				//加重対空値を計算する
+	Status Status() const noexcept;					//ステータスを返す
 	bool HasAir() const noexcept;					//艦載機を保有していた場合はtrue
 	bool HasAirFight() const noexcept;				//航空戦に参加する艦載機を保有していた場合はtrue
 	bool HasAirTrailer() const noexcept;			//触接に参加する艦載機を保有していた場合はtrue
+	bool HasAirBomb() const noexcept;				//艦爆を保有していた場合はtrue
+	bool IsSubmarine() const noexcept;				//潜水艦系ならtrue
 	friend std::ostream& operator<<(std::ostream& os, const Kammusu& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Kammusu& conf);
 };

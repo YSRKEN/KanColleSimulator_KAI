@@ -48,7 +48,7 @@ Kammusu Kammusu::Reset(const WeaponDB &weapon_db) {
 }
 
 // 対空カットインの種類を判別する
-int Kammusu::GetAacType() const noexcept {
+int Kammusu::AacType() const noexcept {
 	// 各種兵装の数を数える
 	//高角砲、高角砲+高射装置、高射装置、対空機銃(三式弾以外)、集中配備の数
 	size_t sum_hag = 0, sum_hagX = 0, sum_aad = 0, sum_aag = 0, sum_aagX = 0;
@@ -57,7 +57,7 @@ int Kammusu::GetAacType() const noexcept {
 	for (auto &it_w : weapons_) {
 		switch (it_w.GetWeaponClass()) {
 		case kWeaponClassGun:
-			if (it_w.GetName().find(L"高角砲") != wstring::npos) {
+			if (it_w.IsHAG()) {
 				if (it_w.GetName().find(L"高射装置") != wstring::npos || it_w.GetName() == L"90mm単装高角砲") {
 					++sum_hagX;
 				}
@@ -143,7 +143,7 @@ int Kammusu::GetAacType() const noexcept {
 }
 
 // 対空カットインの発動確率を計算する
-double Kammusu::GetAacProb(const int &aac_type) const noexcept {
+double Kammusu::AacProb(const int &aac_type) const noexcept {
 	// 色々とお察しください
 	/* 艦娘       位置   素対空値   装備対空値   種類   装備                                         結果      ％      備考
 	 * 秋月       僚艦   116        6            1      12.7高単、12.7高単、22号改四                 72/100    72.0%
@@ -203,8 +203,50 @@ double Kammusu::GetAacProb(const int &aac_type) const noexcept {
 }
 
 // 加重対空値を計算する
-double Kammusu::GetAllAntiAir() const noexcept {
+double Kammusu::AllAntiAir() const noexcept {
+	double aaa_sum = anti_air_;
+	for (auto &it_w : weapons_) {
+		double aaa;
+		if (kammusu_flg_) {
+			aaa = it_w.GetAntiAir() + 0.7 * sqrt(it_w.GetLevel());
+		}
+		else {
+			aaa = int(2.0 * sqrt(it_w.GetAntiAir()));
+		}
+		switch (it_w.GetWeaponClass()) {
+		case kWeaponClassAAG:
+			aaa *= 6.0;
+			break;
+		case kWeaponClassAAD:
+			aaa *= 4.0;
+			break;
+		case kWeaponClassLargeR:
+		case kWeaponClassSmallR:
+			aaa *= 3.0;
+			break;
+		case kWeaponClassPF:
+		case kWeaponClassAAA:
+			aaa *= 0.0;
+			break;
+		case kWeaponClassGun:
+			if (it_w.IsHAG()) aaa *= 4.0; else aaa *= 0.0;
+			break;
+		default:
+			break;
+		}
+		aaa_sum += aaa;
+	}
 	return 0.0;
+}
+
+// ステータスを返す
+Status Kammusu::Status() const noexcept {
+	if (hp_ == max_hp_) return kStatusNoDamage;
+	if (hp_ == 0) return kStatusLost;
+	if (hp_ * 4 > max_hp_ * 3) return kStatusVeryLightDamage;
+	if (hp_ * 4 > max_hp_ * 2) return kStatusLightDamage;
+	if (hp_ * 4 > max_hp_ * 1) return kStatusMiddleDamage;
+	return kStatusHeavyDamage;
 }
 
 // 艦載機を保有していた場合はtrue
@@ -228,6 +270,21 @@ bool Kammusu::HasAirTrailer() const noexcept {
 	for (auto i = 0; i < slots_; ++i) {
 		if (weapons_[i].IsAirTrailer() && airs_[i] > 0) return true;
 	}
+	return false;
+}
+
+// 艦爆を保有していた場合はtrue
+bool Kammusu::HasAirBomb() const noexcept {
+	for (auto i = 0; i < slots_; ++i) {
+		auto weapon_class = weapons_[i].GetWeaponClass();
+		if ((weapon_class == kWeaponClassPB || weapon_class == kWeaponClassPBF) && airs_[i] > 0) return true;
+	}
+	return false;
+}
+
+// 潜水艦系ならtrue
+bool Kammusu::IsSubmarine() const noexcept {
+	if (ship_class_ == kShipClassSS || ship_class_ == kShipClassSSV) return true;
 	return false;
 }
 

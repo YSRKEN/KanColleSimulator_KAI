@@ -23,19 +23,23 @@ public:
 	Fleet(const string &file_name, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, char_cvt::char_enc fileenc = char_cvt::char_enc::utf8);
 	Fleet(std::istream &file, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, char_cvt::char_enc fileenc = char_cvt::char_enc::utf8);
 	// getter
-	auto GetUnit() const { return unit_; }
+	auto& GetUnit() { return unit_; }
+	const auto& GetUnit() const { return unit_; }
 	FleetType GetFleetType() noexcept{ return fleet_type_; }
 	// その他
 	size_t FleetSize() const noexcept { return unit_.size(); }	//「艦隊数」(通常艦隊だと1、連合艦隊だと2)
 	size_t UnitSize(const size_t fi) const noexcept { return unit_[fi].size(); }	//「艦隊」における艦数
-	void Put() const;					//中身を表示する
-	double SearchValue() const noexcept;			//索敵値を計算する
+	void Put() const;							//中身を表示する
+	double SearchValue() const noexcept;		//索敵値を計算する
 	int AntiAirScore() const noexcept;			//制空値を計算する
 	double TrailerAircraftProb(const AirWarStatus&) const;	//触接開始率を計算する
-	int AntiAirBonus() const;			//艦隊対空ボーナス値を計算する
-	Kammusu& RandomKammusu();			//生存艦から艦娘をランダムに指定する
-	bool HasAir() const noexcept;		//艦載機をいずれかの艦が保有していた場合はtrue
-	bool HasAirFight() const noexcept;	//航空戦に参加する艦載機をいずれかの艦が保有していた場合はtrue
+	double TrailerAircraftPlus(Simulator*) const;		//攻撃力補正を計算する
+	int AacType(Simulator*) const;					//発動する対空カットインの種類を判断する
+	int AntiAirBonus() const;								//艦隊対空ボーナス値を計算する
+	int RandomKammusu(Simulator*);					//生存艦から艦娘をランダムに指定する
+	int RandomKammusuNonSS(Simulator*, const bool&);	//水上の生存艦から艦娘をランダムに指定する
+	bool HasAir() const noexcept;			//艦載機をいずれかの艦が保有していた場合はtrue
+	bool HasAirFight() const noexcept;		//航空戦に参加する艦載機をいずれかの艦が保有していた場合はtrue
 	bool HasAirTrailer() const noexcept;	//触接に参加する艦載機をいずれかの艦が保有していた場合はtrue
 	friend std::ostream& operator<<(std::ostream& os, const Fleet& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Fleet& conf);

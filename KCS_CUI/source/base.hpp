@@ -16,7 +16,7 @@
 #include <vector>
 #pragma warning( disable : 4592)
 
-#define KCS_DEBUG_MODE
+//#define KCS_DEBUG_MODE
 
 using std::cout;
 using std::bitset;
