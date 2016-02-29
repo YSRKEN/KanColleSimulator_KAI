@@ -78,6 +78,7 @@ public:
 	int GetEvade() const noexcept { return evade_; }
 	int GetAntiSub() const noexcept { return anti_sub_; }
 	int GetSearch() const noexcept { return search_; }
+	bool IsKammusu() const noexcept { return kammusu_flg_; }
 	int GetHP() const noexcept { return hp_; }
 	vector<int>& GetAir() noexcept { return airs_; }
 	const vector<int>& GetAir() const noexcept { return airs_; }
@@ -93,13 +94,16 @@ public:
 	void SetWeapon(const int index, const Weapon &weapon) { weapons_[index] = weapon; }
 	void SetCond(const int cond) noexcept { cond_ = cond; }
 	// その他
-	void Put() const;				// 中身を表示する
-	wstring GetNameLv() const;		// 簡易的な名称を返す
-	Kammusu Reset();				// 変更可な部分をリセットする
-	Kammusu Reset(const WeaponDB&);	// 変更可な部分をリセットする(初期装備)
-	bool HasAir() const noexcept;			// 艦載機を保有していた場合はtrue
-	bool HasAirFight() const noexcept;		// 航空戦に参加する艦載機を保有していた場合はtrue
-	bool HasAirTrailer() const noexcept;		// 触接に参加する艦載機を保有していた場合はtrue
+	void Put() const;				//中身を表示する
+	wstring GetNameLv() const;		//簡易的な名称を返す
+	Kammusu Reset();				//変更可な部分をリセットする
+	Kammusu Reset(const WeaponDB&);	//変更可な部分をリセットする(初期装備)
+	int GetAacType() const noexcept;				//対空カットインの種類を判別する
+	double GetAacProb(const int&) const noexcept;	//対空カットインの発動確率を計算する
+	double GetAllAntiAir() const noexcept;			//加重対空値を計算する
+	bool HasAir() const noexcept;					//艦載機を保有していた場合はtrue
+	bool HasAirFight() const noexcept;				//航空戦に参加する艦載機を保有していた場合はtrue
+	bool HasAirTrailer() const noexcept;			//触接に参加する艦載機を保有していた場合はtrue
 	friend std::ostream& operator<<(std::ostream& os, const Kammusu& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Kammusu& conf);
 };

@@ -30,7 +30,7 @@ class Weapon {
 	int hit_;					//命中
 	int evade_;					//回避
 	int search_;				//索敵
-	Range wrange_;				//射程
+	Range range_;				//射程
 	int level_;					//装備改修度(0-10)、外部熟練度(0-7)
 	int level_detail_;			//内部熟練度(0-120)
 public:
@@ -42,8 +42,10 @@ public:
 	// getter
 	const std::wstring& GetName() const noexcept { return name_; }
 	WeaponClass GetWeaponClass() const noexcept { return weapon_class_; }
+	int GetAntiAir() const noexcept { return anti_air_; }
 	int GetHit() const noexcept { return hit_; }
 	int GetSearch() const noexcept { return search_; }
+	Range GetRange() const noexcept { return range_; }
 	// setter
 	void SetLevel(const int level) { level_ = level; }
 	void SetLevelDetail(const int level_detail) { level_detail_ = level_detail; }
