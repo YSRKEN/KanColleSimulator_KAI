@@ -17,8 +17,8 @@ void Weapon::Put() const {
 }
 
 //制空値を計算する
-int Weapon::AntiAirScore(const int &airs) const {
-	static double kBonusPF[] = { 0,0,2,5,9,14,14,22 }, kBonusWB[] = { 0,0,1,1,1,3,3,6 };
+int Weapon::AntiAirScore(const int &airs) const noexcept {
+	static const double kBonusPF[] = { 0,0,2,5,9,14,14,22 }, kBonusWB[] = { 0,0,1,1,1,3,3,6 };
 	double anti_air_score = anti_air_ * sqrt(airs) + sqrt(1.0 * level_detail_ / 10);
 	if (weapon_class_ == kWeaponClassPF) {
 		anti_air_score += kBonusPF[level_];
@@ -30,7 +30,7 @@ int Weapon::AntiAirScore(const int &airs) const {
 }
 
 // (熟練度が存在する)艦載機ならtrue
-bool Weapon::IsAir() const {
+bool Weapon::IsAir() const noexcept {
 	switch (weapon_class_) {
 	case kWeaponClassPF:
 	case kWeaponClassPBF:
@@ -49,7 +49,7 @@ bool Weapon::IsAir() const {
 }
 
 // 航空戦に参加する艦載機ならtrue
-bool Weapon::IsAirFight() const {
+bool Weapon::IsAirFight() const noexcept {
 	switch (weapon_class_) {
 	case kWeaponClassPF:
 	case kWeaponClassPBF:
@@ -63,7 +63,7 @@ bool Weapon::IsAirFight() const {
 }
 
 // 触接に参加する艦載機ならtrue
-bool Weapon::IsAirTrailer() const {
+bool Weapon::IsAirTrailer() const noexcept {
 	switch (weapon_class_) {
 	case kWeaponClassPF:
 	case kWeaponClassPA:
@@ -79,7 +79,7 @@ bool Weapon::IsAirTrailer() const {
 }
 
 // 開幕爆撃に参加する艦載機ならtrue
-bool Weapon::IsAirBomb() const {
+bool Weapon::IsAirBomb() const noexcept {
 	switch (weapon_class_) {
 	case kWeaponClassPBF:
 	case kWeaponClassPB:

@@ -118,7 +118,7 @@ void Fleet::Put() const {
 }
 
 // 索敵値を計算する
-double Fleet::SearchValue() const {
+double Fleet::SearchValue() const noexcept {
 	// 2-5式(秋)を採用。将来的には複数形式を切り替えられるようにする
 	double search_sum = 0.0;
 	//司令部レベル(5の倍数で切り上げた)による補正
@@ -165,7 +165,7 @@ double Fleet::SearchValue() const {
 }
 
 // 制空値を計算する
-int Fleet::AntiAirScore() const{
+int Fleet::AntiAirScore() const noexcept {
 	int anti_air_score = 0;
 	for (auto &it_u : unit_) {
 		for (auto &it_k : it_u) {
@@ -179,7 +179,7 @@ int Fleet::AntiAirScore() const{
 }
 
 // 艦載機をいずれかの艦が保有していた場合はtrue
-bool Fleet::HasAir() const {
+bool Fleet::HasAir() const noexcept {
 	for (auto &it_u : unit_) {
 		for (auto &it_k : it_u) {
 			if (it_k.HasAir()) return true;
@@ -189,7 +189,7 @@ bool Fleet::HasAir() const {
 }
 
 // 航空戦に参加する艦載機をいずれかの艦が保有していた場合はtrue
-bool Fleet::HasAirFight() const {
+bool Fleet::HasAirFight() const noexcept {
 	for (auto &it_u : unit_) {
 		for (auto &it_k : it_u) {
 			if (it_k.HasAirFight()) return true;
@@ -199,7 +199,7 @@ bool Fleet::HasAirFight() const {
 }
 
 // 触接に参加する艦載機をいずれかの艦が保有していた場合はtrue
-bool Fleet::HasAirTrailer() const {
+bool Fleet::HasAirTrailer() const noexcept {
 	for (auto &it_u : unit_) {
 		for (auto &it_k : it_u) {
 			if (it_k.HasAirTrailer()) return true;
