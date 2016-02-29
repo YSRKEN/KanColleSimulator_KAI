@@ -9,18 +9,19 @@ Result Simulator::Calc() {
 
 	// 索敵フェイズ
 	auto search_result = SearchPhase();
-
+#ifdef KCS_DEBUG_MODE
 	cout << "索敵結果・索敵値・艦載機を持っているか：\n";
 	for (auto i = 0; i < kBattleSize; ++i) {
 		cout << search_result[i] << " " << fleet_[i].SearchValue() << " " << fleet_[i].HasAir() << "\n";
 	}
 	cout << "\n";
-
+#endif
 	// 航空戦フェイズ
 	auto air_war_result = AirWarPhase(search_result);
-
+#ifdef KCS_DEBUG_MODE
 	cout << "制空状態・自艦隊倍率・敵艦隊倍率：\n";
 	cout << get<0>(air_war_result) << " " << get<1>(air_war_result)[0] << " " << get<1>(air_war_result)[1] << "\n\n";
+#endif
 
 	// 交戦形態の決定
 
@@ -41,7 +42,6 @@ Result Simulator::Calc() {
 		for (auto fi = 0u; fi < fleet_[bi].FleetSize(); ++fi) {
 			for (auto ui = 0u; ui < fleet_[bi].UnitSize(fi); ++ui){
 				result_.SetHP(bi, fi, ui, fleet_[bi].GetUnit()[fi][ui].GetHP());
-//				result.AddDamage(bi, fi, ui, RandInt(100));
 			}
 		}
 	}
@@ -69,7 +69,9 @@ tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleS
 	for (auto i = 0; i < kBattleSize; ++i) {
 		anti_air_score[i] = fleet_[i].AntiAirScore();
 	}
+#ifdef KCS_DEBUG_MODE
 	cout << "制空値：" << anti_air_score[0] << " " << anti_air_score[1] << "\n\n";
+#endif
 	//制空状態を判断する
 	auto air_war_status = JudgeAirWarStatus(search_result, anti_air_score);
 

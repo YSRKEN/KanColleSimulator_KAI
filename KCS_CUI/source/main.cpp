@@ -38,9 +38,11 @@ int main(int argc, char *argv[]) {
 		cout << "処理時間：" << std::chrono::duration_cast<std::chrono::milliseconds>(process_end_time - process_begin_time).count() << "[ms]\n\n";
 #endif
 		// 集計を行う
+#ifdef KCS_DEBUG_MODE
 		for (int n = 0; n < config.GetTimes(); ++n) {
 			cout << result_db[n].Put() << "\n";
 		}
+#endif
 	}
 	catch (const std::exception& er) {
 		std::cerr << er.what() << std::endl;
