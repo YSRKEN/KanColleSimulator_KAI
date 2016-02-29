@@ -35,7 +35,7 @@ class Weapon {
 	int level_detail_;			//内部熟練度(0-120)
 public:
 	// コンストラクタ
-	Weapon();
+	Weapon() noexcept;
 	Weapon(
 		const int, wstring, const WeaponClass, const int, const int, const int, const int,
 		const int, const int, const int, const int, const int, const Range, const int, const int) noexcept;
@@ -52,7 +52,7 @@ public:
 	bool IsAir() const noexcept;				//(熟練度が存在する)艦載機ならtrue
 	bool IsAirFight() const noexcept;		//航空戦に参加する艦載機ならtrue
 	bool IsAirTrailer() const noexcept;		//触接に参加する艦載機ならtrue
-	bool Weapon::IsAirBomb() const noexcept;	//開幕爆撃に参加する艦載機ならtrue
+	bool IsAirBomb() const noexcept;	//開幕爆撃に参加する艦載機ならtrue
 	friend std::ostream& operator<<(std::ostream& os, const Weapon& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Weapon& conf);
 };

@@ -2,7 +2,7 @@
 #include "weapon.hpp"
 #include "char_convert.hpp"
 // コンストラクタ
-Weapon::Weapon() : Weapon(-1, L"なし", kWeaponClassOther, 0, 0, 0, 0, 0, 0, 0, 0, 0, kRangeNone, 0, 0){}
+Weapon::Weapon() noexcept : Weapon(-1, {}, kWeaponClassOther, 0, 0, 0, 0, 0, 0, 0, 0, 0, kRangeNone, 0, 0) {}
 Weapon::Weapon(
 	const int id, wstring name, const WeaponClass weapon_class, const int defense,
 	const int attack, const int torpedo, const int bomb, const int anti_air, const int anti_sub,
@@ -95,7 +95,7 @@ std::ostream & operator<<(std::ostream & os, const Weapon & conf)
 {
 	os
 		<< "装備ID：" << conf.id_ << endl
-		<< "　装備名：" << char_cvt::utf_16_to_shift_jis(conf.name_) << "　種別：" << conf.weapon_class_ << endl
+		<< "　装備名：" << ((conf.name_.empty()) ? "なし" : char_cvt::utf_16_to_shift_jis(conf.name_)) << "　種別：" << conf.weapon_class_ << endl
 		<< "　装甲：" << conf.defense_ << "　火力：" << conf.attack_ << "　雷撃：" << conf.torpedo_ << "　爆装：" << conf.bomb_ << endl
 		<< "　対空：" << conf.anti_air_ << "　対潜：" << conf.anti_sub_ << "　命中：" << conf.hit_ << "　回避：" << conf.evade_ << endl
 		<< "　索敵：" << conf.search_ << "　射程：" << char_cvt::utf_16_to_shift_jis(kRangeStr[conf.wrange_]) << "　改修/熟練：" << conf.level_ << endl;
@@ -106,7 +106,7 @@ std::wostream & operator<<(std::wostream & os, const Weapon & conf)
 {
 	os
 		<< L"装備ID：" << conf.id_ << endl
-		<< L"　装備名：" << conf.name_ << L"　種別：" << conf.weapon_class_ << endl
+		<< L"　装備名：" << ((conf.name_.empty()) ? L"なし" : conf.name_) << L"　種別：" << conf.weapon_class_ << endl
 		<< L"　装甲：" << conf.defense_ << L"　火力：" << conf.attack_ << L"　雷撃：" << conf.torpedo_ << L"　爆装：" << conf.bomb_ << endl
 		<< L"　対空：" << conf.anti_air_ << L"　対潜：" << conf.anti_sub_ << L"　命中：" << conf.hit_ << L"　回避：" << conf.evade_ << endl
 		<< L"　索敵：" << conf.search_ << L"　射程：" << kRangeStr[conf.wrange_] << L"　改修/熟練：" << conf.level_ << endl;
