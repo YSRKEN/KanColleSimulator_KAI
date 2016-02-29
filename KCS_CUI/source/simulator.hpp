@@ -13,7 +13,8 @@ class Simulator {
 	std::mt19937 mt;										//
 	std::uniform_real_distribution<double> rand;			//
 	double RandReal() { return rand(mt); }					//[0, 1)の一様実数乱数を取り出す
-	int RandInt(const int n) { return int(rand(mt) * n); }	//[0, n - 1]一様整数乱数を取り出す
+	int RandInt(const int n) { return int(rand(mt) * n); }	//[0, n - 1]の一様整数乱数を取り出す
+	int RandInt(const int a, const int b) { return int(rand(mt) * (b - a + 1) + a); }	//[a, b]の一様整数乱数を取り出す
 	// 各フェーズ
 	bitset<kBattleSize> SearchPhase();
 	tuple<AirWarStatus, vector<double>> AirWarPhase(const bitset<kBattleSize>&);
