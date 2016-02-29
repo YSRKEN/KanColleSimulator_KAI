@@ -52,3 +52,23 @@ template<typename T>
 constexpr T limit(const T &val, const T &val_min, const T &val_max) {
 	return (val < val_min) ? val_min : (val_max < val) ? val_max : val;
 }
+
+namespace detail {
+	struct to_i_helper {};
+	inline int operator|(const std::string& str, to_i_helper) {
+		return std::stoi(str);
+	}
+	template<typename T>
+	struct limit_helper{
+		constexpr limit_helper(const T &val_min, const T &val_max) : min(val_min), max(val_max) {}
+		const T& min;
+		const T& max;
+	};
+	template<typename T>
+	inline constexpr T operator|(const T &val, const limit_helper<T>& info) {
+		return (val < info.min) ? info.min : (info.max < val) ? info.max : val;
+	}
+}
+inline detail::to_i_helper to_i() { return{}; }
+template<typename T>
+inline constexpr detail::limit_helper<T> limit(const T &val_min, const T &val_max) { return{ val_min, val_max }; }

@@ -1,33 +1,53 @@
 ﻿#include "base.hpp"
 #include "fleet.hpp"
 #include "utf8bomskip.hpp"
+namespace detail {
+	template<typename T>
+	struct to_i_limit_helper {
+		constexpr to_i_limit_helper(const T &val_min, const T &val_max) : min(val_min), max(val_max) {}
+		const T& min;
+		const T& max;
+	};
+	template<typename T>
+	inline T operator|(const std::string& str, const to_i_limit_helper<T>& info) {
+		const int val = str | to_i();
+		return (val < info.min) ? info.min : (info.max < val) ? info.max : static_cast<T>(val);
+	}
+}
+template<typename T>
+inline constexpr detail::to_i_limit_helper<T> to_i_limit(const T &val_min, const T &val_max) { return{ val_min, val_max }; }
+namespace detail {
+	template<typename ResultType> struct picojson_object_get_with_limit_or_default {
+		std::string key; ResultType min; ResultType max; ResultType Default;
+	};
+	template<typename ResultType>
+	ResultType operator|(const picojson::object& obj, const picojson_object_get_with_limit_or_default<ResultType>& info){//ADLで発見される。処理はここが担う
+		auto it = obj.find(info.key);
+		if (obj.end() == it) return info.Default;
+		return it->second.to_str() | to_i_limit(info.min, info.max);
+	}
+}
+template<typename ResultType>
+detail::picojson_object_get_with_limit_or_default<ResultType> GetWithLimitOrDefault(std::string key, ResultType min, ResultType max, ResultType Default) {
+	return{ key, min, max, Default };
+}
+
 void Fleet::LoadJson(std::istream & file, const WeaponDB & weapon_db, const KammusuDB & kammusu_db, char_cvt::char_enc fileenc)
 {
 	using picojson::object;
-	using picojson::value;
 	if (fileenc == char_cvt::char_enc::unknown) throw std::runtime_error("unknown char enc type.");//文字コード自動判別なんてやらない
 	//本当はobjectの検索keyはfileencによってbyte列が違うので文字列テーブルを作らなければならないが、幸いアルファベットのみなのでその作業をサボることにした
-	value v;
+	picojson::value v;
 	file >> v;
 	// 読み込んだJSONデータを解析する
 	auto& o = v.get<object>();
 	//司令部レベル
-	if (o.find("lv") != o.end()) {
-		level_ = limit(stoi(o["lv"].to_str()), 1, 120);
-	}
-	else {
-		level_ = 120;
-	}
+	level_ = o | GetWithLimitOrDefault("lv", 1, 120, 120);
 	//艦隊の形式
-	if (o.find("type") != o.end()) {
-		fleet_type_ = limit(FleetType(stoi(o["type"].to_str())), kFleetTypeNormal, kFleetTypeCombined);
-		if (fleet_type_ == kFleetTypeCombined && formation_ == kFormationEchelon) {
-			// 連合艦隊に梯形陣は存在しないので、とりあえず単横陣(第一警戒航行序列)に変更しておく
-			formation_ = kFormationAbreast;
-		}
-	}
-	else {
-		fleet_type_ = kFleetTypeNormal;
+	fleet_type_ = o | GetWithLimitOrDefault("type", kFleetTypeNormal, kFleetTypeCombined, kFleetTypeNormal);
+	if (fleet_type_ == kFleetTypeCombined && formation_ == kFormationEchelon) {
+		// 連合艦隊に梯形陣は存在しないので、とりあえず単横陣(第一警戒航行序列)に変更しておく
+		formation_ = kFormationAbreast;
 	}
 	unit_.resize(fleet_type_);
 	//艦娘・深海棲艦
@@ -45,26 +65,26 @@ void Fleet::LoadJson(std::istream & file, const WeaponDB & weapon_db, const Kamm
 		for (auto &temp_u : fleet) {
 			// 艦船ID・レベル・運・cond値から艦娘を設定する
 			auto& unit = temp_u.second.get<object>();
-			auto id = stoi(unit["id"].to_str());
-			auto level = limit(stoi(unit["lv"].to_str()), 1, 155);	//上限はいつか変わるかも？
+			auto id = unit["id"].to_str() | to_i();
+			auto level = unit["lv"].to_str() | to_i_limit(1, 155);	//上限はいつか変わるかも？
 			Kammusu temp_k = kammusu_db.Get(id, level).Reset();
-			auto luck = limit(stoi(unit["luck"].to_str()), 0, 100);
+			auto luck = unit["luck"].to_str() | to_i_limit(0, 100);
 			temp_k.SetLuck(luck);
 			if (unit.find("cond") != unit.end()) {
-				temp_k.SetCond(limit(stoi(unit["cond"].to_str()), 0, 100));
+				temp_k.SetCond(unit["cond"].to_str() | to_i_limit(0, 100));
 			}
 			// 装備ID・改修/熟練度・内部熟練度から装備を設定する
 			int wi = 0;
 			for (auto &temp_p : unit["items"].get<object>()) {
 				auto& parts = temp_p.second.get<object>();
-				id = stoi(parts["id"].to_str());
-				Weapon temp_w = weapon_db.Get(id);
+				Weapon temp_w = weapon_db.Get(parts["id"].to_str() | to_i());
 				// 改修・外部熟練度・内部熟練度の処理
 				if (temp_w.IsAir()) {
-					level = limit(stoi(parts["rf"].to_str()), 0, 7);
+					level = parts["rf"].to_str() | to_i_limit(0, 7);
 					int level_detail = 0;
-					if (parts.find("rf_detail") != parts.end()) {
-						level_detail = limit(stoi(parts["rf_detail"].to_str()), 0, 120);
+					auto it = parts.find("rf_detail");
+					if (it != parts.end()) {
+						level_detail = it->second.to_str() | to_i_limit(0, 120);
 						level = ConvertDtoS(level_detail);
 					}
 					else {
@@ -73,7 +93,7 @@ void Fleet::LoadJson(std::istream & file, const WeaponDB & weapon_db, const Kamm
 					temp_w.SetLevelDetail(level_detail);
 				}
 				else {
-					level = limit(stoi(parts["rf"].to_str()), 0, 10);
+					level = parts["rf"].to_str() | to_i_limit(0, 10);
 				}
 				temp_w.SetLevel(level);
 				// 艦娘に装備させる
