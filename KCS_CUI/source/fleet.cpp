@@ -35,7 +35,7 @@ detail::picojson_object_get_with_limit_or_default<ResultType> GetWithLimitOrDefa
 void Fleet::LoadJson(std::istream & file, const WeaponDB & weapon_db, const KammusuDB & kammusu_db, char_cvt::char_enc fileenc)
 {
 	using picojson::object;
-	if (fileenc == char_cvt::char_enc::unknown) throw std::runtime_error("unknown char enc type.");//文字コード自動判別なんてやらない
+	ENCODE_THROW_WITH_MESSAGE_IF(fileenc == char_cvt::char_enc::unknown, "unknown char enc type.")//文字コード自動判別なんてやらない
 	//本当はobjectの検索keyはfileencによってbyte列が違うので文字列テーブルを作らなければならないが、幸いアルファベットのみなのでその作業をサボることにした
 	picojson::value v;
 	file >> v;
@@ -111,10 +111,10 @@ void Fleet::LoadJson(std::istream & file, const WeaponDB & weapon_db, const Kamm
 Fleet::Fleet(const string &file_name, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, const SharedRand& rand, char_cvt::char_enc fileenc)
 	: formation_(formation), rand_(rand)// 陣形はそのまま反映させる
 {
-	if (fileenc == char_cvt::char_enc::unknown) throw std::runtime_error("unknown char enc type.");//文字コード自動判別なんてやらない
+	ENCODE_THROW_WITH_MESSAGE_IF(fileenc == char_cvt::char_enc::unknown, "unknown char enc type.")//文字コード自動判別なんてやらない
 	// ファイルを読み込む
 	ifstream fin(file_name);
-	if (!fin.is_open()) throw "艦隊データが正常に読み込めませんでした.";
+	FILE_THROW_WITH_MESSAGE_IF(!fin.is_open(), "艦隊データが正常に読み込めませんでした.")
 	if(char_cvt::char_enc::shift_jis != fileenc) skip_utf8_bom(fin, fileenc);
 	this->LoadJson(fin, weapon_db, kammusu_db, fileenc);
 }
@@ -122,7 +122,7 @@ Fleet::Fleet(const string &file_name, const Formation &formation, const WeaponDB
 Fleet::Fleet(std::istream & file, const Formation & formation, const WeaponDB & weapon_db, const KammusuDB & kammusu_db, const SharedRand& rand, char_cvt::char_enc fileenc)
 	: formation_(formation), rand_(rand)// 陣形はそのまま反映させる
 {
-	if (fileenc == char_cvt::char_enc::unknown) throw std::runtime_error("unknown char enc type.");//文字コード自動判別なんてやらない
+	ENCODE_THROW_WITH_MESSAGE_IF(fileenc == char_cvt::char_enc::unknown, "unknown char enc type.")//文字コード自動判別なんてやらない
 	this->LoadJson(file, weapon_db, kammusu_db, fileenc);
 }
 

@@ -44,11 +44,18 @@ int main(int argc, char *argv[]) {
 		}
 #endif
 	}
-	catch (const std::exception& er) {
+	catch (const KCS_except::config_error& er){
 		std::cerr << er.what() << endl;
 	}
-	catch (char *e) {
-		std::cerr << "エラー：" << e << endl;
+	catch (const KCS_except::file_error& er){
+		std::cerr << er.what() << endl;
+	}
+	catch (const KCS_except::encode_error& er){
+		std::cerr << er.what() << endl;
+	}
+	catch (const std::exception& er) {
+		std::cerr << "It was stopped by unhandled exception." << endl;
+		std::cerr << er.what() << endl;
 	}
 	return 0;
 }

@@ -65,7 +65,7 @@ WeaponDB::WeaponDB() {
 	// ファイルを開く
 	std::locale::global(std::locale("japanese"));
 	ifstream ifs("slotitems.csv");
-	if (!ifs.is_open()) throw "slotitems.csvが正常に読み込めませんでした.";
+	FILE_THROW_WITH_MESSAGE_IF(!ifs.is_open(), "slotitems.csvが正常に読み込めませんでした.")
 	// 1行づつ読み込んでいく
 	string temp_str;
 	getline(ifs, temp_str);
@@ -127,7 +127,7 @@ KammusuDB::KammusuDB() {
 	// ファイルを開く
 	std::locale::global(std::locale("japanese"));
 	ifstream ifs("ships.csv");
-	if (!ifs.is_open()) throw "ships.csvが正常に読み込めませんでした.";
+	FILE_THROW_WITH_MESSAGE_IF(!ifs.is_open(), "ships.csvが正常に読み込めませんでした.")
 	// 1行づつ読み込んでいく
 	string temp_str;
 	getline(ifs, temp_str);
