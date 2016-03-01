@@ -2,12 +2,12 @@
 #include <stdexcept>
 #include <cstdint>
 #include <string>
-#define CONFIG_THROW_WITH_MESSAGE( MSG ) throw KCS_except::config_error(__FILE__, __FUNCTION__, __LINE__, MSG);
-#define CONFIG_THROW_WITH_MESSAGE_IF( EXPR, MSG ) if( EXPR ){ throw KCS_except::config_error(__FILE__, __FUNCTION__, __LINE__, #EXPR, MSG); }
-#define FILE_THROW_WITH_MESSAGE( MSG ) throw KCS_except::file_error(__FILE__, __FUNCTION__, __LINE__, MSG);
-#define FILE_THROW_WITH_MESSAGE_IF( EXPR, MSG ) if( EXPR ){ throw KCS_except::file_error(__FILE__, __FUNCTION__, __LINE__, #EXPR, MSG); }
-#define ENCODE_THROW_WITH_MESSAGE( MSG ) throw KCS_except::encode_error(__FILE__, __FUNCTION__, __LINE__, MSG);
-#define ENCODE_THROW_WITH_MESSAGE_IF( EXPR, MSG ) if( EXPR ){ throw KCS_except::encode_error(__FILE__, __FUNCTION__, __LINE__, #EXPR, MSG); }
+#define CONFIG_THROW_WITH_MESSAGE( MESSAGE ) throw KCS_except::config_error(__FILE__, __FUNCTION__, __LINE__, MESSAGE);
+#define CONFIG_THROW_WITH_MESSAGE_IF( EXPR, MESSAGE ) if( EXPR ){ throw KCS_except::config_error(__FILE__, __FUNCTION__, __LINE__, #EXPR, MESSAGE); }
+#define FILE_THROW_WITH_MESSAGE( MESSAGE ) throw KCS_except::file_error(__FILE__, __FUNCTION__, __LINE__, MESSAGE);
+#define FILE_THROW_WITH_MESSAGE_IF( EXPR, MESSAGE ) if( EXPR ){ throw KCS_except::file_error(__FILE__, __FUNCTION__, __LINE__, #EXPR, MESSAGE); }
+#define ENCODE_THROW_WITH_MESSAGE( MESSAGE ) throw KCS_except::encode_error(__FILE__, __FUNCTION__, __LINE__, MESSAGE);
+#define ENCODE_THROW_WITH_MESSAGE_IF( EXPR, MESSAGE ) if( EXPR ){ throw KCS_except::encode_error(__FILE__, __FUNCTION__, __LINE__, #EXPR, MESSAGE); }
 
 namespace KCS_except {
 	class config_error : public std::invalid_argument
