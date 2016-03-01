@@ -2,6 +2,8 @@
 #include "kammusu.hpp"
 #include "other.hpp"
 #include "char_convert.hpp"
+#include "fleet.hpp"
+#include "simulator.hpp"
 // コンストラクタ
 Kammusu::Kammusu() 
 	:	Kammusu(-1, L"なし", kShipClassDD, 0, 0, 0, 0, 0, 0, kSpeedNone, kRangeNone,
@@ -247,6 +249,23 @@ Status Kammusu::Status() const noexcept {
 	if (hp_ * 4 > max_hp_ * 2) return kStatusLightDamage;
 	if (hp_ * 4 > max_hp_ * 1) return kStatusMiddleDamage;
 	return kStatusHeavyDamage;
+}
+
+// ダメージを与える
+void Kammusu::MinusHP(const int &damage, const bool &stopper_flg, Simulator *sim) noexcept {
+	if (hp_ > damage) {
+		// 残り耐久＞ダメージなら普通に減算
+		hp_ -= damage;
+	}
+	else if (stopper_flg) {
+		// そうでない場合、撃沈ストッパーが効いている状況下では割合ダメージに変換される
+		hp_ -= int(0.5 * hp_ + 0.3 * sim->RandInt(hp_));
+		if (hp_ <= 0) hp_ = 1;
+	}
+	else {
+		// 撃沈ストッパーが存在しない場合はそのまま沈む
+		hp_ = 0;
+	}
 }
 
 // 艦載機を保有していた場合はtrue

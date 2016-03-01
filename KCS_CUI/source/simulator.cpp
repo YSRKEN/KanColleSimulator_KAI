@@ -231,11 +231,10 @@ tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleS
 		}
 	}
 	// ダメージ処理
-
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
 		auto &friend_unit = fleet_[bi].GetUnit()[0];
 		for (auto ui = 0u; ui < friend_unit.size(); ++ui) {
-			friend_unit[ui].SetHP(friend_unit[ui].GetHP() - all_damage[bi][ui]);
+			friend_unit[ui].MinusHP(all_damage[bi][ui], (bi == kFriendSide), this);
 		}
 	}
 

@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 #include "weapon.hpp"
-#include <iostream>
 class WeaponDB;
+class Simulator;
 
 // 艦種(厳密な綴りはShip Classificationsである)
 // ただし、浮遊要塞・護衛要塞・泊地棲鬼/姫・南方棲鬼は「重巡洋艦」、
@@ -100,6 +100,7 @@ public:
 	double AacProb(const int&) const noexcept;		//対空カットインの発動確率を計算する
 	double AllAntiAir() const noexcept;				//加重対空値を計算する
 	Status Status() const noexcept;					//ステータスを返す
+	void MinusHP(const int&, const bool&, Simulator*) noexcept;	//ダメージを与える
 	bool HasAir() const noexcept;					//艦載機を保有していた場合はtrue
 	bool HasAirFight() const noexcept;				//航空戦に参加する艦載機を保有していた場合はtrue
 	bool HasAirTrailer() const noexcept;			//触接に参加する艦載機を保有していた場合はtrue
