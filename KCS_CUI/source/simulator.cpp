@@ -347,19 +347,19 @@ int Simulator::CalcDamage(
 			// 攻撃側陣形補正
 			switch (friend_side.GetFormation()) {
 			case kFormationTrail:
-				if (is_target_submarine) damage *= 0.60; else damage *= 1.0;
+				damage *= (is_target_submarine) ? 0.60 : 1.0;
 				break;
 			case kFormationSubTrail:
-				if (is_target_submarine) damage *= 0.80; else damage *= 0.8;
+				damage *= (is_target_submarine) ? 0.80 : 0.8;
 				break;
 			case kFormationCircle:
-				if (is_target_submarine) damage *= 1.2; else damage *= 0.7;
+				damage *= (is_target_submarine) ? 1.2 : 0.7;
 				break;
 			case kFormationEchelon:
-				if (is_target_submarine) damage *= 1.0; else damage *= 0.6;
+				damage *= (is_target_submarine) ? 1.0 : 0.6;
 				break;
 			case kFormationAbreast:
-				if (is_target_submarine) damage *= 1.3; else damage *= 0.6;
+				damage *= (is_target_submarine) ? 1.3 : 0.6;
 				break;
 			}
 		}
@@ -368,10 +368,10 @@ int Simulator::CalcDamage(
 		// 損傷状態補正
 		switch (hunter_kammusu.Status()) {
 		case kStatusMiddleDamage:
-			if (battle_phase == kBattlePhaseFirstTorpedo) damage *= 0.8; else damage *= 0.7;
+			damage *= (battle_phase == kBattlePhaseFirstTorpedo) ? 0.8 : 0.7;
 			break;
 		case kStatusHeavyDamage:
-			if (battle_phase == kBattlePhaseFirstTorpedo) damage *= 0.0; else damage *= 0.4;
+			damage *= (battle_phase == kBattlePhaseFirstTorpedo) ? 0.0 : 0.4;
 			break;
 		default:
 			break;
@@ -451,8 +451,7 @@ double Simulator::CalcHitProb(
 				break;
 			}
 			//引き算により命中率を決定する(上限あり)
-			double hit_prob = hit_value - evade_value;
-			if (hit_prob > 0.97) hit_prob = 0.97;
+			const double hit_prob = std::min(hit_value - evade_value, 0.97);
 			return hit_prob;
 		}
 	break;
@@ -467,8 +466,7 @@ double Simulator::CalcHitProb(
 			hit_value += 0.000540 * hunter_kammusu.GetTorpedo();
 			hit_value += 0.009017 * hunter_kammusu.AllHit();
 			auto &hunter_weapon = hunter_kammusu.GetWeapon();
-			if (hunter_weapon[0].GetWeaponClass() == kWeaponClassTorpedo) hit_value += 0.02014 * sqrt(hunter_weapon[0].GetLevel());
-			if (hunter_weapon[1].GetWeaponClass() == kWeaponClassTorpedo) hit_value += 0.02014 * sqrt(hunter_weapon[1].GetLevel());
+			for (auto i : {0, 1}) if (hunter_weapon[i].GetWeaponClass() == kWeaponClassTorpedo) hit_value += 0.02014 * sqrt(hunter_weapon[i].GetLevel());
 			hit_value += 0.001463 * hunter_kammusu.GetLuck();
 			//回避側
 			double a;

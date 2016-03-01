@@ -65,22 +65,22 @@ void Fleet::LoadJson(std::istream & file, const WeaponDB & weapon_db, const Kamm
 		for (auto &temp_u : fleet) {
 			// 艦船ID・レベル・運・cond値から艦娘を設定する
 			auto& unit = temp_u.second.get<object>();
-			auto id = unit["id"].to_str() | to_i();
-			auto level = unit["lv"].to_str() | to_i_limit(1, 155);	//上限はいつか変わるかも？
+			auto id = unit.at("id").to_str() | to_i();
+			auto level = unit.at("lv").to_str() | to_i_limit(1, 155);	//上限はいつか変わるかも？
 			Kammusu temp_k = kammusu_db.Get(id, level).Reset();
-			auto luck = unit["luck"].to_str() | to_i_limit(0, 100);
+			auto luck = unit.at("luck").to_str() | to_i_limit(0, 100);
 			temp_k.SetLuck(luck);
-			if (unit.find("cond") != unit.end()) {
+			if (unit.count("cond")) {
 				temp_k.SetCond(unit["cond"].to_str() | to_i_limit(0, 100));
 			}
 			// 装備ID・改修/熟練度・内部熟練度から装備を設定する
 			int wi = 0;
-			for (auto &temp_p : unit["items"].get<object>()) {
+			for (auto &temp_p : unit.at("items").get<object>()) {
 				auto& parts = temp_p.second.get<object>();
-				Weapon temp_w = weapon_db.Get(parts["id"].to_str() | to_i());
+				Weapon temp_w = weapon_db.Get(parts.at("id").to_str() | to_i());
 				// 改修・外部熟練度・内部熟練度の処理
 				if (temp_w.IsAir()) {
-					level = parts["rf"].to_str() | to_i_limit(0, 7);
+					level = parts.at("rf").to_str() | to_i_limit(0, 7);
 					int level_detail = 0;
 					auto it = parts.find("rf_detail");
 					if (it != parts.end()) {
@@ -93,7 +93,7 @@ void Fleet::LoadJson(std::istream & file, const WeaponDB & weapon_db, const Kamm
 					temp_w.SetLevelDetail(level_detail);
 				}
 				else {
-					level = parts["rf"].to_str() | to_i_limit(0, 10);
+					level = parts.at("rf").to_str() | to_i_limit(0, 10);
 				}
 				temp_w.SetLevel(level);
 				// 艦娘に装備させる
@@ -325,33 +325,28 @@ int Fleet::RandomKammusuNonSS(const bool &has_bomb) {
 	if (alived_list.size() == 0) return -1;
 	return alived_list[rand_.RandInt(alived_list.size())];
 }
- 
-// 艦載機をいずれかの艦が保有していた場合はtrue
-bool Fleet::HasAir() const noexcept {
-	for (auto &it_u : unit_) {
+template<typename CondFunc>
+bool any_of(const std::vector<std::vector<Kammusu>>& unit, CondFunc cond) {
+	for (auto &it_u : unit) {
 		for (auto &it_k : it_u) {
-			if (it_k.HasAir()) return true;
+			if (cond(it_k)) return true;
 		}
 	}
 	return false;
+}
+// 艦載機をいずれかの艦が保有していた場合はtrue
+bool Fleet::HasAir() const noexcept {
+	return any_of(this->unit_, [](const Kammusu& it_k) -> bool { return it_k.HasAir(); });
 }
 
 // 航空戦に参加する艦載機をいずれかの艦が保有していた場合はtrue
 bool Fleet::HasAirFight() const noexcept {
-	for (auto &it_u : unit_) {
-		for (auto &it_k : it_u) {
-			if (it_k.HasAirFight()) return true;
-		}
-	}
-	return false;
+	return any_of(this->unit_, [](const Kammusu& it_k) -> bool { return it_k.HasAirFight(); });
 }
 
 // 触接に参加する艦載機をいずれかの艦が保有していた場合はtrue
 bool Fleet::HasAirTrailer() const noexcept {
-	for (auto &it_k : unit_[0]) {
-		if (it_k.HasAirTrailer()) return true;
-	}
-	return false;
+	return std::any_of(this->unit_[0].begin(), this->unit_[0].end(), [](const Kammusu& it_k) -> bool { return it_k.HasAirTrailer(); });
 }
 
 std::ostream & operator<<(std::ostream & os, const Fleet & conf)
