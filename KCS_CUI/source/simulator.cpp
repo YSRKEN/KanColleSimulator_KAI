@@ -361,8 +361,46 @@ int Simulator::CalcDamage(
 		break;
 	case kBattlePhaseFirstTorpedo:
 	case kBattlePhaseTorpedo:
-		// 雷撃戦命中率
-		hit_prob = 0.70;	//仮書き
+		{
+			// 雷撃戦命中率
+			//命中側
+			double hit_value = 0.9272;	//命中項
+			hit_value += 0.02178 * sqrt(hunter_kammusu.GetLevel() - 1);
+			hit_value += 0.001518 * hunter_kammusu.AllTorpedo(false);
+			hit_value += 0.000540 * hunter_kammusu.GetTorpedo();
+			hit_value += 0.009017 * hunter_kammusu.AllHit();
+			auto &hunter_weapon = hunter_kammusu.GetWeapon();
+			if (hunter_weapon[0].GetWeaponClass() == kWeaponClassTorpedo) hit_value += 0.02014 * sqrt(hunter_weapon[0].GetLevel());
+			if (hunter_weapon[1].GetWeaponClass() == kWeaponClassTorpedo) hit_value += 0.02014 * sqrt(hunter_weapon[1].GetLevel());
+			hit_value += 0.001463 * hunter_kammusu.GetLuck();
+			//回避側
+			double a;
+			switch (enemy_side.GetFormation()) {
+			case kFormationTrail:
+				a = 37.40;
+				break;
+			case kFormationSubTrail:
+				a = 37.16;
+				break;
+			case kFormationCircle:
+				a = 32.77;
+				break;
+			default:
+				a = 37.40;
+				break;
+			}
+			double evade_sum = target_kammusu.AllEvade();
+			double evade_value;		//回避項
+			if (evade_sum < a) {
+				evade_value = evade_sum / (2.0 * a);
+			}
+			else {
+				evade_value = evade_sum / (evade_sum + a);
+			}
+			//引き算により命中率を決定する(上限あり)
+			hit_prob = hit_value - evade_value;
+			if (hit_prob > 0.9691) hit_prob = 0.9691 + sqrt(hit_prob - 0.9691);
+		}
 		break;
 	}
 	return this->rand.RandInt(0, base_attack);	//仮置きのメソッド

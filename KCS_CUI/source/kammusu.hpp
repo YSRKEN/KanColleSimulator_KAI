@@ -82,6 +82,7 @@ public:
 	wstring GetName() const { return name_; }
 	ShipClass GetShipClass() const noexcept { return ship_class_; }
 	int GetMaxHP() const noexcept { return max_hp_; }
+	int GetTorpedo() const noexcept { return torpedo_; }
 	int GetLuck() const noexcept { return luck_; }
 	int GetSlots() const noexcept { return slots_; }
 	int GetEvade() const noexcept { return evade_; }
@@ -117,6 +118,7 @@ public:
 	Mood Mood() const noexcept;						//疲労度を返す
 	int AllHit() const noexcept;					//総命中を返す
 	double FitGunHitPlus() const noexcept;			//フィット砲補正
+	int AllTorpedo(const bool&) const noexcept;		//総雷装を返す
 	void MinusHP(const int&, const bool&);	//ダメージを与える、ctorもしくはSetRandGenerator経由で乱数エンジンを渡している必要がある
 	bool HasAir() const noexcept;					//艦載機を保有していた場合はtrue
 	bool HasAirFight() const noexcept;				//航空戦に参加する艦載機を保有していた場合はtrue

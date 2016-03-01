@@ -360,6 +360,25 @@ double Kammusu::FitGunHitPlus() const noexcept {
 	return hit_plus;
 }
 
+// 総雷装を返す
+// (level_flgがtrueの場合、装備改修による威力向上も考慮する)
+int Kammusu::AllTorpedo(const bool &level_flg) const noexcept {
+	double torpedo_sum = torpedo_;
+	for (auto &it_w : weapons_) {
+		torpedo_sum += it_w.GetTorpedo();
+		if (level_flg) {
+			switch (it_w.GetAntiAir()) {
+			case kWeaponClassTorpedo:
+			case kWeaponClassAAG:
+				torpedo_sum += 1.2 * sqrt(it_w.GetLevel());
+			default:
+				break;
+			}
+		}
+	}
+	return int(torpedo_sum);
+}
+
 // ダメージを与える
 void Kammusu::MinusHP(const int &damage, const bool &stopper_flg) {
 	if (hp_ > damage) {
