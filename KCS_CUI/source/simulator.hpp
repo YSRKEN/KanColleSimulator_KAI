@@ -26,8 +26,8 @@ class Simulator {
 	AirWarStatus JudgeAirWarStatus(const bitset<kBattleSize>&, const vector<int>&);
 	//与えるダメージ量を計算する
 	int CalcDamage(
-		const BattlePhase&, const int&, const KammusuIndex&, KammusuIndex&,
-		const int&, const vector<double>&, const BattlePosition&);
+		const BattlePhase&, const int&, const KammusuIndex&, KammusuIndex&, const int&,
+		const vector<double>&, const BattlePosition&, const bool&, const double&);
 	//「かばい」を確率的に発生させる
 	void ProtectOracle(const int&, KammusuIndex&);
 	//命中率を計算する
