@@ -8,23 +8,17 @@
 #include <type_traits>
 #include <vector>
 #include <cstdint>
-//#include <iostream>
 #include <algorithm>
 #include <unordered_set>
 #include <functional>
 #include <limits>
+#include "exception.hpp"
 #ifdef max
 #undef max
 #endif
 #ifdef min
 #undef min
 #endif
-class missing_rand_generator : public std::runtime_error {
-public:
-	explicit missing_rand_generator() : std::runtime_error("missing_rand_generator") {}
-	explicit missing_rand_generator(const std::string& what_arg) : std::runtime_error("missing_rand_generator : " + what_arg) {}
-	explicit missing_rand_generator(const char* what_arg) : std::runtime_error(std::string("missing_rand_generator : ") + what_arg) {}
-};
 
 using seed_v_t = std::vector<std::uint_least32_t>;
 seed_v_t create_seed_v();
@@ -74,11 +68,9 @@ public:
 		return *this->generator_;
 	}
 	std::mt19937& get() {
-		if (this->is_generatable()) {
-			return *this->generator_;
-		}
+		MISSING_RAND_GENERATOR_THROW_WITH_MESSAGE_IF(!this->is_generatable(), "rand generator is not initialized.")
 		else {
-			throw missing_rand_generator();
+			return *this->generator_;
 		}
 	}
 	std::mt19937& operator*() {
@@ -118,7 +110,7 @@ private:
 	template<typename RandType> std::vector<RandType> make_unique_rand_array_unique(const std::size_t size, RandType rand_min, RandType rand_max) {
 		if (rand_min > rand_max) std::swap(rand_min, rand_max);
 		const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
-		if (max_min_diff < size) throw std::runtime_error("Invalid argument");
+		INVAID_ARGUMENT_THROW_WITH_MESSAGE_IF(max_min_diff < size, "random generate range(" + std::to_string(rand_min) + "-->" + std::to_string(rand_max) + ") is small to make unique rand array.")
 
 		std::vector<RandType> tmp;
 		auto& engine = this->get();
@@ -143,7 +135,7 @@ private:
 	template<typename RandType> std::vector<RandType> make_unique_rand_array_select(const std::size_t size, RandType rand_min, RandType rand_max) {
 		if (rand_min > rand_max) std::swap(rand_min, rand_max);
 		const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
-		if (max_min_diff < size) throw std::runtime_error("Invalid argument");
+		INVAID_ARGUMENT_THROW_WITH_MESSAGE_IF( max_min_diff < size, "random generate range(" + std::to_string(rand_min) + "-->" + std::to_string(rand_max) + ") is small to make unique rand array.")
 
 		std::vector<RandType> tmp;
 		tmp.reserve(max_min_diff);
@@ -165,7 +157,7 @@ private:
 	template<typename RandType> std::vector<RandType> make_unique_rand_array_just_shuffle(const std::size_t size, RandType rand_min, RandType rand_max) {
 		if (rand_min > rand_max) std::swap(rand_min, rand_max);
 		const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
-		if (max_min_diff != size) throw std::runtime_error("Invalid argument");
+		INVAID_ARGUMENT_THROW_WITH_MESSAGE_IF(max_min_diff < size, "random generate range(" + std::to_string(rand_min) + "-->" + std::to_string(rand_max) + ") is small to make unique rand array.")
 
 		auto& engine = this->get();
 		distribution_t<RandType> distribution(rand_min, rand_max);
@@ -180,7 +172,7 @@ public:
 	std::vector<RandType> make_unique_rand_array(const std::size_t size, RandType rand_min, RandType rand_max) {
 		if (rand_min > rand_max) std::swap(rand_min, rand_max);
 		const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
-		if (max_min_diff < size) throw std::runtime_error("Invalid argument");
+		INVAID_ARGUMENT_THROW_WITH_MESSAGE_IF(max_min_diff < size, "random generate range(" + std::to_string(rand_min) + "-->" + std::to_string(rand_max) + ") is small to make unique rand array.")
 
 		if (max_min_diff == size) return make_unique_rand_array_just_shuffle(size, rand_min, rand_max);
 		else if (static_cast<std::uintmax_t>(std::numeric_limits<double>::max()) < max_min_diff || size < (max_min_diff * 0.04)) {
