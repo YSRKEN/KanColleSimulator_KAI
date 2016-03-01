@@ -14,6 +14,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include "arithmetic_convert.hpp"
 #pragma warning( disable : 4592)
 
 #define KCS_DEBUG_MODE
@@ -55,8 +56,9 @@ constexpr T limit(const T &val, const T &val_min, const T &val_max) {
 
 namespace detail {
 	struct to_i_helper {};
-	inline int operator|(const std::string& str, to_i_helper) {
-		return std::stoi(str);
+	template<typename CharType>
+	inline int operator|(const std::basic_string<CharType>& str, to_i_helper) {
+		return atithmetic_cvt::from_str<int>(str);
 	}
 	template<typename T>
 	struct limit_helper{

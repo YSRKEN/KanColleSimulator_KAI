@@ -58,6 +58,7 @@ class Kammusu {
 	int ammo_;					//残弾薬割合
 	int fuel_;					//残燃料割合
 public:
+	struct DependOnLv;
 	// コンストラクタ
 	Kammusu();
 	Kammusu(
@@ -66,6 +67,12 @@ public:
 		const Range range, const int slots, vector<int> max_airs, const int evade, const int anti_sub,
 		const int search, vector<int> first_weapons, const bool kammusu_flg, const int level
 	);
+	Kammusu(
+		const DependOnLv info, const int id, wstring name, const ShipClass shipclass, 
+		const int luck, const Speed speed, const Range range, const int slots, vector<int> max_airs, 
+		vector<int> first_weapons, const bool kammusu_flg
+	);
+
 	// getter
 	wstring GetName() const { return name_; }
 	ShipClass GetShipClass() const noexcept { return ship_class_; }
@@ -112,5 +119,26 @@ public:
 std::ostream& operator<<(std::ostream& os, const Kammusu& conf);
 std::wostream& operator<<(std::wostream& os, const Kammusu& conf);
 
-// 文字列を速力に変換する
-Speed ToSpeed(const string&);
+struct Kammusu::DependOnLv {
+	int max_hp;					//最大耐久
+	int defense;					//装甲
+	int attack;					//火力
+	int torpedo;					//雷撃
+	int anti_air;					//対空
+	int evade;						//回避
+	int anti_sub;					//対潜
+	int search;					//索敵
+	int level;						//レベル(練度)
+};
+namespace detail {
+	struct ToSpeed_helper {};
+	// 文字列を速力に変換する
+	Speed operator| (const string& str, ToSpeed_helper) {
+		switch (str | to_i()) {
+		case 10: return kSpeedHigh;
+		case 5:  return kSpeedLow;
+		default: return kSpeedNone;
+		}
+	}
+}
+constexpr detail::ToSpeed_helper ToSpeed() { return{}; }
