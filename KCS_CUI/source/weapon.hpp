@@ -2,11 +2,11 @@
 #include <iostream>
 // 種別
 enum WeaponClass {
-	kWeaponClassGun, kWeaponClassAP, kWeaponClassSubGun, kWeaponClassTorpedo, kWeaponClassSpecialSS,
-	kWeaponClassPF, kWeaponClassPB, kWeaponClassPBF, kWeaponClassWB, kWeaponClassPA, kWeaponClassPS,
-	kWeaponClassPSS, kWeaponClassDaiteiChan, kWeaponClassWS, kWeaponClassWSN, kWeaponClassASPP, kWeaponClassAJ,
-	kWeaponClassSmallR, kWeaponClassLargeR, kWeaponClassAAG, kWeaponClassAAA, kWeaponClassAAD, kWeaponClassDP,
-	kWeaponClassSonar, kWeaponClassDC, kWeaponClassSL, kWeaponClassLB, kWeaponClassHQ, kWeaponClassSSP,
+	kWeaponClassGun, kWeaponClassAP, kWeaponClassSubGun, kWeaponClassTorpedo, kWeaponClassSpecialSS,			//特殊潜航艇まで
+	kWeaponClassPF, kWeaponClassPB, kWeaponClassPBF, kWeaponClassWB, kWeaponClassPA, kWeaponClassPS,			//艦上偵察機まで
+	kWeaponClassPSS, kWeaponClassDaiteiChan, kWeaponClassWS, kWeaponClassWSN, kWeaponClassASPP, kWeaponClassAJ,	//オートジャイロまで
+	kWeaponClassSmallR, kWeaponClassLargeR, kWeaponClassAAG, kWeaponClassAAA, kWeaponClassAAD, kWeaponClassDP,	//爆雷まで
+	kWeaponClassSonar, kWeaponClassDC, kWeaponClassSL, kWeaponClassLB, kWeaponClassHQ, kWeaponClassSSP,			//水上艦要員まで
 	kWeaponClassCR, kWeaponClassOS, kWeaponClassOther
 };
 const vector<string> kWeaponClassStr = {

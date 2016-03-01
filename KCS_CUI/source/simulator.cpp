@@ -230,7 +230,7 @@ tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleS
 				}
 				// 与えるダメージを計算する
 				KammusuIndex enemy_index = { 0, target };
-				auto damage = CalcDamage(kBattlePhaseAir, bi, { 0, int(ui) }, enemy_index, base_attack, all_attack_plus, kBattlePositionSame);
+				auto damage = CalcDamage(kBattlePhaseAir, bi, { 0, int(ui) }, enemy_index, base_attack, all_attack_plus, kBattlePositionSame, false, 1.0);
 				result_.AddDamage(bi, 0, ui, damage);
 				all_damage[other_side][enemy_index[1]] += damage;
 			}
@@ -307,7 +307,8 @@ AirWarStatus Simulator::JudgeAirWarStatus(const bitset<kBattleSize> &search_resu
 // 与えるダメージ量を計算する
 int Simulator::CalcDamage(
 	const BattlePhase &battle_phase, const int &turn_player, const KammusuIndex &friend_index, KammusuIndex &enemy_index,
-	const int &base_attack, const vector<double> &all_attack_plus, const BattlePosition &battle_position){
+	const int &base_attack, const vector<double> &all_attack_plus, const BattlePosition &battle_position,
+	const bool &is_special_attack, const double &multiple){
 	auto other_side = kBattleSize - turn_player - 1;
 	// 旗艦相手への攻撃に限り、「かばい」が確率的に発生する
 	ProtectOracle(other_side, enemy_index);
@@ -322,11 +323,19 @@ int Simulator::CalcDamage(
 	if (is_target_submarine && battle_phase != kBattlePhaseGun
 		&& battle_phase != kBattlePhaseNight) return 0;		//砲撃戦および夜戦以外ではそもそも対潜攻撃を行わない
 	// 三式弾・WG42による対地上施設特効
+	double damage = base_attack;
 	if (target_kammusu.GetShipClass() == kShipClassAF) {
-
+		bool has_aaa = false;
+		auto wg_count = 0;
+		for (auto &it_w : hunter_kammusu.GetWeapon()) {
+			if (it_w.GetWeaponClass() == kWeaponClassAAA) has_aaa = true;
+			if (it_w.GetName() == L"WG42") ++wg_count;
+		}
+		if (has_aaa) damage *= 2.5;
+		static const double wg_plus[] = { 0, 75, 109, 142, 162 };
+		damage += wg_plus[wg_count];
 	}
 	// キャップ前補正
-	double damage = base_attack;
 	if (battle_phase != kBattlePhaseAir) {
 		if (battle_phase != kBattlePhaseNight) {
 			// 交戦形態補正
@@ -363,8 +372,10 @@ int Simulator::CalcDamage(
 				break;
 			}
 		}
-		// 夜戦特殊攻撃補正
-		
+		else {
+			// 夜戦特殊攻撃補正
+			if (is_special_attack) damage *= multiple;
+		}
 		// 損傷状態補正
 		switch (hunter_kammusu.Status()) {
 		case kStatusMiddleDamage:
@@ -377,8 +388,23 @@ int Simulator::CalcDamage(
 			break;
 		}
 		// 対潜シナジー補正
-
+		bool has_dp = false, has_sonar = false;
+		for (auto &it_w : hunter_kammusu.GetWeapon()) {
+			switch (it_w.GetWeaponClass()) {
+			case kWeaponClassDP:
+				has_dp = true;
+				break;
+			case kWeaponClassSonar:
+				has_sonar = true;
+				break;
+			default:
+				break;
+			}
+		}
+		if (has_dp && has_sonar) damage *= 1.15;
 	}
+	// 軽巡軽量砲補正
+
 	// キャップ計算
 
 	// キャップ後補正
@@ -499,5 +525,5 @@ double Simulator::CalcHitProb(
 		}
 	break;
 	}
-
+	return 0.0;
 }
