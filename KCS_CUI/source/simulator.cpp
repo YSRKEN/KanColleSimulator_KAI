@@ -229,8 +229,7 @@ tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleS
 					break;
 				}
 				// 与えるダメージを計算する
-				//auto damage = CalcDamage(kTurnAir, bi, {0, ui}, {0, target}, base_attack, all_attack_plus, kBattlePositionSame)
-				auto damage = rand.RandInt(0, base_attack);	//仮置きのメソッド
+				auto damage = CalcDamage(kBattlePhaseAir, bi, { 0, int(ui) }, { 0, target }, base_attack, all_attack_plus, kBattlePositionSame);
 				result_.AddDamage(bi, 0, ui, damage);
 				all_damage[other_side][target] += damage;
 			}
@@ -302,4 +301,11 @@ AirWarStatus Simulator::JudgeAirWarStatus(const bitset<kBattleSize> &search_resu
 	else {
 		return kAirWarStatusBest;
 	}
+}
+
+// 与えるダメージ量を計算する
+int Simulator::CalcDamage(
+	const BattlePhase &battle_phase, const int &turn_player, const vector<int> &friend_index, const vector<int> &enemy_index,
+	const int &base_attack, const vector<double> &all_attack_plus, const BattlePosition &battle_position){
+	return this->rand.RandInt(0, base_attack);	//仮置きのメソッド
 }
