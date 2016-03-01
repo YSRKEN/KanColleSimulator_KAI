@@ -93,7 +93,6 @@ https://github.com/kazuho/picojson
 http://wikiwiki.jp/kancolle/  
 http://ja.kancolle.wikia.com/wiki/%E8%89%A6%E3%81%93%E3%82%8C_%E6%A4%9C%E8%A8%BCWiki  
 https://github.com/andanteyk/ElectronicObserver/blob/master/ElectronicObserver/Other/Information/kcmemo.md#%E8%89%A6%E3%81%93%E3%82%8C%E3%81%AE%E4%BB%95%E6%A7%98%E3%81%AB%E9%96%A2%E3%81%99%E3%82%8B%E9%9B%91%E5%A4%9A%E3%81%AA%E3%83%A1%E3%83%A2
-- 砲撃戦命中率は次のページを参考にした  
+http://kancollecalc.web.fc2.com/damage_formula.html
 http://bs-arekore.at.webry.info/201502/article_4.html
-- 雷撃戦命中率は次のページを参考にした  
 https://twitter.com/Xe_UCH/status/700169825121804288

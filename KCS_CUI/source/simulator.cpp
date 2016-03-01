@@ -321,8 +321,62 @@ int Simulator::CalcDamage(
 	auto is_target_submarine = target_kammusu.IsSubmarine();
 	if (is_target_submarine && battle_phase != kBattlePhaseGun
 		&& battle_phase != kBattlePhaseNight) return 0;		//砲撃戦および夜戦以外ではそもそも対潜攻撃を行わない
+	// 三式弾・WG42による対地上施設特効
+	if (target_kammusu.GetShipClass() == kShipClassAF) {
+
+	}
 	// キャップ前補正
+	double damage = base_attack;
 	if (battle_phase != kBattlePhaseAir) {
+		if (battle_phase != kBattlePhaseNight) {
+			// 交戦形態補正
+			switch (battle_position) {
+			case kBattlePositionSame:
+				damage *= 1.0;
+				break;
+			case kBattlePositionReverse:
+				damage *= 0.8;
+				break;
+			case kBattlePositionGoodT:
+				damage *= 1.2;
+				break;
+			case kBattlePositionBadT:
+				damage *= 0.6;
+				break;
+			}
+			// 攻撃側陣形補正
+			switch (friend_side.GetFormation()) {
+			case kFormationTrail:
+				if (is_target_submarine) damage *= 0.60; else damage *= 1.0;
+				break;
+			case kFormationSubTrail:
+				if (is_target_submarine) damage *= 0.80; else damage *= 0.8;
+				break;
+			case kFormationCircle:
+				if (is_target_submarine) damage *= 1.2; else damage *= 0.7;
+				break;
+			case kFormationEchelon:
+				if (is_target_submarine) damage *= 1.0; else damage *= 0.6;
+				break;
+			case kFormationAbreast:
+				if (is_target_submarine) damage *= 1.3; else damage *= 0.6;
+				break;
+			}
+		}
+		// 夜戦特殊攻撃補正
+		
+		// 損傷状態補正
+		switch (hunter_kammusu.Status()) {
+		case kStatusMiddleDamage:
+			if (battle_phase == kBattlePhaseFirstTorpedo) damage *= 0.8; else damage *= 0.7;
+			break;
+		case kStatusHeavyDamage:
+			if (battle_phase == kBattlePhaseFirstTorpedo) damage *= 0.0; else damage *= 0.4;
+			break;
+		default:
+			break;
+		}
+		// 対潜シナジー補正
 
 	}
 	// キャップ計算
