@@ -326,7 +326,7 @@ int Fleet::RandomKammusuNonSS(const bool &has_bomb) {
 	return alived_list[rand_.RandInt(alived_list.size())];
 }
 template<typename CondFunc>
-bool any_of(const std::vector<std::vector<Kammusu>>& unit, CondFunc cond) {
+bool any_of(const std::vector<std::vector<Kammusu>>& unit, CondFunc cond) noexcept {
 	for (auto &it_u : unit) {
 		for (auto &it_k : it_u) {
 			if (cond(it_k)) return true;
