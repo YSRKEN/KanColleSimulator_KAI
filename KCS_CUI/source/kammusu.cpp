@@ -269,6 +269,109 @@ Status Kammusu::Status() const noexcept {
 	return kStatusHeavyDamage;
 }
 
+// 総回避を返す
+int Kammusu::AllEvade() const noexcept {
+	int evade_sum = evade_;
+	for (auto &it_w : weapons_) {
+		evade_sum += it_w.GetEvade();
+	}
+	return evade_sum;
+}
+
+// 疲労度を返す
+// 厳密にはcond値50以上がキラキラ状態だが、
+// 回避率向上はcond値53以上じゃないと起こらないのでそちらに合わせている
+Mood Kammusu::Mood() const noexcept {
+	if (cond_ < 20) {
+		return kMoodRed;
+	}
+	else if (cond_ < 30) {
+		return kMoodOrange;
+	}
+	else if (cond_ < 53) {
+		return kMoodNormal;
+	}
+	else {
+		return kMoodHappy;
+	}
+}
+
+// 総命中を返す
+int Kammusu::AllHit() const noexcept {
+	int hit_sum = 0;
+	for (auto &it_w : weapons_) {
+		hit_sum += it_w.GetHit();
+	}
+	return hit_sum;
+}
+
+// フィット砲補正
+double Kammusu::FitGunHitPlus() const noexcept {
+	double hit_plus = 0.0;
+	// 通常命中率低下は赤疲労検証での減少率÷2ぐらいでちょうどいいのでは？
+	const double fit[] = { 0.0, 0.01365, 0.0315, 0.0261, 0.0319 };
+	const double unfit_small[] = { 0.0, -0.00845, -0.04, -0.0422, -0.04255 };
+	const double unfit_large[] = { 0.0, -0.05375, -0.06365, -0.08415, -0.09585 };
+	// 数を数えておく
+	int sum_356 = 0, sum_38 = 0, sum_381 = 0, sum_41 = 0, sum_46 = 0, sum_46X = 0;
+	for (auto &it_w : weapons_) {
+		if (it_w.GetName().find(L"35.6cm") != string::npos) ++sum_356;
+		if (it_w.GetName().find(L"38cm") != string::npos) ++sum_38;
+		if (it_w.GetName().find(L"381mm") != string::npos) ++sum_381;
+		if (it_w.GetName().find(L"41cm") != string::npos) ++sum_41;
+		if (it_w.GetName().find(L"46cm") != string::npos) {
+			if (it_w.GetName().find(L"試製") != string::npos) ++sum_46X; else ++sum_46;
+		}
+	}
+	// 種類により減衰量を決定する
+	//伊勢型および扶桑型
+	if ((GetName().find(L"伊勢") != string::npos)
+		|| (GetName().find(L"日向") != string::npos)
+		|| (GetName().find(L"扶桑") != string::npos)
+		|| (GetName().find(L"山城") != string::npos)) {
+		if (GetName().find(L"改") != string::npos) {
+			// 航戦
+			hit_plus = fit[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];
+		}
+		else {
+			// 戦艦
+			hit_plus = fit[sum_356] + fit[sum_38] + fit[sum_381] + unfit_large[sum_46] + unfit_small[sum_46X];
+			if ((GetName().find(L"扶桑") != string::npos)
+				|| (GetName().find(L"山城") != string::npos)) {
+				hit_plus += fit[sum_41];
+			}
+		}
+	}
+	//金剛型およびビスマルク
+	if ((GetName().find(L"金剛") != string::npos)
+		|| (GetName().find(L"比叡") != string::npos)
+		|| (GetName().find(L"榛名") != string::npos)
+		|| (GetName().find(L"霧島") != string::npos)
+		|| (GetName().find(L"Bismarck") != string::npos)) {
+		hit_plus = fit[sum_356] + fit[sum_38] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];
+		if (GetName().find(L"Bismarck") == string::npos) {
+			hit_plus += unfit_small[sum_381];
+		}
+	}
+	//イタリア艦
+	if ((GetName().find(L"Littorio") != string::npos)
+		|| (GetName().find(L"Italia") != string::npos)
+		|| (GetName().find(L"Roma") != string::npos)) {
+		hit_plus = fit[sum_356] + fit[sum_381] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];
+	}
+	//長門型
+	if ((GetName().find(L"長門") != string::npos)
+		|| (GetName().find(L"陸奥") != string::npos)) {
+		hit_plus = fit[sum_356] + fit[sum_381] + fit[sum_41] + unfit_small[sum_46] + unfit_small[sum_46X];
+	}
+	//大和型
+	if ((GetName().find(L"大和") != string::npos)
+		|| (GetName().find(L"武蔵") != string::npos)) {
+		hit_plus = fit[sum_41];
+	}
+	return hit_plus;
+}
+
 // ダメージを与える
 void Kammusu::MinusHP(const int &damage, const bool &stopper_flg) {
 	if (hp_ > damage) {

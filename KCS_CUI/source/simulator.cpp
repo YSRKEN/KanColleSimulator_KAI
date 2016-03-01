@@ -311,18 +311,58 @@ int Simulator::CalcDamage(
 	auto other_side = kBattleSize - turn_player - 1;
 	// 旗艦相手への攻撃に限り、「かばい」が確率的に発生する
 	ProtectOracle(other_side, enemy_index);
+	const auto &friend_side = fleet_[turn_player];
+	const auto &enemy_side  = fleet_[other_side];
+	const auto &hunter_kammusu = friend_side.GetUnit()[friend_index[0]][friend_index[1]];
+	const auto &target_kammusu = enemy_side.GetUnit()[enemy_index[0]][enemy_index[1]];
 	// 攻撃の命中率を計算する
 	double hit_prob = 0.0;
 	switch (battle_phase) {
 	case kBattlePhaseAir:
 	case kBattlePhaseGun:
 	case kBattlePhaseNight:
-		// 砲撃戦命中率
-
+		{
+			// 昼砲撃戦命中率
+			//回避側
+			double evade_sum = target_kammusu.AllEvade();	//回避値
+			if (enemy_side.GetFormation() == kFormationEchelon || enemy_side.GetFormation() == kFormationAbreast) evade_sum *= 1.2;
+			if (target_kammusu.Mood() == kMoodHappy) evade_sum *= 1.8;
+			double evade_value;		//回避項
+			if (evade_sum <= 40) {
+				evade_value = 0.03 + evade_sum / 80;
+			}
+			else {
+				evade_value = 0.03 + evade_sum / (evade_sum + 40);
+			}
+			//命中側
+			double hit_value = 1.0 + sqrt(hunter_kammusu.GetLevel() - 1) / 50;	//練度による命中率補正
+			hit_value += hunter_kammusu.AllHit() / 100;							//装備による明示的な命中率補正
+			if (hunter_kammusu.Mood() == kMoodRed) hit_value /= 1.9;	//赤疲労状態だと命中率が激減する
+			hit_value += hunter_kammusu.GetLuck() * 0.0015;				//命中率の運補正
+			hit_value += hunter_kammusu.FitGunHitPlus();				//フィット砲補正
+			//命中率の陣形補正
+			switch (friend_side.GetFormation()) {
+			case kFormationSubTrail:
+				if (enemy_side.GetFormation() != kFormationAbreast) hit_value += 0.2;
+				break;
+			case kFormationEchelon:
+				if (enemy_side.GetFormation() != kFormationSubTrail) hit_value += 0.2;
+				break;
+			case kFormationAbreast:
+				if (enemy_side.GetFormation() != kFormationTrail) hit_value += 0.2;
+				break;
+			default:
+				break;
+			}
+			//引き算により命中率を決定する(上限あり)
+			hit_prob = hit_value - evade_value;
+			if (hit_prob > 0.97) hit_prob = 0.97;
+		}
 		break;
 	case kBattlePhaseFirstTorpedo:
 	case kBattlePhaseTorpedo:
 		// 雷撃戦命中率
+		hit_prob = 0.70;	//仮書き
 		break;
 	}
 	return this->rand.RandInt(0, base_attack);	//仮置きのメソッド

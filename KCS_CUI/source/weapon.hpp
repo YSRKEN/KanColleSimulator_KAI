@@ -46,6 +46,7 @@ public:
 	int GetBomb() const noexcept { return bomb_; }
 	int GetAntiAir() const noexcept { return anti_air_; }
 	int GetHit() const noexcept { return hit_; }
+	int GetEvade() const noexcept { return evade_; }
 	int GetSearch() const noexcept { return search_; }
 	Range GetRange() const noexcept { return range_; }
 	int GetLevel() const noexcept { return level_; }

@@ -26,9 +26,10 @@ public:
 	// setter
 	void SetRandGenerator(const SharedRand& rand);
 	// getter
+	Formation GetFormation() const noexcept { return formation_; }
 	auto& GetUnit() { return unit_; }
 	const auto& GetUnit() const { return unit_; }
-	FleetType GetFleetType() noexcept{ return fleet_type_; }
+	FleetType GetFleetType() const noexcept{ return fleet_type_; }
 	// その他
 	size_t FleetSize() const noexcept { return unit_.size(); }	//「艦隊数」(通常艦隊だと1、連合艦隊だと2)
 	size_t UnitSize(const size_t fi) const noexcept { return unit_[fi].size(); }	//「艦隊」における艦数

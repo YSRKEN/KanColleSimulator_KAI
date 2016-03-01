@@ -29,6 +29,9 @@ const wstring kSpeedStr[] = { L"無", L"低速", L"高速" };
 // ステータス(無傷・小破・中破・大破・撃沈)
 enum Status {kStatusNoDamage, kStatusVeryLightDamage, kStatusLightDamage, kStatusMiddleDamage, kStatusHeavyDamage, kStatusLost};
 
+// 艦娘の疲労度(キラキラ状態・通常状態・橙疲労状態・赤疲労状態)
+enum Mood { kMoodHappy, kMoodNormal, kMoodOrange, kMoodRed };
+
 // 艦娘クラス
 class Kammusu {
 	// 変更しないもの
@@ -85,6 +88,7 @@ public:
 	int GetAntiSub() const noexcept { return anti_sub_; }
 	int GetSearch() const noexcept { return search_; }
 	bool IsKammusu() const noexcept { return kammusu_flg_; }
+	int GetLevel() const noexcept { return level_; }
 	int GetHP() const noexcept { return hp_; }
 	vector<int>& GetAir() noexcept { return airs_; }
 	const vector<int>& GetAir() const noexcept { return airs_; }
@@ -109,6 +113,10 @@ public:
 	double AacProb(const int&) const noexcept;		//対空カットインの発動確率を計算する
 	double AllAntiAir() const noexcept;				//加重対空値を計算する
 	Status Status() const noexcept;					//ステータスを返す
+	int AllEvade() const noexcept;					//総回避を返す
+	Mood Mood() const noexcept;						//疲労度を返す
+	int AllHit() const noexcept;					//総命中を返す
+	double FitGunHitPlus() const noexcept;			//フィット砲補正
 	void MinusHP(const int&, const bool&);	//ダメージを与える、ctorもしくはSetRandGenerator経由で乱数エンジンを渡している必要がある
 	bool HasAir() const noexcept;					//艦載機を保有していた場合はtrue
 	bool HasAirFight() const noexcept;				//航空戦に参加する艦載機を保有していた場合はtrue
