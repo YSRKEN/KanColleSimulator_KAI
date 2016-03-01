@@ -4,9 +4,7 @@
 #include "char_convert.hpp"
 // コンストラクタ
 Config::Config(int argc, char *argv[]) {
-	if (argc < 4) {
-		throw "引数の数が足りていません.";
-	}
+	CONFIG_THROW_WITH_MESSAGE_IF( argc < 4, "引数の数が足りていません." )
 	// 各オプションのデフォルト値を設定する
 	input_filename_.resize(kBattleSize);
 	formation_.resize(kBattleSize);
@@ -20,43 +18,41 @@ Config::Config(int argc, char *argv[]) {
 		// オプション用文字列なら、各オプションに反映させる
 		if (temp == "-i") {
 			// 入力ファイル名
-			if (argc - i <= 2) throw "コマンドライン引数が異常です.";
+			CONFIG_THROW_WITH_MESSAGE_IF( argc - i <= 2, "コマンドライン引数が異常です." )
 			input_filename_[0] = argv[i + 1];
 			input_filename_[1] = argv[i + 2];
 			i += 2;
 		}
 		else if (temp == "-f") {
 			// 陣形
-			if (argc - i <= 2) throw "コマンドライン引数が異常です.";
+			CONFIG_THROW_WITH_MESSAGE_IF( argc - i <= 2, "コマンドライン引数が異常です." )
 			formation_[0] = static_cast<Formation>(argv[i + 1] | to_i());
 			formation_[1] = static_cast<Formation>(argv[i + 2] | to_i());
 			i += 2;
 		}
 		else if (temp == "-n") {
 			// 試行回数
-			if (argc - i <= 1) throw "コマンドライン引数が異常です.";
+			CONFIG_THROW_WITH_MESSAGE_IF( argc - i <= 1, "コマンドライン引数が異常です." )
 			times_ = argv[i + 1] | to_i();
 			if (times_ <= 0) times_ = 1;
 			++i;
 		}
 		else if (temp == "-t") {
 			// 実行スレッド数
-			if (argc - i <= 1) throw "コマンドライン引数が異常です.";
+			CONFIG_THROW_WITH_MESSAGE_IF( argc - i <= 1, "コマンドライン引数が異常です." )
 			threads_ = argv[i + 1] | to_i();
 			if (threads_ <= 0) threads_ = 1;
 			++i;
 		}
 		else if (temp == "-o") {
 			// 出力ファイル名
-			if (argc - i <= 1) throw "コマンドライン引数が異常です.";
+			CONFIG_THROW_WITH_MESSAGE_IF( argc - i <= 1, "コマンドライン引数が異常です." )
 			output_filename_ = argv[i + 1];
 			++i;
 		}
 	}
 	// 入力ファイル名は必須であることに注意する
-	if (input_filename_[0] == "" && input_filename_[1] == "") {
-		throw "入力ファイル名は必ず指定してください.";
-	}
+	CONFIG_THROW_WITH_MESSAGE_IF(input_filename_[0] == "" && input_filename_[1] == "", "入力ファイル名は必ず指定してください." )
 }
 
 // 中身を表示する

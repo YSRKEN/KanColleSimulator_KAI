@@ -14,6 +14,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include "exception.hpp"
 #include "arithmetic_convert.hpp"
 #pragma warning( disable : 4592)
 
