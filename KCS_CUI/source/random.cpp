@@ -98,3 +98,10 @@ seed_v_t create_seed_v() {
 	sed_v.push_back(static_cast<std::uint_least32_t>((end_time - begin_time).count()));
 	return sed_v;
 }
+
+SharedRand make_SharedRand()
+{
+	const auto sed_v = create_seed_v();
+	std::seed_seq seq(sed_v.begin(), sed_v.end());
+	return SharedRand(std::mt19937(seq));
+}

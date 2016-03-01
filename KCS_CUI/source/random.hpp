@@ -25,6 +25,7 @@ public:
 	SharedRand() : generator_(), defalut_dist_(0.0, 1.0) {}
 	explicit SharedRand(unsigned int seed) : generator_(new std::mt19937(seed)), defalut_dist_(0.0, 1.0) {}
 	explicit SharedRand(std::seed_seq& seed) : generator_(new std::mt19937(seed)), defalut_dist_(0.0, 1.0) {}
+	explicit SharedRand(std::mt19937&& engine) : generator_(new std::mt19937(std::move(engine))), defalut_dist_(0.0, 1.0) {}
 	SharedRand(const SharedRand& o) noexcept : generator_(o.generator_), defalut_dist_(o.defalut_dist_) {}
 	SharedRand(SharedRand&& o) noexcept : generator_(std::move(o.generator_)), defalut_dist_(o.defalut_dist_) {}
 	SharedRand& operator=(const SharedRand& o) {
@@ -90,3 +91,5 @@ public:
 		}
 	}
 };
+
+SharedRand make_SharedRand();
