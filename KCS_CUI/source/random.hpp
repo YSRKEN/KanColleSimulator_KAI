@@ -1,10 +1,24 @@
 ﻿#pragma once
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 #include <random>
 #include <memory>
 #include <stdexcept>
 #include <type_traits>
 #include <vector>
 #include <cstdint>
+//#include <iostream>
+#include <algorithm>
+#include <unordered_set>
+#include <functional>
+#include <limits>
+#ifdef max
+#undef max
+#endif
+#ifdef min
+#undef min
+#endif
 class missing_rand_generator : public std::runtime_error {
 public:
 	explicit missing_rand_generator() : std::runtime_error("missing_rand_generator") {}
@@ -14,6 +28,18 @@ public:
 
 using seed_v_t = std::vector<std::uint_least32_t>;
 seed_v_t create_seed_v();
+namespace detail {
+	template<typename T, std::enable_if_t<std::is_integral<T>::value, std::nullptr_t> = nullptr> 
+	auto diff(T n1, T n2) -> std::make_unsigned_t<T> {
+		if (n1 < n2) std::swap(n1, n2);
+		return static_cast<std::make_unsigned_t<T>>(n1 - n2);
+	}
+	template<typename T, std::enable_if_t<std::is_floating_point<T>::value, std::nullptr_t> = nullptr>
+	std::size_t diff(T n1, T n2) {
+		if (n1 < n2) std::swap(n1, n2);
+		return static_cast<std::size_t>(n1 - n2);
+	}
+}
 
 class SharedRand {
 private:
@@ -38,6 +64,8 @@ public:
 		this->generator_ = std::move(o.generator_);
 		return *this;
 	}
+
+	//utility
 	bool is_generatable() const noexcept {
 		return generator_.use_count() && generator_.get();
 	}
@@ -47,25 +75,31 @@ public:
 	bool operator!() const noexcept {
 		return this->is_generatable();
 	}
-	double RandReal() {
+	std::mt19937& get(std::nothrow_t) noexcept {
+		return *this->generator_;
+	}
+	std::mt19937& get() {
 		if (this->is_generatable()) {
-			return this->defalut_dist_(*this->generator_);
+			return *this->generator_;
 		}
 		else {
 			throw missing_rand_generator();
 		}
+	}
+	std::mt19937& operator*() {
+		return this->get();
+	}
+
+	//generater
+	double RandReal() {
+		return this->defalut_dist_(this->get());
 	}
 	double operator()() {
 		return this->RandReal();
 	}
 	template<typename RandType>
 	RandType generate(const RandType min, const RandType max) {
-		if (this->is_generatable()) {
-			return distribution_t<RandType>(min, max)(*this->generator_);
-		}
-		else {
-			throw missing_rand_generator();
-		}
+		return distribution_t<RandType>(min, max)(this->get());
 	}
 	template<typename RandType>
 	RandType operator()(const RandType min, const RandType max) {
@@ -83,13 +117,100 @@ public:
 		return this->generate(min, max);
 	}
 	bool RandBool(double rate = 0.5) {
-		if (this->is_generatable()) {
-			return std::bernoulli_distribution(rate)(*this->generator_);
+		return std::bernoulli_distribution(rate)(this->get());
+	}
+private:
+	template<typename RandType> std::vector<RandType> make_unique_rand_array_unique(const std::size_t size, RandType rand_min, RandType rand_max) {
+		if (rand_min > rand_max) std::swap(rand_min, rand_max);
+		const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
+		if (max_min_diff < size) throw std::runtime_error("Invalid argument");
+
+		std::vector<RandType> tmp;
+		auto& engine = this->get();
+		distribution_t<RandType> distribution(rand_min, rand_max);
+
+		const std::size_t make_size = (static_cast<std::uintmax_t>(std::numeric_limits<double>::max()) < size) ? ((std::numeric_limits<std::size_t>::max() - size / 5) < size) ? size : size + size / 5 : static_cast<size_t>(size*1.2);
+		tmp.reserve(make_size);
+		while (tmp.size() < size) {
+			while (tmp.size() < make_size) tmp.push_back(distribution(engine));
+			std::sort(tmp.begin(), tmp.end());
+			auto unique_end = std::unique(tmp.begin(), tmp.end());
+
+			if (size < static_cast<std::size_t>(std::distance(tmp.begin(), unique_end))) {
+				unique_end = std::next(tmp.begin(), size);
+			}
+			tmp.erase(unique_end, tmp.end());
+		}
+
+		std::shuffle(tmp.begin(), tmp.end(), engine);
+		return tmp;
+	}
+	template<typename RandType> std::vector<RandType> make_unique_rand_array_select(const std::size_t size, RandType rand_min, RandType rand_max) {
+		if (rand_min > rand_max) std::swap(rand_min, rand_max);
+		const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
+		if (max_min_diff < size) throw std::runtime_error("Invalid argument");
+
+		std::vector<RandType> tmp;
+		tmp.reserve(max_min_diff);
+
+		for (auto i = rand_min; i <= rand_max; ++i)tmp.push_back(i);
+
+		auto& engine = this->get();
+		distribution_t<RandType> distribution(rand_min, rand_max);
+
+		for (std::size_t cnt = 0; cnt < size; ++cnt) {
+			std::size_t pos = std::uniform_int_distribution<std::size_t>(cnt, tmp.size() - 1)(engine);
+
+			if (cnt != pos) std::swap(tmp[cnt], tmp[pos]);
+		}
+		tmp.erase(std::next(tmp.begin(), size), tmp.end());
+
+		return tmp;
+	}
+	template<typename RandType> std::vector<RandType> make_unique_rand_array_just_shuffle(const std::size_t size, RandType rand_min, RandType rand_max) {
+		if (rand_min > rand_max) std::swap(rand_min, rand_max);
+		const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
+		if (max_min_diff != size) throw std::runtime_error("Invalid argument");
+
+		auto& engine = this->get();
+		distribution_t<RandType> distribution(rand_min, rand_max);
+		std::vector<RandType> re(size);
+		auto t = rand_min;
+		std::generate(re.begin(), re.end(), [&t]() { return t++; });
+		std::shuffle(re.begin(), re.end(), engine);
+		return re;
+	}
+public:
+	template<typename RandType, std::enable_if_t<std::is_arithmetic<RandType>::value, std::nullptr_t> = nullptr>
+	std::vector<RandType> make_unique_rand_array(const std::size_t size, RandType rand_min, RandType rand_max) {
+		if (rand_min > rand_max) std::swap(rand_min, rand_max);
+		const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
+		if (max_min_diff < size) throw std::runtime_error("Invalid argument");
+
+		if (max_min_diff == size) return make_unique_rand_array_just_shuffle(size, rand_min, rand_max);
+		else if (static_cast<std::uintmax_t>(std::numeric_limits<double>::max()) < max_min_diff || size < (max_min_diff * 0.04)) {
+			return make_unique_rand_array_unique(size, rand_min, rand_max);
 		}
 		else {
-			throw missing_rand_generator();
+			return make_unique_rand_array_select(size, rand_min, rand_max);
 		}
 	}
-};
+	template<typename ForwardIte, typename RandType, std::enable_if_t<std::is_arithmetic<RandType>::value, std::nullptr_t> = nullptr>
+	void generate(ForwardIte begin, ForwardIte end, RandType rand_min, RandType rand_max) {
+		if (rand_min > rand_max) std::swap(rand_min, rand_max);
+		auto& engine = this->get();
+		distribution_t<RandType> distribution(rand_min, rand_max);
+		std::generate(begin, end, [&distribution, &engine]() { return distribution(engine); });
+	}
+	template<typename RandType, std::enable_if_t<std::is_arithmetic<RandType>::value, std::nullptr_t> = nullptr>
+	std::vector<RandType> generate_n(const std::size_t size, RandType rand_min, RandType rand_max) {
+		if (rand_min > rand_max) std::swap(rand_min, rand_max);
+		std::vector<RandType> re(size);
+		auto& engine = this->get();
+		distribution_t<RandType> distribution(rand_min, rand_max);
+		for (auto& e : re) e = distribution(engine);
+		return re;
+	}
 
+};
 SharedRand make_SharedRand();

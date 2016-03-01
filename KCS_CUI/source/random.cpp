@@ -1,3 +1,6 @@
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 #if defined(_WIN32) || defined(_WIN64)
 #if (!defined(_MSC_VER) || _MSC_VER >= 1400) && (!defined(DISABE_CRT_RAND_S))//Visual Studio 2005‚æ‚èrand_s‚ÍŽÀ‘•‚³‚ê‚½
 #define _CRT_RAND_S
