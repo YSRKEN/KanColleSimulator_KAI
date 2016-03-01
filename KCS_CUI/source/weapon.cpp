@@ -92,8 +92,12 @@ bool Weapon::IsAirBomb() const noexcept {
 
 // 高角砲ならtrue
 bool Weapon::IsHAG() const noexcept {
-	if (name_.find(L"高角砲") != wstring::npos) return true;
-	return false;
+	return Include(L"高角砲");
+}
+
+// 名前に特定の文字が含まれていればtrue
+bool Weapon::Include(const wstring &wstr) const noexcept {
+	return (name_.find(wstr) != wstring::npos);
 }
 
 std::ostream & operator<<(std::ostream & os, const Weapon & conf)

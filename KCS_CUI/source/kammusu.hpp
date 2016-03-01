@@ -123,6 +123,7 @@ public:
 	bool HasAirTrailer() const noexcept;			//触接に参加する艦載機を保有していた場合はtrue
 	bool HasAirBomb() const noexcept;				//艦爆を保有していた場合はtrue
 	bool IsSubmarine() const noexcept;				//潜水艦系ならtrue
+	bool Include(const wstring&) const noexcept;	//名前に特定の文字が含まれていればtrue
 	friend std::ostream& operator<<(std::ostream& os, const Kammusu& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Kammusu& conf);
 };

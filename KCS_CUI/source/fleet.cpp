@@ -280,7 +280,7 @@ int Fleet::AntiAirBonus() const {
 		for (auto &it_k : it_u) {
 			double anti_air_bonus = 0.0;
 			for (auto &it_w : it_k.GetWeapon()) {
-				if (it_w.IsHAG() || it_w.GetName().find(L"高射装置") != wstring::npos) {
+				if (it_w.IsHAG() || it_w.Include(L"高射装置")) {
 					anti_air_bonus += 0.35 * it_w.GetAntiAir();
 				}
 				else if (it_w.GetWeaponClass() == kWeaponClassSmallR || it_w.GetWeaponClass() == kWeaponClassLargeR) {

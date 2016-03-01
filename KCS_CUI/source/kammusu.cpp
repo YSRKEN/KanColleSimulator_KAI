@@ -78,7 +78,7 @@ int Kammusu::AacType() const noexcept {
 		switch (it_w.GetWeaponClass()) {
 		case kWeaponClassGun:
 			if (it_w.IsHAG()) {
-				if (it_w.GetName().find(L"高射装置") != wstring::npos || it_w.GetName() == L"90mm単装高角砲") {
+				if (it_w.Include(L"高射装置") || it_w.GetName() == L"90mm単装高角砲") {
 					++sum_hagX;
 				}
 				else {
@@ -93,7 +93,7 @@ int Kammusu::AacType() const noexcept {
 			++sum_aad;
 			break;
 		case kWeaponClassAAG:
-			if (it_w.GetName().find(L"集中") != wstring::npos) {
+			if (it_w.Include(L"集中")) {
 				++sum_aagX;
 			}
 			else {
@@ -105,7 +105,7 @@ int Kammusu::AacType() const noexcept {
 			break;
 		case kWeaponClassSmallR:
 		case kWeaponClassLargeR:
-			if (it_w.GetName().find(L"対空") != wstring::npos) {
+			if (it_w.Include(L"対空")) {
 				++sum_radarA;
 			}
 			else {
@@ -116,7 +116,7 @@ int Kammusu::AacType() const noexcept {
 		}
 	}
 	// まず、固有カットインを判定する
-	if (name_.find(L"秋月") != wstring::npos || name_.find(L"照月") != wstring::npos || name_.find(L"初月") != wstring::npos) {
+	if (Include(L"秋月") || Include(L"照月") || Include(L"初月")) {
 		/* 秋月型……ご存知防空駆逐艦。対空カットイン無しでも圧倒的な対空値により艦載機を殲滅する。
 		* 二次創作界隈ではまさma氏が有名であるが、秋月型がこれ以上増えると投稿時のタイトルが長くなりすぎることから
 		* 嬉しい悲鳴を上げていたとか。なお史実上では後9隻居るが、有名なのは涼月などだろう……  */
@@ -124,13 +124,13 @@ int Kammusu::AacType() const noexcept {
 		if (sum_hag + sum_hagX >= 1 && sum_radarW + sum_radarA >= 1) return 2;
 		if (sum_hag + sum_hagX >= 2) return 3;
 	}
-	if (name_.find(L"摩耶改二") != wstring::npos) {
+	if (name_ == L"摩耶改二") {
 		/* 摩耶改二……麻耶ではない。対空兵装により「洋上の対空要塞」(by 青島文化教材社)となったため、
 		* 重巡にしては驚異的な対空値を誇る。ついでに服装もかなりプリティーに進化した(妹の鳥海も同様) */
 		if (sum_hag + sum_hagX >= 1 && sum_aagX >= 1 && sum_radarA >= 1) return 10;
 		if (sum_hag + sum_hagX >= 1 && sum_aagX >= 1) return 11;
 	}
-	if (name_.find(L"五十鈴改二") != wstring::npos) {
+	if (name_ == L"五十鈴改二") {
 		/* 五十鈴改二…… 名前通りLv50からの改装である。防空巡洋艦になった史実から、射程が短となり、
 		* 防空力が大幅にアップした。しかし搭載数0で火力面で使いづらくなった上、対潜は装備対潜のウェイトが高いため
 		* 彼女を最適解に出来る状況は限られている。また、改二なのに金レアで固有カットインがゴミクズ「だった」ことから、
@@ -138,7 +138,7 @@ int Kammusu::AacType() const noexcept {
 		if (sum_hag + sum_hagX >= 1 && sum_aag + sum_aagX >= 1 && sum_radarA >= 1) return 14;
 		if (sum_hag + sum_hagX >= 1 && sum_aag + sum_aagX >= 1) return 15;
 	}
-	if (name_.find(L"霞改二乙") != string::npos) {
+	if (name_ == L"霞改二乙") {
 		/* 霞改二乙…… Lv88という驚異的な練度を要求するだけあり、内蔵されたギミックは特殊である。
 		* まず霞改二でも積めた大発に加え、大型電探も装備可能になった(代償に艦隊司令部施設が積めなくなった)。
 		* また、対空値も上昇し、固有カットインも実装された。ポスト秋月型＋アルファとも言えるだろう。
@@ -146,7 +146,7 @@ int Kammusu::AacType() const noexcept {
 		if (sum_hag + sum_hagX >= 1 && sum_aag + sum_aagX >= 1 && sum_radarA >= 1) return 16;
 		if (sum_hag + sum_hagX >= 1 && sum_aag + sum_aagX >= 1) return 17;
 	}
-	if (name_.find(L"皐月改二") != string::npos) {
+	if (name_ == L"皐月改二") {
 		/* 皐月改二…… うるう年の2/29に実装された、皐月改二における固有の対空カットイン。
 		 * この調子では改二が出るたびに新型カットインが出るのではないかと一部で危惧されている。*/
 		if (sum_aagX >= 1) return 18;
@@ -315,58 +315,46 @@ double Kammusu::FitGunHitPlus() const noexcept {
 	// 数を数えておく
 	int sum_356 = 0, sum_38 = 0, sum_381 = 0, sum_41 = 0, sum_46 = 0, sum_46X = 0;
 	for (auto &it_w : weapons_) {
-		if (it_w.GetName().find(L"35.6cm") != string::npos) ++sum_356;
-		if (it_w.GetName().find(L"38cm") != string::npos) ++sum_38;
-		if (it_w.GetName().find(L"381mm") != string::npos) ++sum_381;
-		if (it_w.GetName().find(L"41cm") != string::npos) ++sum_41;
-		if (it_w.GetName().find(L"46cm") != string::npos) {
-			if (it_w.GetName().find(L"試製") != string::npos) ++sum_46X; else ++sum_46;
+		if (it_w.Include(L"35.6cm")) ++sum_356;
+		if (it_w.Include(L"38cm")) ++sum_38;
+		if (it_w.Include(L"381mm")) ++sum_381;
+		if (it_w.Include(L"41cm")) ++sum_41;
+		if (it_w.Include(L"46cm")) {
+			if (it_w.Include(L"試製")) ++sum_46X; else ++sum_46;
 		}
 	}
 	// 種類により減衰量を決定する
 	//伊勢型および扶桑型
-	if ((GetName().find(L"伊勢") != string::npos)
-		|| (GetName().find(L"日向") != string::npos)
-		|| (GetName().find(L"扶桑") != string::npos)
-		|| (GetName().find(L"山城") != string::npos)) {
-		if (GetName().find(L"改") != string::npos) {
-			// 航戦
-			hit_plus = fit[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];
-		}
-		else {
-			// 戦艦
-			hit_plus = fit[sum_356] + fit[sum_38] + fit[sum_381] + unfit_large[sum_46] + unfit_small[sum_46X];
-			if ((GetName().find(L"扶桑") != string::npos)
-				|| (GetName().find(L"山城") != string::npos)) {
-				hit_plus += fit[sum_41];
+	if (Include(L"伊勢") || Include(L"日向") || Include(L"扶桑") || Include(L"山城")) {
+			if(Include(L"改")) {
+				// 航戦
+				hit_plus = fit[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];
 			}
-		}
+			else {
+				// 戦艦
+				hit_plus = fit[sum_356] + fit[sum_38] + fit[sum_381] + unfit_large[sum_46] + unfit_small[sum_46X];
+				if (Include(L"扶桑") || Include(L"山城")) {
+					hit_plus += fit[sum_41];
+				}
+			}
 	}
 	//金剛型およびビスマルク
-	if ((GetName().find(L"金剛") != string::npos)
-		|| (GetName().find(L"比叡") != string::npos)
-		|| (GetName().find(L"榛名") != string::npos)
-		|| (GetName().find(L"霧島") != string::npos)
-		|| (GetName().find(L"Bismarck") != string::npos)) {
+	if (Include(L"金剛") || Include(L"比叡") || Include(L"榛名") || Include(L"霧島") || Include(L"Bismarck")) {
 		hit_plus = fit[sum_356] + fit[sum_38] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];
-		if (GetName().find(L"Bismarck") == string::npos) {
+		if (Include(L"Bismarck")) {
 			hit_plus += unfit_small[sum_381];
 		}
 	}
 	//イタリア艦
-	if ((GetName().find(L"Littorio") != string::npos)
-		|| (GetName().find(L"Italia") != string::npos)
-		|| (GetName().find(L"Roma") != string::npos)) {
+	if (Include(L"Littorio") || Include(L"Italia") || Include(L"Roma")) {
 		hit_plus = fit[sum_356] + fit[sum_381] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];
 	}
 	//長門型
-	if ((GetName().find(L"長門") != string::npos)
-		|| (GetName().find(L"陸奥") != string::npos)) {
+	if (Include(L"長門") || Include(L"陸奥")) {
 		hit_plus = fit[sum_356] + fit[sum_381] + fit[sum_41] + unfit_small[sum_46] + unfit_small[sum_46X];
 	}
 	//大和型
-	if ((GetName().find(L"大和") != string::npos)
-		|| (GetName().find(L"武蔵") != string::npos)) {
+	if (Include(L"大和") || Include(L"武蔵")) {
 		hit_plus = fit[sum_41];
 	}
 	return hit_plus;
@@ -426,6 +414,11 @@ bool Kammusu::HasAirBomb() const noexcept {
 bool Kammusu::IsSubmarine() const noexcept {
 	if (ship_class_ == kShipClassSS || ship_class_ == kShipClassSSV) return true;
 	return false;
+}
+
+// 名前に特定の文字が含まれていればtrue
+bool Kammusu::Include(const wstring &wstr) const noexcept {
+	return (name_.find(wstr) != wstring::npos);
 }
 
 std::ostream & operator<<(std::ostream & os, const Kammusu & conf)

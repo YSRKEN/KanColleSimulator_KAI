@@ -61,6 +61,7 @@ public:
 	bool IsAirTrailer() const noexcept;				//触接に参加する艦載機ならtrue
 	bool IsAirBomb() const noexcept;				//開幕爆撃に参加する艦載機ならtrue
 	bool IsHAG() const noexcept;					//高角砲ならtrue
+	bool Include(const wstring&) const noexcept;	//名前に特定の文字が含まれていればtrue
 	friend std::ostream& operator<<(std::ostream& os, const Weapon& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Weapon& conf);
 };
