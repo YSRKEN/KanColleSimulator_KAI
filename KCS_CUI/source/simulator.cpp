@@ -20,7 +20,7 @@ Result Simulator::Calc() {
 			}
 		}
 	}
-	cout << result_.Put() << "\n";
+	cout << result_.Put() << endl;
 #endif
 
 	// 索敵フェイズ
@@ -28,15 +28,15 @@ Result Simulator::Calc() {
 #ifdef KCS_DEBUG_MODE
 	cout << "索敵結果・索敵値・艦載機を持っているか：\n";
 	for (auto i = 0; i < kBattleSize; ++i) {
-		cout << search_result[i] << " " << fleet_[i].SearchValue() << " " << fleet_[i].HasAir() << "\n";
+		cout << search_result[i] << " " << fleet_[i].SearchValue() << " " << fleet_[i].HasAir() << endl;
 	}
-	cout << "\n";
+	cout << endl;
 #endif
 	// 航空戦フェイズ
 	auto air_war_result = AirWarPhase(search_result);
 #ifdef KCS_DEBUG_MODE
 	cout << "制空状態・自艦隊倍率・敵艦隊倍率：\n";
-	cout << get<0>(air_war_result) << " " << get<1>(air_war_result)[0] << " " << get<1>(air_war_result)[1] << "\n\n";
+	cout << get<0>(air_war_result) << " " << get<1>(air_war_result)[0] << " " << get<1>(air_war_result)[1] << "\n" << endl;
 #endif
 
 	// 交戦形態の決定
@@ -86,7 +86,7 @@ tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleS
 		anti_air_score[i] = fleet_[i].AntiAirScore();
 	}
 #ifdef KCS_DEBUG_MODE
-	cout << "制空値：" << anti_air_score[0] << " " << anti_air_score[1] << "\n\n";
+	cout << "制空値：" << anti_air_score[0] << " " << anti_air_score[1] << "\n" << endl;
 #endif
 	//制空状態を判断する
 	auto air_war_status = JudgeAirWarStatus(search_result, anti_air_score);
@@ -245,27 +245,27 @@ tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleS
 	}
 
 #ifdef KCS_DEBUG_MODE
-	cout << "残機：\n";
+	cout << "残機：" << endl;
 	for (auto i = 0; i < kBattleSize; ++i) {
 		for (auto &it_u : fleet_[i].GetUnit()) {
 			for (auto &it_k : it_u) {
 				for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
 					cout << it_k.GetAir()[wi] << " ";
 				}
-				cout << "\n";
+				cout << endl;
 			}
 		}
 	}
-	cout << "\n";
-	cout << "受けたダメージ：\n";
+	cout << endl;
+	cout << "受けたダメージ：" << endl;
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
 		auto &friend_unit = fleet_[bi].GetUnit()[0];
 		for (auto ui = 0u; ui < friend_unit.size(); ++ui) {
 			cout << all_damage[bi][ui] << ",";
 		}
-		cout << "\n";
+		cout << endl;
 	}
-	cout << "\n";
+	cout << endl;
 #endif
 
 	return tuple <AirWarStatus, vector<double>>(air_war_status, all_attack_plus) ;

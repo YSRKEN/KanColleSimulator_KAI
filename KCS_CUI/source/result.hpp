@@ -15,23 +15,23 @@ public:
 	// その他
 	string Put() const{
 		std::stringstream output;
-		output << "残りHP：\n";
+		output << "残りHP：" << endl;
 		for (auto bi = 0; bi < kBattleSize; ++bi) {
 			for (auto fi = 0u; fi < kMaxFleetSize; ++fi) {
 				for (auto ui = 0u; ui < kMaxUnitSize; ++ui) {
 					output << hp_[bi][fi][ui] << ",";
 				}
 			}
-			output << "\n";
+			output << endl;
 		}
-		output << "ダメージ量：\n";
+		output << "ダメージ量：" << endl;
 		for (auto bi = 0; bi < kBattleSize; ++bi) {
 			for (auto fi = 0u; fi < kMaxFleetSize; ++fi) {
 				for (auto ui = 0u; ui < kMaxUnitSize; ++ui) {
 					output << damage_[bi][fi][ui] << ",";
 				}
 			}
-			output << "\n";
+			output << endl;
 		}
 		return output.str();
 	}
