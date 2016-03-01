@@ -18,9 +18,7 @@ class Simulator {
 public:
 	// コンストラクタ
 	Simulator(){}
-	Simulator(const vector<Fleet> &fleet, const unsigned int seed)
-		: fleet_(fleet), rand(seed)
-	{}
+	Simulator(const vector<Fleet> &fleet, const unsigned int seed);
 	SharedRand GetGenerator() noexcept { return this->rand; }
 	// 計算用メソッド
 	Result Calc();

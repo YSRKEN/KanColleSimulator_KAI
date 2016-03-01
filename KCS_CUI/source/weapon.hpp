@@ -42,20 +42,24 @@ public:
 	// getter
 	const std::wstring& GetName() const noexcept { return name_; }
 	WeaponClass GetWeaponClass() const noexcept { return weapon_class_; }
+	int GetTorpedo() const noexcept { return torpedo_; }
+	int GetBomb() const noexcept { return bomb_; }
 	int GetAntiAir() const noexcept { return anti_air_; }
 	int GetHit() const noexcept { return hit_; }
 	int GetSearch() const noexcept { return search_; }
 	Range GetRange() const noexcept { return range_; }
+	int GetLevel() const noexcept { return level_; }
 	// setter
 	void SetLevel(const int level) { level_ = level; }
 	void SetLevelDetail(const int level_detail) { level_detail_ = level_detail; }
 	// その他
 	void Put() const;					//中身を表示する
 	int AntiAirScore(const int&) const noexcept;	//制空値を計算する
-	bool IsAir() const noexcept;				//(熟練度が存在する)艦載機ならtrue
-	bool IsAirFight() const noexcept;		//航空戦に参加する艦載機ならtrue
-	bool IsAirTrailer() const noexcept;		//触接に参加する艦載機ならtrue
-	bool IsAirBomb() const noexcept;	//開幕爆撃に参加する艦載機ならtrue
+	bool IsAir() const noexcept;					//(熟練度が存在する)艦載機ならtrue
+	bool IsAirFight() const noexcept;				//航空戦に参加する艦載機ならtrue
+	bool IsAirTrailer() const noexcept;				//触接に参加する艦載機ならtrue
+	bool IsAirBomb() const noexcept;				//開幕爆撃に参加する艦載機ならtrue
+	bool IsHAG() const noexcept;					//高角砲ならtrue
 	friend std::ostream& operator<<(std::ostream& os, const Weapon& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Weapon& conf);
 };

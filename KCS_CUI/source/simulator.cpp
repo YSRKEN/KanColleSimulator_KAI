@@ -3,9 +3,25 @@
 #include "fleet.hpp"
 #include "simulator.hpp"
 
+Simulator::Simulator(const vector<Fleet>& fleet, const unsigned int seed)
+	: fleet_(fleet), rand(seed)
+{
+	for (auto& f : this->fleet_) f.SetRandGenerator(rand);
+}
+
 // 計算用メソッド
 Result Simulator::Calc() {
 	result_ = Result();
+#ifdef KCS_DEBUG_MODE
+	for (auto bi = 0; bi < kBattleSize; ++bi) {
+		for (auto fi = 0u; fi < fleet_[bi].FleetSize(); ++fi) {
+			for (auto ui = 0u; ui < fleet_[bi].UnitSize(fi); ++ui) {
+				result_.SetHP(bi, fi, ui, fleet_[bi].GetUnit()[fi][ui].GetHP());
+			}
+		}
+	}
+	cout << result_.Put() << "\n";
+#endif
 
 	// 索敵フェイズ
 	auto search_result = SearchPhase();
@@ -88,20 +104,7 @@ tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleS
 		auto trailer_aircraft_prob = fleet_[i].TrailerAircraftProb(air_war_status);
 		if (trailer_aircraft_prob < rand.RandReal()) continue;	//触接は確率的に開始される
 		// 触接の選択率を計算する
-		const double all_attack_plus_list[] = { 1.12, 1.12, 1.17, 1.20 };
-		[&] {
-			for (auto &it_u : fleet_[i].GetUnit()) {
-				for (auto &it_k : it_u) {
-					for (auto &it_w : it_k.GetWeapon()) {
-						if (!it_w.IsAirTrailer()) continue;
-						if (0.07 * it_w.GetSearch() >= rand.RandReal()) {
-							all_attack_plus[i] = all_attack_plus_list[it_w.GetHit()];
-							return;
-						}
-					}
-				}
-			}
-		}();
+		all_attack_plus[i] = fleet_[i].TrailerAircraftPlus();
 	}
 
 	// 空中戦
@@ -145,89 +148,126 @@ tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleS
 		// 艦隊対空ボーナス値を決定
 		int anti_air_bonus = fleet_[i].AntiAirBonus();
 		// 対空カットイン判定を行う
-		int aac_type = 0;
-		[&] {
-			// まず、秋月型カットイン以外の判定を行う
-			for (auto &it_u : fleet_[i].GetUnit()) {
-				for (auto &it_k : it_u) {
-					auto aac_type_ = it_k.GetAacType();
-					if (aac_type_ <= 3) continue;
-					if (it_k.GetAacProb(aac_type_) < rand.RandReal()) continue;
-					aac_type = aac_type_;
-					return;
-				}
-			}
-			// まず、秋月型カットイン以外の判定を行う
-			for (auto &it_u : fleet_[i].GetUnit()) {
-				for (auto &it_k : it_u) {
-					auto aac_type_ = it_k.GetAacType();
-					if (aac_type_ != limit(aac_type_, 1, 3)) continue;
-					if (it_k.GetAacProb(aac_type_) < rand.RandReal()) continue;
-					aac_type = aac_type_;
-					return;
-				}
-			}
-		}();
+		int aac_type = fleet_[i].AacType();
 		// 迎撃！
+		//加重対空値
 		//                       0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
-		int aac_bonus_add1[] = { 0,7,6,4,6,4,4,3,4,2,8, 6, 3, 0, 4, 3, 4, 2, 0};
+		const int aac_bonus_add1[] = { 0,7,6,4,6,4,4,3,4,2,8, 6, 3, 0, 4, 3, 4, 2, 2};
 		auto other_side = kBattleSize - i - 1;	//自分にとっての敵、敵にとっての自分
-		for (auto &it_u : fleet_[other_side].GetUnit()) {
-			for (auto &it_k : it_u) {
-				for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
-					auto &it_w = it_k.GetWeapon()[wi];
-					if (!it_w.IsAirFight()) continue;
-					auto &target_airs = it_k.GetAir()[wi];
-					Kammusu &intercept_kammusu = fleet_[i].RandomKammusu();	//迎撃艦
-					auto all_anti_air = intercept_kammusu.GetAllAntiAir();	//加重対空値
-					int killed_airs = 0;
-					//固定撃墜
-					if (rand.RandBool()) {
-						if (intercept_kammusu.IsKammusu()) {
-							killed_airs += int(0.1 * (all_anti_air + anti_air_bonus));
-						}
-						else {
-							killed_airs += int(1.0 * (all_anti_air + anti_air_bonus) / 10.6);
-						}
-						// 対空カットイン成功時における固定撃墜の追加ボーナス
-						/* 種類／対空 11  45  48  69.4 75  91  102 108 126 142
-						 * 第9種(+2)      +1  +2    +2          +3          +4
-						 * 第7種(+3)                       +3   +3  +4  +5  +5
-						 * 第8種(+4)                +3 +3       +4
-						 * 第4種(+6)                            +5
-						 * 第1種(+7)  +0
-						 */
-						if (aac_type > 0) {
-							killed_airs += int(-1.1376 + 0.2341 * aac_bonus_add1[aac_type] + 0.0392 * all_anti_air + 0.5);
-						}
-					}
-					//割合撃墜
-					if (rand.RandBool()) killed_airs += int(int(0.9 * all_anti_air) * target_airs / 360);
-					//対空カットイン成功時の固定ボーナス
-					killed_airs += aac_bonus_add1[aac_type];
-					//艦娘限定ボーナス
-					if (intercept_kammusu.IsKammusu()) killed_airs += 1;
-					//撃墜処理
-					if (target_airs > killed_airs) {
-						target_airs -= killed_airs;
+		for (auto &it_k : fleet_[other_side].GetUnit()[0]) {
+			for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
+				auto &it_w = it_k.GetWeapon()[wi];
+				if (!it_w.IsAirFight()) continue;
+				Kammusu &intercept_kammusu = fleet_[i].GetUnit()[0][fleet_[i].RandomKammusu()];	//迎撃艦
+				auto all_anti_air = intercept_kammusu.AllAntiAir();									//加重対空値
+				int killed_airs = 0;
+				//固定撃墜
+				if (rand.RandBool()) {
+					if (intercept_kammusu.IsKammusu()) {
+						killed_airs += int(0.1 * (all_anti_air + anti_air_bonus));
 					}
 					else {
-						target_airs = 0;
+						killed_airs += int(1.0 * (all_anti_air + anti_air_bonus) / 10.6);
 					}
+					// 対空カットイン成功時における固定撃墜の追加ボーナス
+					/* 種類／対空 11  45  48  69.4 75  91  102 108 126 142
+						* 第9種(+2)      +1  +2    +2          +3          +4
+						* 第7種(+3)                       +3   +3  +4  +5  +5
+						* 第8種(+4)                +3 +3       +4
+						* 第4種(+6)                            +5
+						* 第1種(+7)  +0
+						*/
+					if (aac_type > 0) {
+						killed_airs += int(-1.1376 + 0.2341 * aac_bonus_add1[aac_type] + 0.0392 * all_anti_air + 0.5);
+					}
+				}
+				//割合撃墜
+				if (rand.RandBool()) killed_airs += int(int(0.9 * all_anti_air) * it_k.GetAir()[wi] / 360);
+				//対空カットイン成功時の固定ボーナス
+				killed_airs += aac_bonus_add1[aac_type];
+				//艦娘限定ボーナス
+				if (intercept_kammusu.IsKammusu()) killed_airs += 1;
+				//撃墜処理
+				if (it_k.GetAir()[wi] > killed_airs) {
+					it_k.GetAir()[wi] -= killed_airs;
+				}
+				else {
+					it_k.GetAir()[wi] = 0;
 				}
 			}
 		}
 	}
 
 	// 開幕爆撃
-	for (auto i = 0; i < kBattleSize; ++i) {
-		// 敵の中での水上艦だけをピックアップする
-
-		// 水上艦だけに開幕爆撃が行われる
-
-		// ダメージ処理
-
+	//ダメージ計算
+	vector<vector<int>> all_damage(kBattleSize, vector<int>(kMaxUnitSize, 0));
+	for (auto bi = 0; bi < kBattleSize; ++bi) {
+		auto other_side = kBattleSize - bi - 1;
+		auto &friend_unit = fleet_[bi].GetUnit()[0];
+		for (auto ui = 0u; ui < friend_unit.size(); ++ui) {
+			auto &friend_kammusu = friend_unit[ui];
+			auto &friend_weapon = friend_kammusu.GetWeapon();
+			for (auto wi = 0; wi < friend_kammusu.GetSlots(); ++wi) {
+				if (friend_kammusu.GetAir()[wi] == 0 || !friend_weapon[wi].IsAirBomb()) continue;
+				// 爆撃する対象を決定する
+				auto target = fleet_[other_side].RandomKammusuNonSS(friend_kammusu.HasAirBomb());
+				// 基礎攻撃力を算出する
+				int base_attack;
+				switch (friend_weapon[wi].GetWeaponClass()) {
+				case kWeaponClassPBF:
+				case kWeaponClassPB:
+				case kWeaponClassWB:
+					// 爆撃は等倍ダメージ
+					base_attack = int(friend_weapon[wi].GetBomb() * sqrt(friend_kammusu.GetAir()[wi]) + 25);
+					break;
+				case kWeaponClassPA:
+					// 雷撃は150％か80％かがランダムで決まる
+					base_attack = int((rand.RandBool() ? 1.5 : 0.8) * (friend_weapon[wi].GetTorpedo() * sqrt(friend_kammusu.GetAir()[wi]) + 25));
+					break;
+				default:
+					base_attack = 0;
+					break;
+				}
+				// 与えるダメージを計算する
+				//auto damage = CalcDamage(kTurnAir, bi, {0, ui}, {0, target}, base_attack, all_attack_plus, kBattlePositionSame)
+				auto damage = rand.RandInt(0, base_attack);	//仮置きのメソッド
+				result_.AddDamage(bi, 0, ui, damage);
+				all_damage[other_side][target] += damage;
+			}
+		}
 	}
+	// ダメージ処理
+	for (auto bi = 0; bi < kBattleSize; ++bi) {
+		auto &friend_unit = fleet_[bi].GetUnit()[0];
+		for (auto ui = 0u; ui < friend_unit.size(); ++ui) {
+			friend_unit[ui].SetRandGenerator(this->rand);
+			friend_unit[ui].MinusHP(all_damage[bi][ui], (bi == kFriendSide));
+		}
+	}
+
+#ifdef KCS_DEBUG_MODE
+	cout << "残機：\n";
+	for (auto i = 0; i < kBattleSize; ++i) {
+		for (auto &it_u : fleet_[i].GetUnit()) {
+			for (auto &it_k : it_u) {
+				for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
+					cout << it_k.GetAir()[wi] << " ";
+				}
+				cout << "\n";
+			}
+		}
+	}
+	cout << "\n";
+	cout << "受けたダメージ：\n";
+	for (auto bi = 0; bi < kBattleSize; ++bi) {
+		auto &friend_unit = fleet_[bi].GetUnit()[0];
+		for (auto ui = 0u; ui < friend_unit.size(); ++ui) {
+			cout << all_damage[bi][ui] << ",";
+		}
+		cout << "\n";
+	}
+	cout << "\n";
+#endif
 
 	return tuple <AirWarStatus, vector<double>>(air_war_status, all_attack_plus) ;
 }
