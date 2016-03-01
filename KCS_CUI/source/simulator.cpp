@@ -311,10 +311,40 @@ int Simulator::CalcDamage(
 	auto other_side = kBattleSize - turn_player - 1;
 	// 旗艦相手への攻撃に限り、「かばい」が確率的に発生する
 	ProtectOracle(other_side, enemy_index);
+	// 攻撃の命中率を計算する
+	double hit_prob = 0.0;
+	switch (battle_phase) {
+	case kBattlePhaseAir:
+	case kBattlePhaseGun:
+	case kBattlePhaseNight:
+		// 砲撃戦命中率
+
+		break;
+	case kBattlePhaseFirstTorpedo:
+	case kBattlePhaseTorpedo:
+		// 雷撃戦命中率
+		break;
+	}
 	return this->rand.RandInt(0, base_attack);	//仮置きのメソッド
 }
 
 // 「かばい」を確率的に発生させる
 void Simulator::ProtectOracle(const int &defense_side, KammusuIndex &defense_index) {
+	// 旗艦ではない場合、かばいは発生しない
+	if (defense_index[1] != 0) return;
+	// 水上艦は水上艦、潜水艦は潜水艦しかかばえないのでリストを作成する
+	auto &attendants = fleet_[defense_side].GetUnit()[defense_index[0]];
+	auto is_submarine = attendants[0].IsSubmarine();
+	vector<int> block_list;
+	for (auto ui = 1u; ui < attendants.size(); ++ui) {
+		if (attendants[ui].IsSubmarine() == is_submarine && attendants[ui].Status() < kStatusLightDamage) {
+			block_list.push_back(ui);
+		}
+	}
+	if (block_list.size() == 0) return;
+	// かばいは確率的に発生し、どの艦がかばうかも確率的に決まる
+	if (rand.RandInt(100) < 40) {	//とりあえず4割に設定している
+		defense_index[1] = block_list[rand.RandInt(block_list.size())];
+	}
 	return;	//仮置き
 }
