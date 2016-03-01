@@ -22,11 +22,16 @@ class Simulator {
 	bitset<kBattleSize> SearchPhase();
 	tuple<AirWarStatus, vector<double>> AirWarPhase(const bitset<kBattleSize>&);
 	// 計算用メソッド(内部)
-	AirWarStatus JudgeAirWarStatus(const bitset<kBattleSize>&, const vector<int>&);	//制空状態を判断する
+	//制空状態を判断する
+	AirWarStatus JudgeAirWarStatus(const bitset<kBattleSize>&, const vector<int>&);
+	//与えるダメージ量を計算する
 	int CalcDamage(
-		const BattlePhase&, const int&, const KammusuIndex&, KammusuIndex&,		//与えるダメージ量を計算する
+		const BattlePhase&, const int&, const KammusuIndex&, KammusuIndex&,
 		const int&, const vector<double>&, const BattlePosition&);
-	void ProtectOracle(const int&, KammusuIndex&);								//「かばい」を確率的に発生させる
+	//「かばい」を確率的に発生させる
+	void ProtectOracle(const int&, KammusuIndex&);
+	//命中率を計算する
+	double CalcHitProb(const Formation&, const Formation&, const Kammusu&, const Kammusu&, const BattlePhase&) const noexcept;
 public:
 	// コンストラクタ
 	Simulator(){}

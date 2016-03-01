@@ -316,93 +316,21 @@ int Simulator::CalcDamage(
 	const auto &hunter_kammusu = friend_side.GetUnit()[friend_index[0]][friend_index[1]];
 	const auto &target_kammusu = enemy_side.GetUnit()[enemy_index[0]][enemy_index[1]];
 	// 攻撃の命中率を計算する
-	double hit_prob = 0.0;
-	switch (battle_phase) {
-	case kBattlePhaseAir:
-	case kBattlePhaseGun:
-	case kBattlePhaseNight:
-		{
-			// 昼砲撃戦命中率
-			//回避側
-			double evade_sum = target_kammusu.AllEvade();	//回避値
-			if (enemy_side.GetFormation() == kFormationEchelon || enemy_side.GetFormation() == kFormationAbreast) evade_sum *= 1.2;
-			if (target_kammusu.Mood() == kMoodHappy) evade_sum *= 1.8;
-			double evade_value;		//回避項
-			if (evade_sum <= 40) {
-				evade_value = 0.03 + evade_sum / 80;
-			}
-			else {
-				evade_value = 0.03 + evade_sum / (evade_sum + 40);
-			}
-			//命中側
-			double hit_value = 1.0 + sqrt(hunter_kammusu.GetLevel() - 1) / 50;	//練度による命中率補正
-			hit_value += hunter_kammusu.AllHit() / 100;							//装備による明示的な命中率補正
-			if (hunter_kammusu.Mood() == kMoodRed) hit_value /= 1.9;	//赤疲労状態だと命中率が激減する
-			hit_value += hunter_kammusu.GetLuck() * 0.0015;				//命中率の運補正
-			hit_value += hunter_kammusu.FitGunHitPlus();				//フィット砲補正
-			//命中率の陣形補正
-			switch (friend_side.GetFormation()) {
-			case kFormationSubTrail:
-				if (enemy_side.GetFormation() != kFormationAbreast) hit_value += 0.2;
-				break;
-			case kFormationEchelon:
-				if (enemy_side.GetFormation() != kFormationSubTrail) hit_value += 0.2;
-				break;
-			case kFormationAbreast:
-				if (enemy_side.GetFormation() != kFormationTrail) hit_value += 0.2;
-				break;
-			default:
-				break;
-			}
-			//引き算により命中率を決定する(上限あり)
-			hit_prob = hit_value - evade_value;
-			if (hit_prob > 0.97) hit_prob = 0.97;
-		}
-		break;
-	case kBattlePhaseFirstTorpedo:
-	case kBattlePhaseTorpedo:
-		{
-			// 雷撃戦命中率
-			//命中側
-			double hit_value = 0.9272;	//命中項
-			hit_value += 0.02178 * sqrt(hunter_kammusu.GetLevel() - 1);
-			hit_value += 0.001518 * hunter_kammusu.AllTorpedo(false);
-			hit_value += 0.000540 * hunter_kammusu.GetTorpedo();
-			hit_value += 0.009017 * hunter_kammusu.AllHit();
-			auto &hunter_weapon = hunter_kammusu.GetWeapon();
-			if (hunter_weapon[0].GetWeaponClass() == kWeaponClassTorpedo) hit_value += 0.02014 * sqrt(hunter_weapon[0].GetLevel());
-			if (hunter_weapon[1].GetWeaponClass() == kWeaponClassTorpedo) hit_value += 0.02014 * sqrt(hunter_weapon[1].GetLevel());
-			hit_value += 0.001463 * hunter_kammusu.GetLuck();
-			//回避側
-			double a;
-			switch (enemy_side.GetFormation()) {
-			case kFormationTrail:
-				a = 37.40;
-				break;
-			case kFormationSubTrail:
-				a = 37.16;
-				break;
-			case kFormationCircle:
-				a = 32.77;
-				break;
-			default:
-				a = 37.40;
-				break;
-			}
-			double evade_sum = target_kammusu.AllEvade();
-			double evade_value;		//回避項
-			if (evade_sum < a) {
-				evade_value = evade_sum / (2.0 * a);
-			}
-			else {
-				evade_value = evade_sum / (evade_sum + a);
-			}
-			//引き算により命中率を決定する(上限あり)
-			hit_prob = hit_value - evade_value;
-			if (hit_prob > 0.9691) hit_prob = 0.9691 + sqrt(hit_prob - 0.9691);
-		}
-		break;
+	double hit_prob = CalcHitProb(friend_side.GetFormation(), enemy_side.GetFormation(), hunter_kammusu, target_kammusu, battle_phase);
+	// 対潜攻撃かどうかを判断する
+	auto is_target_submarine = target_kammusu.IsSubmarine();
+	if (is_target_submarine && battle_phase != kBattlePhaseGun
+		&& battle_phase != kBattlePhaseNight) return 0;		//砲撃戦および夜戦以外ではそもそも対潜攻撃を行わない
+	// キャップ前補正
+	if (battle_phase != kBattlePhaseAir) {
+
 	}
+	// キャップ計算
+
+	// キャップ後補正
+
+	// 
+
 	return this->rand.RandInt(0, base_attack);	//仮置きのメソッド
 }
 
@@ -425,4 +353,99 @@ void Simulator::ProtectOracle(const int &defense_side, KammusuIndex &defense_ind
 		defense_index[1] = block_list[rand.RandInt(block_list.size())];
 	}
 	return;	//仮置き
+}
+
+//命中率を計算する
+double Simulator::CalcHitProb(
+	const Formation &friend_formation, const Formation &enemy_formation, const Kammusu &hunter_kammusu,
+	const Kammusu &target_kammusu, const BattlePhase &battle_phase) const noexcept {
+	switch (battle_phase) {
+	case kBattlePhaseAir:
+	case kBattlePhaseGun:
+	case kBattlePhaseNight:
+		{
+			// 昼砲撃戦命中率
+			//回避側
+			double evade_sum = target_kammusu.AllEvade();	//回避値
+			if (enemy_formation == kFormationEchelon || enemy_formation == kFormationAbreast) evade_sum *= 1.2;
+			if (target_kammusu.Mood() == kMoodHappy) evade_sum *= 1.8;
+			double evade_value;		//回避項
+			if (evade_sum <= 40) {
+				evade_value = 0.03 + evade_sum / 80;
+			}
+			else {
+				evade_value = 0.03 + evade_sum / (evade_sum + 40);
+			}
+			//命中側
+			double hit_value = 1.0 + sqrt(hunter_kammusu.GetLevel() - 1) / 50;	//練度による命中率補正
+			hit_value += hunter_kammusu.AllHit() / 100;							//装備による明示的な命中率補正
+			if (hunter_kammusu.Mood() == kMoodRed) hit_value /= 1.9;	//赤疲労状態だと命中率が激減する
+			hit_value += hunter_kammusu.GetLuck() * 0.0015;				//命中率の運補正
+			hit_value += hunter_kammusu.FitGunHitPlus();				//フィット砲補正
+																		//命中率の陣形補正
+			switch (friend_formation) {
+			case kFormationSubTrail:
+				if (enemy_formation != kFormationAbreast) hit_value += 0.2;
+				break;
+			case kFormationEchelon:
+				if (enemy_formation != kFormationSubTrail) hit_value += 0.2;
+				break;
+			case kFormationAbreast:
+				if (enemy_formation != kFormationTrail) hit_value += 0.2;
+				break;
+			default:
+				break;
+			}
+			//引き算により命中率を決定する(上限あり)
+			double hit_prob = hit_value - evade_value;
+			if (hit_prob > 0.97) hit_prob = 0.97;
+			return hit_prob;
+		}
+	break;
+	case kBattlePhaseFirstTorpedo:
+	case kBattlePhaseTorpedo:
+		{
+			// 雷撃戦命中率
+			//命中側
+			double hit_value = 0.9272;	//命中項
+			hit_value += 0.02178 * sqrt(hunter_kammusu.GetLevel() - 1);
+			hit_value += 0.001518 * hunter_kammusu.AllTorpedo(false);
+			hit_value += 0.000540 * hunter_kammusu.GetTorpedo();
+			hit_value += 0.009017 * hunter_kammusu.AllHit();
+			auto &hunter_weapon = hunter_kammusu.GetWeapon();
+			if (hunter_weapon[0].GetWeaponClass() == kWeaponClassTorpedo) hit_value += 0.02014 * sqrt(hunter_weapon[0].GetLevel());
+			if (hunter_weapon[1].GetWeaponClass() == kWeaponClassTorpedo) hit_value += 0.02014 * sqrt(hunter_weapon[1].GetLevel());
+			hit_value += 0.001463 * hunter_kammusu.GetLuck();
+			//回避側
+			double a;
+			switch (enemy_formation) {
+			case kFormationTrail:
+				a = 37.40;
+				break;
+			case kFormationSubTrail:
+				a = 37.16;
+				break;
+			case kFormationCircle:
+				a = 32.77;
+				break;
+			default:
+				a = 37.40;
+				break;
+			}
+			double evade_sum = target_kammusu.AllEvade();
+			double evade_value;		//回避項
+			if (evade_sum < a) {
+				evade_value = evade_sum / (2.0 * a);
+			}
+			else {
+				evade_value = evade_sum / (evade_sum + a);
+			}
+			//引き算により命中率を決定する(上限あり)
+			double hit_prob = hit_value - evade_value;
+			if (hit_prob > 0.9691) hit_prob = 0.9691 + sqrt(hit_prob - 0.9691);
+			return hit_prob;
+		}
+	break;
+	}
+
 }
