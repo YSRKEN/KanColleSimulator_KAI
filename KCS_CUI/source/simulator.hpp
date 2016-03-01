@@ -9,6 +9,8 @@ enum BattlePhase{ kBattlePhaseAir, kBattlePhaseFirstTorpedo, kBattlePhaseGun, kB
 // 陣形(同航戦・反航戦・丁字有利・丁字不利)
 enum BattlePosition{ kBattlePositionSame, kBattlePositionReverse, kBattlePositionGoodT, kBattlePositionBadT };
 
+typedef vector<int> KammusuIndex;
+
 class Fleet;
 #include "result.hpp"
 #include "random.hpp"
@@ -22,8 +24,9 @@ class Simulator {
 	// 計算用メソッド(内部)
 	AirWarStatus JudgeAirWarStatus(const bitset<kBattleSize>&, const vector<int>&);	//制空状態を判断する
 	int CalcDamage(
-		const BattlePhase&, const int&, const vector<int>&, const vector<int>&,		//与えるダメージ量を計算する
+		const BattlePhase&, const int&, const KammusuIndex&, KammusuIndex&,		//与えるダメージ量を計算する
 		const int&, const vector<double>&, const BattlePosition&);
+	void ProtectOracle(const int&, KammusuIndex&);								//「かばい」を確率的に発生させる
 public:
 	// コンストラクタ
 	Simulator(){}

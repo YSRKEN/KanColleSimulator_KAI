@@ -67,6 +67,11 @@
 ## ライセンス
 MITライセンスとします。
 
+## 作者
+- YSR https://github.com/YSRKEN
+- yumetodo https://github.com/yumetodo
+- Cranberries https://github.com/LoliGothick
+
 ## 参考資料
 - ほっぽアルファのデータライブラリからships0209.csvとslotitems0209.csvを頂いた  
 (ソフトウェア用に適宜改造している)  
@@ -79,11 +84,10 @@ http://www.fujlog.net/2014/04/command-line-getopt-usage-format.html
 http://tatesuke.github.io/KanTanMarkdown/ktm-full.html
 - C++コードの書式は「Google C++ スタイルガイド」に準じている  
 http://www.textdrop.net/google-styleguide-ja/cppguide.xml
-- 時間測定にはh2suzukiのコードを少し改造して使用した  
-http://qiita.com/h2suzuki/items/be367edcc8834b508a78
 - JSON読み込みにはpicojsonを使用した  
 https://github.com/kazuho/picojson
 - 艦これの仕様は通常wiki・検証wikiなどを参考にした  
 http://wikiwiki.jp/kancolle/  
 http://ja.kancolle.wikia.com/wiki/%E8%89%A6%E3%81%93%E3%82%8C_%E6%A4%9C%E8%A8%BCWiki  
 https://github.com/andanteyk/ElectronicObserver/blob/master/ElectronicObserver/Other/Information/kcmemo.md#%E8%89%A6%E3%81%93%E3%82%8C%E3%81%AE%E4%BB%95%E6%A7%98%E3%81%AB%E9%96%A2%E3%81%99%E3%82%8B%E9%9B%91%E5%A4%9A%E3%81%AA%E3%83%A1%E3%83%A2
+- ダメージ計算式は

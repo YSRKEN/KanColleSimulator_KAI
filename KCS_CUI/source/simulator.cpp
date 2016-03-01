@@ -229,9 +229,10 @@ tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleS
 					break;
 				}
 				// 与えるダメージを計算する
-				auto damage = CalcDamage(kBattlePhaseAir, bi, { 0, int(ui) }, { 0, target }, base_attack, all_attack_plus, kBattlePositionSame);
+				KammusuIndex enemy_index = { 0, target };
+				auto damage = CalcDamage(kBattlePhaseAir, bi, { 0, int(ui) }, enemy_index, base_attack, all_attack_plus, kBattlePositionSame);
 				result_.AddDamage(bi, 0, ui, damage);
-				all_damage[other_side][target] += damage;
+				all_damage[other_side][enemy_index[1]] += damage;
 			}
 		}
 	}
@@ -305,7 +306,15 @@ AirWarStatus Simulator::JudgeAirWarStatus(const bitset<kBattleSize> &search_resu
 
 // 与えるダメージ量を計算する
 int Simulator::CalcDamage(
-	const BattlePhase &battle_phase, const int &turn_player, const vector<int> &friend_index, const vector<int> &enemy_index,
+	const BattlePhase &battle_phase, const int &turn_player, const KammusuIndex &friend_index, KammusuIndex &enemy_index,
 	const int &base_attack, const vector<double> &all_attack_plus, const BattlePosition &battle_position){
+	auto other_side = kBattleSize - turn_player - 1;
+	// 旗艦相手への攻撃に限り、「かばい」が確率的に発生する
+	ProtectOracle(other_side, enemy_index);
 	return this->rand.RandInt(0, base_attack);	//仮置きのメソッド
+}
+
+// 「かばい」を確率的に発生させる
+void Simulator::ProtectOracle(const int &defense_side, KammusuIndex &defense_index) {
+	return;	//仮置き
 }
