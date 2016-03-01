@@ -14,7 +14,7 @@
 #include <ctime>//clock(), time()
 #include <functional>//std::ref in gcc
 #include <chrono>
-#if defined(_MSC_VER) && !defined(__clang__)
+#if !defined(_MSC_VER) || !defined(__clang__)
 #ifndef __INTEL_COMPILER
 #include <immintrin.h>
 #if defined(_WIN32) || defined(_WIN64)
@@ -55,28 +55,28 @@ namespace intrin {
 		return (RDRAND_MASK == (reg.ECX & RDRAND_MASK));
 	}
 }
-#endif//defined(_MSC_VER) && !defined(__clang__)
+#endif//!defined(_MSC_VER) || !defined(__clang__)
 using seed_v_t = std::vector<std::uint_least32_t>;
 seed_v_t create_seed_v() {
 	const auto begin_time = std::chrono::high_resolution_clock::now();
 	std::random_device rnd;// ランダムデバイス
 	seed_v_t sed_v(10);// 初期化用ベクター
 	std::generate(sed_v.begin(), sed_v.end(), std::ref(rnd));// ベクタの初期化
-#if defined(_MSC_VER) && !defined(__clang__)
+#if !defined(_MSC_VER) || !defined(__clang__)
 	if (intrin::IsRDRANDsupport()) {//RDRAND命令の結果もベクターに追加
 		for (std::size_t i = 0; i < 4; i++) {
 			unsigned int rdrand_value = 0;
 #ifndef __GNUC__
 			_rdrand32_step(&rdrand_value);
-#else
+#else//__GNUC__
 			__builtin_ia32_rdrand32_step(&rdrand_value);
-#endif
+#endif//__GNUC__
 			if (0 != rdrand_value) {
 				sed_v.push_back(rdrand_value & i);
 			}
 		}
 	}
-#endif
+#endif//!defined(_MSC_VER) || !defined(__clang__)
 #ifdef _CRT_RAND_S
 	unsigned int rand_s_value = 0;
 	rand_s(&rand_s_value);

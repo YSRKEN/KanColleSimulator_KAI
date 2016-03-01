@@ -34,11 +34,6 @@ namespace detail {
 		if (n1 < n2) std::swap(n1, n2);
 		return static_cast<std::make_unsigned_t<T>>(n1 - n2);
 	}
-	template<typename T, std::enable_if_t<std::is_floating_point<T>::value, std::nullptr_t> = nullptr>
-	std::size_t diff(T n1, T n2) {
-		if (n1 < n2) std::swap(n1, n2);
-		return static_cast<std::size_t>(n1 - n2);
-	}
 }
 
 class SharedRand {
@@ -181,7 +176,7 @@ private:
 		return re;
 	}
 public:
-	template<typename RandType, std::enable_if_t<std::is_arithmetic<RandType>::value, std::nullptr_t> = nullptr>
+	template<typename RandType, std::enable_if_t<std::is_integral<RandType>::value/*std::is_arithmetic<RandType>::value*/, std::nullptr_t> = nullptr>
 	std::vector<RandType> make_unique_rand_array(const std::size_t size, RandType rand_min, RandType rand_max) {
 		if (rand_min > rand_max) std::swap(rand_min, rand_max);
 		const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
