@@ -429,11 +429,31 @@ int Simulator::CalcDamage(
 		}
 		damage = int(damage);	//※この切り捨ては仕様です
 		// 触接補正
-
+		damage *= all_attack_plus[turn_player];
+		// 弾着観測射撃補正
+		if (battle_phase == kBattlePhaseGun && is_special_attack) damage *= multiple;
 	}
-	// 
-
-	return this->rand.RandInt(0, base_attack);	//仮置きのメソッド
+	// 装甲乱数の分だけダメージを減少させる
+	damage -= 0.7 * target_kammusu.AllDefense() + 0.6 * rand.RandInt(target_kammusu.AllDefense());
+	// 弾薬量補正
+	if (hunter_kammusu.GetAmmo() < 50) {
+		damage *= 2.0 * hunter_kammusu.GetAmmo() / 100;
+	}
+	// 弾着観測射撃時、カットインが入ると命中率が劇的に上昇する(試験実装)
+	if (kBattlePhaseGun && is_special_attack) {
+		if (hit_prob < 0.9) hit_prob = 0.9;
+	}
+	// 弾着観測射撃および夜間特殊攻撃ならば回避してもカスダメ、それ以外では0ダメージ
+	if (!rand.RandBool(hit_prob)) {
+		if (is_special_attack) damage = 0.0; else return 0;
+	}
+	// 夜戦における対潜攻撃は常にカスダメ(ただし開幕夜戦および連合艦隊では無視される)
+	if (friend_side.GetFleetType() == kFleetTypeNormal && is_target_submarine && battle_phase == kBattlePhaseNight) damage = 0.0;
+	// カスダメの際は相手残り耐久の6～14％を与える
+	if (damage < 1.0) {
+		damage = 0.06 * target_kammusu.GetHP() + 0.08 * rand.RandInt(target_kammusu.GetHP());
+	}
+	return int(damage);
 }
 
 // 「かばい」を確率的に発生させる

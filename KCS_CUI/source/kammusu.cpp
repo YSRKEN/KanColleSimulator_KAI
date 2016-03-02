@@ -385,6 +385,7 @@ double Kammusu::FitGunAttackPlus() const noexcept {
 	case kShipClassCL:
 	case kShipClassCLT:
 	case kShipClassCP:
+	{
 		auto light_gun_single = 0, light_gun_double = 0;
 		for (auto &it_w : weapons_) {
 			auto &name = it_w.GetName();
@@ -395,6 +396,7 @@ double Kammusu::FitGunAttackPlus() const noexcept {
 				|| name == L"15.2cm連装砲改") ++light_gun_double;
 		}
 		return sqrt(light_gun_single) + 2.0 * sqrt(light_gun_double);
+	}
 		break;
 	default:
 		return 0.0;
@@ -467,15 +469,22 @@ double Kammusu::CL2AttackPlus() const noexcept {
 		case kWeaponClassPB:
 		case kWeaponClassPBF:
 		case kWeaponClassWB:
-			auto plus_per = 0.1 * it_w.GetLevel() / 7;
-			if(wi == 0) plus_per *= 2;	//1スロット目は10％ではなく20％であることを簡略表記
-			cl_attack_plus += plus_per;
+			cl_attack_plus += (wi == 0 ? 0.2 : 0.1) * it_w.GetLevel() / 7;
 			break;
 		default:
 			break;
 		}
 	}
 	return cl_attack_plus;
+}
+
+// 総装甲を返す
+int Kammusu::AllDefense() const noexcept {
+	int defense_sum = defense_;
+	for (auto &it_w : weapons_) {
+		defense_sum += it_w.GetDefense();
+	}
+	return defense_sum;
 }
 
 // ダメージを与える

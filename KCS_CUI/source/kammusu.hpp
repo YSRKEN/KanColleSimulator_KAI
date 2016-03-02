@@ -95,6 +95,7 @@ public:
 	const vector<int>& GetAir() const noexcept { return airs_; }
 	vector<Weapon>& GetWeapon() noexcept { return weapons_; }
 	const vector<Weapon>& GetWeapon() const noexcept { return weapons_; }
+	int GetAmmo() const noexcept { return ammo_; }
 	// setter
 	void SetMaxHP(const int max_hp) noexcept { max_hp_ = max_hp; }
 	void SetLuck(const int luck) noexcept { luck_ = luck; }
@@ -123,6 +124,7 @@ public:
 	double SpecialEffectApPlus() const noexcept;	//徹甲弾補正
 	double CL2ProbPlus() const noexcept;			//熟練艦載機によるCL2率上昇
 	double CL2AttackPlus() const noexcept;			//熟練艦載機によるダメージ補正
+	int AllDefense() const noexcept;				//総装甲を返す
 	void MinusHP(const int&, const bool&);	//ダメージを与える、ctorもしくはSetRandGenerator経由で乱数エンジンを渡している必要がある
 	bool HasAir() const noexcept;					//艦載機を保有していた場合はtrue
 	bool HasAirFight() const noexcept;				//航空戦に参加する艦載機を保有していた場合はtrue

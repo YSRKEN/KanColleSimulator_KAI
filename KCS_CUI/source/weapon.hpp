@@ -42,6 +42,7 @@ public:
 	// getter
 	const std::wstring& GetName() const noexcept { return name_; }
 	WeaponClass GetWeaponClass() const noexcept { return weapon_class_; }
+	int GetDefense() const noexcept { return defense_; }
 	int GetTorpedo() const noexcept { return torpedo_; }
 	int GetBomb() const noexcept { return bomb_; }
 	int GetAntiAir() const noexcept { return anti_air_; }
