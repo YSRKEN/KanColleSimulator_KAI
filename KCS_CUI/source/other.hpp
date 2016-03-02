@@ -28,6 +28,21 @@ public:
 	Kammusu Get(const int, const int) const;
 };
 
+// 集計結果保存用クラス
+class ResultStat {
+	vector<vector<vector<int>>> hp_min_, hp_max_, damage_min_, damage_max_;
+	vector<vector<int>>mvp_count_, heavy_damage_count_;
+	vector<vector<vector<double>>> hp_ave_, hp_sd_, damage_ave_, damage_sd_;
+	int all_count_, reader_killed_count_;
+public:
+	// コンストラクタ：収集した結果から内部を計算で初期化する
+	ResultStat(const vector<Result>&, const vector<vector<Kammusu>>&) noexcept;
+	// 結果を標準出力に出力する
+	void Put(const vector<Fleet>&) const noexcept;
+	// 結果をファイルに出力する
+
+};
+
 // 文字列をデリミタで区切り分割する
 //vector<string> Split(const string&, const char);
 
@@ -37,7 +52,3 @@ vector<int> ToInt(const vector<string>&);
 //// 配列をハッシュに変換する
 //template<typename T>
 //unordered_map<T, size_t> ToHash(const vector<T>&);
-
-// 結果を集計し、出力する
-void PutResult(const vector<Fleet>&, const vector<Result>&);
-void PutResult_(const vector<Fleet>&, const vector<Result>&, const int&);

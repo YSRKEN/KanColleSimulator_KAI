@@ -216,6 +216,105 @@ Kammusu KammusuDB::Get(const int id, const int level) const {
 	return temp_k;
 }
 
+// 集計結果保存用クラスのコンストラクタ
+ResultStat::ResultStat(const vector<Result> &result_db, const vector<vector<Kammusu>> &unit) noexcept {
+	hp_min_.resize(kBattleSize, vector<vector<int>>(kMaxFleetSize, vector<int>(kMaxUnitSize, 10000)));
+	hp_max_.resize(kBattleSize, vector<vector<int>>(kMaxFleetSize, vector<int>(kMaxUnitSize, -1)));
+	damage_min_.resize(kBattleSize, vector<vector<int>>(kMaxFleetSize, vector<int>(kMaxUnitSize, 10000)));
+	damage_max_.resize(kBattleSize, vector<vector<int>>(kMaxFleetSize, vector<int>(kMaxUnitSize, -1)));
+
+	hp_ave_.resize(kBattleSize, vector<vector<double>>(kMaxFleetSize, vector<double>(kMaxUnitSize)));
+	hp_sd_.resize(kBattleSize, vector<vector<double>>(kMaxFleetSize, vector<double>(kMaxUnitSize)));
+	damage_ave_.resize(kBattleSize, vector<vector<double>>(kMaxFleetSize, vector<double>(kMaxUnitSize)));
+	damage_sd_.resize(kBattleSize, vector<vector<double>>(kMaxFleetSize, vector<double>(kMaxUnitSize)));
+
+	mvp_count_.resize(kMaxFleetSize, vector<int>(kMaxUnitSize, 0));
+	heavy_damage_count_.resize(kMaxFleetSize, vector<int>(kMaxUnitSize, 0));
+	all_count_ = result_db.size();
+	reader_killed_count_ = 0;
+	for (auto ti = 0; ti < all_count_; ++ti) {
+		for (auto fi = 0u; fi < unit.size(); ++fi) {
+			auto mvp_index = 0, mvp_damage = -1;
+			for (auto ui = 0u; ui < kMaxUnitSize; ++ui) {
+				// 残り耐久・与ダメージ
+				for (auto bi = 0u; bi < kBattleSize; ++bi) {
+					auto hp = result_db[ti].GetHP(bi, fi, ui);
+					auto damage = result_db[ti].GetDamage(bi, fi, ui);
+					hp_min_[bi][fi][ui] = std::min(hp_min_[bi][fi][ui], hp);
+					hp_max_[bi][fi][ui] = std::max(hp_max_[bi][fi][ui], hp);
+					damage_min_[bi][fi][ui] = std::min(damage_min_[bi][fi][ui], damage);
+					damage_max_[bi][fi][ui] = std::max(damage_max_[bi][fi][ui], damage);
+					hp_ave_[bi][fi][ui] += hp;
+					damage_ave_[bi][fi][ui] += damage;
+				}
+				// MVP・大破
+				auto damage = result_db[ti].GetDamage(0, fi, ui);
+				if (damage > mvp_damage) {
+					mvp_index = ui;
+					mvp_damage = damage;
+				}
+				if (result_db[ti].GetHP(0, fi, ui) * 4 <= unit[fi][ui].GetMaxHP()) ++heavy_damage_count_[fi][ui];
+			}
+			++mvp_count_[fi][mvp_index];
+		}
+		// 旗艦撃破
+		if (result_db[ti].GetHP(1, 0, 0) == 0) ++reader_killed_count_;
+	}
+	// 平均
+	double all_count_inv = 1.0 / all_count_;
+	for (auto bi = 0u; bi < kBattleSize; ++bi) {
+		for (auto fi = 0u; fi < kMaxFleetSize; ++fi) {
+			for (auto ui = 0u; ui < kMaxUnitSize; ++ui) {
+				hp_ave_[bi][fi][ui] *= all_count_inv;
+				damage_ave_[bi][fi][ui] *= all_count_inv;
+			}
+		}
+	}
+	// 標本標準偏差
+	for (auto ti = 0; ti < all_count_; ++ti) {
+		for (auto bi = 0u; bi < kBattleSize; ++bi) {
+			for (auto fi = 0u; fi < kMaxFleetSize; ++fi) {
+				for (auto ui = 0u; ui < kMaxUnitSize; ++ui) {
+					double temp1 = hp_ave_[bi][fi][ui] - result_db[ti].GetHP(bi, fi, ui);
+					hp_sd_[bi][fi][ui] += temp1 * temp1;
+					double temp2 = damage_ave_[bi][fi][ui] - result_db[ti].GetDamage(bi, fi, ui);
+					damage_sd_[bi][fi][ui] += temp2 * temp2;
+				}
+			}
+		}
+	}
+	double all_count_inv2 = 1.0 / (all_count_ - 1);
+	for (auto bi = 0u; bi < kBattleSize; ++bi) {
+		for (auto fi = 0u; fi < kMaxFleetSize; ++fi) {
+			for (auto ui = 0u; ui < kMaxUnitSize; ++ui) {
+				hp_sd_[bi][fi][ui] = sqrt(hp_sd_[bi][fi][ui] * all_count_inv2);
+				damage_sd_[bi][fi][ui] = sqrt(damage_sd_[bi][fi][ui] * all_count_inv2);
+			}
+		}
+	}
+}
+
+// 結果を標準出力に出力する
+void ResultStat::Put(const vector<Fleet> &fleet) const noexcept {
+	for (auto bi = 0; bi < kBattleSize; ++bi) {
+		wcout << (bi == kFriendSide ? L"自" : L"敵") << L"艦隊：" << endl;
+		const auto &unit = fleet[bi].GetUnit();
+		for (auto fi = 0u; fi < unit.size(); ++fi) {
+			wcout << L"　第" << (fi + 1) << L"艦隊：" << endl;
+			for (auto ui = 0u; ui < unit[fi].size(); ++ui) {
+				wcout << L"　　" << unit[fi][ui].GetNameLv() << endl;
+				wcout << L"　　　残耐久：" << L"[" << hp_min_[bi][fi][ui] << L"～" << hp_ave_[bi][fi][ui] << L"～" << hp_max_[bi][fi][ui] << L"] σ＝" << hp_sd_[bi][fi][ui] << endl;
+				wcout << L"　　　与ダメージ：" << L"[" << damage_min_[bi][fi][ui] << L"～" << damage_ave_[bi][fi][ui] << L"～" << damage_max_[bi][fi][ui] << L"] σ＝" << damage_sd_[bi][fi][ui] << endl;
+				if (bi == 0) {
+					wcout << L"　　　MVP率：" << (100.0 * mvp_count_[fi][ui] / all_count_) << L"％ ";
+					wcout << L"大破率：" << (100.0 * heavy_damage_count_[fi][ui] / all_count_) << L"％" << endl;
+				}
+			}
+		}
+	}
+	wcout << L"旗艦撃破率：" << (100.0 * reader_killed_count_ / all_count_) << L"％" << endl;
+}
+
 // 文字列をデリミタで区切り分割する
 //vector<string> Split(const string &str, char delim) {
 //	vector<string> re;
@@ -226,94 +325,3 @@ Kammusu KammusuDB::Get(const int id, const int level) const {
 //	re.emplace_back(str, current, str.size() - current);
 //	return re;
 //}
-
-// 結果を集計し、出力する
-void PutResult(const vector<Fleet> &fleet, const vector<Result> &result_db) {
-	// 残耐久に関する統計を表示する
-	PutResult_(fleet, result_db, 0);
-	// 与ダメージに関する統計を表示する
-	PutResult_(fleet, result_db, 1);
-	// MVP率・大破率・旗艦撃破率に関する統計を表示する
-	PutResult_(fleet, result_db, 2);
-}
-
-void PutResult_(const vector<Fleet> &fleet, const vector<Result> &result_db, const int &type) {
-	if (type < 2) {
-		wcout << (type == 0 ? L"【残耐久】" : L"【与ダメージ】") << endl;
-		for (auto bi = 0; bi < kBattleSize; ++bi) {
-			wcout << (bi == kFriendSide ? L"自" : L"敵") << L"艦隊：" << endl;
-			const auto &unit = fleet[bi].GetUnit();
-			for (auto fi = 0u; fi < unit.size(); ++fi) {
-				wcout << L"　第" << (fi + 1) << L"艦隊：" << endl;
-				for (auto ui = 0u; ui < unit[fi].size(); ++ui) {
-					wcout << L"　　" << unit[fi][ui].GetNameLv() << " ";
-					// 統計を計算する
-					int num_sum = 0, num_min = result_db[0].GerParam(type, bi, fi, ui), num_max = num_min;
-					const auto num_count = result_db.size();
-					for (auto ti = 0u; ti < num_count; ++ti) {
-						auto temp = result_db[ti].GerParam(type, bi, fi, ui);
-						num_sum += temp;
-						num_max = std::max(num_max, temp);
-						num_min = std::min(num_min, temp);
-					}
-					double num_ave = 1.0 * num_sum / num_count;
-					double num_sum2 = 0.0;
-					for (auto ti = 0u; ti < num_count; ++ti) {
-						auto temp = num_ave - result_db[ti].GerParam(type, bi, fi, ui);
-						num_sum2 += temp * temp;
-					}
-					double num_sd = sqrt(num_sum2 / (num_count - 1));
-					// 計算結果を表示する
-					wcout << L"[" << num_min << L"～";
-					wcout << num_ave << L"～";
-					wcout << num_max << L"] σ＝";
-					wcout << num_sd << endl;
-				}
-			}
-		}
-	}
-	else {
-		wcout << L"【MVP率・大破率・旗艦撃破率】" << endl;
-		// MVP率を算出する
-		const auto num_count = result_db.size();
-		const auto &unit = fleet[0].GetUnit();
-		vector<vector<int>> mvp_sum(kMaxFleetSize, vector<int>(kMaxUnitSize, 0));
-		for (auto ti = 0u; ti < num_count; ++ti) {
-			for (auto fi = 0u; fi < fleet[0].FleetSize(); ++fi) {
-				auto mvp_index = 0, mvp_damage = -1;
-				for (auto ui = 0u; ui < unit[fi].size(); ++ui) {
-					auto damage = result_db[ti].GetDamage(0, fi, ui);
-					if (damage > mvp_damage) {
-						mvp_index = ui;
-						mvp_damage = damage;
-					}
-				}
-				++mvp_sum[fi][mvp_index];
-			}
-		}
-		// 大破率を算出する
-		vector<vector<int>> heavy_damage_sum(kMaxFleetSize, vector<int>(kMaxUnitSize, 0));
-		for (auto ti = 0u; ti < num_count; ++ti) {
-			for (auto fi = 0u; fi < fleet[0].FleetSize(); ++fi) {
-				for (auto ui = 0u; ui < unit[fi].size(); ++ui) {
-					if (result_db[ti].GetHP(0, fi, ui) * 4 <= unit[fi][ui].GetMaxHP()) ++heavy_damage_sum[fi][ui];
-				}
-			}
-		}
-		// 旗艦撃破率を算出する
-		int reader_killed_count = 0;
-		for (auto ti = 0u; ti < num_count; ++ti) {
-			if (result_db[ti].GetHP(0, fleet[1].FleetSize() - 1, 0) == 0) ++reader_killed_count;
-		}
-		// 結果を出力する
-		for (auto fi = 0u; fi < unit.size(); ++fi) {
-			wcout << L"第" << (fi + 1) << L"艦隊：" << endl;
-			for (auto ui = 0u; ui < unit[fi].size(); ++ui) {
-				wcout << L"　" << unit[fi][ui].GetNameLv() << L" ";
-				wcout << L"MVP率" << (100.0 * mvp_sum[fi][ui] / num_count) << L"％ ";
-				wcout << L"大破率" << (100.0 * heavy_damage_sum[fi][ui] / num_count) << L"％" << endl;
-			}
-		}
-		wcout << L"旗艦撃破率：" << (100.0 * reader_killed_count / num_count) << L"％" << endl;
-	}
-}

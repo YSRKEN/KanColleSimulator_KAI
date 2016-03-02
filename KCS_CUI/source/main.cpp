@@ -38,9 +38,10 @@ int main(int argc, char *argv[]) {
 		cout << "処理時間：" << std::chrono::duration_cast<std::chrono::milliseconds>(process_end_time - process_begin_time).count() << "[ms]\n" << endl;
 #endif
 		// 集計を行う
+		ResultStat result_stat(result_db, fleet[kFriendSide].GetUnit());
 		if (config.GetOutputFilename() == "") {
 			// 標準出力モード
-			PutResult(fleet, result_db);
+			result_stat.Put(fleet);
 		}
 		else {
 			// ファイル出力モード
