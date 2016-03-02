@@ -38,11 +38,14 @@ int main(int argc, char *argv[]) {
 		cout << "処理時間：" << std::chrono::duration_cast<std::chrono::milliseconds>(process_end_time - process_begin_time).count() << "[ms]\n" << endl;
 #endif
 		// 集計を行う
-#ifdef KCS_DEBUG_MODE
-		for (int n = 0; n < config.GetTimes(); ++n) {
-			cout << result_db[n].Put() << endl;
+		if (config.GetOutputFilename() == "") {
+			// 標準出力モード
+			PutResult(fleet, result_db);
 		}
-#endif
+		else {
+			// ファイル出力モード
+
+		}
 	}
 	catch (const KCS_except::config_error& er){
 		std::cerr << er.what() << endl;

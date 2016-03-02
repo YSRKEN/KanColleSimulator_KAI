@@ -3,6 +3,9 @@
 #include "weapon.hpp"
 #include "kammusu.hpp"
 
+class Fleet;
+class Result;
+
 // 装備DB
 class WeaponDB {
 	unordered_map<int, Weapon> hash_;
@@ -34,3 +37,7 @@ vector<int> ToInt(const vector<string>&);
 //// 配列をハッシュに変換する
 //template<typename T>
 //unordered_map<T, size_t> ToHash(const vector<T>&);
+
+// 結果を集計し、出力する
+void PutResult(const vector<Fleet>&, const vector<Result>&);
+void PutResult_(const vector<Fleet>&, const vector<Result>&, const int&);

@@ -1,5 +1,7 @@
 ﻿#include "base.hpp"
 #include "other.hpp"
+#include "fleet.hpp"
+#include "result.hpp"
 #include "char_convert.hpp"
 #include <algorithm>
 enum class CsvParseLevel : std::size_t { kLevel1 = 0, kLevel99 = 1 };
@@ -224,3 +226,69 @@ Kammusu KammusuDB::Get(const int id, const int level) const {
 //	re.emplace_back(str, current, str.size() - current);
 //	return re;
 //}
+
+// 結果を集計し、出力する
+void PutResult(const vector<Fleet> &fleet, const vector<Result> &result_db) {
+	// 残耐久に関する統計を表示する
+	PutResult_(fleet, result_db, 0);
+	// 与ダメージに関する統計を表示する
+	PutResult_(fleet, result_db, 1);
+}
+
+void PutResult_(const vector<Fleet> &fleet, const vector<Result> &result_db, const int &type) {
+	wcout << (type == 0 ? L"【残耐久】" : L"【与ダメージ】") << endl;
+	for (auto bi = 0; bi < kBattleSize; ++bi) {
+		wcout << (bi == kFriendSide ? L"自" : L"敵") << L"艦隊：" << endl;
+		const auto &unit = fleet[bi].GetUnit();
+		for (auto fi = 0u; fi < unit.size(); ++fi) {
+			wcout << L"　第" << (fi + 1) << L"艦隊：" << endl;
+			for (auto ui = 0u; ui < unit[fi].size(); ++ui) {
+				wcout << L"　　" << unit[fi][ui].GetNameLv() << " ";
+				// 統計を計算する
+				int num_min, num_max;
+				double num_ave, num_sd;
+				if (type == 0) {
+					int num_sum = 0;
+					num_min = num_max = result_db[0].GetHP(bi, fi, ui);
+					auto num_count = result_db.size();
+					for (auto ti = 0u; ti < num_count; ++ti) {
+						auto temp = result_db[ti].GetHP(bi, fi, ui);
+						num_sum += temp;
+						num_max = std::max(num_max, temp);
+						num_min = std::min(num_min, temp);
+					}
+					num_ave = 1.0 * num_sum / num_count;
+					double num_sum2 = 0.0;
+					for (auto ti = 0u; ti < num_count; ++ti) {
+						auto temp = num_ave - result_db[ti].GetHP(bi, fi, ui);
+						num_sum2 += temp * temp;
+					}
+					num_sd = sqrt(num_sum2 / (num_count - 1));
+				}
+				else {
+					int num_sum = 0;
+					num_min = num_max = result_db[0].GetDamage(bi, fi, ui);
+					auto num_count = result_db.size();
+					for (auto ti = 0u; ti < num_count; ++ti) {
+						auto temp = result_db[ti].GetDamage(bi, fi, ui);
+						num_sum += temp;
+						num_max = std::max(num_max, temp);
+						num_min = std::min(num_min, temp);
+					}
+					num_ave = 1.0 * num_sum / num_count;
+					double num_sum2 = 0.0;
+					for (auto ti = 0u; ti < num_count; ++ti) {
+						auto temp = num_ave - result_db[ti].GetDamage(bi, fi, ui);
+						num_sum2 += temp * temp;
+					}
+					num_sd = sqrt(num_sum2 / (num_count - 1));
+				}
+				// 計算結果を表示する
+				wcout << L"[" << num_min << L"～";
+				wcout << num_ave << L"～";
+				wcout << num_max << L"] σ＝";
+				wcout << num_sd << endl;
+			}
+		}
+	}
+}

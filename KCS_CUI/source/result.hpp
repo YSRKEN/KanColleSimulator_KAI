@@ -9,6 +9,9 @@ public:
 		hp_.resize(kBattleSize, vector<vector<int>>(kMaxFleetSize, vector<int>(kMaxUnitSize)));
 		damage_.resize(kBattleSize, vector<vector<int>>(kMaxFleetSize, vector<int>(kMaxUnitSize, 0)));
 	}
+	// getter
+	int GetHP(const int bi, const int fi, const int ui) const noexcept { return hp_[bi][fi][ui]; }
+	int GetDamage(const int bi, const int fi, const int ui) const noexcept { return damage_[bi][fi][ui]; }
 	// setter
 	void SetHP(const int bi, const int fi, const int ui, const int hp) noexcept { hp_[bi][fi][ui] = hp; }
 	void AddDamage(const int bi, const int fi, const int ui, const int damage) noexcept { damage_[bi][fi][ui] += damage; }
