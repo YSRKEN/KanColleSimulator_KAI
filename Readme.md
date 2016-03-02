@@ -4,7 +4,7 @@
 艦これの戦闘をシミュレートします。
 
 ## 使い方
-`usage: KCS_CUI -i input1.json input2.json [-f formation1 formation2] [-n times] [-t threads] [-o output.csv]`
+`usage: KCS_CUI -i input1.json input2.json [-f formation1 formation2] [-n times] [-t threads] [-o output.json]`
 
 - input1.jsonは自艦隊、input2.jsonは敵艦隊かマップのデータ
 - 自艦隊には連合艦隊も許容されるが、敵艦隊やマップ内の艦隊は通常艦隊のみ
@@ -18,15 +18,15 @@
 　開幕夜戦マスは(対潜マスを除いて)formation1で指定した陣形になる
 - timesは試行回数。値が1だと艦隊の詳細も表記される。略すと1になる
 - threadsは実行スレッド数。略すとシングルスレッドで実行される
-- output.csvを指定すると、結果を標準出力ではなくCSVに書き出すようになる。  
+- output.jsonを指定すると、結果を標準出力ではなくJSONに書き出すようになる。  
 また、出力形式も標準出力のような感じ(まとめ表示)ではなく各回についての結果が書き出される
 
 ## 使用例
 `KCS_CUI -i "sample\fleet sample1.json" "sample\fleet sample2.json" -f 0 1 -n 1`
 
-`KCS_CUI -i "sample\fleet 1-5.json" "sample\map 1-5 high.json" -f 0 0 -n 10000 -t 2 -o output.csv`
+`KCS_CUI -i "sample\fleet 1-5.json" "sample\map 1-5 high.json" -f 0 0 -n 10000 -t 2 -o output.json`
 
-`KCS_CUI -i "sample\fleet 2016冬E3甲輸送.json" "sample\map 2016冬E3甲輸送.json" -f 3 4 -n 100000 -t 4 -o output.csv`
+`KCS_CUI -i "sample\fleet 2016冬E3甲輸送.json" "sample\map 2016冬E3甲輸送.json" -f 3 4 -n 100000 -t 4 -o output.json`
 
 ## JSONデータの書式(艦隊編)
 - UTF-8で保存してください(どうせASCII文字しか無いと思いますが)

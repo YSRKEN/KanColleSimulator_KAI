@@ -79,6 +79,7 @@ public:
 	);
 	void SetRandGenerator(const SharedRand& rand);
 	// getter
+	int GetID() const noexcept { return id_; }
 	wstring GetName() const { return name_; }
 	ShipClass GetShipClass() const noexcept { return ship_class_; }
 	int GetMaxHP() const noexcept { return max_hp_; }

@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
 		}
 		else {
 			// ファイル出力モード
-
+			result_stat.Put(fleet, config.GetOutputFilename());
 		}
 	}
 	catch (const KCS_except::config_error& er){

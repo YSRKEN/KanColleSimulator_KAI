@@ -315,6 +315,50 @@ void ResultStat::Put(const vector<Fleet> &fleet) const noexcept {
 	wcout << L"旗艦撃破率：" << (100.0 * reader_killed_count_ / all_count_) << L"％" << endl;
 }
 
+// 結果をJSONファイルに出力する
+void ResultStat::Put(const vector<Fleet> &fleet, const string &file_name) const {
+	ofstream fout(file_name);
+	FILE_THROW_WITH_MESSAGE_IF(!fout.is_open(), "計算結果が正常に保存できませんでした.")
+	picojson::object o;
+	o["reader_killed_per"] = picojson::value(100.0 * reader_killed_count_ / all_count_);
+	for (auto bi = 0; bi < kBattleSize; ++bi) {
+		picojson::object o1;
+		const auto &unit = fleet[bi].GetUnit();
+		for (auto fi = 0u; fi < unit.size(); ++fi) {
+			picojson::object o2;
+			for (auto ui = 0u; ui < unit[fi].size(); ++ui) {
+				picojson::object o3;
+				o3["id"] = picojson::value(to_string(unit[fi][ui].GetID()));
+				o3["lv"] = picojson::value(1.0 * unit[fi][ui].GetLevel());
+				{
+					picojson::object o4;
+					o4["min"] = picojson::value(1.0 * hp_min_[bi][fi][ui]);
+					o4["ave"] = picojson::value(hp_ave_[bi][fi][ui]);
+					o4["max"] = picojson::value(1.0 * hp_max_[bi][fi][ui]);
+					o4["sd"] = picojson::value(1.0 * hp_sd_[bi][fi][ui]);
+					o3["hp"] = picojson::value(o4);
+				}
+				{
+					picojson::object o4;
+					o4["min"] = picojson::value(1.0 * damage_min_[bi][fi][ui]);
+					o4["ave"] = picojson::value(damage_ave_[bi][fi][ui]);
+					o4["max"] = picojson::value(1.0 * damage_max_[bi][fi][ui]);
+					o4["sd"] = picojson::value(1.0 * damage_sd_[bi][fi][ui]);
+					o3["damage"] = picojson::value(o4);
+				}
+				if (bi == 0) {
+					o3["mvp_per"] = picojson::value(100.0 * mvp_count_[fi][ui] / all_count_);
+					o3["heavy_damage_per"] = picojson::value(100.0 * heavy_damage_count_[fi][ui] / all_count_);
+				}
+				o2["s" + to_string(ui + 1)] = picojson::value(o3);
+			}
+			o1["f" + to_string(fi + 1)] = picojson::value(o2);
+		}
+		o["b" + to_string(bi + 1)] = picojson::value(o1);
+	}
+	fout << picojson::value(o).serialize(false) << endl;
+}
+
 // 文字列をデリミタで区切り分割する
 //vector<string> Split(const string &str, char delim) {
 //	vector<string> re;

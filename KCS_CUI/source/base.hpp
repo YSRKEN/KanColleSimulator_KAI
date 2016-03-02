@@ -27,6 +27,7 @@ using std::fill;
 using std::get;
 using std::ifstream;
 using std::move;
+using std::ofstream;
 using std::stoi;
 using std::string;
 using std::wstring;
