@@ -245,44 +245,21 @@ void PutResult_(const vector<Fleet> &fleet, const vector<Result> &result_db, con
 			for (auto ui = 0u; ui < unit[fi].size(); ++ui) {
 				wcout << L"　　" << unit[fi][ui].GetNameLv() << " ";
 				// 統計を計算する
-				int num_min, num_max;
-				double num_ave, num_sd;
-				if (type == 0) {
-					int num_sum = 0;
-					num_min = num_max = result_db[0].GetHP(bi, fi, ui);
-					auto num_count = result_db.size();
-					for (auto ti = 0u; ti < num_count; ++ti) {
-						auto temp = result_db[ti].GetHP(bi, fi, ui);
-						num_sum += temp;
-						num_max = std::max(num_max, temp);
-						num_min = std::min(num_min, temp);
-					}
-					num_ave = 1.0 * num_sum / num_count;
-					double num_sum2 = 0.0;
-					for (auto ti = 0u; ti < num_count; ++ti) {
-						auto temp = num_ave - result_db[ti].GetHP(bi, fi, ui);
-						num_sum2 += temp * temp;
-					}
-					num_sd = sqrt(num_sum2 / (num_count - 1));
+				int num_sum = 0, num_min = result_db[0].GerParam(type, bi, fi, ui), num_max = num_min;
+				auto num_count = result_db.size();
+				for (auto ti = 0u; ti < num_count; ++ti) {
+					auto temp = result_db[ti].GerParam(type, bi, fi, ui);
+					num_sum += temp;
+					num_max = std::max(num_max, temp);
+					num_min = std::min(num_min, temp);
 				}
-				else {
-					int num_sum = 0;
-					num_min = num_max = result_db[0].GetDamage(bi, fi, ui);
-					auto num_count = result_db.size();
-					for (auto ti = 0u; ti < num_count; ++ti) {
-						auto temp = result_db[ti].GetDamage(bi, fi, ui);
-						num_sum += temp;
-						num_max = std::max(num_max, temp);
-						num_min = std::min(num_min, temp);
-					}
-					num_ave = 1.0 * num_sum / num_count;
-					double num_sum2 = 0.0;
-					for (auto ti = 0u; ti < num_count; ++ti) {
-						auto temp = num_ave - result_db[ti].GetDamage(bi, fi, ui);
-						num_sum2 += temp * temp;
-					}
-					num_sd = sqrt(num_sum2 / (num_count - 1));
+				double num_ave = 1.0 * num_sum / num_count;
+				double num_sum2 = 0.0;
+				for (auto ti = 0u; ti < num_count; ++ti) {
+					auto temp = num_ave - result_db[ti].GerParam(type, bi, fi, ui);
+					num_sum2 += temp * temp;
 				}
+				double num_sd = sqrt(num_sum2 / (num_count - 1));
 				// 計算結果を表示する
 				wcout << L"[" << num_min << L"～";
 				wcout << num_ave << L"～";
