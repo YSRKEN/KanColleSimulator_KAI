@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <exceprion>
 #include <stdexcept>
 #include <cstdint>
 #include <string>
@@ -20,18 +21,18 @@ namespace KCS_except {
 	public:
 		invalid_argument(const char* sorce_name, const char* func_name, uint64_t line, const char* expression, const std::string& msg) noexcept
 			: msg(
-				std::string("excetopn : invalid_argument\n") 
-				+ "  in " + sorce_name + "\n" 
+				std::string("excetopn : invalid_argument\n")
+				+ "  in " + sorce_name + "\n"
 				+ "  " + func_name + "() (line." + std::to_string(line) + ")\n"
 				+ "  follow by below\n"
-				+ "    " + expression 
+				+ "    " + expression
 				+ ((msg.empty() || msg[0] == '\0') ? "\n" : "\n  MESSAGE : " + msg + "\n")
 			)
 		{}
 		invalid_argument(const char* sorce_name, const char* func_name, uint64_t line, const std::string& msg) noexcept
 			: msg(
 				std::string("excetopn : invalid_argument\n")
-				+ " in " + sorce_name +  "\n" 
+				+ " in " + sorce_name +  "\n"
 				+ "  " + func_name + "() (line." + std::to_string(line) + ")\n"
 				+ ((msg.empty() || msg[0] == '\0') ? "\n" : " MESSAGE : " + msg + "\n")
 			)
