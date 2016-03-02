@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-#include <exceprion>
+#include <exception>
 #include <stdexcept>
 #include <cstdint>
 #include <string>
