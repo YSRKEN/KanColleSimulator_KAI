@@ -349,6 +349,11 @@ bool Fleet::HasAirTrailer() const noexcept {
 	return std::any_of(this->unit_[0].begin(), this->unit_[0].end(), [](const Kammusu& it_k) -> bool { return it_k.HasAirTrailer(); });
 }
 
+// 彩雲をいずれかの艦が保有していた場合はtrue
+bool Fleet::HasAirPss() const noexcept {
+	return std::any_of(this->unit_[0].begin(), this->unit_[0].end(), [](const Kammusu& it_k) -> bool { return it_k.HasAirPss(); });
+}
+
 std::ostream & operator<<(std::ostream & os, const Fleet & conf)
 {
 	os << "陣形：" << char_cvt::utf_16_to_shift_jis(kFormationStr[conf.formation_]) << "　司令部レベル：" << conf.level_ << "　形式：" << char_cvt::utf_16_to_shift_jis(kFleetTypeStr[conf.fleet_type_ - 1]) << endl;

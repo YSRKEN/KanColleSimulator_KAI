@@ -21,6 +21,7 @@ class Simulator {
 	// 各フェーズ
 	bitset<kBattleSize> SearchPhase();
 	tuple<AirWarStatus, vector<double>> AirWarPhase(const bitset<kBattleSize>&);
+	BattlePosition BattlePositionOracle() noexcept;
 	// 計算用メソッド(内部)
 	//制空状態を判断する
 	AirWarStatus JudgeAirWarStatus(const bitset<kBattleSize>&, const vector<int>&);

@@ -40,6 +40,10 @@ Result Simulator::Calc() {
 #endif
 
 	// 交戦形態の決定
+	BattlePosition battle_position = BattlePositionOracle();
+#ifdef KCS_DEBUG_MODE
+		cout << "交戦形態：" << battle_position << "\n" << endl;
+#endif
 
 	// 支援艦隊攻撃フェイズ(未実装)
 
@@ -272,7 +276,28 @@ tuple<AirWarStatus, vector<double>> Simulator::AirWarPhase(const bitset<kBattleS
 	return tuple <AirWarStatus, vector<double>>(air_war_status, all_attack_plus) ;
 }
 
-//制空状態を判断する
+// 交戦形態を確率的に決定する
+BattlePosition Simulator::BattlePositionOracle() noexcept {
+	// 彩雲を持っているかを判断する
+	auto has_pss = fleet_[0].HasAirPss();
+	int dice = rand.RandInt(100);
+	if (dice < 45) {
+		return kBattlePositionSame;
+	}
+	else if (dice < 60) {
+		return kBattlePositionGoodT;
+	}
+	else {
+		if (dice < 90 || has_pss) {
+			return kBattlePositionReverse;
+		}
+		else {
+			return kBattlePositionBadT;
+		}
+	}
+}
+
+// 制空状態を判断する
 AirWarStatus Simulator::JudgeAirWarStatus(const bitset<kBattleSize> &search_result, const vector<int> &anti_air_score) {
 	// どちらも航空戦に参加する艦載機を持っていなかった場合は航空均衡
 	if (!fleet_[kFriendSide].HasAirFight() && !fleet_[kEnemySide].HasAirFight()) {

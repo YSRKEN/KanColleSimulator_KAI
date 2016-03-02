@@ -135,6 +135,7 @@ public:
 	bool Include(const wstring&) const noexcept;	//名前に特定の文字が含まれていればtrue
 	bool HasAntiSubSynergy() const noexcept;		//対潜シナジーを持っていたらtrue
 	bool IsSpecialEffectAP() const noexcept;		//徹甲弾補正を食らう側ならtrue
+	bool HasAirPss() const noexcept;				//彩雲を保有していた場合はtrue
 	friend std::ostream& operator<<(std::ostream& os, const Kammusu& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Kammusu& conf);
 };

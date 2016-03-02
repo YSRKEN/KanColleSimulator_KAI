@@ -582,6 +582,14 @@ bool Kammusu::IsSpecialEffectAP() const noexcept {
 	}
 }
 
+// 彩雲を保有していた場合はtrue
+bool Kammusu::HasAirPss() const noexcept {
+	for (auto &it_w : weapons_) {
+		if (it_w.GetWeaponClass() == kWeaponClassPSS) return true;
+	}
+	return false;
+}
+
 std::ostream & operator<<(std::ostream & os, const Kammusu & conf)
 {
 	os 
