@@ -189,6 +189,7 @@
       <ExceptionHandling>Enabled</ExceptionHandling>
       <Optimization>MaxSpeed</Optimization>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;</PreprocessorDefinitions>
+      <AdditionalOptions> -Wextra %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='clang_Debug|x64'">
@@ -203,6 +204,7 @@
       <ExceptionHandling>Enabled</ExceptionHandling>
       <Optimization>MaxSpeed</Optimization>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;</PreprocessorDefinitions>
+      <AdditionalOptions> -Wextra %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

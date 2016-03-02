@@ -384,8 +384,8 @@ double Kammusu::FitGunAttackPlus() const noexcept {
 	switch (ship_class_) {
 	case kShipClassCL:
 	case kShipClassCLT:
-	case kShipClassCP:
-		auto light_gun_single = 0, light_gun_double = 0;
+	case kShipClassCP: {
+		int light_gun_single = 0, light_gun_double = 0;
 		for (auto &it_w : weapons_) {
 			auto &name = it_w.GetName();
 			if (name == L"14cm単装砲"
@@ -396,6 +396,7 @@ double Kammusu::FitGunAttackPlus() const noexcept {
 		}
 		return sqrt(light_gun_single) + 2.0 * sqrt(light_gun_double);
 		break;
+	}
 	default:
 		return 0.0;
 	}
@@ -466,11 +467,12 @@ double Kammusu::CL2AttackPlus() const noexcept {
 		case kWeaponClassPA:
 		case kWeaponClassPB:
 		case kWeaponClassPBF:
-		case kWeaponClassWB:
-			auto plus_per = 0.1 * it_w.GetLevel() / 7;
-			if(wi == 0) plus_per *= 2;	//1スロット目は10％ではなく20％であることを簡略表記
+		case kWeaponClassWB: {
+			double plus_per = 0.1 * it_w.GetLevel() / 7;
+			if (wi == 0) plus_per *= 2;	//1スロット目は10％ではなく20％であることを簡略表記
 			cl_attack_plus += plus_per;
 			break;
+		}
 		default:
 			break;
 		}
