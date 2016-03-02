@@ -15,11 +15,11 @@
 #define ENCODE_THROW_WITH_MESSAGE_IF( EXPR, MESSAGE ) if( EXPR ){ throw KCS_except::encode_error(__FILE__, __FUNCTION__, __LINE__, #EXPR, MESSAGE); }
 
 namespace KCS_except {
-	class invalid_argument : public std::invalid_argument
+	class kcs_except : public std::exception
 	{
 	public:
-		invalid_argument(const char* sorce_name, const char* func_name, uint64_t line, const char* expression, const std::string& msg)
-			: std::invalid_argument(
+		invalid_argument(const char* sorce_name, const char* func_name, uint64_t line, const char* expression, const std::string& msg) noexcept
+			: msg(
 				std::string("excetopn : invalid_argument\n") 
 				+ "  in " + sorce_name + "\n" 
 				+ "  " + func_name + "() (line." + std::to_string(line) + ")\n"
@@ -28,102 +28,52 @@ namespace KCS_except {
 				+ ((msg.empty() || msg[0] == '\0') ? "\n" : "\n  MESSAGE : " + msg + "\n")
 			)
 		{}
-		invalid_argument(const char* sorce_name, const char* func_name, uint64_t line, const std::string& msg)
-			: std::invalid_argument(
+		invalid_argument(const char* sorce_name, const char* func_name, uint64_t line, const std::string& msg) noexcept
+			: msg(
 				std::string("excetopn : invalid_argument\n")
 				+ " in " + sorce_name +  "\n" 
 				+ "  " + func_name + "() (line." + std::to_string(line) + ")\n"
 				+ ((msg.empty() || msg[0] == '\0') ? "\n" : " MESSAGE : " + msg + "\n")
 			)
 		{}
-	};
-	class config_error : public std::invalid_argument
+        const char* what() const noexcept {
+			return msg.c_str();
+		}
+    private:
+        std::string msg;
+    };
+	class config_error : public kcs_except
 	{
 	public:
-		config_error(const char* sorce_name, const char* func_name, uint64_t line, const char* expression, const std::string& msg) 
-			: std::invalid_argument(
-				std::string("excetopn : config_error\n") 
-				+ "  in " + sorce_name + "\n" 
-				+ "  " + func_name + "() (line." + std::to_string(line) + ")\n"
-				+ "  follow by below\n"
-				+ "    " + expression 
-				+ ((msg.empty() || msg[0] == '\0') ? "\n" : "\n  MESSAGE : " + msg + "\n")
-			)
-		{}
-		config_error(const char* sorce_name, const char* func_name, uint64_t line, const std::string& msg)
-			: std::invalid_argument(
-				std::string("excetopn : config_error\n")
-				+ " in " + sorce_name +  "\n" 
-				+ "  " + func_name + "() (line." + std::to_string(line) + ")\n"
-				+ ((msg.empty() || msg[0] == '\0') ? "\n" : " MESSAGE : " + msg + "\n")
-			)
-		{}
+        config_error(const char* sorce_name, const char* func_name, uint64_t line, const char* expression, const std::string& msg) noexcept
+            : kcs_except(sorce_name, func_name, line, expression, msg) {}
+        config_error(const char* sorce_name, const char* func_name, uint64_t line, const std::string& msg) noexcept
+            : kcs_except(sorce_name, func_name, line, msg) {}
 	};
-	class missing_rand_generator : public std::runtime_error
+	class missing_rand_generator : public kcs_except
 	{
 	public:
-		missing_rand_generator(const char* sorce_name, const char* func_name, uint64_t line, const char* expression, const std::string& msg)
-			: std::runtime_error(
-				std::string("excetopn : missing_rand_generator\n") 
-				+ "  in " + sorce_name + "\n" 
-				+ "  " + func_name + "() (line." + std::to_string(line) + ")\n"
-				+ "  follow by below\n"
-				+ "    " + expression 
-				+ ((msg.empty() || msg[0] == '\0') ? "\n" : "\n  MESSAGE : " + msg + "\n")
-			)
-		{}
-		missing_rand_generator(const char* sorce_name, const char* func_name, uint64_t line, const std::string& msg)
-			: std::runtime_error(
-				std::string("excetopn : missing_rand_generator\n")
-				+ " in " + sorce_name +  "\n" 
-				+ "  " + func_name + "() (line." + std::to_string(line) + ")\n"
-				+ ((msg.empty() || msg[0] == '\0') ? "\n" : " MESSAGE : " + msg + "\n")
-			)
-		{}
+        missing_rand_generator(const char* sorce_name, const char* func_name, uint64_t line, const char* expression, const std::string& msg) noexcept
+            : kcs_except(sorce_name, func_name, line, expression, msg) {}
+        missing_rand_generator(const char* sorce_name, const char* func_name, uint64_t line, const std::string& msg) noexcept
+            : kcs_except(sorce_name, func_name, line, msg) {}
+
 	};
-	class file_error : public std::runtime_error
+	class file_error : public kcs_except
 	{
 	public:
-		file_error(const char* sorce_name, const char* func_name, uint64_t line, const char* expression, const std::string& msg) 
-			: std::runtime_error(
-				std::string("excetopn : file_error\n") 
-				+ "  in " + sorce_name + "\n" 
-				+ "  " + func_name + "() (line." + std::to_string(line) + ")\n"
-				+ "  follow by below\n"
-				+ "    " + expression 
-				+ ((msg.empty() || msg[0] == '\0') ? "\n" : "\n  MESSAGE : " + msg + "\n")
-			)
-		{}
-		file_error(const char* sorce_name, const char* func_name, uint64_t line, const std::string& msg)
-			: std::runtime_error(
-				std::string("excetopn : file_error\n")
-				+ " in " + sorce_name +  "\n" 
-				+ "  " + func_name + "() (line." + std::to_string(line) + ")\n"
-				+ ((msg.empty() || msg[0] == '\0') ? "\n" : " MESSAGE : " + msg + "\n")
-			)
-		{}
+        file_error(const char* sorce_name, const char* func_name, uint64_t line, const char* expression, const std::string& msg) noexcept
+            : kcs_except(sorce_name, func_name, line, expression, msg) {}
+        file_error(const char* sorce_name, const char* func_name, uint64_t line, const std::string& msg) noexcept
+            : kcs_except(sorce_name, func_name, line, msg) {}
 	};
-	class encode_error : public std::runtime_error
+	class encode_error : public kcs_except
 	{
 	public:
-		encode_error(const char* sorce_name, const char* func_name, uint64_t line, const char* expression, const std::string& msg) 
-			: std::runtime_error(
-				std::string("excetopn : encode_error\n") 
-				+ "  in " + sorce_name + "\n" 
-				+ "  " + func_name + "() (line." + std::to_string(line) + ")\n"
-				+ "  follow by below\n"
-				+ "    " + expression 
-				+ ((msg.empty() || msg[0] == '\0') ? "\n" : "\n  MESSAGE : " + msg + "\n")
-			)
-		{}
-		encode_error(const char* sorce_name, const char* func_name, uint64_t line, const std::string& msg)
-			: std::runtime_error(
-				std::string("excetopn : encode_error\n")
-				+ " in " + sorce_name +  "\n" 
-				+ "  " + func_name + "() (line." + std::to_string(line) + ")\n"
-				+ ((msg.empty() || msg[0] == '\0') ? "\n" : " MESSAGE : " + msg + "\n")
-			)
-		{}
+        encode_error(const char* sorce_name, const char* func_name, uint64_t line, const char* expression, const std::string& msg) noexcept
+            : kcs_except(sorce_name, func_name, line, expression, msg) {}
+        encode_error(const char* sorce_name, const char* func_name, uint64_t line, const std::string& msg) noexcept
+            : kcs_except(sorce_name, func_name, line, msg) {}
 	};
 
 }
