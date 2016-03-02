@@ -10,11 +10,11 @@ class WeaponDB;
 // 南方棲戦鬼は「航空巡洋艦」、装甲空母鬼/姫・戦艦レ級は「航空戦艦」、
 // 秋津洲は「水上機母艦」カテゴリに入れている
 enum ShipClass {
-	kShipClassPT = 1, kShipClassDD, kShipClassCL, kShipClassCLT,
-	kShipClassCA, kShipClassCAV, kShipClassCVL, kShipClassCC, kShipClassBB,
-	kShipClassBBV, kShipClassCV, kShipClassAF, kShipClassSS, kShipClassSSV,
-	kShipClassLST, kShipClassAV, kShipClassLHA, kShipClassACV, kShipClassAR,
-	kShipClassAS, kShipClassCP, kShipClassAO
+	kShipClassPT = 1, kShipClassDD, kShipClassCL, kShipClassCLT,				//重雷装巡洋艦まで
+	kShipClassCA, kShipClassCAV, kShipClassCVL, kShipClassCC, kShipClassBB,		//戦艦まで
+	kShipClassBBV, kShipClassCV, kShipClassAF, kShipClassSS, kShipClassSSV,		//潜水空母まで
+	kShipClassLST, kShipClassAV, kShipClassLHA, kShipClassACV, kShipClassAR,	//工作艦まで
+	kShipClassAS, kShipClassCP, kShipClassAO									//給油艦まで
 };
 const wstring kShipClassStr[] = { L"", L"魚雷艇", L"駆逐艦", L"軽巡洋艦", L"重雷装巡洋艦",
 L"重巡洋艦", L"航空巡洋艦", L"軽空母", L"巡洋戦艦", L"戦艦", L"航空戦艦", L"正規空母",
@@ -119,6 +119,10 @@ public:
 	int AllHit() const noexcept;					//総命中を返す
 	double FitGunHitPlus() const noexcept;			//フィット砲補正
 	int AllTorpedo(const bool&) const noexcept;		//総雷装を返す
+	double FitGunAttackPlus() const noexcept;		//軽巡軽量砲補正
+	double SpecialEffectApPlus() const noexcept;	//徹甲弾補正
+	double CL2ProbPlus() const noexcept;			//熟練艦載機によるCL2率上昇
+	double CL2AttackPlus() const noexcept;			//熟練艦載機によるダメージ補正
 	void MinusHP(const int&, const bool&);	//ダメージを与える、ctorもしくはSetRandGenerator経由で乱数エンジンを渡している必要がある
 	bool HasAir() const noexcept;					//艦載機を保有していた場合はtrue
 	bool HasAirFight() const noexcept;				//航空戦に参加する艦載機を保有していた場合はtrue
@@ -126,6 +130,8 @@ public:
 	bool HasAirBomb() const noexcept;				//艦爆を保有していた場合はtrue
 	bool IsSubmarine() const noexcept;				//潜水艦系ならtrue
 	bool Include(const wstring&) const noexcept;	//名前に特定の文字が含まれていればtrue
+	bool HasAntiSubSynergy() const noexcept;		//対潜シナジーを持っていたらtrue
+	bool IsSpecialEffectAP() const noexcept;		//徹甲弾補正を食らう側ならtrue
 	friend std::ostream& operator<<(std::ostream& os, const Kammusu& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Kammusu& conf);
 };

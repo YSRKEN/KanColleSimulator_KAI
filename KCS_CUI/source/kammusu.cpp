@@ -379,6 +379,105 @@ int Kammusu::AllTorpedo(const bool &level_flg) const noexcept {
 	return int(torpedo_sum);
 }
 
+// 軽巡軽量砲補正
+double Kammusu::FitGunAttackPlus() const noexcept {
+	switch (ship_class_) {
+	case kShipClassCL:
+	case kShipClassCLT:
+	case kShipClassCP:
+		auto light_gun_single = 0, light_gun_double = 0;
+		for (auto &it_w : weapons_) {
+			auto &name = it_w.GetName();
+			if (name == L"14cm単装砲"
+				|| name == L"15.2cm単装砲") ++light_gun_single;
+			if (name == L"14cm連装砲"
+				|| name == L"15.2cm連装砲"
+				|| name == L"15.2cm連装砲改") ++light_gun_double;
+		}
+		return sqrt(light_gun_single) + 2.0 * sqrt(light_gun_double);
+		break;
+	default:
+		return 0.0;
+	}
+}
+
+// 徹甲弾補正
+double Kammusu::SpecialEffectApPlus() const noexcept {
+	bool has_gun = false, has_ap = false, has_subgun = false, has_radar = false;
+	for (auto &it_w : weapons_) {
+		switch (it_w.GetWeaponClass()) {
+		case kWeaponClassGun:
+			has_gun = true;
+			break;
+		case kWeaponClassAP:
+			has_ap = true;
+			break;
+		case kWeaponClassSubGun:
+			has_subgun = true;
+			break;
+		case kWeaponClassSmallR:
+		case kWeaponClassLargeR:
+			has_radar = true;
+			break;
+		default:
+			break;
+		}
+	}
+	if (has_gun && has_ap) {
+		if (has_subgun) {
+			return 1.15;
+		}
+		else if (has_radar) {
+			return 1.1;
+		}
+		else {
+			return 1.08;
+		}
+	}
+	else {
+		return 1.0;
+	}
+}
+
+// 熟練艦載機によるCL2率上昇
+double Kammusu::CL2ProbPlus() const noexcept {
+	double cl_prob_plus = 0.0;
+	for (auto &it_w : weapons_) {
+		switch (it_w.GetWeaponClass()) {
+		case kWeaponClassPA:
+		case kWeaponClassPB:
+		case kWeaponClassPBF:
+		case kWeaponClassWB:
+			cl_prob_plus += 0.05 * it_w.GetLevel() / 7;
+			break;
+		default:
+			break;
+		}
+	}
+	return cl_prob_plus;
+}
+
+// 熟練艦載機によるダメージ補正
+double Kammusu::CL2AttackPlus() const noexcept {
+	double cl_attack_plus = 0.0;
+	for (auto wi = 0; wi < slots_; ++wi) {
+		auto &it_w = weapons_[wi];
+		switch (it_w.GetWeaponClass()) {
+		case kWeaponClassPA:
+		case kWeaponClassPB:
+		case kWeaponClassPBF:
+		case kWeaponClassWB:
+			auto plus_per = 0.1 * it_w.GetLevel() / 7;
+			if(wi == 0) plus_per *= 2;	//1スロット目は10％ではなく20％であることを簡略表記
+			cl_attack_plus += plus_per;
+			break;
+		default:
+			break;
+		}
+	}
+	return cl_attack_plus;
+}
+
 // ダメージを与える
 void Kammusu::MinusHP(const int &damage, const bool &stopper_flg) {
 	if (hp_ > damage) {
@@ -438,6 +537,40 @@ bool Kammusu::IsSubmarine() const noexcept {
 // 名前に特定の文字が含まれていればtrue
 bool Kammusu::Include(const wstring &wstr) const noexcept {
 	return (name_.find(wstr) != wstring::npos);
+}
+
+// 対潜シナジーを持っていたらtrue
+bool Kammusu::HasAntiSubSynergy() const noexcept {
+	bool has_dp = false, has_sonar = false;
+	for (auto &it_w : weapons_) {
+		switch (it_w.GetWeaponClass()) {
+		case kWeaponClassDP:
+			has_dp = true;
+			break;
+		case kWeaponClassSonar:
+			has_sonar = true;
+			break;
+		default:
+			break;
+		}
+	}
+	return (has_dp && has_sonar);
+}
+
+// 徹甲弾補正を食らう側ならtrue
+bool Kammusu::IsSpecialEffectAP() const noexcept {
+	switch (ship_class_) {
+	case kShipClassCA:
+	case kShipClassCAV:
+	case kShipClassBB:
+	case kShipClassBBV:
+	case kShipClassCV:
+	case kShipClassAF:
+	case kShipClassACV:
+		return true;
+	default:
+		return false;
+	}
 }
 
 std::ostream & operator<<(std::ostream & os, const Kammusu & conf)

@@ -54,6 +54,9 @@ template<typename T>
 constexpr T limit(const T &val, const T &val_min, const T &val_max) {
 	return (val < val_min) ? val_min : (val_max < val) ? val_max : val;
 }
+constexpr double LimitCap(const double &val, const double &val_cap) {
+	return (val < val_cap) ? val : (val_cap + sqrt(val - val_cap));
+}
 
 namespace detail {
 	struct to_i_helper {};

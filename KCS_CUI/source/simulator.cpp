@@ -388,27 +388,49 @@ int Simulator::CalcDamage(
 			break;
 		}
 		// 対潜シナジー補正
-		bool has_dp = false, has_sonar = false;
-		for (auto &it_w : hunter_kammusu.GetWeapon()) {
-			switch (it_w.GetWeaponClass()) {
-			case kWeaponClassDP:
-				has_dp = true;
-				break;
-			case kWeaponClassSonar:
-				has_sonar = true;
-				break;
-			default:
-				break;
-			}
-		}
-		if (has_dp && has_sonar) damage *= 1.15;
+		if(hunter_kammusu.HasAntiSubSynergy()) damage *= 1.15;
 	}
 	// 軽巡軽量砲補正
-
+	damage += hunter_kammusu.FitGunAttackPlus();
 	// キャップ計算
-
+	if (is_target_submarine) {
+		damage = LimitCap(damage, 100);
+	}
+	else {
+		if (battle_phase == kBattlePhaseNight) {
+			damage = LimitCap(damage, 300);
+		}
+		else {
+			damage = LimitCap(damage, 150);
+		}
+	}
 	// キャップ後補正
+	damage = int(damage);	//※この切り捨ては仕様です
+	{
+		// 徹甲弾補正
+		if (target_kammusu.IsSpecialEffectAP()) {
+			damage = int(hunter_kammusu.SpecialEffectApPlus());	//※この切り捨ては仕様です
+		}
+		// クリティカル補正
+		double prob_per;
+		switch (battle_phase) {
+		case kBattlePhaseAir:
+			prob_per = 0.025;
+			break;
+		case kBattlePhaseNight:
+			prob_per = 0.3;		//この値は試験実装
+			break;
+		default:
+			prob_per = 0.25 * hit_prob / (hit_prob + 1) + 0.0125;
+		}
+		prob_per += hunter_kammusu.CL2ProbPlus();	//熟練艦載機によるCL2率上昇(試験実装)
+		if (rand.RandBool(prob_per)) {
+			damage *= 1.5 * hunter_kammusu.CL2AttackPlus();	//熟練艦載機によるダメージ補正
+		}
+		damage = int(damage);	//※この切り捨ては仕様です
+		// 触接補正
 
+	}
 	// 
 
 	return this->rand.RandInt(0, base_attack);	//仮置きのメソッド
