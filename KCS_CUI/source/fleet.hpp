@@ -31,6 +31,11 @@ public:
 	const auto& GetUnit() const { return unit_; }
 	FleetType GetFleetType() const noexcept{ return fleet_type_; }
 	// その他
+	auto& FirstUnit() { return unit_[0]; }
+	const auto& FirstUnit() const  { return unit_[0]; }
+	auto& SecondUnit() { return unit_[unit_.size() - 1]; }
+	const auto& SecondUnit() const { return unit_[unit_.size() - 1]; }
+
 	size_t FleetSize() const noexcept { return unit_.size(); }	//「艦隊数」(通常艦隊だと1、連合艦隊だと2)
 	size_t UnitSize(const size_t fi) const noexcept { return unit_[fi].size(); }	//「艦隊」における艦数
 	void Put() const;							//中身を表示する
@@ -41,7 +46,7 @@ public:
 	bool HasAirFight() const noexcept;		//航空戦に参加する艦載機をいずれかの艦が保有していた場合はtrue
 	bool HasAirTrailer() const noexcept;	//触接に参加する艦載機をいずれかの艦が保有していた場合はtrue
 	bool HasAirPss() const noexcept;		//彩雲をいずれかの艦が保有していた場合はtrue
-	int AntiAirBonus() const;								//艦隊対空ボーナス値を計算する
+	int AntiAirBonus() const;				//艦隊対空ボーナス値を計算する
 	friend std::ostream& operator<<(std::ostream& os, const Fleet& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Fleet& conf);
 

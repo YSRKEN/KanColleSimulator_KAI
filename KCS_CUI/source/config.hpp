@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include <iostream>
 #include <memory>
+[[noreturn]] void print_commandline_help() noexcept(false);
+[[noreturn]] void print_verison() noexcept(false);
 // 設定クラス
 class Config {
 	struct Impl;

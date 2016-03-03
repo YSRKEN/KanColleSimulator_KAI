@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <cstdint>
 #include <string>
+#define SUCCESSFUL_TERMINATION_THROW_WITH_MESSAGE( MESSAGE ) throw KCS_except::successful_termination(__FILE__, __FUNCTION__, __LINE__, MESSAGE);
 #define INVAID_ARGUMENT_THROW_WITH_MESSAGE( MESSAGE ) throw KCS_except::invalid_argument(__FILE__, __FUNCTION__, __LINE__, MESSAGE);
 #define INVAID_ARGUMENT_THROW_WITH_MESSAGE_IF( EXPR, MESSAGE ) if( EXPR ){ throw KCS_except::invalid_argument(__FILE__, __FUNCTION__, __LINE__, #EXPR, MESSAGE); }
 #define CONFIG_THROW_WITH_MESSAGE( MESSAGE ) throw KCS_except::config_error(__FILE__, __FUNCTION__, __LINE__, MESSAGE);
@@ -15,6 +16,21 @@
 #define ENCODE_THROW_WITH_MESSAGE_IF( EXPR, MESSAGE ) if( EXPR ){ throw KCS_except::encode_error(__FILE__, __FUNCTION__, __LINE__, #EXPR, MESSAGE); }
 
 namespace KCS_except {
+	class successful_termination : public std::exception {
+		std::string hold_;
+	public:
+		successful_termination(const char* sorce_name, const char* func_name, uint64_t line, const std::string& msg)
+			: hold_(
+				std::string("excetopn : successful_termination\n")
+				+ "  in " + sorce_name + "\n"
+				+ "  " + func_name + "() (line." + std::to_string(line) + ")\n"
+				+ ((msg.empty() || msg[0] == '\0') ? "\n" : "\n  MESSAGE : " + msg + "\n")
+			) 
+		{}
+		virtual char const* what() const noexcept override {
+			return hold_.c_str();
+		}
+	};
 	class invalid_argument : public std::invalid_argument
 	{
 	public:

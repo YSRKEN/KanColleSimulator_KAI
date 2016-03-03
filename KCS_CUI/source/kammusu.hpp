@@ -2,8 +2,10 @@
 
 #include "weapon.hpp"
 #include <iostream>
+#include <cstdint>
 #include "random.hpp"
 class WeaponDB;
+enum TorpedoTurn : std::uint8_t;
 
 // 艦種(厳密な綴りはShip Classificationsである)
 // ただし、浮遊要塞・護衛要塞・泊地棲鬼/姫・南方棲鬼は「重巡洋艦」、
@@ -126,16 +128,20 @@ public:
 	double CL2ProbPlus() const noexcept;			//熟練艦載機によるCL2率上昇
 	double CL2AttackPlus() const noexcept;			//熟練艦載機によるダメージ補正
 	int AllDefense() const noexcept;				//総装甲を返す
-	void MinusHP(const int&, const bool&);	//ダメージを与える、ctorもしくはSetRandGenerator経由で乱数エンジンを渡している必要がある
+	void MinusHP(const int&, const bool&);			//ダメージを与える、ctorもしくはSetRandGenerator経由で乱数エンジンを渡している必要がある
+	void ConsumeMaterial() noexcept;				//弾薬・燃料を減少させる
 	bool HasAir() const noexcept;					//艦載機を保有していた場合はtrue
 	bool HasAirFight() const noexcept;				//航空戦に参加する艦載機を保有していた場合はtrue
 	bool HasAirTrailer() const noexcept;			//触接に参加する艦載機を保有していた場合はtrue
 	bool HasAirBomb() const noexcept;				//艦爆を保有していた場合はtrue
 	bool IsSubmarine() const noexcept;				//潜水艦系ならtrue
-	bool Include(const wstring&) const noexcept;	//名前に特定の文字が含まれていればtrue
+	bool Include(const wstring& wstr) const noexcept;	//名前に特定の文字が含まれていればtrue
+	bool Include(const wchar_t* wstr) const noexcept;	//名前に特定の文字が含まれていればtrue
+	bool IncludeAnyOf(std::initializer_list<const wchar_t*> strings)  const;//いずれか一つが含まれていたらtrue
 	bool HasAntiSubSynergy() const noexcept;		//対潜シナジーを持っていたらtrue
 	bool IsSpecialEffectAP() const noexcept;		//徹甲弾補正を食らう側ならtrue
 	bool HasAirPss() const noexcept;				//彩雲を保有していた場合はtrue
+	bool IsFireTorpedo(const TorpedoTurn&) const noexcept;	//魚雷を発射できればtrue
 	friend std::ostream& operator<<(std::ostream& os, const Kammusu& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Kammusu& conf);
 };

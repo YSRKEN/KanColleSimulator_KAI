@@ -1,9 +1,13 @@
-﻿#include "base.hpp"
+﻿#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include "base.hpp"
 #include "kammusu.hpp"
 #include "other.hpp"
 #include "char_convert.hpp"
 #include "fleet.hpp"
 #include "simulator.hpp"
+#include <algorithm>
 // コンストラクタ
 Kammusu::Kammusu() 
 	:	Kammusu(-1, L"なし", kShipClassDD, 0, 0, 0, 0, 0, 0, kSpeedNone, kRangeNone,
@@ -116,7 +120,7 @@ int Kammusu::AacType() const noexcept {
 		}
 	}
 	// まず、固有カットインを判定する
-	if (Include(L"秋月") || Include(L"照月") || Include(L"初月")) {
+	if (IncludeAnyOf({ L"秋月", L"照月", L"初月" })) {
 		/* 秋月型……ご存知防空駆逐艦。対空カットイン無しでも圧倒的な対空値により艦載機を殲滅する。
 		* 二次創作界隈ではまさma氏が有名であるが、秋月型がこれ以上増えると投稿時のタイトルが長くなりすぎることから
 		* 嬉しい悲鳴を上げていたとか。なお史実上では後9隻居るが、有名なのは涼月などだろう……  */
@@ -165,30 +169,32 @@ int Kammusu::AacType() const noexcept {
 // 対空カットインの発動確率を計算する
 double Kammusu::AacProb(const int &aac_type) const noexcept {
 	// 色々とお察しください
-	/* 艦娘       位置   素対空値   装備対空値   種類   装備                                         結果      ％      備考
-	 * 秋月       僚艦   116        6            1      12.7高単、12.7高単、22号改四                 72/100    72.0%
-	 * 秋月       僚艦   116        24           1      秋月砲★9、秋月砲★9、13号改                 164/206   79.6%   (16-991)
-	 * 秋月       僚艦   116        17           3      10cm、10cm、94式                             121/202   59.9%
-	 * 秋月       僚艦   116        23           3      秋月砲★9、秋月砲★9、94式★6                33/56     58.9%   (16-813)
-	 * 榛名       旗艦   92         18           4      ダズル、三式弾、14号、91式                   33/50     66.0%   (16-691)
-	 * 大淀       僚艦   74         28           5      秋月砲、秋月砲、14号、観測機                 67/100    67.0%
-	 * 大淀       僚艦   74         29           5      秋月砲、秋月砲、14号、94式                   65/100    65.0%
-	 * 大淀       僚艦   74         32           5      秋月砲、秋月砲、14号、14号                   60/100    60.0%
-	 * 榛名       旗艦   92         12           6      ダズル、三式弾、22号、91式                   23/50     46.0%
-	 * 大淀       僚艦   74         29           7      浦風砲、浦風砲、14号、94式                   48/100    48.0%
-	 * 摩耶       僚艦   89         14           7      8cm、91式、14号                              89/200    44.5%
-	 * 雪風       旗艦   59         14           8      秋月砲★9、13号改、魚雷                      144/279   51.6%   (17-10)
-	 * 能代       僚艦   72         8            8      秋月砲★4、FuMO                              48/100    48.0%
-	 * 時雨       旗艦   72         14           8      秋月砲★9、13号改、魚雷                      58/100    58.0%   (16-785)
-	 * 時雨       旗艦   72         16           8      秋月砲、13号改、主砲                         26/50     52.0%
-	 * 大淀       僚艦   74         25           8      秋月砲、10cm、14号、観測機                   52/100    52.0%   (16-600)
-	 * 陽炎       僚艦   49         17           9      10cm、10cm、94式                             103/300   34.3%   (16-702,17-44)
-	 * 能代       僚艦   72         6            9      8cm、91式                                    44/100    44.0%   (16-701)
-	 * 能代       僚艦   72         8            9      8cm、94式★2                                 49/100    49.0%   (16-660)
-	 * 潮         僚艦   74         17           9      10cm、10cm、94式                             131/300   43.7%   (17-44)
-	 * 摩耶       僚艦   89         8            9      8cm、91式                                    83/200    41.5%
-	 * 摩耶改二   僚艦   106        27           10     2号砲★9、90mm高★10、集中機銃、Fumo         108/206   52.4%   [22]
-	 * 摩耶改二   僚艦   106        22           11     2号砲★9、90mm高★10、集中機銃、観測機>>     103/204   50.5%
+	/*
+	| 艦娘     | 位置 | 素対空値 | 装備対空値 | 種類 | 装備                                   | 結果    | ％    | 備考            |
+	|----------|------|----------|------------|------|----------------------------------------|---------|-------|-----------------|
+	| 秋月     | 僚艦 | 116      | 6          | 1    | 12.7高単、12.7高単、22号改四           | 72/100  | 72.0% |                 |
+	| 秋月     | 僚艦 | 116      | 24         | 1    | 秋月砲★9、秋月砲★9、13号改             | 164/206 | 79.6% | (16-991)        |
+	| 秋月     | 僚艦 | 116      | 17         | 3    | 10cm、10cm、94式                       | 121/202 | 59.9% |                 |
+	| 秋月     | 僚艦 | 116      | 23         | 3    | 秋月砲★9、秋月砲★9、94式★6             | 33/56   | 58.9% | (16-813)        |
+	| 榛名     | 旗艦 | 92       | 18         | 4    | ダズル、三式弾、14号、91式             | 33/50   | 66.0% | (16-691)        |
+	| 大淀     | 僚艦 | 74       | 28         | 5    | 秋月砲、秋月砲、14号、観測機           | 67/100  | 67.0% |                 |
+	| 大淀     | 僚艦 | 74       | 29         | 5    | 秋月砲、秋月砲、14号、94式             | 65/100  | 65.0% |                 |
+	| 大淀     | 僚艦 | 74       | 32         | 5    | 秋月砲、秋月砲、14号、14号             | 60/100  | 60.0% |                 |
+	| 榛名     | 旗艦 | 92       | 12         | 6    | ダズル、三式弾、22号、91式             | 23/50   | 46.0% |                 |
+	| 大淀     | 僚艦 | 74       | 29         | 7    | 浦風砲、浦風砲、14号、94式             | 48/100  | 48.0% |                 |
+	| 摩耶     | 僚艦 | 89       | 14         | 7    | 8cm、91式、14号                        | 89/200  | 44.5% |                 |
+	| 雪風     | 旗艦 | 59       | 14         | 8    | 秋月砲★9、13号改、魚雷                 | 144/279 | 51.6% | (17-10)         |
+	| 能代     | 僚艦 | 72       | 8          | 8    | 秋月砲★4、FuMO                         | 48/100  | 48.0% |                 |
+	| 時雨     | 旗艦 | 72       | 14         | 8    | 秋月砲★9、13号改、魚雷                 | 58/100  | 58.0% | (16-785)        |
+	| 時雨     | 旗艦 | 72       | 16         | 8    | 秋月砲、13号改、主砲                   | 26/50   | 52.0% |                 |
+	| 大淀     | 僚艦 | 74       | 25         | 8    | 秋月砲、10cm、14号、観測機             | 52/100  | 52.0% | (16-600)        |
+	| 陽炎     | 僚艦 | 49       | 17         | 9    | 10cm、10cm、94式                       | 103/300 | 34.3% | (16-702, 17-44) |
+	| 能代     | 僚艦 | 72       | 6          | 9    | 8cm、91式                              | 44/100  | 44.0% | (16-701)        |
+	| 能代     | 僚艦 | 72       | 8          | 9    | 8cm、94式★2                            | 49/100  | 49.0% | (16-660)        |
+	| 潮       | 僚艦 | 74       | 17         | 9    | 10cm、10cm、94式                       | 131/300 | 43.7% | (17-44)         |
+	| 摩耶     | 僚艦 | 89       | 8          | 9    | 8cm、91式                              | 83/200  | 41.5% |                 |
+	| 摩耶改二 | 僚艦 | 106      | 27         | 10   | 2号砲★9、90mm高★10、集中機銃、Fumo     | 108/206 | 52.4% | [22]            |
+	| 摩耶改二 | 僚艦 | 106      | 22         | 11   | 2号砲★9、90mm高★10、集中機銃、観測機>> | 103/204 | 50.5% |                 |
 	 */
 	// とりあえず装備対空を計算する
 	int weapon_anti_air = 0;
@@ -325,7 +331,7 @@ double Kammusu::FitGunHitPlus() const noexcept {
 	}
 	// 種類により減衰量を決定する
 	//伊勢型および扶桑型
-	if (Include(L"伊勢") || Include(L"日向") || Include(L"扶桑") || Include(L"山城")) {
+	if (IncludeAnyOf({ L"伊勢", L"日向", L"扶桑", L"山城" })) {
 			if(Include(L"改")) {
 				// 航戦
 				hit_plus = fit[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];
@@ -333,28 +339,28 @@ double Kammusu::FitGunHitPlus() const noexcept {
 			else {
 				// 戦艦
 				hit_plus = fit[sum_356] + fit[sum_38] + fit[sum_381] + unfit_large[sum_46] + unfit_small[sum_46X];
-				if (Include(L"扶桑") || Include(L"山城")) {
+				if (IncludeAnyOf({ L"扶桑", L"山城" })) {
 					hit_plus += fit[sum_41];
 				}
 			}
 	}
 	//金剛型およびビスマルク
-	if (Include(L"金剛") || Include(L"比叡") || Include(L"榛名") || Include(L"霧島") || Include(L"Bismarck")) {
+	if (IncludeAnyOf({ L"金剛", L"比叡", L"榛名", L"霧島", L"Bismarck" })) {
 		hit_plus = fit[sum_356] + fit[sum_38] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];
 		if (Include(L"Bismarck")) {
 			hit_plus += unfit_small[sum_381];
 		}
 	}
 	//イタリア艦
-	if (Include(L"Littorio") || Include(L"Italia") || Include(L"Roma")) {
+	if (IncludeAnyOf({ L"Littorio", L"Italia", L"Roma" })) {
 		hit_plus = fit[sum_356] + fit[sum_381] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];
 	}
 	//長門型
-	if (Include(L"長門") || Include(L"陸奥")) {
+	if (IncludeAnyOf({ L"長門", L"陸奥" })) {
 		hit_plus = fit[sum_356] + fit[sum_381] + fit[sum_41] + unfit_small[sum_46] + unfit_small[sum_46X];
 	}
 	//大和型
-	if (Include(L"大和") || Include(L"武蔵")) {
+	if (IncludeAnyOf({ L"大和", L"武蔵" })) {
 		hit_plus = fit[sum_41];
 	}
 	return hit_plus;
@@ -504,6 +510,12 @@ void Kammusu::MinusHP(const int &damage, const bool &stopper_flg) {
 	}
 }
 
+//弾薬・燃料を減少させる
+void Kammusu::ConsumeMaterial() noexcept {
+	ammo_ = (ammo_ - 20) | limit(0, 100);
+	fuel_ = (fuel_ - 20) | limit(0, 100);
+}
+
 // 艦載機を保有していた場合はtrue
 bool Kammusu::HasAir() const noexcept {
 	for (auto i = 0; i < slots_; ++i) {
@@ -548,6 +560,16 @@ bool Kammusu::Include(const wstring &wstr) const noexcept {
 	return (name_.find(wstr) != wstring::npos);
 }
 
+bool Kammusu::Include(const wchar_t* wstr) const noexcept
+{
+	return (name_.find(wstr) != wstring::npos);
+}
+
+bool Kammusu::IncludeAnyOf(std::initializer_list<const wchar_t*> strings) const
+{
+	return std::any_of(strings.begin(), strings.end(), [this](const wchar_t* const s) { return this->Include(s); });
+}
+
 // 対潜シナジーを持っていたらtrue
 bool Kammusu::HasAntiSubSynergy() const noexcept {
 	bool has_dp = false, has_sonar = false;
@@ -588,6 +610,51 @@ bool Kammusu::HasAirPss() const noexcept {
 		if (it_w.GetWeaponClass() == kWeaponClassPSS) return true;
 	}
 	return false;
+}
+
+// 魚雷を発射できればtrue
+bool Kammusu::IsFireTorpedo(const TorpedoTurn &torpedo_turn) const noexcept {
+	switch (torpedo_turn) {
+	case kTorpedoFirst:	//開幕魚雷
+		// 鬱陶しいことに艦娘と深海棲艦とでは判定条件が異なるので分けて処理する
+		if (kammusu_flg_) {
+			// 甲標的を積んだ軽巡(事実上阿武隈改二のみ)・潜水系・雷巡・水母は飛ばせる
+			// (冷静に考えると、甲標的さえ載れば飛ばせるはず……)
+			/*switch (ship_class_) {
+			case kShipClassCL:
+			case kShipClassSS:
+			case kShipClassSSV:
+			case kShipClassCLT:
+			case kShipClassAV:*/
+				for (auto &it_w : weapons_) {
+					if (it_w.GetWeaponClass() == kWeaponClassSpecialSS) return true;
+				}
+			/*default:
+				break;
+			}*/
+			// Lv10以上の潜水艦系は甲標的無しでも飛ばせる
+			if (IsSubmarine() && level_ >= 10) return true;
+		}
+		else {
+			// elite以上の潜水艦なら開幕魚雷を撃てる(ただし潜水棲姫は除く。なんでや！)
+			if (IsSubmarine() && IncludeAnyOf({ L"elite", L"flagship" })) return true;
+			// エリレ級と水母棲姫と駆逐水鬼(甲作戦最終形態,艦船ID=649)は無条件で撃てる
+			if (name_ == L"戦艦レ級elite" || name_ == L"水母棲姫" || id_ == 649) return true;
+		}
+		return false;
+		break;
+	case kTorpedoSecond:	//雷撃戦
+		// 中破以上だと不可
+		if (Status() >= kStatusMiddleDamage) return false;
+		// 素雷装が0なら不可
+		if (torpedo_ == 0) return false;
+		// 秋津洲および未改造の千歳型は不可
+		if (Include(L"秋津洲") || name_ == L"千歳" || name_ == L"千代田") return false;
+		return true;
+		break;
+	default:
+		return false;
+	}
 }
 
 std::ostream & operator<<(std::ostream & os, const Kammusu & conf)
