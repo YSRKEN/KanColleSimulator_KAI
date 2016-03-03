@@ -1,5 +1,6 @@
 ﻿#pragma once
-
+#include <cstdint>
+#include "kammusu.hpp"
 // 制空状態(制空権確保・航空優勢・制空拮抗・航空劣勢・制空権喪失)
 enum AirWarStatus { kAirWarStatusBest, kAirWarStatusGood, kAirWarStatusNormal, kAirWarStatusBad, kAirWarStatusWorst};
 
@@ -13,7 +14,7 @@ enum BattlePosition{ kBattlePositionSame, kBattlePositionReverse, kBattlePositio
 enum SimulateMode { kSimulateModeDN, kSimulateModeD, kSimulateModeN };
 
 // 雷撃戦の巡目(開幕および雷撃戦)
-enum TorpedoTurn { kTorpedoFirst, kTorpedoSecond };
+enum TorpedoTurn : std::uint8_t { kTorpedoFirst, kTorpedoSecond };
 
 // 砲撃戦の巡目(1巡目および2巡目)
 enum FireTurn { kFireFirst , kFireSecond };

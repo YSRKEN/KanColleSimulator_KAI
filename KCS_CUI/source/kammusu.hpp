@@ -2,9 +2,10 @@
 
 #include "weapon.hpp"
 #include <iostream>
+#include <cstdint>
 #include "random.hpp"
 class WeaponDB;
-enum TorpedoTurn;
+enum TorpedoTurn : std::uint8_t;
 
 // 艦種(厳密な綴りはShip Classificationsである)
 // ただし、浮遊要塞・護衛要塞・泊地棲鬼/姫・南方棲鬼は「重巡洋艦」、
