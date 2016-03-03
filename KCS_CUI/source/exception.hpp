@@ -19,7 +19,7 @@ namespace KCS_except {
 	class kcs_except : public std::exception
 	{
 	public:
-		invalid_argument(const char* sorce_name, const char* func_name, uint64_t line, const char* expression, const std::string& msg) noexcept
+		kcs_except(const char* sorce_name, const char* func_name, uint64_t line, const char* expression, const std::string& msg) noexcept
 			: msg(
 				std::string("excetopn : invalid_argument\n")
 				+ "  in " + sorce_name + "\n"
@@ -29,7 +29,7 @@ namespace KCS_except {
 				+ ((msg.empty() || msg[0] == '\0') ? "\n" : "\n  MESSAGE : " + msg + "\n")
 			)
 		{}
-		invalid_argument(const char* sorce_name, const char* func_name, uint64_t line, const std::string& msg) noexcept
+		kcs_except(const char* sorce_name, const char* func_name, uint64_t line, const std::string& msg) noexcept
 			: msg(
 				std::string("excetopn : invalid_argument\n")
 				+ " in " + sorce_name +  "\n"
