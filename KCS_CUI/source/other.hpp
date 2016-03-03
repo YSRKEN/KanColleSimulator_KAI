@@ -11,7 +11,7 @@ class WeaponDB {
 	unordered_map<int, Weapon> hash_;
 public:
 	// コンストラクタ
-	WeaponDB();
+	WeaponDB(const char* csv_name);
 	// ハッシュからデータを読みだす
 	Weapon Get(const int) const;
 	Weapon Get(const int id, std::nothrow_t) const noexcept;
@@ -23,7 +23,7 @@ class KammusuDB {
 	unordered_map<int, Kammusu> hash_lv99_;
 public:
 	// コンストラクタ
-	KammusuDB();
+	KammusuDB(const char* csv_name);
 	// ハッシュからデータを読みだす
 	Kammusu Get(const int, const int) const;
 };

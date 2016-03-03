@@ -190,9 +190,18 @@ public:
 		std::generate(begin, end, [&distribution, &engine]() { return distribution(engine); });
 	}
 	template<typename RandType, std::enable_if_t<std::is_arithmetic<RandType>::value, std::nullptr_t> = nullptr>
-	std::vector<RandType> generate_n(const std::size_t size, RandType rand_min, RandType rand_max) {
+	std::vector<RandType> generate_n(const std::size_t size, RandType rand_min = std::numeric_limits<RandType>::min(), RandType rand_max = std::numeric_limits<RandType>::max()) {
 		if (rand_min > rand_max) std::swap(rand_min, rand_max);
 		std::vector<RandType> re(size);
+		auto& engine = this->get();
+		distribution_t<RandType> distribution(rand_min, rand_max);
+		for (auto& e : re) e = distribution(engine);
+		return re;
+	}
+	template<std::size_t N, typename RandType, std::enable_if_t<std::is_arithmetic<RandType>::value, std::nullptr_t> = nullptr>
+	std::array<RandType, N> generate_n(RandType rand_min = std::numeric_limits<RandType>::min(), RandType rand_max = std::numeric_limits<RandType>::max()) {
+		if (rand_min > rand_max) std::swap(rand_min, rand_max);
+		std::array<RandType, N> re;
 		auto& engine = this->get();
 		distribution_t<RandType> distribution(rand_min, rand_max);
 		for (auto& e : re) e = distribution(engine);
