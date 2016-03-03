@@ -21,7 +21,7 @@ struct Config::Impl {
 Config::Config() : pimpl(new Impl()){}
 
 // コンストラクタ
-Config::Config(int argc, char *argv[]) {
+Config::Config(int argc, char *argv[]) : pimpl(new Impl()) {
 	CONFIG_THROW_WITH_MESSAGE_IF( argc < 4, "引数の数が足りていません." )
 	// 各オプションのデフォルト値を設定する
 	this->pimpl->e.input_filename_.resize(kBattleSize);
