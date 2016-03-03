@@ -8,8 +8,8 @@
 #include "simulator.hpp"
 #include "random.hpp"
 // 艦隊の形式
-enum FleetType {kFleetTypeNormal = 1, kFleetTypeCombined};
-const wstring kFleetTypeStr[] = {L"通常艦隊", L"連合艦隊"};
+enum FleetType {kFleetTypeNormal = 1, kFleetTypeCombinedAir, kFleetTypeCombinedGun, kFleetTypeCombinedDrum};
+const wstring kFleetTypeStr[] = {L"通常艦隊", L"空母機動部隊", L"水上打撃部隊", L"輸送護衛部隊" };
 
 class Fleet {
 	Formation formation_;			//陣形

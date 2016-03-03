@@ -12,7 +12,7 @@ Simulator::Simulator(const vector<Fleet>& fleet, const unsigned int seed, const 
 // 計算用メソッド
 Result Simulator::Calc() {
 	result_ = Result();
-#ifdef KCS_DEBUG_MODE
+#ifdef _DEBUG
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
 		for (auto fi = 0u; fi < fleet_[bi].FleetSize(); ++fi) {
 			for (auto ui = 0u; ui < fleet_[bi].UnitSize(fi); ++ui) {
@@ -24,11 +24,11 @@ Result Simulator::Calc() {
 #endif
 
 	// 今のところ、敵が連合艦隊である場合には対応していない
-	if (fleet_[kEnemySide].GetFleetType() == kFleetTypeCombined) return result_;
+	if (fleet_[kEnemySide].GetFleetType() != kFleetTypeNormal) return result_;
 
 	// 索敵フェイズ
 	SearchPhase();
-#ifdef KCS_DEBUG_MODE
+#ifdef _DEBUG
 	cout << "索敵結果・索敵値・艦載機を持っているか：\n";
 	for (auto i = 0; i < kBattleSize; ++i) {
 		cout << search_result_[i] << " " << fleet_[i].SearchValue() << " " << fleet_[i].HasAir() << endl;
@@ -39,14 +39,14 @@ Result Simulator::Calc() {
 		// 航空戦フェイズ
 		AirWarPhase();
 		if (IsBattleTerminate()) goto Exit;
-#ifdef KCS_DEBUG_MODE
+#ifdef _DEBUG
 		cout << "制空状態・自艦隊倍率・敵艦隊倍率：\n";
 		cout << get<0>(air_war_result_) << " " << get<1>(air_war_result_)[0] << " " << get<1>(air_war_result_)[1] << "\n" << endl;
 #endif
 
 		// 交戦形態の決定
 		BattlePositionOracle();
-#ifdef KCS_DEBUG_MODE
+#ifdef _DEBUG
 		cout << "交戦形態：" << battle_position_ << "\n" << endl;
 #endif
 
@@ -103,7 +103,7 @@ void Simulator::AirWarPhase() {
 	for (auto i = 0; i < kBattleSize; ++i) {
 		anti_air_score[i] = fleet_[i].AntiAirScore();
 	}
-#ifdef KCS_DEBUG_MODE
+#ifdef _DEBUG
 	cout << "制空値：" << anti_air_score[0] << " " << anti_air_score[1] << "\n" << endl;
 #endif
 	//制空状態を判断する
@@ -263,7 +263,7 @@ void Simulator::AirWarPhase() {
 		}
 	}
 
-#ifdef KCS_DEBUG_MODE
+#ifdef _DEBUG
 	cout << "残機：" << endl;
 	for (auto i = 0; i < kBattleSize; ++i) {
 		for (auto &it_u : fleet_[i].GetUnit()) {
