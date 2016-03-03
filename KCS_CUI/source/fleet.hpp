@@ -46,7 +46,7 @@ public:
 	bool HasAirFight() const noexcept;		//航空戦に参加する艦載機をいずれかの艦が保有していた場合はtrue
 	bool HasAirTrailer() const noexcept;	//触接に参加する艦載機をいずれかの艦が保有していた場合はtrue
 	bool HasAirPss() const noexcept;		//彩雲をいずれかの艦が保有していた場合はtrue
-	int AntiAirBonus() const;								//艦隊対空ボーナス値を計算する
+	int AntiAirBonus() const;				//艦隊対空ボーナス値を計算する
 	friend std::ostream& operator<<(std::ostream& os, const Fleet& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Fleet& conf);
 

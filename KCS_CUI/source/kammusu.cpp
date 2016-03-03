@@ -504,6 +504,12 @@ void Kammusu::MinusHP(const int &damage, const bool &stopper_flg) {
 	}
 }
 
+//弾薬・燃料を減少させる
+void Kammusu::ConsumeMaterial() noexcept {
+	ammo_ = (ammo_ - 20) | limit(0, 100);
+	fuel_ = (fuel_ - 20) | limit(0, 100);
+}
+
 // 艦載機を保有していた場合はtrue
 bool Kammusu::HasAir() const noexcept {
 	for (auto i = 0; i < slots_; ++i) {

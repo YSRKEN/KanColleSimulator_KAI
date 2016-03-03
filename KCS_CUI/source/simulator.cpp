@@ -74,6 +74,11 @@ Result Simulator::Calc() {
 	// 終了処理
 Exit:
 	// 燃料・弾薬を減少させる
+	for (auto &it_u : fleet_[kFriendSide].GetUnit()) {
+		for (auto &it_k : it_u) {
+			it_k.ConsumeMaterial();
+		}
+	}
 
 	// 結果を出力する
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
