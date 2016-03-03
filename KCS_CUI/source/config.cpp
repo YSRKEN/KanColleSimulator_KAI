@@ -7,6 +7,7 @@
 #include <array>
 
 struct ForConfigImpl {
+	ForConfigImpl() : input_filename_(), formation_({{ kFormationTrail , kFormationTrail }}), times_(1), threads_(1), json_prettify_flg_(true) {}
 	std::array<string, kBattleSize> input_filename_;	//入力ファイル名
 	std::array<Formation, kBattleSize> formation_;		//陣形指定
 	int times_;		//試行回数
@@ -24,11 +25,6 @@ Config::Config() : pimpl(new Impl()){}
 // コンストラクタ
 Config::Config(int argc, char *argv[]) : pimpl(new Impl()) {
 	CONFIG_THROW_WITH_MESSAGE_IF( argc < 4, "引数の数が足りていません." )
-	// 各オプションのデフォルト値を設定する
-	fill(this->pimpl->e.formation_.begin(), this->pimpl->e.formation_.end(), kFormationTrail);
-	this->pimpl->e.times_ = 1;
-	this->pimpl->e.threads_ = 1;
-	this->pimpl->e.json_prettify_flg_ = true;
 	// オプションの文字列を読み込む
 	for (auto i = 1; i < argc; ++i) {
 		// 一旦stringに落としこむ
@@ -83,9 +79,9 @@ Config::Config(int argc, char *argv[]) : pimpl(new Impl()) {
 
 Config::~Config() = default;
 
-Config::Config(Config && o) : pimpl(std::move(o.pimpl)) {}
+Config::Config(Config && o) noexcept : pimpl(std::move(o.pimpl)) {}
 
-Config & Config::operator=(Config && o)
+Config & Config::operator=(Config && o) noexcept
 {
 	this->pimpl = std::move(o.pimpl);
 	return *this;

@@ -11,9 +11,9 @@ public:
 	Config(int argc, char *argv[]);
 	~Config();
 	Config(const Config&) = delete;
-	Config(Config&&);
+	Config(Config&&) noexcept;
 	Config& operator=(const Config&) = delete;
-	Config& operator=(Config&&);
+	Config& operator=(Config&&) noexcept;
 	// 中身を表示する
 	void Put() const;
 	// getter
