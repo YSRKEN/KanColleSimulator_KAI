@@ -18,8 +18,6 @@
 #include "arithmetic_convert.hpp"
 #pragma warning( disable : 4592)
 
-//#define KCS_DEBUG_MODE
-
 using std::cout;
 using std::bitset;
 using std::endl;

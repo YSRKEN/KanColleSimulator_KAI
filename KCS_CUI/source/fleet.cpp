@@ -44,12 +44,19 @@ void Fleet::LoadJson(std::istream & file, const WeaponDB & weapon_db, const Kamm
 	//司令部レベル
 	level_ = o | GetWithLimitOrDefault("lv", 1, 120, 120);
 	//艦隊の形式
-	fleet_type_ = o | GetWithLimitOrDefault("type", kFleetTypeNormal, kFleetTypeCombined, kFleetTypeNormal);
-	if (fleet_type_ == kFleetTypeCombined && formation_ == kFormationEchelon) {
+	fleet_type_ = o | GetWithLimitOrDefault("type", kFleetTypeNormal, kFleetTypeCombinedDrum, kFleetTypeNormal);
+	if (fleet_type_ != kFleetTypeNormal && formation_ == kFormationEchelon) {
 		// 連合艦隊に梯形陣は存在しないので、とりあえず単横陣(第一警戒航行序列)に変更しておく
 		formation_ = kFormationAbreast;
 	}
-	unit_.resize(fleet_type_);
+	if (fleet_type_ == kFleetTypeNormal) {
+		// 通常艦隊
+		unit_.resize(1);
+	}
+	else {
+		// 連合艦隊
+		unit_.resize(2);
+	}
 	//艦娘・深海棲艦
 	int fi = 0;	//読み込む際のインデックス
 	for (auto &temp_f : o) {
@@ -357,7 +364,7 @@ bool Fleet::HasAirPss() const noexcept {
 std::ostream & operator<<(std::ostream & os, const Fleet & conf)
 {
 	os << "陣形：" << char_cvt::utf_16_to_shift_jis(kFormationStr[conf.formation_]) << "　司令部レベル：" << conf.level_ << "　形式：" << char_cvt::utf_16_to_shift_jis(kFleetTypeStr[conf.fleet_type_ - 1]) << endl;
-	for (auto fi = 0; fi < conf.fleet_type_; ++fi) {
+	for (auto fi = 0; fi < conf.unit_.size(); ++fi) {
 		os << "　第" << (fi + 1) << "艦隊：" << endl;
 		for (auto &it_k : conf.unit_[fi]) {
 			os << "　　" << char_cvt::utf_16_to_shift_jis(it_k.GetNameLv()) << endl;
@@ -370,7 +377,7 @@ std::ostream & operator<<(std::ostream & os, const Fleet & conf)
 std::wostream & operator<<(std::wostream & os, const Fleet & conf)
 {
 	os << L"陣形：" << kFormationStr[conf.formation_] << L"　司令部レベル：" << conf.level_ << L"　形式：" << kFleetTypeStr[conf.fleet_type_ - 1] << endl;
-	for (auto fi = 0; fi < conf.fleet_type_; ++fi) {
+	for (auto fi = 0; fi < conf.unit_.size(); ++fi) {
 		os << L"　第" << (fi + 1) << L"艦隊：" << endl;
 		for (auto &it_k : conf.unit_[fi]) {
 			os << L"　　" << it_k.GetNameLv() << endl;
