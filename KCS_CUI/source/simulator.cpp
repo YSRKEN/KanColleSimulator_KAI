@@ -110,7 +110,6 @@ void Simulator::AirWarPhase() {
 	auto air_war_status = JudgeAirWarStatus(anti_air_score);
 
 	// 触接判定
-	// TODO:simulatorクラス内のrand.RandReal関数を別の関数に「渡す」には？
 	vector<double> all_attack_plus(2, 1.0);
 	for (auto i = 0; i < kBattleSize; ++i) {
 		// 触接発生条件
@@ -151,6 +150,7 @@ void Simulator::AirWarPhase() {
 	}
 	for (auto i = 0; i < kBattleSize; ++i) {
 		for (auto &it_k : fleet_[i].FirstUnit()) {
+			if (it_k.Status() == kStatusLost) continue;
 			for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
 				auto &it_w = it_k.GetWeapon()[wi];
 				if (!it_w.IsAirFight()) continue;
@@ -171,6 +171,7 @@ void Simulator::AirWarPhase() {
 		const int aac_bonus_add1[] = { 0,7,6,4,6,4,4,3,4,2,8, 6, 3, 0, 4, 3, 4, 2, 2};
 		auto other_side = kBattleSize - i - 1;	//自分にとっての敵、敵にとっての自分
 		for (auto &it_k : fleet_[other_side].FirstUnit()) {
+			if (it_k.Status() == kStatusLost) continue;
 			for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
 				auto &it_w = it_k.GetWeapon()[wi];
 				if (!it_w.IsAirFight()) continue;
@@ -223,9 +224,14 @@ void Simulator::AirWarPhase() {
 		for (auto ui = 0u; ui < friend_unit.size(); ++ui) {
 			auto &friend_kammusu = friend_unit[ui];
 			auto &friend_weapon = friend_kammusu.GetWeapon();
+			// 既に沈んでいる場合は攻撃できない
+			if (friend_kammusu.Status() == kStatusLost) continue;
+			// 敵に攻撃できない場合は次の艦娘にバトンタッチ
+			if (fleet_[other_side].RandomKammusuNonSS(friend_kammusu.HasAirBomb()) < 0) continue;
+			// そうでない場合は、各スロットに対して攻撃対象を選択する
 			for (auto wi = 0; wi < friend_kammusu.GetSlots(); ++wi) {
 				if (friend_kammusu.GetAir()[wi] == 0 || !friend_weapon[wi].IsAirBomb()) continue;
-				// 爆撃する対象を決定する
+				// 爆撃する対象を決定する(各スロット毎に、ランダムに対象を選択しなければならない)
 				auto target = fleet_[other_side].RandomKammusuNonSS(friend_kammusu.HasAirBomb());
 				// 基礎攻撃力を算出する
 				int base_attack;
@@ -307,7 +313,7 @@ void Simulator::BattlePositionOracle() noexcept {
 	}
 }
 
-// 開幕雷撃フェイズ
+// (開幕)雷撃フェイズ
 void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 	// ダメージ計算
 	vector<vector<int>> all_damage(kBattleSize, vector<int>(kMaxUnitSize, 0));
@@ -316,11 +322,42 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 		auto &friend_unit = fleet_[bi].SecondUnit();
 		for (auto ui = 0u; ui < friend_unit.size(); ++ui) {
 			auto &friend_kammusu = friend_unit[ui];
-
+			// 魚雷が発射できるかどうかを判定する
+			if (!friend_kammusu.IsFireTorpedo(torpedo_turn)) continue;
+			// 既に沈んでいる場合は攻撃できない
+			if (friend_kammusu.Status() == kStatusLost) continue;
+			// 敵に攻撃できない場合は次の艦娘にバトンタッチ
+			auto target = fleet_[other_side].RandomKammusuNonSS(true);
+			if(target < 0) continue;
+			// 基礎攻撃力を算出する
+			int base_attack = friend_kammusu.AllTorpedo(true) + 5;
+			// 与えるダメージを計算する
+			KammusuIndex enemy_index = { 0, target };
+			auto damage = CalcDamage((torpedo_turn == kTorpedoFirst ? kBattlePhaseFirstTorpedo : kBattlePhaseTorpedo), bi, { 0, int(ui) }, enemy_index, base_attack, false, 1.0);
+			result_.AddDamage(bi, 0, ui, damage);
+			all_damage[other_side][enemy_index[1]] += damage;
 		}
 	}
 	// ダメージ処理
+	for (auto bi = 0; bi < kBattleSize; ++bi) {
+		auto &friend_unit = fleet_[bi].FirstUnit();
+		for (auto ui = 0u; ui < friend_unit.size(); ++ui) {
+			friend_unit[ui].SetRandGenerator(this->rand);
+			friend_unit[ui].MinusHP(all_damage[bi][ui], (bi == kFriendSide));
+		}
+	}
 
+#ifdef _DEBUG
+	cout << "受けたダメージ：" << endl;
+	for (auto bi = 0; bi < kBattleSize; ++bi) {
+		auto &friend_unit = fleet_[bi].FirstUnit();
+		for (auto ui = 0u; ui < friend_unit.size(); ++ui) {
+			cout << all_damage[bi][ui] << ",";
+		}
+		cout << endl;
+	}
+	cout << endl;
+#endif
 }
 
 // 砲撃戦フェイズ
@@ -516,6 +553,11 @@ int Simulator::CalcDamage(
 	}
 	return int(damage);
 }
+int Simulator::CalcDamage(
+	const BattlePhase &battle_phase, const int &turn_player, const KammusuIndex &friend_index, KammusuIndex &enemy_index,
+	const int &base_attack, const bool &is_special_attack, const double &multiple) {
+	return CalcDamage(battle_phase, turn_player, friend_index, enemy_index, base_attack, get<1>(air_war_result_), battle_position_, is_special_attack, multiple);
+	}
 
 // 「かばい」を確率的に発生させる
 void Simulator::ProtectOracle(const int &defense_side, KammusuIndex &defense_index) {

@@ -154,6 +154,7 @@ double Fleet::SearchValue() const noexcept {
 	//艦娘・装備による補正
 	for (auto &it_u : unit_) {
 		for (auto &it_k : it_u) {
+			if (it_k.Status() == kStatusLost) continue;
 			search_sum += sqrt(it_k.GetSearch()) * 1.6841056;
 			for (auto &it_w : it_k.GetWeapon()) {
 				switch (it_w.GetWeaponClass()) {
@@ -194,7 +195,8 @@ double Fleet::SearchValue() const noexcept {
 // 制空値を計算する
 int Fleet::AntiAirScore() const noexcept {
 	int anti_air_score = 0;
-	for (auto &it_k : unit_[0]) {
+	for (auto &it_k : FirstUnit()) {
+		if (it_k.Status() == kStatusLost) continue;
 		for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
 			if (!it_k.GetWeapon()[wi].IsAirFight()) continue;
 			anti_air_score += it_k.GetWeapon()[wi].AntiAirScore(it_k.GetAir()[wi]);
@@ -207,7 +209,8 @@ int Fleet::AntiAirScore() const noexcept {
 double Fleet::TrailerAircraftProb(const AirWarStatus &air_war_status) const {
 	// 制空権確保時の確率を計算する
 	double trailer_aircraft_prob = 0.0;
-	for (auto &it_k : unit_[0]) {
+	for (auto &it_k : FirstUnit()) {
+		if (it_k.Status() == kStatusLost) continue;
 		for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
 			auto it_w = it_k.GetWeapon()[wi];
 			switch (it_w.GetWeaponClass()) {
@@ -245,7 +248,8 @@ double Fleet::TrailerAircraftProb(const AirWarStatus &air_war_status) const {
 // 攻撃力補正を計算する
 double Fleet::TrailerAircraftPlus(){
 	const static double all_attack_plus_list[] = { 1.12, 1.12, 1.17, 1.20 };
-	for (auto &it_k :unit_[0] ) {
+	for (auto &it_k :FirstUnit() ) {
+		if (it_k.Status() == kStatusLost) continue;
 		for (auto &it_w : it_k.GetWeapon()) {
 			if (!it_w.IsAirTrailer()) continue;
 			if (0.07 * it_w.GetSearch() >= rand_.RandReal()) {
@@ -261,15 +265,17 @@ int Fleet::AacType() {
 	// まず、秋月型カットイン以外の判定を行う
 	for (auto &it_u : unit_) {
 		for (auto &it_k : it_u) {
+			if (it_k.Status() == kStatusLost) continue;
 			auto aac_type = it_k.AacType();
 			if (aac_type <= 3) continue;
 			if (it_k.AacProb(aac_type) < rand_.RandReal()) continue;
 			return aac_type;
 		}
 	}
-	// まず、秋月型カットイン以外の判定を行う
+	// 次に、秋月型カットインの判定を行う
 	for (auto &it_u : unit_) {
 		for (auto &it_k : it_u) {
+			if (it_k.Status() == kStatusLost) continue;
 			auto aac_type = it_k.AacType();
 			if (aac_type != limit(aac_type, 1, 3)) continue;
 			if (it_k.AacProb(aac_type) < rand_.RandReal()) continue;
@@ -285,6 +291,7 @@ int Fleet::AntiAirBonus() const {
 	int fleets_anti_air_bonus = 0;
 	for (auto &it_u : unit_) {
 		for (auto &it_k : it_u) {
+			if (it_k.Status() == kStatusLost) continue;
 			double anti_air_bonus = 0.0;
 			for (auto &it_w : it_k.GetWeapon()) {
 				if (it_w.IsHAG() || it_w.Include(L"高射装置")) {
@@ -303,15 +310,15 @@ int Fleet::AntiAirBonus() const {
 			fleets_anti_air_bonus += int(anti_air_bonus);
 		}
 	}
-	return int(2 * kAntiAirBonusPer[(unit_[0][0].IsKammusu() ? 0 : 1)][formation_] * fleets_anti_air_bonus);
+	return int(2 * kAntiAirBonusPer[(FirstUnit()[0].IsKammusu() ? 0 : 1)][formation_] * fleets_anti_air_bonus);
 }
 
-// 生存艦から艦娘をランダムに指定する
+// 生存艦から艦娘をランダムに指定する(航空戦用)
 int Fleet::RandomKammusu() {
 	//生存艦をリストアップ
 	vector<int> alived_list;
-	for (auto ui = 0u; ui < unit_[0].size(); ++ui) {
-		if (unit_[0][ui].Status() != kStatusLost) alived_list.push_back(ui);
+	for (auto ui = 0u; ui < FirstUnit().size(); ++ui) {
+		if (FirstUnit()[ui].Status() != kStatusLost) alived_list.push_back(ui);
 	}
 	if (alived_list.size() == 0) return -1;
 	return alived_list[rand_.RandInt(alived_list.size())];
@@ -322,8 +329,8 @@ int Fleet::RandomKammusu() {
 int Fleet::RandomKammusuNonSS(const bool &has_bomb) {
 	//生存する水上艦をリストアップ
 	vector<int> alived_list;
-	for (auto ui = 0u; ui < unit_[0].size(); ++ui) {
-		auto &it_k = unit_[0][ui];
+	for (auto ui = 0u; ui < FirstUnit().size(); ++ui) {
+		auto &it_k = FirstUnit()[ui];
 		if (it_k.Status() == kStatusLost) continue;
 		if (it_k.IsSubmarine()) continue;
 		if (has_bomb && it_k.GetShipClass() == kShipClassAF) continue;
@@ -336,6 +343,7 @@ template<typename CondFunc>
 bool any_of(const std::vector<std::vector<Kammusu>>& unit, CondFunc cond) noexcept {
 	for (auto &it_u : unit) {
 		for (auto &it_k : it_u) {
+			if (it_k.Status() == kStatusLost) continue;
 			if (cond(it_k)) return true;
 		}
 	}
@@ -353,12 +361,12 @@ bool Fleet::HasAirFight() const noexcept {
 
 // 触接に参加する艦載機をいずれかの艦が保有していた場合はtrue
 bool Fleet::HasAirTrailer() const noexcept {
-	return std::any_of(this->unit_[0].begin(), this->unit_[0].end(), [](const Kammusu& it_k) -> bool { return it_k.HasAirTrailer(); });
+	return std::any_of(this->FirstUnit().begin(), this->FirstUnit().end(), [](const Kammusu& it_k) -> bool { return it_k.HasAirTrailer(); });
 }
 
 // 彩雲をいずれかの艦が保有していた場合はtrue
 bool Fleet::HasAirPss() const noexcept {
-	return std::any_of(this->unit_[0].begin(), this->unit_[0].end(), [](const Kammusu& it_k) -> bool { return it_k.HasAirPss(); });
+	return std::any_of(this->FirstUnit().begin(), this->FirstUnit().end(), [](const Kammusu& it_k) -> bool { return it_k.HasAirPss(); });
 }
 
 std::ostream & operator<<(std::ostream & os, const Fleet & conf)
