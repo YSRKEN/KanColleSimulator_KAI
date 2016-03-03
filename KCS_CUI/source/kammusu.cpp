@@ -1,9 +1,13 @@
-﻿#include "base.hpp"
+﻿#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include "base.hpp"
 #include "kammusu.hpp"
 #include "other.hpp"
 #include "char_convert.hpp"
 #include "fleet.hpp"
 #include "simulator.hpp"
+#include <algorithm>
 // コンストラクタ
 Kammusu::Kammusu() 
 	:	Kammusu(-1, L"なし", kShipClassDD, 0, 0, 0, 0, 0, 0, kSpeedNone, kRangeNone,
@@ -556,6 +560,16 @@ bool Kammusu::Include(const wstring &wstr) const noexcept {
 	return (name_.find(wstr) != wstring::npos);
 }
 
+bool Kammusu::Include(const wchar_t* wstr) const noexcept
+{
+	return (name_.find(wstr) != wstring::npos);
+}
+
+bool Kammusu::IncludeAnyOf(std::initializer_list<const wchar_t*> strings) const
+{
+	return std::any_of(strings.begin(), strings.end(), [this](const wchar_t* const s) { return this->Include(s); });
+}
+
 // 対潜シナジーを持っていたらtrue
 bool Kammusu::HasAntiSubSynergy() const noexcept {
 	bool has_dp = false, has_sonar = false;
@@ -623,7 +637,7 @@ bool Kammusu::IsFireTorpedo(const TorpedoTurn &torpedo_turn) const noexcept {
 		}
 		else {
 			// elite以上の潜水艦なら開幕魚雷を撃てる(ただし潜水棲姫は除く。なんでや！)
-			if (IsSubmarine() && (Include(L"elite") || Include(L"flagship"))) return true;
+			if (IsSubmarine() && IncludeAnyOf({ L"elite", L"flagship" })) return true;
 			// エリレ級と水母棲姫と駆逐水鬼(甲作戦最終形態,艦船ID=649)は無条件で撃てる
 			if (name_ == L"戦艦レ級elite" || name_ == L"水母棲姫" || id_ == 649) return true;
 		}
