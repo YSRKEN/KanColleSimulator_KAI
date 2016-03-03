@@ -4,10 +4,11 @@
 #include "char_convert.hpp"
 #include <unordered_map>
 #include <functional>
+#include <array>
 
 struct ForConfigImpl {
-	vector<string> input_filename_;	//入力ファイル名
-	vector<Formation> formation_;		//陣形指定
+	std::array<string, kBattleSize> input_filename_;	//入力ファイル名
+	std::array<Formation, kBattleSize> formation_;		//陣形指定
 	int times_;		//試行回数
 	int threads_;	//スレッド数
 	string output_filename_;	//出力ファイル名
@@ -24,8 +25,6 @@ Config::Config() : pimpl(new Impl()){}
 Config::Config(int argc, char *argv[]) : pimpl(new Impl()) {
 	CONFIG_THROW_WITH_MESSAGE_IF( argc < 4, "引数の数が足りていません." )
 	// 各オプションのデフォルト値を設定する
-	this->pimpl->e.input_filename_.resize(kBattleSize);
-	this->pimpl->e.formation_.resize(kBattleSize);
 	fill(this->pimpl->e.formation_.begin(), this->pimpl->e.formation_.end(), kFormationTrail);
 	this->pimpl->e.times_ = 1;
 	this->pimpl->e.threads_ = 1;
