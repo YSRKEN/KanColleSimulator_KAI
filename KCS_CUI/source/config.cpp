@@ -66,10 +66,10 @@ namespace detail {
 		};
 		unordered_map<string, function<void(const char*)>> case_one_arg = {
 			{ "-n", [&re](const char*arg) {
-				re.times_ = std::min(1, arg | to_i());
+				re.times_ = std::max(1, arg | to_i());
 			}},
 			{ "-t", [&re](const char*arg) {
-				re.threads_ = std::min(1, arg | to_i());
+				re.threads_ = std::max(1, arg | to_i());
 			}},
 			{ "-o", [&re](const char*arg) {
 				re.output_filename_ = arg;
