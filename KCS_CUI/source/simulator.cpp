@@ -542,7 +542,7 @@ int Simulator::CalcDamage(
 		if (hit_prob < 0.9) hit_prob = 0.9;
 	}
 	// 弾着観測射撃および夜間特殊攻撃ならば回避してもカスダメ、それ以外では0ダメージ
-	if (!rand.RandBool(hit_prob)) {
+	if (!rand.RandBool(hit_prob | limit(0.0, 1.0))) {
 		if (is_special_attack) damage = 0.0; else return 0;
 	}
 	// 夜戦における対潜攻撃は常にカスダメ(ただし開幕夜戦および連合艦隊では無視される)
