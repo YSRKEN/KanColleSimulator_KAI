@@ -19,7 +19,7 @@ Config::Config() : pimpl(new Impl()){}
 
 // コンストラクタ
 Config::Config(int argc, char *argv[]) {
-	CONFIG_THROW_WITH_MESSAGE_IF( argc < 4, "引数の数が足りていません." )
+	CONFIG_THROW_WITH_MESSAGE_IF(argc < 4, "引数の数が足りていません.")
 	// 各オプションのデフォルト値を設定する
 	this->pimpl->input_filename_.resize(kBattleSize);
 	this->pimpl->formation_.resize(kBattleSize);

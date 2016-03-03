@@ -5,12 +5,6 @@
 class Config {
 	struct Impl;
 	std::unique_ptr<Impl> pimpl;
-	//vector<string> input_filename_;	//入力ファイル名
-	//vector<Formation> formation_;		//陣形指定
-	//int times_;		//試行回数
-	//int threads_;	//スレッド数
-	//string output_filename_;	//出力ファイル名
-	//bool json_prettify_flg_;	//出力ファイルを整形するか
 public:
 	// コンストラクタ
 	Config();
