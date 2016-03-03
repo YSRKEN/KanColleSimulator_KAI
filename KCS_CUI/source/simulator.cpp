@@ -498,7 +498,7 @@ int Simulator::CalcDamage(
 		damage *= 2.0 * hunter_kammusu.GetAmmo() / 100;
 	}
 	// 弾着観測射撃時、カットインが入ると命中率が劇的に上昇する(試験実装)
-	if (kBattlePhaseGun && is_special_attack) {
+	if (battle_phase == kBattlePhaseGun && is_special_attack) {
 		if (hit_prob < 0.9) hit_prob = 0.9;
 	}
 	// 弾着観測射撃および夜間特殊攻撃ならば回避してもカスダメ、それ以外では0ダメージ
