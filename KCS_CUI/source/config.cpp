@@ -23,20 +23,8 @@ struct Config::Impl {
 Config::Config() : pimpl(new Impl()){}
 
 // コンストラクタ
-<<<<<<< HEAD
-Config::Config(int argc, char *argv[]) {
-	CONFIG_THROW_WITH_MESSAGE_IF(argc < 4, "引数の数が足りていません.")
-	// 各オプションのデフォルト値を設定する
-	this->pimpl->input_filename_.resize(kBattleSize);
-	this->pimpl->formation_.resize(kBattleSize);
-	fill(this->pimpl->formation_.begin(), this->pimpl->formation_.end(), kFormationTrail);
-	this->pimpl->times_ = 1;
-	this->pimpl->threads_ = 1;
-	this->pimpl->json_prettify_flg_ = true;
-=======
 Config::Config(int argc, char *argv[]) : pimpl(new Impl()) {
-	CONFIG_THROW_WITH_MESSAGE_IF( argc < 4, "引数の数が足りていません." )
->>>>>>> origin/master
+	CONFIG_THROW_WITH_MESSAGE_IF(argc < 4, "引数の数が足りていません.")
 	// オプションの文字列を読み込む
 	for (auto i = 1; i < argc; ++i) {
 		// 一旦stringに落としこむ
