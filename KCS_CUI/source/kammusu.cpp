@@ -590,6 +590,50 @@ bool Kammusu::HasAirPss() const noexcept {
 	return false;
 }
 
+// 魚雷を発射できればtrue
+bool Kammusu::IsFireTorpedo(const TorpedoTurn &torpedo_turn) const noexcept {
+	switch (torpedo_turn) {
+	case kTorpedoFirst:	//開幕魚雷
+		// 鬱陶しいことに艦娘と深海棲艦とでは判定条件が異なるので分けて処理する
+		if (kammusu_flg_) {
+			// 甲標的を積んだ軽巡(事実上阿武隈改二のみ)・潜水系・雷巡・水母は飛ばせる
+			switch (ship_class_) {
+			case kShipClassCL:
+			case kShipClassSS:
+			case kShipClassSSV:
+			case kShipClassCLT:
+			case kShipClassAV:
+				for (auto &it_w : weapons_) {
+					if (it_w.GetWeaponClass() == kWeaponClassSpecialSS) return true;
+				}
+			default:
+				break;
+			}
+			// Lv10以上の潜水艦系は甲標的無しでも飛ばせる
+			if (IsSubmarine() && level_ >= 10) return true;
+		}
+		else {
+			// elite以上の潜水艦なら開幕魚雷を撃てる(ただし潜水棲姫は除く。なんでや！)
+			if (IsSubmarine() && (Include(L"elite") || Include(L"flagship"))) return true;
+			// エリレ級と水母棲姫と駆逐水鬼(甲作戦最終形態,艦船ID=649)は無条件で撃てる
+			if (name_ == L"戦艦レ級elite" || name_ == L"水母棲姫" || id_ == 649) return true;
+		}
+		return false;
+		break;
+	case kTorpedoSecond:	//雷撃戦
+		// 中破以上だと不可
+		if (Status() >= kStatusMiddleDamage) return false;
+		// 素雷装が0なら不可
+		if (torpedo_ == 0) return false;
+		// 秋津洲および未改造の千歳型は不可
+		if (Include(L"秋津洲") || name_ == L"千歳" || name_ == L"千代田") return false;
+		return true;
+		break;
+	default:
+		return false;
+	}
+}
+
 std::ostream & operator<<(std::ostream & os, const Kammusu & conf)
 {
 	os 

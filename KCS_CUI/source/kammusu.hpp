@@ -4,6 +4,7 @@
 #include <iostream>
 #include "random.hpp"
 class WeaponDB;
+enum TorpedoTurn;
 
 // 艦種(厳密な綴りはShip Classificationsである)
 // ただし、浮遊要塞・護衛要塞・泊地棲鬼/姫・南方棲鬼は「重巡洋艦」、
@@ -126,7 +127,7 @@ public:
 	double CL2ProbPlus() const noexcept;			//熟練艦載機によるCL2率上昇
 	double CL2AttackPlus() const noexcept;			//熟練艦載機によるダメージ補正
 	int AllDefense() const noexcept;				//総装甲を返す
-	void MinusHP(const int&, const bool&);	//ダメージを与える、ctorもしくはSetRandGenerator経由で乱数エンジンを渡している必要がある
+	void MinusHP(const int&, const bool&);			//ダメージを与える、ctorもしくはSetRandGenerator経由で乱数エンジンを渡している必要がある
 	bool HasAir() const noexcept;					//艦載機を保有していた場合はtrue
 	bool HasAirFight() const noexcept;				//航空戦に参加する艦載機を保有していた場合はtrue
 	bool HasAirTrailer() const noexcept;			//触接に参加する艦載機を保有していた場合はtrue
@@ -136,6 +137,7 @@ public:
 	bool HasAntiSubSynergy() const noexcept;		//対潜シナジーを持っていたらtrue
 	bool IsSpecialEffectAP() const noexcept;		//徹甲弾補正を食らう側ならtrue
 	bool HasAirPss() const noexcept;				//彩雲を保有していた場合はtrue
+	bool IsFireTorpedo(const TorpedoTurn&) const noexcept;	//魚雷を発射できればtrue
 	friend std::ostream& operator<<(std::ostream& os, const Kammusu& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Kammusu& conf);
 };
