@@ -1,10 +1,16 @@
-﻿#include "base.hpp"
+﻿#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include "base.hpp"
 #include "config.hpp"
 #include <codecvt>
 #include "char_convert.hpp"
 #include <unordered_map>
 #include <functional>
 #include <array>
+#include <algorithm>
+#include "exception.hpp"
+#include <iostream>
 
 struct ForConfigImpl {
 	ForConfigImpl() : input_filename_(), formation_({{ kFormationTrail , kFormationTrail }}), times_(1), threads_(1), json_prettify_flg_(true) {}
@@ -18,63 +24,102 @@ struct ForConfigImpl {
 struct Config::Impl {
 	ForConfigImpl e;
 };
-// コンストラクタ
+namespace detail {
+	void print_verison() noexcept(false)
+	{
+		std::cout << "version" << std::endl;
+	}
+	void print_commandline_help() noexcept(false)
+	{
+		detail::print_verison();
+		std::cout << "help" << std::endl;
+	}
+}
+void print_commandline_help() noexcept(false)
+{
+	detail::print_commandline_help();
+	SUCCESSFUL_TERMINATION_THROW_WITH_MESSAGE("");
+}
 
+void print_verison() noexcept(false)
+{
+	detail::print_verison();
+	SUCCESSFUL_TERMINATION_THROW_WITH_MESSAGE("");
+}
+
+
+namespace detail {
+	ForConfigImpl commandline_analyzer(int argc, char* argv[]) noexcept(false) {
+		CONFIG_THROW_WITH_MESSAGE_IF(argc < 4, "引数の数が足りていません.")
+		using std::unordered_map;
+		using std::function;
+		ForConfigImpl re = {};
+		unordered_map<string, function<void(const char*, const char*)>> case_two_arg = {
+			{ "-i", [&re](const char* arg1, const char* arg2) {
+				re.input_filename_[0] = arg1;
+				re.input_filename_[1] = arg2;
+			}},
+			{ "-f", [&re](const char* arg1, const char* arg2) {
+				re.formation_[0] = static_cast<Formation>(arg1 | to_i());
+				re.formation_[1] = static_cast<Formation>(arg2 | to_i());
+			}}
+		};
+		unordered_map<string, function<void(const char*)>> case_one_arg = {
+			{ "-n", [&re](const char*arg) {
+				re.times_ = std::min(1, arg | to_i());
+			}},
+			{ "-t", [&re](const char*arg) {
+				re.threads_ = std::min(1, arg | to_i());
+			}},
+			{ "-o", [&re](const char*arg) {
+				re.output_filename_ = arg;
+			}}
+		};
+		unordered_map<string, function<void()>> case_no_arg = {
+			{ "--no-result-json-prettify", [&re]() {
+				re.json_prettify_flg_ = false;
+			}},
+			{ "--result-json-prettify", [&re]() {
+				re.json_prettify_flg_ = true;
+			} }
+		};
+		unordered_map<string, function<void()>> case_exist = {
+			{ "-h", print_commandline_help },
+			{ "--help", print_commandline_help },
+			{ "-v", print_verison },
+			{ "--version", print_verison }
+		};
+		for (int i = 1; i < argc; ++i) {
+			if (case_two_arg.count(argv[i])) {
+				INVAID_ARGUMENT_THROW_WITH_MESSAGE_IF(i + 2 >= argc, string("Incorrect usage :") + argv[i])
+				INVAID_ARGUMENT_THROW_WITH_MESSAGE_IF('-' == argv[i + 1][0] || '-' == argv[i + 2][0], string("Incorrect usage :") + argv[i])
+				case_two_arg[argv[i]](argv[i + 1], argv[i + 2]);
+				i += 2;
+			}
+			else if (case_one_arg.count(argv[i])) {
+				INVAID_ARGUMENT_THROW_WITH_MESSAGE_IF(i + 1 >= argc, string("Incorrect usage :") + argv[i])
+				INVAID_ARGUMENT_THROW_WITH_MESSAGE_IF('-' == argv[i + 1][0], string("Incorrect usage :") + argv[i])
+				case_one_arg[argv[i]](argv[i + 1]);
+				++i;
+			}
+			else if (case_no_arg.count(argv[i])) case_no_arg[argv[i]]();
+			else if (case_exist.count(argv[i])) case_exist[argv[i]]();//throw successful_termination
+			else {
+				detail::print_commandline_help();
+				INVAID_ARGUMENT_THROW_WITH_MESSAGE(string("unknown option : ") + argv[i]);
+			}
+		}
+		return re;
+	}
+}
+
+// コンストラクタ
 Config::Config() : pimpl(new Impl()){}
 
 // コンストラクタ
-Config::Config(int argc, char *argv[]) : pimpl(new Impl()) {
-	CONFIG_THROW_WITH_MESSAGE_IF( argc < 4, "引数の数が足りていません." )
-	// オプションの文字列を読み込む
-	for (auto i = 1; i < argc; ++i) {
-		// 一旦stringに落としこむ
-		string temp(argv[i]);
-		// オプション用文字列なら、各オプションに反映させる
-		if (temp == "-i") {
-			// 入力ファイル名
-			CONFIG_THROW_WITH_MESSAGE_IF( argc - i <= 2, "コマンドライン引数が異常です." )
-			this->pimpl->e.input_filename_[0] = argv[i + 1];
-			this->pimpl->e.input_filename_[1] = argv[i + 2];
-			i += 2;
-		}
-		else if (temp == "-f") {
-			// 陣形
-			CONFIG_THROW_WITH_MESSAGE_IF( argc - i <= 2, "コマンドライン引数が異常です." )
-			this->pimpl->e.formation_[0] = static_cast<Formation>(argv[i + 1] | to_i());
-			this->pimpl->e.formation_[1] = static_cast<Formation>(argv[i + 2] | to_i());
-			i += 2;
-		}
-		else if (temp == "-n") {
-			// 試行回数
-			CONFIG_THROW_WITH_MESSAGE_IF( argc - i <= 1, "コマンドライン引数が異常です." )
-			this->pimpl->e.times_ = argv[i + 1] | to_i();
-			if (this->pimpl->e.times_ <= 0) this->pimpl->e.times_ = 1;
-			++i;
-		}
-		else if (temp == "-t") {
-			// 実行スレッド数
-			CONFIG_THROW_WITH_MESSAGE_IF( argc - i <= 1, "コマンドライン引数が異常です." )
-				this->pimpl->e.threads_ = argv[i + 1] | to_i();
-			if (this->pimpl->e.threads_ <= 0) this->pimpl->e.threads_ = 1;
-			++i;
-		}
-		else if (temp == "-o") {
-			// 出力ファイル名
-			CONFIG_THROW_WITH_MESSAGE_IF( argc - i <= 1, "コマンドライン引数が異常です." )
-			this->pimpl->e.output_filename_ = argv[i + 1];
-			++i;
-		}
-		else if (temp == "--no-result-json-prettify") {
-			// 出力ファイルを整形するかのフラグ
-			this->pimpl->e.json_prettify_flg_ = false;
-		}
-		else if (temp == "--result-json-prettify") {
-			// 出力ファイルを整形するかのフラグ
-			this->pimpl->e.json_prettify_flg_ = true;
-		}
-	}
+Config::Config(int argc, char *argv[]) : pimpl(new Impl({ detail::commandline_analyzer(argc, argv) })) {
 	// 入力ファイル名は必須であることに注意する
-	CONFIG_THROW_WITH_MESSAGE_IF(this->pimpl->e.input_filename_[0] == "" && this->pimpl->e.input_filename_[1] == "", "入力ファイル名は必ず指定してください." )
+	CONFIG_THROW_WITH_MESSAGE_IF(this->pimpl->e.input_filename_[0].empty() || this->pimpl->e.input_filename_[1].empty(), "入力ファイル名は必ず指定してください." )
 }
 
 Config::~Config() = default;

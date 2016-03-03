@@ -172,8 +172,10 @@ namespace char_cvt {
 #pragma warning( push )
 #pragma warning( disable : 4100 )//warning C4100: 'type': 引数は関数の本体部で 1 度も参照されません。
 #endif
-	inline std::string to_string(const std::string& s, char_enc type = char_enc::unknown) { return s; }
-	inline std::wstring to_wstring(const std::wstring& s, char_enc type = char_enc::unknown) { return s; }
+	inline std::string to_string(const std::string& s) { return s; }
+	inline std::string to_string(const std::string& s, char_enc) { return s; }
+	inline std::wstring to_wstring(const std::wstring& s) { return s; }
+	inline std::wstring to_wstring(const std::wstring& s, char_enc) { return s; }
 #ifdef _MSC_VER
 #pragma warning( pop )
 #endif

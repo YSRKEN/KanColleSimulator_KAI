@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
 #endif
 		// 集計を行う
 		ResultStat result_stat(result_db, fleet[kFriendSide].GetUnit());
-		if (config.GetOutputFilename() == "") {
+		if (config.GetOutputFilename().empty()) {
 			// 標準出力モード
 			result_stat.Put(fleet);
 		}
@@ -49,18 +49,25 @@ int main(int argc, char *argv[]) {
 			result_stat.Put(fleet, config.GetOutputFilename(), config.GetJsonPrettifyFlg());
 		}
 	}
+	catch (const KCS_except::successful_termination&) {
+		return 0;
+	}
 	catch (const KCS_except::config_error& er){
 		std::cerr << er.what() << endl;
+		return -1;
 	}
 	catch (const KCS_except::file_error& er){
 		std::cerr << er.what() << endl;
+		return -1;
 	}
 	catch (const KCS_except::encode_error& er){
 		std::cerr << er.what() << endl;
+		return -1;
 	}
 	catch (const std::exception& er) {
 		std::cerr << "It was stopped by unhandled exception." << endl;
 		std::cerr << er.what() << endl;
+		return -1;
 	}
 	return 0;
 }
