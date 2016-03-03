@@ -30,9 +30,9 @@ int main(int argc, char *argv[]) {
 #endif
 		#pragma omp parallel for num_threads(config.GetThreads())
 		for (int n = 0; n < config.GetTimes(); ++n) {
-			Simulator simulator(fleet, seed[n], kSimulateModeDN);
+			vector<Fleet> fleet_ = fleet;	//ハードコピーしないと徐々に体力が削られるだけなのでダメ
+			Simulator simulator(fleet_, seed[n], kSimulateModeDN);	//戦闘のたびにSimulatorインスタンスを設定する
 			result_db[n] = simulator.Calc();
-			cout << "hoge\n";
 		}
 #if defined(KCS_MEASURE_PROCESS_TIME)
 		const auto process_end_time = std::chrono::high_resolution_clock::now();

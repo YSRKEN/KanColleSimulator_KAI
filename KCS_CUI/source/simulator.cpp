@@ -71,8 +71,11 @@ Result Simulator::Calc() {
 	// 夜戦フェイズ(連合艦隊では第2艦隊のみ)
 	NightPhase();
 
-	// 結果を出力する
+	// 終了処理
 Exit:
+	// 燃料・弾薬を減少させる
+
+	// 結果を出力する
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
 		for (auto fi = 0u; fi < fleet_[bi].FleetSize(); ++fi) {
 			for (auto ui = 0u; ui < fleet_[bi].UnitSize(fi); ++ui){

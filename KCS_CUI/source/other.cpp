@@ -271,24 +271,26 @@ ResultStat::ResultStat(const vector<Result> &result_db, const vector<vector<Kamm
 		}
 	}
 	// 標本標準偏差
-	for (auto ti = 0; ti < all_count_; ++ti) {
-		for (auto bi = 0u; bi < kBattleSize; ++bi) {
-			for (auto fi = 0u; fi < kMaxFleetSize; ++fi) {
-				for (auto ui = 0u; ui < kMaxUnitSize; ++ui) {
-					double temp1 = hp_ave_[bi][fi][ui] - result_db[ti].GetHP(bi, fi, ui);
-					hp_sd_[bi][fi][ui] += temp1 * temp1;
-					double temp2 = damage_ave_[bi][fi][ui] - result_db[ti].GetDamage(bi, fi, ui);
-					damage_sd_[bi][fi][ui] += temp2 * temp2;
+	if (all_count_ > 1) {
+		for (auto ti = 0; ti < all_count_; ++ti) {
+			for (auto bi = 0u; bi < kBattleSize; ++bi) {
+				for (auto fi = 0u; fi < kMaxFleetSize; ++fi) {
+					for (auto ui = 0u; ui < kMaxUnitSize; ++ui) {
+						double temp1 = hp_ave_[bi][fi][ui] - result_db[ti].GetHP(bi, fi, ui);
+						hp_sd_[bi][fi][ui] += temp1 * temp1;
+						double temp2 = damage_ave_[bi][fi][ui] - result_db[ti].GetDamage(bi, fi, ui);
+						damage_sd_[bi][fi][ui] += temp2 * temp2;
+					}
 				}
 			}
 		}
-	}
-	double all_count_inv2 = 1.0 / (all_count_ - 1);
-	for (auto bi = 0u; bi < kBattleSize; ++bi) {
-		for (auto fi = 0u; fi < kMaxFleetSize; ++fi) {
-			for (auto ui = 0u; ui < kMaxUnitSize; ++ui) {
-				hp_sd_[bi][fi][ui] = sqrt(hp_sd_[bi][fi][ui] * all_count_inv2);
-				damage_sd_[bi][fi][ui] = sqrt(damage_sd_[bi][fi][ui] * all_count_inv2);
+		double all_count_inv2 = 1.0 / (all_count_ - 1);
+		for (auto bi = 0u; bi < kBattleSize; ++bi) {
+			for (auto fi = 0u; fi < kMaxFleetSize; ++fi) {
+				for (auto ui = 0u; ui < kMaxUnitSize; ++ui) {
+					hp_sd_[bi][fi][ui] = sqrt(hp_sd_[bi][fi][ui] * all_count_inv2);
+					damage_sd_[bi][fi][ui] = sqrt(damage_sd_[bi][fi][ui] * all_count_inv2);
+				}
 			}
 		}
 	}
@@ -303,8 +305,8 @@ void ResultStat::Put(const vector<Fleet> &fleet) const noexcept {
 			wcout << L"　第" << (fi + 1) << L"艦隊：" << endl;
 			for (auto ui = 0u; ui < unit[fi].size(); ++ui) {
 				wcout << L"　　" << unit[fi][ui].GetNameLv() << endl;
-				wcout << L"　　　残耐久：" << L"[" << hp_min_[bi][fi][ui] << L"～" << hp_ave_[bi][fi][ui] << L"～" << hp_max_[bi][fi][ui] << L"] σ＝" << hp_sd_[bi][fi][ui] << endl;
-				wcout << L"　　　与ダメージ：" << L"[" << damage_min_[bi][fi][ui] << L"～" << damage_ave_[bi][fi][ui] << L"～" << damage_max_[bi][fi][ui] << L"] σ＝" << damage_sd_[bi][fi][ui] << endl;
+				wcout << L"　　　残耐久：" << L"[" << hp_min_[bi][fi][ui] << L"～" << hp_ave_[bi][fi][ui] << L"～" << hp_max_[bi][fi][ui] << L"] σ＝" << (all_count_ > 1, hp_sd_[bi][fi][ui], L"―") << endl;
+				wcout << L"　　　与ダメージ：" << L"[" << damage_min_[bi][fi][ui] << L"～" << damage_ave_[bi][fi][ui] << L"～" << damage_max_[bi][fi][ui] << L"] σ＝" << (all_count_ > 1, damage_sd_[bi][fi][ui], L"―") << endl;
 				if (bi == 0) {
 					wcout << L"　　　MVP率：" << (100.0 * mvp_count_[fi][ui] / all_count_) << L"％ ";
 					wcout << L"大破率：" << (100.0 * heavy_damage_count_[fi][ui] / all_count_) << L"％" << endl;
@@ -335,7 +337,7 @@ void ResultStat::Put(const vector<Fleet> &fleet, const string &file_name, const 
 					o4["min"] = picojson::value(1.0 * hp_min_[bi][fi][ui]);
 					o4["ave"] = picojson::value(hp_ave_[bi][fi][ui]);
 					o4["max"] = picojson::value(1.0 * hp_max_[bi][fi][ui]);
-					o4["sd"] = picojson::value(1.0 * hp_sd_[bi][fi][ui]);
+					o4["sd"] = picojson::value((all_count_ > 1, 1.0 * hp_sd_[bi][fi][ui], -1.0));
 					o3["hp"] = picojson::value(o4);
 				}
 				{
@@ -343,7 +345,7 @@ void ResultStat::Put(const vector<Fleet> &fleet, const string &file_name, const 
 					o4["min"] = picojson::value(1.0 * damage_min_[bi][fi][ui]);
 					o4["ave"] = picojson::value(damage_ave_[bi][fi][ui]);
 					o4["max"] = picojson::value(1.0 * damage_max_[bi][fi][ui]);
-					o4["sd"] = picojson::value(1.0 * damage_sd_[bi][fi][ui]);
+					o4["sd"] = picojson::value((all_count_ > 1, 1.0 * damage_sd_[bi][fi][ui], -1.0));
 					o3["damage"] = picojson::value(o4);
 				}
 				if (bi == 0) {
