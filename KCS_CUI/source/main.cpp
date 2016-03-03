@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
 #endif
 		#pragma omp parallel for num_threads(config.GetThreads())
 		for (int n = 0; n < config.GetTimes(); ++n) {
-			Simulator simulator(fleet, seed + n);
+			Simulator simulator(fleet, seed + n, kSimulateModeDN);
 			result_db[n] = simulator.Calc();
 		}
 #if defined(KCS_MEASURE_PROCESS_TIME)

@@ -3,8 +3,8 @@
 #include "fleet.hpp"
 #include "simulator.hpp"
 
-Simulator::Simulator(const vector<Fleet>& fleet, const unsigned int seed)
-	: fleet_(fleet), rand(seed)
+Simulator::Simulator(const vector<Fleet>& fleet, const unsigned int seed, const SimulateMode& simulate_mode)
+	: fleet_(fleet), rand(seed), simulate_mode_(simulate_mode)
 {
 	for (auto& f : this->fleet_) f.SetRandGenerator(rand);
 }
@@ -473,7 +473,7 @@ int Simulator::CalcDamage(
 		if (is_special_attack) damage = 0.0; else return 0;
 	}
 	// 夜戦における対潜攻撃は常にカスダメ(ただし開幕夜戦および連合艦隊では無視される)
-	if (friend_side.GetFleetType() == kFleetTypeNormal && is_target_submarine && battle_phase == kBattlePhaseNight) damage = 0.0;
+	if (friend_side.GetFleetType() == kFleetTypeNormal && simulate_mode_ != kSimulateModeN && is_target_submarine && battle_phase == kBattlePhaseNight) damage = 0.0;
 	// カスダメの際は相手残り耐久の6～14％を与える
 	if (damage < 1.0) {
 		damage = 0.06 * target_kammusu.GetHP() + 0.08 * rand.RandInt(target_kammusu.GetHP());

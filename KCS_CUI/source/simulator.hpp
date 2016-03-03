@@ -9,6 +9,9 @@ enum BattlePhase{ kBattlePhaseAir, kBattlePhaseFirstTorpedo, kBattlePhaseGun, kB
 // 陣形(同航戦・反航戦・丁字有利・丁字不利)
 enum BattlePosition{ kBattlePositionSame, kBattlePositionReverse, kBattlePositionGoodT, kBattlePositionBadT };
 
+// 戦闘モード(昼戦＋夜戦、昼戦のみ、開幕夜戦)
+enum SimulateMode { kSimulateModeDN, kSimulateModeD, kSimulateModeN };
+
 typedef vector<int> KammusuIndex;
 
 class Fleet;
@@ -17,7 +20,8 @@ class Fleet;
 class Simulator {
 	vector<Fleet> fleet_;	//シミュレーションに使用する艦隊
 	Result result_;			//シミュレーション結果を保存するクラス
-	SharedRand rand;
+	SharedRand rand;		//シミュレーションに使用する乱数生成器
+	SimulateMode simulate_mode_;	//シミュレーションにおける戦闘モード
 	// 各フェーズ
 	bitset<kBattleSize> SearchPhase();
 	tuple<AirWarStatus, vector<double>> AirWarPhase(const bitset<kBattleSize>&);
@@ -36,7 +40,7 @@ class Simulator {
 public:
 	// コンストラクタ
 	Simulator(){}
-	Simulator(const vector<Fleet> &fleet, const unsigned int seed);
+	Simulator(const vector<Fleet> &fleet, const unsigned int seed, const SimulateMode&);
 	SharedRand GetGenerator() noexcept { return this->rand; }
 	// 計算用メソッド
 	Result Calc();
