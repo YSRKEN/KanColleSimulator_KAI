@@ -12,23 +12,35 @@ enum BattlePosition{ kBattlePositionSame, kBattlePositionReverse, kBattlePositio
 // 戦闘モード(昼戦＋夜戦、昼戦のみ、開幕夜戦)
 enum SimulateMode { kSimulateModeDN, kSimulateModeD, kSimulateModeN };
 
+// 雷撃戦の巡目(開幕および雷撃戦)
+enum TorpedoTurn { kTorpedoFirst, kTorpedoSecond };
+
+// 砲撃戦の巡目(1巡目および2巡目)
+enum FireTurn { kFireFirst , kFireSecond };
+
 typedef vector<int> KammusuIndex;
 
 class Fleet;
 #include "result.hpp"
 #include "random.hpp"
 class Simulator {
-	vector<Fleet> fleet_;	//シミュレーションに使用する艦隊
-	Result result_;			//シミュレーション結果を保存するクラス
-	SharedRand rand;		//シミュレーションに使用する乱数生成器
+	vector<Fleet> fleet_;			//シミュレーションに使用する艦隊
+	Result result_;					//シミュレーション結果を保存するクラス
+	SharedRand rand;				//シミュレーションに使用する乱数生成器
 	SimulateMode simulate_mode_;	//シミュレーションにおける戦闘モード
+	bitset<kBattleSize> search_result_;	//索敵結果
+	tuple<AirWarStatus, vector<double>> air_war_result_;	//制空状態および触接倍率
+	BattlePosition battle_position_;	//陣形
 	// 各フェーズ
-	bitset<kBattleSize> SearchPhase();
-	tuple<AirWarStatus, vector<double>> AirWarPhase(const bitset<kBattleSize>&);
-	BattlePosition BattlePositionOracle() noexcept;
+	void SearchPhase();
+	void AirWarPhase();
+	void BattlePositionOracle() noexcept;
+	void TorpedoPhase(const TorpedoTurn&);
+	void FirePhase(const FireTurn&);
+	void NightPhase();
 	// 計算用メソッド(内部)
 	//制空状態を判断する
-	AirWarStatus JudgeAirWarStatus(const bitset<kBattleSize>&, const vector<int>&);
+	AirWarStatus JudgeAirWarStatus(const vector<int>&);
 	//与えるダメージ量を計算する
 	int CalcDamage(
 		const BattlePhase&, const int&, const KammusuIndex&, KammusuIndex&, const int&,
@@ -37,6 +49,8 @@ class Simulator {
 	void ProtectOracle(const int&, KammusuIndex&);
 	//命中率を計算する
 	double CalcHitProb(const Formation&, const Formation&, const Kammusu&, const Kammusu&, const BattlePhase&) const noexcept;
+	// 戦闘終了を判断する
+	bool IsBattleTerminate() const noexcept;
 public:
 	// コンストラクタ
 	Simulator(){}
