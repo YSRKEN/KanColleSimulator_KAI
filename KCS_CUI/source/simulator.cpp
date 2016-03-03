@@ -23,6 +23,9 @@ Result Simulator::Calc() {
 	cout << result_.Put() << endl;
 #endif
 
+	// 今のところ、敵が連合艦隊である場合には対応していない
+	if (fleet_[kEnemySide].GetFleetType() == kFleetTypeCombined) return result_;
+
 	// 索敵フェイズ
 	SearchPhase();
 #ifdef KCS_DEBUG_MODE
@@ -35,6 +38,7 @@ Result Simulator::Calc() {
 	if (simulate_mode_ != kSimulateModeN) {
 		// 航空戦フェイズ
 		AirWarPhase();
+		if (IsBattleTerminate()) goto Exit;
 #ifdef KCS_DEBUG_MODE
 		cout << "制空状態・自艦隊倍率・敵艦隊倍率：\n";
 		cout << get<0>(air_war_result_) << " " << get<1>(air_war_result_)[0] << " " << get<1>(air_war_result_)[1] << "\n" << endl;
@@ -48,19 +52,27 @@ Result Simulator::Calc() {
 
 		// 支援艦隊攻撃フェイズ(未実装)
 
-		// 開幕雷撃フェイズ
-		FirstTorpedoPhase();
+		// 開幕雷撃フェイズ(連合艦隊では第2艦隊のみ)
+		TorpedoPhase(kTorpedoFirst);
+		if (IsBattleTerminate()) goto Exit;
 
-		// 砲撃戦フェイズ(1巡目)
+		// 砲撃戦フェイズ(1巡目)　水上打撃なら第1艦隊・空母機動と輸送護衛では第2艦隊
+		FirePhase(kFireFirst);
+		if (IsBattleTerminate()) goto Exit;
 
-		// 砲撃戦フェイズ(2巡目)
+		// 砲撃戦フェイズ(2巡目)　水上打撃なら第2艦隊・空母機動と輸送護衛では第1艦隊
+		FirePhase(kFireSecond);
+		if (IsBattleTerminate()) goto Exit;
 
-		// 雷撃フェイズ
+		// 雷撃フェイズ(連合艦隊では第2艦隊のみ)
+		TorpedoPhase(kTorpedoSecond);
+		if (IsBattleTerminate()) goto Exit;
 	}
-	// 夜戦フェイズ
-
+	// 夜戦フェイズ(連合艦隊では第2艦隊のみ)
+	NightPhase();
 
 	// 結果を出力する
+Exit:
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
 		for (auto fi = 0u; fi < fleet_[bi].FleetSize(); ++fi) {
 			for (auto ui = 0u; ui < fleet_[bi].UnitSize(fi); ++ui){
@@ -300,7 +312,17 @@ void Simulator::BattlePositionOracle() noexcept {
 }
 
 // 開幕雷撃フェイズ
-void Simulator::FirstTorpedoPhase() {
+void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
+
+}
+
+// 砲撃戦フェイズ
+void Simulator::FirePhase(const FireTurn &fire_turn) {
+
+}
+
+// 夜戦フェイズ
+void Simulator::NightPhase() {
 
 }
 
@@ -600,4 +622,14 @@ double Simulator::CalcHitProb(
 	break;
 	}
 	return 0.0;
+}
+
+// 戦闘終了を判断する
+bool Simulator::IsBattleTerminate() const noexcept {
+	for (auto &it_u : fleet_[kEnemySide].GetUnit()) {
+		for (auto &it_k : it_u) {
+			if (it_k.Status() != kStatusLost) return false;
+		}
+	}
+	return true;
 }
