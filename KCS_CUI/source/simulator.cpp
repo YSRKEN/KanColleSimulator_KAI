@@ -313,6 +313,10 @@ void Simulator::BattlePositionOracle() noexcept {
 
 // 開幕雷撃フェイズ
 void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
+	// ダメージ計算
+	vector<vector<int>> all_damage(kBattleSize, vector<int>(kMaxUnitSize, 0));
+
+	// ダメージ処理
 
 }
 
