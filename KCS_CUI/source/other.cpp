@@ -63,11 +63,11 @@ namespace detail {
 }
 detail::ToHash_helper ToHash() noexcept { return{}; }
 // 装備DBのコンストラクタ
-WeaponDB::WeaponDB() {
+WeaponDB::WeaponDB(const char* csv_name) {
 	// ファイルを開く
 	std::locale::global(std::locale("japanese"));
-	ifstream ifs("slotitems.csv");
-	FILE_THROW_WITH_MESSAGE_IF(!ifs.is_open(), "slotitems.csvが正常に読み込めませんでした.")
+	ifstream ifs(csv_name);
+	FILE_THROW_WITH_MESSAGE_IF(!ifs.is_open(), string(csv_name) + "が正常に読み込めませんでした.")
 	// 1行づつ読み込んでいく
 	string temp_str;
 	getline(ifs, temp_str);
@@ -125,11 +125,11 @@ namespace detail{
 	}
 }
 // 艦娘DBのコンストラクタ
-KammusuDB::KammusuDB() {
+KammusuDB::KammusuDB(const char* csv_name) {
 	// ファイルを開く
 	std::locale::global(std::locale("japanese"));
-	ifstream ifs("ships.csv");
-	FILE_THROW_WITH_MESSAGE_IF(!ifs.is_open(), "ships.csvが正常に読み込めませんでした.")
+	ifstream ifs(csv_name);
+	FILE_THROW_WITH_MESSAGE_IF(!ifs.is_open(), string(csv_name) + "が正常に読み込めませんでした.")
 	// 1行づつ読み込んでいく
 	string temp_str;
 	getline(ifs, temp_str);

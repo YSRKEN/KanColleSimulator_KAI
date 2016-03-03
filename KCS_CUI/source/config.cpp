@@ -159,8 +159,9 @@ bool Config::GetJsonPrettifyFlg() const noexcept { return this->pimpl->e.json_pr
 
 std::ostream & operator<<(std::ostream & os, const Config & conf)
 {
-	os << "入力ファイル名：" << endl;
-	os << "陣形指定：" << endl;
+	os 
+		<< "入力ファイル名：" << conf.GetInputFilename(0) << ", " << conf.GetInputFilename(1) << endl
+		<< "陣形指定：" << endl;
 	for (auto &it : conf.pimpl->e.formation_) {
 		os << "　" << char_cvt::utf_16_to_shift_jis(kFormationStr[it]) << endl;
 	}
@@ -173,8 +174,9 @@ std::ostream & operator<<(std::ostream & os, const Config & conf)
 
 std::wostream & operator<<(std::wostream & os, const Config & conf)
 {
-	os << L"入力ファイル名：" << endl;
-	os << L"陣形指定：" << endl;
+	os 
+		<< L"入力ファイル名：" << conf.GetInputFilenameW(0) << L", " << conf.GetInputFilenameW(1) << endl
+		<< L"陣形指定：" << endl;
 	for (auto &it : conf.pimpl->e.formation_) {
 		os << L"　" << kFormationStr[it] << endl;
 	}

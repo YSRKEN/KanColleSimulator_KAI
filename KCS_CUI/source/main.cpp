@@ -6,6 +6,7 @@
 #include "fleet.hpp"
 #include "result.hpp"
 #include "simulator.hpp"
+#include "random.hpp"
 #define KCS_MEASURE_PROCESS_TIME
 int main(int argc, char *argv[]) {
 	try {
@@ -13,8 +14,8 @@ int main(int argc, char *argv[]) {
 		Config config(argc, argv);
 		config.Put();
 		// データベースを読み込む
-		WeaponDB weapon_db;
-		KammusuDB kammusu_db;
+		WeaponDB weapon_db("..\\slotitems.csv");
+		KammusuDB kammusu_db("..\\ships.csv");
 		// ファイルから艦隊を読み込む
 		vector<Fleet> fleet(kBattleSize);
 		for (auto i = 0; i < kBattleSize; ++i) {
@@ -22,15 +23,14 @@ int main(int argc, char *argv[]) {
 			fleet[i].Put();
 		}
 		// シミュレータを構築し、並列演算を行う
-		std::random_device rd;
-		auto seed = rd();
+		auto seed = make_SharedRand().generate_n<unsigned int>(config.GetThreads());
 		vector<Result> result_db(config.GetTimes());
 #if defined(KCS_MEASURE_PROCESS_TIME)
 		const auto process_begin_time = std::chrono::high_resolution_clock::now();
 #endif
 		#pragma omp parallel for num_threads(config.GetThreads())
 		for (int n = 0; n < config.GetTimes(); ++n) {
-			Simulator simulator(fleet, seed + n, kSimulateModeDN);
+			Simulator simulator(fleet, seed[n], kSimulateModeDN);
 			result_db[n] = simulator.Calc();
 		}
 #if defined(KCS_MEASURE_PROCESS_TIME)
