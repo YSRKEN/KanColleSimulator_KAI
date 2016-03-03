@@ -150,13 +150,11 @@ void Simulator::AirWarPhase() {
 		break;
 	}
 	for (auto i = 0; i < kBattleSize; ++i) {
-		for (auto &it_u : fleet_[i].GetUnit()) {
-			for (auto &it_k : it_u) {
-				for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
-					auto &it_w = it_k.GetWeapon()[wi];
-					if (!it_w.IsAirFight()) continue;
-					it_k.GetAir()[wi] -= int(it_k.GetAir()[wi] * killed_airs_per[i]);
-				}
+		for (auto &it_k : fleet_[i].FirstUnit()) {
+			for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
+				auto &it_w = it_k.GetWeapon()[wi];
+				if (!it_w.IsAirFight()) continue;
+				it_k.GetAir()[wi] -= int(it_k.GetAir()[wi] * killed_airs_per[i]);
 			}
 		}
 	}
@@ -172,12 +170,12 @@ void Simulator::AirWarPhase() {
 		//                       0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
 		const int aac_bonus_add1[] = { 0,7,6,4,6,4,4,3,4,2,8, 6, 3, 0, 4, 3, 4, 2, 2};
 		auto other_side = kBattleSize - i - 1;	//自分にとっての敵、敵にとっての自分
-		for (auto &it_k : fleet_[other_side].GetUnit()[0]) {
+		for (auto &it_k : fleet_[other_side].FirstUnit()) {
 			for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
 				auto &it_w = it_k.GetWeapon()[wi];
 				if (!it_w.IsAirFight()) continue;
-				Kammusu &intercept_kammusu = fleet_[i].GetUnit()[0][fleet_[i].RandomKammusu()];	//迎撃艦
-				auto all_anti_air = intercept_kammusu.AllAntiAir();									//加重対空値
+				Kammusu &intercept_kammusu = fleet_[i].FirstUnit()[fleet_[i].RandomKammusu()];	//迎撃艦
+				auto all_anti_air = intercept_kammusu.AllAntiAir();								//加重対空値
 				int killed_airs = 0;
 				//固定撃墜
 				if (rand.RandBool()) {
@@ -221,7 +219,7 @@ void Simulator::AirWarPhase() {
 	vector<vector<int>> all_damage(kBattleSize, vector<int>(kMaxUnitSize, 0));
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
 		auto other_side = kBattleSize - bi - 1;
-		auto &friend_unit = fleet_[bi].GetUnit()[0];
+		auto &friend_unit = fleet_[bi].FirstUnit();
 		for (auto ui = 0u; ui < friend_unit.size(); ++ui) {
 			auto &friend_kammusu = friend_unit[ui];
 			auto &friend_weapon = friend_kammusu.GetWeapon();
@@ -256,7 +254,7 @@ void Simulator::AirWarPhase() {
 	}
 	// ダメージ処理
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
-		auto &friend_unit = fleet_[bi].GetUnit()[0];
+		auto &friend_unit = fleet_[bi].FirstUnit();
 		for (auto ui = 0u; ui < friend_unit.size(); ++ui) {
 			friend_unit[ui].SetRandGenerator(this->rand);
 			friend_unit[ui].MinusHP(all_damage[bi][ui], (bi == kFriendSide));
@@ -266,19 +264,17 @@ void Simulator::AirWarPhase() {
 #ifdef _DEBUG
 	cout << "残機：" << endl;
 	for (auto i = 0; i < kBattleSize; ++i) {
-		for (auto &it_u : fleet_[i].GetUnit()) {
-			for (auto &it_k : it_u) {
-				for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
-					cout << it_k.GetAir()[wi] << " ";
-				}
-				cout << endl;
+		for (auto &it_k : fleet_[i].FirstUnit()) {
+			for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
+				cout << it_k.GetAir()[wi] << " ";
 			}
+			cout << endl;
 		}
 	}
 	cout << endl;
 	cout << "受けたダメージ：" << endl;
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
-		auto &friend_unit = fleet_[bi].GetUnit()[0];
+		auto &friend_unit = fleet_[bi].FirstUnit();
 		for (auto ui = 0u; ui < friend_unit.size(); ++ui) {
 			cout << all_damage[bi][ui] << ",";
 		}
@@ -315,7 +311,14 @@ void Simulator::BattlePositionOracle() noexcept {
 void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 	// ダメージ計算
 	vector<vector<int>> all_damage(kBattleSize, vector<int>(kMaxUnitSize, 0));
+	for (auto bi = 0; bi < kBattleSize; ++bi) {
+		auto other_side = kBattleSize - bi - 1;
+		auto &friend_unit = fleet_[bi].SecondUnit();
+		for (auto ui = 0u; ui < friend_unit.size(); ++ui) {
+			auto &friend_kammusu = friend_unit[ui];
 
+		}
+	}
 	// ダメージ処理
 
 }
