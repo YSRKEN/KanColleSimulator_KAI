@@ -637,7 +637,11 @@ double Simulator::CalcHitProb(
 			hit_value += 0.000540 * hunter_kammusu.GetTorpedo();
 			hit_value += 0.009017 * hunter_kammusu.AllHit();
 			auto &hunter_weapon = hunter_kammusu.GetWeapon();
-			for (auto i : {0, 1}) if (hunter_weapon[i].GetWeaponClass() == kWeaponClassTorpedo) hit_value += 0.02014 * sqrt(hunter_weapon[i].GetLevel());
+			for (auto &it_w : hunter_weapon) {
+				if (it_w.GetWeaponClass() == kWeaponClassTorpedo) {
+					hit_value += 0.02014 * sqrt(it_w.GetLevel());
+				}
+			}
 			hit_value += 0.001463 * hunter_kammusu.GetLuck();
 			//回避側
 			double a;

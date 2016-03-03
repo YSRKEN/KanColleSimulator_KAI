@@ -32,6 +32,7 @@ int main(int argc, char *argv[]) {
 		for (int n = 0; n < config.GetTimes(); ++n) {
 			Simulator simulator(fleet, seed + n, kSimulateModeDN);
 			result_db[n] = simulator.Calc();
+			cout << "hoge\n";
 		}
 #if defined(KCS_MEASURE_PROCESS_TIME)
 		const auto process_end_time = std::chrono::high_resolution_clock::now();
