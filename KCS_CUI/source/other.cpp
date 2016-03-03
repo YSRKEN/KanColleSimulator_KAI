@@ -224,9 +224,9 @@ ResultStat::ResultStat(const vector<Result> &result_db, const vector<vector<Kamm
 	damage_max_.resize(kBattleSize, vector<vector<int>>(kMaxFleetSize, vector<int>(kMaxUnitSize, -1)));
 
 	hp_ave_.resize(kBattleSize, vector<vector<double>>(kMaxFleetSize, vector<double>(kMaxUnitSize)));
-	hp_sd_.resize(kBattleSize, vector<vector<double>>(kMaxFleetSize, vector<double>(kMaxUnitSize)));
+	hp_sd_.resize(kBattleSize, vector<vector<double>>(kMaxFleetSize, vector<double>(kMaxUnitSize, 0.0)));
 	damage_ave_.resize(kBattleSize, vector<vector<double>>(kMaxFleetSize, vector<double>(kMaxUnitSize)));
-	damage_sd_.resize(kBattleSize, vector<vector<double>>(kMaxFleetSize, vector<double>(kMaxUnitSize)));
+	damage_sd_.resize(kBattleSize, vector<vector<double>>(kMaxFleetSize, vector<double>(kMaxUnitSize, 0.0)));
 
 	mvp_count_.resize(kMaxFleetSize, vector<int>(kMaxUnitSize, 0));
 	heavy_damage_count_.resize(kMaxFleetSize, vector<int>(kMaxUnitSize, 0));
@@ -305,8 +305,10 @@ void ResultStat::Put(const vector<Fleet> &fleet) const noexcept {
 			wcout << L"　第" << (fi + 1) << L"艦隊：" << endl;
 			for (auto ui = 0u; ui < unit[fi].size(); ++ui) {
 				wcout << L"　　" << unit[fi][ui].GetNameLv() << endl;
-				wcout << L"　　　残耐久：" << L"[" << hp_min_[bi][fi][ui] << L"～" << hp_ave_[bi][fi][ui] << L"～" << hp_max_[bi][fi][ui] << L"] σ＝" << (all_count_ > 1, hp_sd_[bi][fi][ui], L"―") << endl;
-				wcout << L"　　　与ダメージ：" << L"[" << damage_min_[bi][fi][ui] << L"～" << damage_ave_[bi][fi][ui] << L"～" << damage_max_[bi][fi][ui] << L"] σ＝" << (all_count_ > 1, damage_sd_[bi][fi][ui], L"―") << endl;
+				wcout << L"　　　残耐久：" << L"[" << hp_min_[bi][fi][ui] << L"～" << hp_ave_[bi][fi][ui] << L"～" << hp_max_[bi][fi][ui] << L"] σ＝";
+				if (all_count_ > 1) wcout << hp_sd_[bi][fi][ui] << endl; else wcout << L"―" << endl;
+				wcout << L"　　　与ダメージ：" << L"[" << damage_min_[bi][fi][ui] << L"～" << damage_ave_[bi][fi][ui] << L"～" << damage_max_[bi][fi][ui] << L"] σ＝";
+				if (all_count_ > 1) wcout << damage_sd_[bi][fi][ui] << endl; else wcout << L"―" << endl;
 				if (bi == 0) {
 					wcout << L"　　　MVP率：" << (100.0 * mvp_count_[fi][ui] / all_count_) << L"％ ";
 					wcout << L"大破率：" << (100.0 * heavy_damage_count_[fi][ui] / all_count_) << L"％" << endl;
@@ -337,7 +339,7 @@ void ResultStat::Put(const vector<Fleet> &fleet, const string &file_name, const 
 					o4["min"] = picojson::value(1.0 * hp_min_[bi][fi][ui]);
 					o4["ave"] = picojson::value(hp_ave_[bi][fi][ui]);
 					o4["max"] = picojson::value(1.0 * hp_max_[bi][fi][ui]);
-					o4["sd"] = picojson::value((all_count_ > 1, 1.0 * hp_sd_[bi][fi][ui], -1.0));
+					o4["sd"] = picojson::value((all_count_ > 1 ? 1.0 * hp_sd_[bi][fi][ui] : -1.0));
 					o3["hp"] = picojson::value(o4);
 				}
 				{
@@ -345,7 +347,7 @@ void ResultStat::Put(const vector<Fleet> &fleet, const string &file_name, const 
 					o4["min"] = picojson::value(1.0 * damage_min_[bi][fi][ui]);
 					o4["ave"] = picojson::value(damage_ave_[bi][fi][ui]);
 					o4["max"] = picojson::value(1.0 * damage_max_[bi][fi][ui]);
-					o4["sd"] = picojson::value((all_count_ > 1, 1.0 * damage_sd_[bi][fi][ui], -1.0));
+					o4["sd"] = picojson::value((all_count_ > 1 ? 1.0 * damage_sd_[bi][fi][ui] : -1.0));
 					o3["damage"] = picojson::value(o4);
 				}
 				if (bi == 0) {
