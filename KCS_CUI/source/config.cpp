@@ -11,6 +11,7 @@ Config::Config(int argc, char *argv[]) {
 	fill(formation_.begin(), formation_.end(), kFormationTrail);
 	times_ = 1;
 	threads_ = 1;
+	json_prettify_flg_ = true;
 	// オプションの文字列を読み込む
 	for (auto i = 1; i < argc; ++i) {
 		// 一旦stringに落としこむ
@@ -49,6 +50,14 @@ Config::Config(int argc, char *argv[]) {
 			CONFIG_THROW_WITH_MESSAGE_IF( argc - i <= 1, "コマンドライン引数が異常です." )
 			output_filename_ = argv[i + 1];
 			++i;
+		}
+		else if (temp == "--no-result-json-prettify") {
+			// 出力ファイルを整形するかのフラグ
+			json_prettify_flg_ = false;
+		}
+		else if (temp == "--result-json-prettify") {
+			// 出力ファイルを整形するかのフラグ
+			json_prettify_flg_ = true;
 		}
 	}
 	// 入力ファイル名は必須であることに注意する

@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
 		else {
 			// ファイル出力モード
 			result_stat.Put(fleet);	//一応標準出力にも出すようにする
-			result_stat.Put(fleet, config.GetOutputFilename());
+			result_stat.Put(fleet, config.GetOutputFilename(), config.GetJsonPrettifyFlg());
 		}
 	}
 	catch (const KCS_except::config_error& er){
