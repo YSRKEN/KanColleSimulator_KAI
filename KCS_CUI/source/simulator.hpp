@@ -18,17 +18,21 @@ class Fleet;
 #include "result.hpp"
 #include "random.hpp"
 class Simulator {
-	vector<Fleet> fleet_;	//シミュレーションに使用する艦隊
-	Result result_;			//シミュレーション結果を保存するクラス
-	SharedRand rand;		//シミュレーションに使用する乱数生成器
+	vector<Fleet> fleet_;			//シミュレーションに使用する艦隊
+	Result result_;					//シミュレーション結果を保存するクラス
+	SharedRand rand;				//シミュレーションに使用する乱数生成器
 	SimulateMode simulate_mode_;	//シミュレーションにおける戦闘モード
+	bitset<kBattleSize> search_result_;	//索敵結果
+	tuple<AirWarStatus, vector<double>> air_war_result_;	//制空状態および触接倍率
+	BattlePosition battle_position_;	//陣形
 	// 各フェーズ
-	bitset<kBattleSize> SearchPhase();
-	tuple<AirWarStatus, vector<double>> AirWarPhase(const bitset<kBattleSize>&);
-	BattlePosition BattlePositionOracle() noexcept;
+	void SearchPhase();
+	void AirWarPhase();
+	void BattlePositionOracle() noexcept;
+	void FirstTorpedoPhase();
 	// 計算用メソッド(内部)
 	//制空状態を判断する
-	AirWarStatus JudgeAirWarStatus(const bitset<kBattleSize>&, const vector<int>&);
+	AirWarStatus JudgeAirWarStatus(const vector<int>&);
 	//与えるダメージ量を計算する
 	int CalcDamage(
 		const BattlePhase&, const int&, const KammusuIndex&, KammusuIndex&, const int&,
