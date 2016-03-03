@@ -12,6 +12,12 @@ enum BattlePosition{ kBattlePositionSame, kBattlePositionReverse, kBattlePositio
 // 戦闘モード(昼戦＋夜戦、昼戦のみ、開幕夜戦)
 enum SimulateMode { kSimulateModeDN, kSimulateModeD, kSimulateModeN };
 
+// 雷撃戦の巡目(開幕および雷撃戦)
+enum TorpedoTurn { kTorpedoFirst, kTorpedoSecond };
+
+// 砲撃戦の巡目(1巡目および2巡目)
+enum FireTurn { kFireFirst , kFireSecond };
+
 typedef vector<int> KammusuIndex;
 
 class Fleet;
@@ -29,7 +35,9 @@ class Simulator {
 	void SearchPhase();
 	void AirWarPhase();
 	void BattlePositionOracle() noexcept;
-	void FirstTorpedoPhase();
+	void TorpedoPhase(const TorpedoTurn&);
+	void FirePhase(const FireTurn&);
+	void NightPhase();
 	// 計算用メソッド(内部)
 	//制空状態を判断する
 	AirWarStatus JudgeAirWarStatus(const vector<int>&);
@@ -41,6 +49,8 @@ class Simulator {
 	void ProtectOracle(const int&, KammusuIndex&);
 	//命中率を計算する
 	double CalcHitProb(const Formation&, const Formation&, const Kammusu&, const Kammusu&, const BattlePhase&) const noexcept;
+	// 戦闘終了を判断する
+	bool IsBattleTerminate() const noexcept;
 public:
 	// コンストラクタ
 	Simulator(){}
