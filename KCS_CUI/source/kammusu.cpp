@@ -120,7 +120,7 @@ int Kammusu::AacType() const noexcept {
 		}
 	}
 	// まず、固有カットインを判定する
-	if (Include(L"秋月") || Include(L"照月") || Include(L"初月")) {
+	if (IncludeAnyOf({ L"秋月", L"照月", L"初月" })) {
 		/* 秋月型……ご存知防空駆逐艦。対空カットイン無しでも圧倒的な対空値により艦載機を殲滅する。
 		* 二次創作界隈ではまさma氏が有名であるが、秋月型がこれ以上増えると投稿時のタイトルが長くなりすぎることから
 		* 嬉しい悲鳴を上げていたとか。なお史実上では後9隻居るが、有名なのは涼月などだろう……  */
@@ -331,7 +331,7 @@ double Kammusu::FitGunHitPlus() const noexcept {
 	}
 	// 種類により減衰量を決定する
 	//伊勢型および扶桑型
-	if (Include(L"伊勢") || Include(L"日向") || Include(L"扶桑") || Include(L"山城")) {
+	if (IncludeAnyOf({ L"伊勢", L"日向", L"扶桑", L"山城" })) {
 			if(Include(L"改")) {
 				// 航戦
 				hit_plus = fit[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];
@@ -339,28 +339,28 @@ double Kammusu::FitGunHitPlus() const noexcept {
 			else {
 				// 戦艦
 				hit_plus = fit[sum_356] + fit[sum_38] + fit[sum_381] + unfit_large[sum_46] + unfit_small[sum_46X];
-				if (Include(L"扶桑") || Include(L"山城")) {
+				if (IncludeAnyOf({ L"扶桑", L"山城" })) {
 					hit_plus += fit[sum_41];
 				}
 			}
 	}
 	//金剛型およびビスマルク
-	if (Include(L"金剛") || Include(L"比叡") || Include(L"榛名") || Include(L"霧島") || Include(L"Bismarck")) {
+	if (IncludeAnyOf({ L"金剛", L"比叡", L"榛名", L"霧島", L"Bismarck" })) {
 		hit_plus = fit[sum_356] + fit[sum_38] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];
 		if (Include(L"Bismarck")) {
 			hit_plus += unfit_small[sum_381];
 		}
 	}
 	//イタリア艦
-	if (Include(L"Littorio") || Include(L"Italia") || Include(L"Roma")) {
+	if (IncludeAnyOf({ L"Littorio", L"Italia", L"Roma" })) {
 		hit_plus = fit[sum_356] + fit[sum_381] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];
 	}
 	//長門型
-	if (Include(L"長門") || Include(L"陸奥")) {
+	if (IncludeAnyOf({ L"長門", L"陸奥" })) {
 		hit_plus = fit[sum_356] + fit[sum_381] + fit[sum_41] + unfit_small[sum_46] + unfit_small[sum_46X];
 	}
 	//大和型
-	if (Include(L"大和") || Include(L"武蔵")) {
+	if (IncludeAnyOf({ L"大和", L"武蔵" })) {
 		hit_plus = fit[sum_41];
 	}
 	return hit_plus;
