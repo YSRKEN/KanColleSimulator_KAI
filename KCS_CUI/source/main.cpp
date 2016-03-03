@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
 #endif
 		#pragma omp parallel for num_threads(config.GetThreads())
 		for (int n = 0; n < config.GetTimes(); ++n) {
-			Simulator simulator(fleet, seed + n);
+			Simulator simulator(fleet, seed + n, kSimulateModeDN);
 			result_db[n] = simulator.Calc();
 		}
 #if defined(KCS_MEASURE_PROCESS_TIME)
@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
 		else {
 			// ファイル出力モード
 			result_stat.Put(fleet);	//一応標準出力にも出すようにする
-			result_stat.Put(fleet, config.GetOutputFilename());
+			result_stat.Put(fleet, config.GetOutputFilename(), config.GetJsonPrettifyFlg());
 		}
 	}
 	catch (const KCS_except::config_error& er){

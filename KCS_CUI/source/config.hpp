@@ -7,6 +7,7 @@ class Config {
 	int times_;		//試行回数
 	int threads_;	//スレッド数
 	string output_filename_;	//出力ファイル名
+	bool json_prettify_flg_;	//出力ファイルを整形するか
 public:
 	// コンストラクタ
 	Config() {}
@@ -20,6 +21,8 @@ public:
 	int GetTimes() const noexcept { return times_; }
 	int GetThreads() const noexcept { return threads_; }
 	const string& GetOutputFilename() noexcept { return output_filename_; }
+	bool GetJsonPrettifyFlg() const noexcept { return json_prettify_flg_; }
+	//
 	friend std::ostream& operator<<(std::ostream& os, const Config& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Config& conf);
 };

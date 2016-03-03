@@ -40,7 +40,7 @@ public:
 	// 結果を標準出力に出力する
 	void Put(const vector<Fleet>&) const noexcept;
 	// 結果をファイルに出力する
-	void Put(const vector<Fleet>&, const string&) const;
+	void Put(const vector<Fleet>&, const string&, const bool&) const;
 };
 
 // 文字列をデリミタで区切り分割する

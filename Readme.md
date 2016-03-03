@@ -4,7 +4,7 @@
 艦これの戦闘をシミュレートします。
 
 ## 使い方
-`usage: KCS_CUI -i input1.json input2.json [-f formation1 formation2] [-n times] [-t threads] [-o output.json]`
+`usage: KCS_CUI -i input1.json input2.json [-f formation1 formation2] [-n times] [-t threads] [-o output.json] [--result-json-prettify | --no-result-json-prettify]`
 
 - input1.jsonは自艦隊、input2.jsonは敵艦隊かマップのデータ
 - 自艦隊には連合艦隊も許容されるが、敵艦隊やマップ内の艦隊は通常艦隊のみ
@@ -20,6 +20,7 @@
 - threadsは実行スレッド数。略すとシングルスレッドで実行される
 - output.jsonを指定すると、結果を標準出力ではなくJSONに書き出すようになる。  
 また、出力形式も標準出力のような感じ(まとめ表示)ではなく各回についての結果が書き出される
+- --no-result-json-prettifyを指定すると、出力するJSONが整形されないようになる
 
 ## 使用例
 `KCS_CUI -i "sample\fleet sample1.json" "sample\fleet sample2.json" -f 0 1 -n 1`

@@ -316,7 +316,7 @@ void ResultStat::Put(const vector<Fleet> &fleet) const noexcept {
 }
 
 // 結果をJSONファイルに出力する
-void ResultStat::Put(const vector<Fleet> &fleet, const string &file_name) const {
+void ResultStat::Put(const vector<Fleet> &fleet, const string &file_name, const bool &json_prettify_flg) const {
 	ofstream fout(file_name);
 	FILE_THROW_WITH_MESSAGE_IF(!fout.is_open(), "計算結果が正常に保存できませんでした.")
 	picojson::object o;
@@ -356,7 +356,7 @@ void ResultStat::Put(const vector<Fleet> &fleet, const string &file_name) const 
 		}
 		o["b" + to_string(bi + 1)] = picojson::value(o1);
 	}
-	fout << picojson::value(o).serialize(false) << endl;
+	fout << picojson::value(o).serialize(json_prettify_flg) << endl;
 }
 
 // 文字列をデリミタで区切り分割する
