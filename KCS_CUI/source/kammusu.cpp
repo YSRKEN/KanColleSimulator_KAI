@@ -597,18 +597,19 @@ bool Kammusu::IsFireTorpedo(const TorpedoTurn &torpedo_turn) const noexcept {
 		// 鬱陶しいことに艦娘と深海棲艦とでは判定条件が異なるので分けて処理する
 		if (kammusu_flg_) {
 			// 甲標的を積んだ軽巡(事実上阿武隈改二のみ)・潜水系・雷巡・水母は飛ばせる
-			switch (ship_class_) {
+			// (冷静に考えると、甲標的さえ載れば飛ばせるはず……)
+			/*switch (ship_class_) {
 			case kShipClassCL:
 			case kShipClassSS:
 			case kShipClassSSV:
 			case kShipClassCLT:
-			case kShipClassAV:
+			case kShipClassAV:*/
 				for (auto &it_w : weapons_) {
 					if (it_w.GetWeaponClass() == kWeaponClassSpecialSS) return true;
 				}
-			default:
+			/*default:
 				break;
-			}
+			}*/
 			// Lv10以上の潜水艦系は甲標的無しでも飛ばせる
 			if (IsSubmarine() && level_ >= 10) return true;
 		}

@@ -14,8 +14,8 @@ int main(int argc, char *argv[]) {
 		Config config(argc, argv);
 		config.Put();
 		// データベースを読み込む
-		WeaponDB weapon_db("..\\slotitems.csv");
-		KammusuDB kammusu_db("..\\ships.csv");
+		WeaponDB weapon_db("slotitems.csv");
+		KammusuDB kammusu_db("ships.csv");
 		// ファイルから艦隊を読み込む
 		vector<Fleet> fleet(kBattleSize);
 		for (auto i = 0; i < kBattleSize; ++i) {

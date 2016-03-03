@@ -668,8 +668,7 @@ double Simulator::CalcHitProb(
 				evade_value = evade_sum / (evade_sum + a);
 			}
 			//引き算により命中率を決定する(上限あり)
-			double hit_prob = hit_value - evade_value;
-			if (hit_prob > 0.9691) hit_prob = 0.9691 + sqrt(hit_prob - 0.9691);
+			const double hit_prob = std::min(hit_value - evade_value, 0.9691);
 			return hit_prob;
 		}
 	break;
