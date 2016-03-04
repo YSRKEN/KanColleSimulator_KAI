@@ -109,7 +109,7 @@ void Fleet::LoadJson(std::istream & file, const WeaponDB & weapon_db, const Kamm
 				if (wi >= temp_k.GetSlots()) break;
 			}
 			// リストに加える
-			unit_[fi].push_back(temp_k);
+			unit_[fi].push_back(move(temp_k));
 		}
 		++fi;
 	}
@@ -326,33 +326,33 @@ int Fleet::RandomKammusu() {
 
 // 生存する水上艦から艦娘をランダムに指定する
 // ただしhas_bombがtrueの際は陸上型棲姫を避けるようになる
-vector<int> Fleet::RandomKammusuNonSS(const bool &has_bomb, const TargetType &target_type) {
+tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool &has_bomb, const TargetType &target_type) {
 	// 攻撃する艦隊の対象を選択する
-	vector<int> list;
+	vector<size_t> list;
 	switch (target_type) {
 	case kTargetTypeFirst:
 		list = { 0 };
 		break;
 	case kTargetTypeSecond:
-		list = { int(unit_.size()) - 1 };
+		list = { unit_.size() - 1 };
 		break;
 	case kTargetTypeAll:
-		list = { 0, int(unit_.size()) - 1 };
+		list = { 0, unit_.size() - 1 };
 		break;
 	}
 	//生存する水上艦をリストアップ
-	vector<vector<int>> alived_list;
+	vector<KammusuIndex> alived_list;
 	for (auto &fi : list) {
-		for (auto ui = 0u; ui < FirstUnit().size(); ++ui) {
+		for (auto ui = 0u; ui < GetUnit()[fi].size(); ++ui) {
 			auto &it_k = GetUnit()[fi][ui];
 			if (it_k.Status() == kStatusLost) continue;
 			if (it_k.IsSubmarine()) continue;
 			if (has_bomb && it_k.GetShipClass() == kShipClassAF) continue;
-			alived_list.push_back({ fi, int(ui) });
+			alived_list.push_back({ fi, ui });
 		}
 	}
-	if (alived_list.size() == 0) return { -1 , -1 };
-	return alived_list[rand_.RandInt(alived_list.size())];
+	if (alived_list.size() == 0) return tuple<bool, KammusuIndex>(false, { 0 , 0 });
+	return tuple<bool, KammusuIndex>(true, alived_list[rand_.RandInt(alived_list.size())]);
 }
 template<typename CondFunc>
 bool any_of(const std::vector<std::vector<Kammusu>>& unit, CondFunc cond) noexcept {

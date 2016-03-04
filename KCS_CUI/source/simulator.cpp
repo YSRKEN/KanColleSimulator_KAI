@@ -38,7 +38,7 @@ Result Simulator::Calc() {
 	if (simulate_mode_ != kSimulateModeN) {
 		// 航空戦フェイズ(連合艦隊では第一艦隊のみ関わるが、第二艦隊も開幕爆撃の被害対象になる)
 		AirWarPhase();
-		if (IsBattleTerminate()) goto Exit;
+		if (IsBattleTerminate()) goto SimulatorCalcExit;
 #ifdef _DEBUG
 		cout << "制空状態・自艦隊倍率・敵艦隊倍率：\n";
 		cout << get<0>(air_war_result_) << " " << get<1>(air_war_result_)[0] << " " << get<1>(air_war_result_)[1] << "\n" << endl;
@@ -54,47 +54,47 @@ Result Simulator::Calc() {
 
 		// 開幕雷撃フェイズ(連合艦隊では第2艦隊のみ)
 		TorpedoPhase(kTorpedoFirst);
-		if (IsBattleTerminate()) goto Exit;
+		if (IsBattleTerminate()) goto SimulatorCalcExit;
 
 		// 砲撃戦フェイズ
 		switch (fleet_[kFriendSide].GetFleetType()) {
 		case kFleetTypeNormal:
 			// 通常艦隊：1巡目→2巡目
 			FirePhase(kFireFirst);
-			if (IsBattleTerminate()) goto Exit;
+			if (IsBattleTerminate()) goto SimulatorCalcExit;
 			FirePhase(kFireSecond);
-			if (IsBattleTerminate()) goto Exit;
+			if (IsBattleTerminate()) goto SimulatorCalcExit;
 			break;
 		case kFleetTypeCombinedAir:
 		case kFleetTypeCombinedDrum:
 			// 空母機動・輸送護衛：第2艦隊→第1艦隊1巡目→第1艦隊2巡目
 			FirePhase(kFireFirst);
-			if (IsBattleTerminate()) goto Exit;
+			if (IsBattleTerminate()) goto SimulatorCalcExit;
 			FirePhase(kFireFirst);
-			if (IsBattleTerminate()) goto Exit;
+			if (IsBattleTerminate()) goto SimulatorCalcExit;
 			FirePhase(kFireSecond);
-			if (IsBattleTerminate()) goto Exit;
+			if (IsBattleTerminate()) goto SimulatorCalcExit;
 			break;
 		case kFleetTypeCombinedGun:
 			// 水上打撃：第1艦隊1巡目→第1艦隊2巡目→第2艦隊
 			FirePhase(kFireFirst);
-			if (IsBattleTerminate()) goto Exit;
+			if (IsBattleTerminate()) goto SimulatorCalcExit;
 			FirePhase(kFireSecond);
-			if (IsBattleTerminate()) goto Exit;
+			if (IsBattleTerminate()) goto SimulatorCalcExit;
 			FirePhase(kFireFirst);
-			if (IsBattleTerminate()) goto Exit;
+			if (IsBattleTerminate()) goto SimulatorCalcExit;
 			break;
 		}
 
 		// 雷撃フェイズ(連合艦隊では第2艦隊のみ)
 		TorpedoPhase(kTorpedoSecond);
-		if (IsBattleTerminate()) goto Exit;
+		if (IsBattleTerminate()) goto SimulatorCalcExit;
 	}
 	// 夜戦フェイズ(連合艦隊では第2艦隊のみ)
 	NightPhase();
 
 	// 終了処理
-Exit:
+SimulatorCalcExit:
 	// 燃料・弾薬を減少させる
 	for (auto &it_u : fleet_[kFriendSide].GetUnit()) {
 		for (auto &it_k : it_u) {
@@ -257,12 +257,13 @@ void Simulator::AirWarPhase() {
 			// 既に沈んでいる場合は攻撃できない
 			if (friend_kammusu.Status() == kStatusLost) continue;
 			// 敵に攻撃できない場合は次の艦娘にバトンタッチ
-			if (fleet_[other_side].RandomKammusuNonSS(friend_kammusu.HasAirBomb(), kTargetTypeAll)[0] < 0) continue;
+			auto has_attacker = fleet_[other_side].RandomKammusuNonSS(friend_kammusu.HasAirBomb(), kTargetTypeAll);
+			if (!get<0>(has_attacker)) continue;
 			// そうでない場合は、各スロットに対して攻撃対象を選択する
 			for (auto wi = 0; wi < friend_kammusu.GetSlots(); ++wi) {
 				if (friend_kammusu.GetAir()[wi] == 0 || !friend_weapon[wi].IsAirBomb()) continue;
 				// 爆撃する対象を決定する(各スロット毎に、ランダムに対象を選択しなければならない)
-				auto target = fleet_[other_side].RandomKammusuNonSS(friend_kammusu.HasAirBomb(), kTargetTypeAll);
+				auto target = get<1>(fleet_[other_side].RandomKammusuNonSS(friend_kammusu.HasAirBomb(), kTargetTypeAll));
 				// 基礎攻撃力を算出する
 				int base_attack;
 				switch (friend_weapon[wi].GetWeaponClass()) {
@@ -282,7 +283,7 @@ void Simulator::AirWarPhase() {
 				}
 				// 与えるダメージを計算する
 				KammusuIndex enemy_index = target;
-				auto damage = CalcDamage(kBattlePhaseAir, bi, { 0, int(ui) }, enemy_index, base_attack, all_attack_plus, kBattlePositionSame, false, 1.0);
+				auto damage = CalcDamage(kBattlePhaseAir, bi, { 0, ui }, enemy_index, base_attack, all_attack_plus, kBattlePositionSame, false, 1.0);
 				result_.AddDamage(bi, 0, ui, damage);
 				all_damage[other_side][enemy_index[1]] += damage;
 			}
@@ -358,12 +359,12 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 			if (friend_kammusu.Status() == kStatusLost) continue;
 			// 敵に攻撃できない場合は次の艦娘にバトンタッチ
 			auto target = fleet_[other_side].RandomKammusuNonSS(true, kTargetTypeSecond);
-			if(target[0] < 0) continue;
+			if(!get<0>(target)) continue;
 			// 基礎攻撃力を算出する
 			int base_attack = friend_kammusu.AllTorpedo(true) + 5;
 			// 与えるダメージを計算する
-			KammusuIndex enemy_index = target;
-			auto damage = CalcDamage((torpedo_turn == kTorpedoFirst ? kBattlePhaseFirstTorpedo : kBattlePhaseTorpedo), bi, { 0, int(ui) }, enemy_index, base_attack, false, 1.0);
+			KammusuIndex enemy_index = get<1>(target);
+			auto damage = CalcDamage((torpedo_turn == kTorpedoFirst ? kBattlePhaseFirstTorpedo : kBattlePhaseTorpedo), bi, { 0, ui }, enemy_index, base_attack, false, 1.0);
 			result_.AddDamage(bi, 0, ui, damage);
 			all_damage[other_side][enemy_index[1]] += damage;
 		}
