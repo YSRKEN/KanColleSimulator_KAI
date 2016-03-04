@@ -471,6 +471,31 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 			int base_attack = 0;
 			bool special_attack_flg = false;
 			double multiple = 1.0;
+			switch (fire_type) {
+			case kDayFireAir:	//空撃
+				// 陸上型考慮に注意
+				base_attack = 5;	//仮置き
+				break;
+			case kDayFireChage:	//爆雷攻撃
+				base_attack = 5;	//仮置き
+				break;
+			case kDayFireGun:	//砲撃
+				// 陸上型考慮に注意
+				base_attack = 5;	//仮置き
+				// 弾着観測射撃補正
+				//発動可能な弾着の種類を判断する
+
+				//索敵に成功していないとダメな上、大破状態でも使えない
+				if (!search_result_[bi] || hunter_kammusu.Status() >= kStatusHeavyDamage) break;
+				//航空優勢以上でないと使えない
+				if (bi == kFriendSide && std::get<0>(air_war_result_) > kAirWarStatusGood) break;
+				if (bi == other_side  && std::get<0>(air_war_result_) < kAirWarStatusBad)  break;
+				//弾着観測射撃は確率的に発生する
+
+				//弾着観測射撃による補正
+
+				break;
+			}
 			// 与えるダメージを計算し、処理を行う
 			auto damage = CalcDamage(kBattlePhaseGun, bi, friend_index, enemy_index, base_attack, special_attack_flg, multiple);
 			result_.AddDamage(bi, friend_index.fleet_no, friend_index.fleet_i, damage);
