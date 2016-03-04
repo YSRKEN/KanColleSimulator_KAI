@@ -43,6 +43,10 @@ constexpr int kFriendSide = 0, kEnemySide = 1;	//味方および敵陣営の番�
 struct KammusuIndex {
 	std::size_t fleet_no;
 	std::size_t fleet_i;
+	KammusuIndex(const size_t no, const size_t i) noexcept{
+		fleet_no = no;
+		fleet_i = i;
+	}
 };
 
 // 射程

@@ -284,7 +284,7 @@ void Simulator::AirWarPhase() {
 				}
 				// 与えるダメージを計算する
 				KammusuIndex enemy_index = target;
-				auto damage = CalcDamage(kBattlePhaseAir, bi, { 0, ui }, enemy_index, base_attack, all_attack_plus, kBattlePositionSame, false, 1.0);
+				auto damage = CalcDamage(kBattlePhaseAir, bi, KammusuIndex(0u, ui), enemy_index, base_attack, all_attack_plus, kBattlePositionSame, false, 1.0);
 				result_.AddDamage(bi, 0, ui, damage);
 				all_damage[other_side][enemy_index.fleet_no][enemy_index.fleet_i] += damage;
 			}
@@ -369,7 +369,7 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 			int base_attack = friend_kammusu.AllTorpedo(true) + 5;
 			// 与えるダメージを計算する
 			KammusuIndex enemy_index = std::get<1>(target);
-			auto damage = CalcDamage((torpedo_turn == kTorpedoFirst ? kBattlePhaseFirstTorpedo : kBattlePhaseTorpedo), bi, { 0, ui }, enemy_index, base_attack, false, 1.0);
+			auto damage = CalcDamage((torpedo_turn == kTorpedoFirst ? kBattlePhaseFirstTorpedo : kBattlePhaseTorpedo), bi, KammusuIndex(0, ui), enemy_index, base_attack, false, 1.0);
 			result_.AddDamage(bi, 0, ui, damage);
 			all_damage[other_side][enemy_index.fleet_i] += damage;
 		}
@@ -659,7 +659,7 @@ void Simulator::ProtectOracle(const int &defense_side, KammusuIndex &defense_ind
 	if (block_list.size() == 0) return;
 	// かばいは確率的に発生し、どの艦がかばうかも確率的に決まる
 	if (rand.RandBool(0.4)) {	//とりあえず4割に設定している
-		defense_index.fleet_no = block_list[rand.RandInt(block_list.size())];
+		defense_index.fleet_i = block_list[rand.RandInt(block_list.size())];
 	}
 	return;
 }
