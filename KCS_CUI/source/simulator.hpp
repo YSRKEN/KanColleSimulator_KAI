@@ -19,8 +19,6 @@ enum TorpedoTurn : std::uint8_t { kTorpedoFirst, kTorpedoSecond };
 // 砲撃戦の巡目(1巡目および2巡目)
 enum FireTurn { kFireFirst , kFireSecond };
 
-typedef vector<std::size_t> KammusuIndex;
-
 class Fleet;
 #include "result.hpp"
 #include "random.hpp"
@@ -37,7 +35,7 @@ class Simulator {
 	void AirWarPhase();
 	void BattlePositionOracle() noexcept;
 	void TorpedoPhase(const TorpedoTurn&);
-	void FirePhase(const FireTurn&);
+	void FirePhase(const FireTurn&, const size_t &fleet_index = 0);
 	void NightPhase();
 	// 計算用メソッド(内部)
 	//制空状態を判断する

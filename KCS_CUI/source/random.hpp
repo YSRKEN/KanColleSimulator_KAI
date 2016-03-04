@@ -12,6 +12,7 @@
 #include <unordered_set>
 #include <functional>
 #include <limits>
+#include <numeric>
 #include "exception.hpp"
 #ifdef max
 #undef max
@@ -109,8 +110,12 @@ public:
 private:
 	template<typename RandType> std::vector<RandType> make_unique_rand_array_unique(const std::size_t size, RandType rand_min, RandType rand_max) {
 		if (rand_min > rand_max) std::swap(rand_min, rand_max);
-		const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
-		INVAID_ARGUMENT_THROW_WITH_MESSAGE_IF(max_min_diff < size, "random generate range(" + std::to_string(rand_min) + "-->" + std::to_string(rand_max) + ") is small to make unique rand array.")
+		const auto max_min_diff_tmp = detail::diff(rand_max, rand_min);
+		const auto max_min_diff = max_min_diff_tmp + 1;
+		INVAID_ARGUMENT_THROW_WITH_MESSAGE_IF(
+			max_min_diff_tmp != std::numeric_limits<decltype(max_min_diff_tmp)>::max() && max_min_diff < size,
+			"random generate range(" + std::to_string(rand_min) + "-->" + std::to_string(rand_max) + ") is small to make unique rand array."
+		)
 
 		std::vector<RandType> tmp;
 		auto& engine = this->get();
@@ -134,13 +139,13 @@ private:
 	}
 	template<typename RandType> std::vector<RandType> make_unique_rand_array_select(const std::size_t size, RandType rand_min, RandType rand_max) {
 		if (rand_min > rand_max) std::swap(rand_min, rand_max);
-		const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
-		INVAID_ARGUMENT_THROW_WITH_MESSAGE_IF( max_min_diff < size, "random generate range(" + std::to_string(rand_min) + "-->" + std::to_string(rand_max) + ") is small to make unique rand array.")
+		const auto max_min_diff_tmp = detail::diff(rand_max, rand_min);
+		INVAID_ARGUMENT_THROW_WITH_MESSAGE_IF(max_min_diff_tmp == std::numeric_limits<decltype(max_min_diff_tmp)>::max(), "random generate range(" + std::to_string(rand_min) + "-->" + std::to_string(rand_max) + ") is too big!")
+		const auto max_min_diff = max_min_diff_tmp + 1;
+		INVAID_ARGUMENT_THROW_WITH_MESSAGE_IF(max_min_diff < size, "random generate range(" + std::to_string(rand_min) + "-->" + std::to_string(rand_max) + ") is small to make unique rand array.")
 
-		std::vector<RandType> tmp;
-		tmp.reserve(max_min_diff);
-
-		for (auto i = rand_min; i <= rand_max; ++i)tmp.push_back(i);
+		std::vector<RandType> tmp(max_min_diff);
+		std::iota(tmp.begin(), tmp.end(), rand_min);
 
 		auto& engine = this->get();
 		distribution_t<RandType> distribution(rand_min, rand_max);
@@ -157,13 +162,12 @@ private:
 	template<typename RandType> std::vector<RandType> make_unique_rand_array_just_shuffle(const std::size_t size, RandType rand_min, RandType rand_max) {
 		if (rand_min > rand_max) std::swap(rand_min, rand_max);
 		const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
-		INVAID_ARGUMENT_THROW_WITH_MESSAGE_IF(max_min_diff < size, "random generate range(" + std::to_string(rand_min) + "-->" + std::to_string(rand_max) + ") is small to make unique rand array.")
+		INVAID_ARGUMENT_THROW_WITH_MESSAGE_IF(max_min_diff != size, "random generate range(" + std::to_string(rand_min) + "-->" + std::to_string(rand_max) + ")'s size is not same with size.")
 
 		auto& engine = this->get();
 		distribution_t<RandType> distribution(rand_min, rand_max);
 		std::vector<RandType> re(size);
-		auto t = rand_min;
-		std::generate(re.begin(), re.end(), [&t]() { return t++; });
+		std::iota(re.begin(), re.end(), rand_min);
 		std::shuffle(re.begin(), re.end(), engine);
 		return re;
 	}
@@ -172,7 +176,9 @@ public:
 	std::vector<RandType> make_unique_rand_array(const std::size_t size, RandType rand_min = std::numeric_limits<RandType>::min(), RandType rand_max = std::numeric_limits<RandType>::max()) {
 		if (rand_min > rand_max) std::swap(rand_min, rand_max);
 		if (1 == size) return{ this->generate(rand_min, rand_max) };
-		const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
+		const auto max_min_diff_tmp = detail::diff(rand_max, rand_min);
+		if(max_min_diff_tmp == std::numeric_limits<decltype(max_min_diff_tmp)>::max()) return make_unique_rand_array_unique(size, rand_min, rand_max);
+		const auto max_min_diff = max_min_diff_tmp + 1;
 		INVAID_ARGUMENT_THROW_WITH_MESSAGE_IF(max_min_diff < size, "random generate range(" + std::to_string(rand_min) + "-->" + std::to_string(rand_max) + ") is small to make unique rand array.")
 
 		if (max_min_diff == size) return make_unique_rand_array_just_shuffle(size, rand_min, rand_max);
