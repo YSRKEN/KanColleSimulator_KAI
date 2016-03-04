@@ -2,6 +2,7 @@
 #include "config.hpp"
 #include "fleet.hpp"
 #include "simulator.hpp"
+#include <algorithm>
 
 Simulator::Simulator(const vector<Fleet>& fleet, const unsigned int seed, const SimulateMode& simulate_mode)
 	: fleet_(fleet), rand(seed), simulate_mode_(simulate_mode)
@@ -431,9 +432,9 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 		}
 		if (fire_turn == kFireFirst) {
 			// 一覧をシャッフルする
-
+			std::shuffle(attack_list[bi].begin(), attack_list[bi].end(), this->rand.get());
 			// 一覧を射程で安定ソートする
-			
+			//std::stable_sort(attack_list[bi].begin(), attack_list[bi].end(), []() {});
 		}
 	}
 	// 決定した巡目に基づいて攻撃を行う
