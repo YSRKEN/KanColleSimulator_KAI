@@ -37,7 +37,7 @@ class Simulator {
 	void AirWarPhase();
 	void BattlePositionOracle() noexcept;
 	void TorpedoPhase(const TorpedoTurn&);
-	void FirePhase(const FireTurn&);
+	void FirePhase(const FireTurn&, const size_t &fleet_index = 0);
 	void NightPhase();
 	// 計算用メソッド(内部)
 	//制空状態を判断する

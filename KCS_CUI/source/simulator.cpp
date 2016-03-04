@@ -68,20 +68,20 @@ Result Simulator::Calc() {
 		case kFleetTypeCombinedAir:
 		case kFleetTypeCombinedDrum:
 			// 空母機動・輸送護衛：第2艦隊→第1艦隊1巡目→第1艦隊2巡目
-			FirePhase(kFireFirst);
+			FirePhase(kFireSecond, 1);
 			if (IsBattleTerminate()) goto SimulatorCalcExit;
-			FirePhase(kFireFirst);
+			FirePhase(kFireFirst, 0);
 			if (IsBattleTerminate()) goto SimulatorCalcExit;
-			FirePhase(kFireSecond);
+			FirePhase(kFireSecond, 0);
 			if (IsBattleTerminate()) goto SimulatorCalcExit;
 			break;
 		case kFleetTypeCombinedGun:
 			// 水上打撃：第1艦隊1巡目→第1艦隊2巡目→第2艦隊
-			FirePhase(kFireFirst);
+			FirePhase(kFireFirst, 0);
 			if (IsBattleTerminate()) goto SimulatorCalcExit;
-			FirePhase(kFireSecond);
+			FirePhase(kFireSecond, 0);
 			if (IsBattleTerminate()) goto SimulatorCalcExit;
-			FirePhase(kFireFirst);
+			FirePhase(kFireSecond, 1);
 			if (IsBattleTerminate()) goto SimulatorCalcExit;
 			break;
 		}
@@ -396,7 +396,7 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 }
 
 // 砲撃戦フェイズ
-void Simulator::FirePhase(const FireTurn &fire_turn) {
+void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) {
 	// 2巡目は、どちらかの艦隊に戦艦か陸上型が存在していない場合には実行されない
 	if (fire_turn == kFireSecond) {
 		bool has_bb = false;
@@ -415,7 +415,10 @@ void Simulator::FirePhase(const FireTurn &fire_turn) {
 		}();
 		if(!has_bb) return;
 	}
-	// 
+	// 攻撃順を決定する
+
+	// 決定した巡目に基づいて攻撃を行う
+
 }
 
 // 夜戦フェイズ
