@@ -354,6 +354,33 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool &has_bomb, const 
 	if (alived_list.size() == 0) return tuple<bool, KammusuIndex>(false, { 0 , 0 });
 	return tuple<bool, KammusuIndex>(true, alived_list[rand_.RandInt(alived_list.size())]);
 }
+
+// 潜水の生存艦から艦娘をランダムに指定する
+tuple<bool, KammusuIndex> Fleet::RandomKammusuSS(const size_t &fleet_index) {
+	// 攻撃する艦隊の対象を選択する
+	vector<size_t> list;
+	switch (fleet_index) {
+	case 0:
+		list = { FirstIndex() };
+		break;
+	case 1:
+		list = { SecondIndex() };
+		break;
+	}
+	//生存する水上艦をリストアップ
+	vector<KammusuIndex> alived_list;
+	for (auto &fi : list) {
+		for (auto ui = 0u; ui < GetUnit()[fi].size(); ++ui) {
+			auto &it_k = GetUnit()[fi][ui];
+			if (it_k.Status() == kStatusLost) continue;
+			if (!it_k.IsSubmarine()) continue;
+			alived_list.push_back({ fi, ui });
+		}
+	}
+	if (alived_list.size() == 0) return tuple<bool, KammusuIndex>(false, { 0 , 0 });
+	return tuple<bool, KammusuIndex>(true, alived_list[rand_.RandInt(alived_list.size())]);
+}
+
 template<typename CondFunc>
 bool any_of(const std::vector<std::vector<Kammusu>>& unit, CondFunc cond) noexcept {
 	for (auto &it_u : unit) {

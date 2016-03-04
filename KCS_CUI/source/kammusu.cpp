@@ -715,6 +715,11 @@ bool Kammusu::IsFireGun() const noexcept {
 	return true;
 }
 
+// 昼戦で対潜可能な艦ならtrue
+bool Kammusu::IsAntiSubDay() const noexcept {
+	return false;	//仮置き
+}
+
 std::ostream & operator<<(std::ostream & os, const Kammusu & conf)
 {
 	os 
