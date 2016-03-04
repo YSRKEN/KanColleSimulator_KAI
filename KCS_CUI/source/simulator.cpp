@@ -41,7 +41,7 @@ Result Simulator::Calc() {
 		if (IsBattleTerminate()) goto SimulatorCalcExit;
 #ifdef _DEBUG
 		cout << "制空状態・自艦隊倍率・敵艦隊倍率：\n";
-		cout << get<0>(air_war_result_) << " " << get<1>(air_war_result_)[0] << " " << get<1>(air_war_result_)[1] << "\n" << endl;
+		cout << std::get<0>(air_war_result_) << " " << std::get<1>(air_war_result_)[0] << " " << std::get<1>(air_war_result_)[1] << "\n" << endl;
 #endif
 
 		// 交戦形態の決定
@@ -258,12 +258,12 @@ void Simulator::AirWarPhase() {
 			if (friend_kammusu.Status() == kStatusLost) continue;
 			// 敵に攻撃できない場合は次の艦娘にバトンタッチ
 			auto has_attacker = fleet_[other_side].RandomKammusuNonSS(friend_kammusu.HasAirBomb(), kTargetTypeAll);
-			if (!get<0>(has_attacker)) continue;
+			if (!std::get<0>(has_attacker)) continue;
 			// そうでない場合は、各スロットに対して攻撃対象を選択する
 			for (auto wi = 0; wi < friend_kammusu.GetSlots(); ++wi) {
 				if (friend_kammusu.GetAir()[wi] == 0 || !friend_weapon[wi].IsAirBomb()) continue;
 				// 爆撃する対象を決定する(各スロット毎に、ランダムに対象を選択しなければならない)
-				auto target = get<1>(fleet_[other_side].RandomKammusuNonSS(friend_kammusu.HasAirBomb(), kTargetTypeAll));
+				auto target = std::get<1>(fleet_[other_side].RandomKammusuNonSS(friend_kammusu.HasAirBomb(), kTargetTypeAll));
 				// 基礎攻撃力を算出する
 				int base_attack;
 				switch (friend_weapon[wi].GetWeaponClass()) {
@@ -359,11 +359,11 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 			if (friend_kammusu.Status() == kStatusLost) continue;
 			// 敵に攻撃できない場合は次の艦娘にバトンタッチ
 			auto target = fleet_[other_side].RandomKammusuNonSS(true, kTargetTypeSecond);
-			if(!get<0>(target)) continue;
+			if(!std::get<0>(target)) continue;
 			// 基礎攻撃力を算出する
 			int base_attack = friend_kammusu.AllTorpedo(true) + 5;
 			// 与えるダメージを計算する
-			KammusuIndex enemy_index = get<1>(target);
+			KammusuIndex enemy_index = std::get<1>(target);
 			auto damage = CalcDamage((torpedo_turn == kTorpedoFirst ? kBattlePhaseFirstTorpedo : kBattlePhaseTorpedo), bi, { 0, ui }, enemy_index, base_attack, false, 1.0);
 			result_.AddDamage(bi, 0, ui, damage);
 			all_damage[other_side][enemy_index[1]] += damage;
@@ -591,7 +591,7 @@ int Simulator::CalcDamage(
 int Simulator::CalcDamage(
 	const BattlePhase &battle_phase, const int &turn_player, const KammusuIndex &friend_index, KammusuIndex &enemy_index,
 	const int &base_attack, const bool &is_special_attack, const double &multiple) {
-	return CalcDamage(battle_phase, turn_player, friend_index, enemy_index, base_attack, get<1>(air_war_result_), battle_position_, is_special_attack, multiple);
+	return CalcDamage(battle_phase, turn_player, friend_index, enemy_index, base_attack, std::get<1>(air_war_result_), battle_position_, is_special_attack, multiple);
 	}
 
 // 「かばい」を確率的に発生させる
