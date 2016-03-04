@@ -247,7 +247,7 @@ void Simulator::AirWarPhase() {
 
 	// 開幕爆撃
 	//ダメージ計算
-	vector<vector<int>> all_damage(kBattleSize, vector<int>(kMaxUnitSize, 0));
+	vector<vector<vector<int>>> all_damage(kBattleSize, vector<vector<int>>(kMaxFleetSize, vector<int>(kMaxUnitSize, 0)));
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
 		auto other_side = kBattleSize - bi - 1;
 		auto &friend_unit = fleet_[bi].FirstUnit();
@@ -285,16 +285,18 @@ void Simulator::AirWarPhase() {
 				KammusuIndex enemy_index = target;
 				auto damage = CalcDamage(kBattlePhaseAir, bi, { 0, ui }, enemy_index, base_attack, all_attack_plus, kBattlePositionSame, false, 1.0);
 				result_.AddDamage(bi, 0, ui, damage);
-				all_damage[other_side][enemy_index[1]] += damage;
+				all_damage[other_side][enemy_index[0]][enemy_index[1]] += damage;
 			}
 		}
 	}
 	// ダメージ処理
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
-		auto &friend_unit = fleet_[bi].FirstUnit();
-		for (auto ui = 0u; ui < friend_unit.size(); ++ui) {
-			friend_unit[ui].SetRandGenerator(this->rand);
-			friend_unit[ui].MinusHP(all_damage[bi][ui], (bi == kFriendSide));
+		for (auto fi = 0u; fi < fleet_[bi].FleetSize(); ++fi) {
+			auto &friend_unit = fleet_[bi].GetUnit()[fi];
+			for (auto ui = 0u; ui < friend_unit.size(); ++ui) {
+				friend_unit[ui].SetRandGenerator(this->rand);
+				friend_unit[ui].MinusHP(all_damage[bi][fi][ui], (bi == kFriendSide));
+			}
 		}
 	}
 
@@ -311,11 +313,13 @@ void Simulator::AirWarPhase() {
 	cout << endl;
 	cout << "航空戦で受けたダメージ：" << endl;
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
-		auto &friend_unit = fleet_[bi].FirstUnit();
-		for (auto ui = 0u; ui < friend_unit.size(); ++ui) {
-			cout << all_damage[bi][ui] << ",";
+		for (auto fi = 0u; fi < fleet_[bi].FleetSize(); ++fi) {
+			auto &friend_unit = fleet_[bi].GetUnit()[fi];
+			for (auto ui = 0u; ui < friend_unit.size(); ++ui) {
+				cout << all_damage[bi][fi][ui] << ",";
+			}
+			cout << endl;
 		}
-		cout << endl;
 	}
 	cout << endl;
 #endif
@@ -371,7 +375,7 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 	}
 	// ダメージ処理
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
-		auto &friend_unit = fleet_[bi].FirstUnit();
+		auto &friend_unit = fleet_[bi].SecondUnit();
 		for (auto ui = 0u; ui < friend_unit.size(); ++ui) {
 			friend_unit[ui].SetRandGenerator(this->rand);
 			friend_unit[ui].MinusHP(all_damage[bi][ui], (bi == kFriendSide));
@@ -381,7 +385,7 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 #ifdef _DEBUG
 	cout << (torpedo_turn == kTorpedoFirst ? "開幕雷撃で" : "雷撃戦で") << "受けたダメージ：" << endl;
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
-		auto &friend_unit = fleet_[bi].FirstUnit();
+		auto &friend_unit = fleet_[bi].SecondUnit();
 		for (auto ui = 0u; ui < friend_unit.size(); ++ui) {
 			cout << all_damage[bi][ui] << ",";
 		}
