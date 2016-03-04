@@ -61,6 +61,7 @@ public:
 	int AacType();							//発動する対空カットインの種類を判断する
 	int RandomKammusu();					//生存艦から艦娘をランダムに指定する
 	tuple<bool, KammusuIndex> RandomKammusuNonSS(const bool&, const TargetType&);	//水上の生存艦から艦娘をランダムに指定する
+	tuple<bool, KammusuIndex> RandomKammusuSS(const size_t&);						//潜水の生存艦から艦娘をランダムに指定する
 };
 std::ostream& operator<<(std::ostream& os, const Fleet& conf);
 std::wostream& operator<<(std::wostream& os, const Fleet& conf);
