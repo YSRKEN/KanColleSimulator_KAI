@@ -421,17 +421,18 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
 		auto &unit = fleet_[bi].GetUnit();
 		// 行動可能な艦娘一覧を作成する
-		auto &unit2 = unit[fleet_index];
 		if (bi == kFriendSide) {
+			auto &unit2 = unit[fleet_index];
 			for (auto ui = 0u; ui < unit2.size(); ++ui) {
 				if (!unit2[ui].IsMoveGun()) continue;
 				attack_list[bi].push_back({{fleet_index, ui}, unit2[ui].MaxRange()});
 			}
 		}
 		else {
-			for (auto ui = 0u; ui < unit[0].size(); ++ui) {
+			auto &unit2 = unit[0];
+			for (auto ui = 0u; ui < unit2.size(); ++ui) {
 				if (!unit2[ui].IsMoveGun()) continue;
-				attack_list[bi].push_back({ { 0, ui }, unit[0][ui].MaxRange() });
+				attack_list[bi].push_back({ { 0, ui }, unit2[ui].MaxRange() });
 			}
 		}
 		if (fire_turn == kFireFirst) {
