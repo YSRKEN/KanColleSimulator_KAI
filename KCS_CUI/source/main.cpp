@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
 			fleet[i].Put();
 		}
 		// シミュレータを構築し、並列演算を行う
-		auto seed = make_SharedRand().generate_n<unsigned int>(config.GetThreads());
+		auto seed = make_SharedRand().make_unique_rand_array<unsigned int>(config.GetThreads());
 		vector<Result> result_db(config.GetTimes());
 #if defined(KCS_MEASURE_PROCESS_TIME)
 		const auto process_begin_time = std::chrono::high_resolution_clock::now();

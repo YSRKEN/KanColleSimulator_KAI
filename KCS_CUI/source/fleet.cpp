@@ -109,7 +109,7 @@ void Fleet::LoadJson(std::istream & file, const WeaponDB & weapon_db, const Kamm
 				if (wi >= temp_k.GetSlots()) break;
 			}
 			// リストに加える
-			unit_[fi].push_back(temp_k);
+			unit_[fi].push_back(move(temp_k));
 		}
 		++fi;
 	}
@@ -326,9 +326,9 @@ int Fleet::RandomKammusu() {
 
 // 生存する水上艦から艦娘をランダムに指定する
 // ただしhas_bombがtrueの際は陸上型棲姫を避けるようになる
-int Fleet::RandomKammusuNonSS(const bool &has_bomb) {
+std::pair<std::size_t, std::size_t> Fleet::RandomKammusuNonSS(const bool &has_bomb) {
 	//生存する水上艦をリストアップ
-	vector<int> alived_list;
+	KammusuIndex alived_list;
 	for (auto ui = 0u; ui < FirstUnit().size(); ++ui) {
 		auto &it_k = FirstUnit()[ui];
 		if (it_k.Status() == kStatusLost) continue;
@@ -336,8 +336,8 @@ int Fleet::RandomKammusuNonSS(const bool &has_bomb) {
 		if (has_bomb && it_k.GetShipClass() == kShipClassAF) continue;
 		alived_list.push_back(ui);
 	}
-	if (alived_list.size() == 0) return -1;
-	return alived_list[rand_.RandInt(alived_list.size())];
+	const auto aliver_n = alived_list.size();
+	return { aliver_n, (aliver_n) ? alived_list[rand_.RandInt(alived_list.size())] : 0 };
 }
 template<typename CondFunc>
 bool any_of(const std::vector<std::vector<Kammusu>>& unit, CondFunc cond) noexcept {
