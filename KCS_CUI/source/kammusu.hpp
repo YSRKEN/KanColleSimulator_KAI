@@ -84,34 +84,34 @@ public:
 	);
 	void SetRandGenerator(const SharedRand& rand);
 	// getter
-	int GetID() const noexcept { return id_; }
-	wstring GetName() const { return name_; }
-	ShipClass GetShipClass() const noexcept { return ship_class_; }
-	int GetMaxHP() const noexcept { return max_hp_; }
-	int GetTorpedo() const noexcept { return torpedo_; }
-	int GetLuck() const noexcept { return luck_; }
-	int GetSlots() const noexcept { return slots_; }
-	int GetEvade() const noexcept { return evade_; }
-	int GetAntiSub() const noexcept { return anti_sub_; }
-	int GetSearch() const noexcept { return search_; }
-	bool IsKammusu() const noexcept { return kammusu_flg_; }
-	int GetLevel() const noexcept { return level_; }
-	int GetHP() const noexcept { return hp_; }
-	vector<int>& GetAir() noexcept { return airs_; }
-	const vector<int>& GetAir() const noexcept { return airs_; }
-	vector<Weapon>& GetWeapon() noexcept { return weapons_; }
-	const vector<Weapon>& GetWeapon() const noexcept { return weapons_; }
-	int GetAmmo() const noexcept { return ammo_; }
+	int GetID() const noexcept;
+	wstring GetName() const;
+	ShipClass GetShipClass() const noexcept;
+	int GetMaxHP() const noexcept;
+	int GetTorpedo() const noexcept;
+	int GetLuck() const noexcept;
+	int GetSlots() const noexcept;
+	int GetEvade() const noexcept;
+	int GetAntiSub() const noexcept;
+	int GetSearch() const noexcept;
+	bool IsKammusu() const noexcept;
+	int GetLevel() const noexcept;
+	int GetHP() const noexcept;
+	vector<int>& GetAir() noexcept;
+	const vector<int>& GetAir() const noexcept;
+	vector<Weapon>& GetWeapon() noexcept;
+	const vector<Weapon>& GetWeapon() const noexcept;
+	int GetAmmo() const noexcept;
 	// setter
-	void SetMaxHP(const int max_hp) noexcept { max_hp_ = max_hp; }
-	void SetLuck(const int luck) noexcept { luck_ = luck; }
-	void SetEvade(const int evade) noexcept { evade_ = evade; }
-	void SetAntiSub(const int anti_sub) noexcept { anti_sub_ = anti_sub; }
-	void SetSearch(const int search) noexcept { search_ = search; }
-	void SetLevel(const int level) noexcept { level_ = level; }
-	void SetHP(const int hp) noexcept { hp_ = hp; }
-	void SetWeapon(const int index, const Weapon &weapon) { weapons_[index] = weapon; }
-	void SetCond(const int cond) noexcept { cond_ = cond; }
+	void SetMaxHP(const int max_hp) noexcept;
+	void SetLuck(const int luck) noexcept;
+	void SetEvade(const int evade) noexcept;
+	void SetAntiSub(const int anti_sub) noexcept;
+	void SetSearch(const int search) noexcept;
+	void SetLevel(const int level) noexcept;
+	void SetHP(const int hp) noexcept;
+	void SetWeapon(const int index, const Weapon &weapon);
+	void SetCond(const int cond) noexcept;
 	// その他
 	void Put() const;				//中身を表示する
 	wstring GetNameLv() const;		//簡易的な名称を返す

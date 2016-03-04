@@ -10,6 +10,8 @@ Simulator::Simulator(const vector<Fleet>& fleet, const unsigned int seed, const 
 	for (auto& f : this->fleet_) f.SetRandGenerator(rand);
 }
 
+SharedRand Simulator::GetGenerator() noexcept { return this->rand; }
+
 // 計算用メソッド
 Result Simulator::Calc() {
 	result_ = Result();
@@ -443,7 +445,7 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 		}
 	}
 	// 決定した巡目に基づいて攻撃を行う
-	for (auto ui = 0; ui < kMaxUnitSize; ++ui) {
+	for (size_t ui = 0; ui < kMaxUnitSize; ++ui) {
 		// 基本的に、敵と味方が交互に砲撃を行う
 		for (auto bi = 0; bi < kBattleSize; ++bi) {
 			auto other_side = kBattleSize - bi - 1;
