@@ -139,6 +139,30 @@ void Fleet::SetRandGenerator(const SharedRand & rand) {
 	this->rand_ = rand;
 }
 
+// getter
+Formation Fleet::GetFormation() const noexcept { return formation_; }
+vector<vector<Kammusu>>& Fleet::GetUnit() { return unit_; }
+const vector<vector<Kammusu>>& Fleet::GetUnit() const { return unit_; }
+FleetType Fleet::GetFleetType() const noexcept { return fleet_type_; }
+// その他
+vector<Kammusu>& Fleet::FirstUnit() { return unit_[0]; }
+const vector<Kammusu>& Fleet::FirstUnit() const { return unit_[0]; }
+vector<Kammusu>& Fleet::SecondUnit() { return unit_[unit_.size() - 1]; }
+const vector<Kammusu>& Fleet::SecondUnit() const { return unit_[unit_.size() - 1]; }
+size_t Fleet::FleetSize() const noexcept { return unit_.size(); }
+
+//「艦隊数」(通常艦隊だと1、連合艦隊だと2)
+
+size_t Fleet::UnitSize(const size_t fi) const noexcept { return unit_[fi].size(); }
+
+//「艦隊」における艦数
+
+size_t Fleet::FirstIndex() const noexcept { return 0; }
+
+//第一艦隊のインデックス
+
+size_t Fleet::SecondIndex() const noexcept { return unit_.size() - 1; }
+
 // 中身を表示する
 void Fleet::Put() const {
 	cout << *this;

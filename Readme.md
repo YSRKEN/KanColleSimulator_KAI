@@ -75,7 +75,7 @@
 ## ライセンス
 MITライセンスとします。
 
-## 作者
+## 開発者
 - YSR https://github.com/YSRKEN
 - yumetodo https://github.com/yumetodo
 - Cranberries https://github.com/LoliGothick

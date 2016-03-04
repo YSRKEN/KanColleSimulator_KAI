@@ -33,10 +33,11 @@ using std::tuple;
 using std::unordered_map;
 using std::vector;
 using std::wcout;
+using std::size_t;
 
 constexpr int kBattleSize = 2;		//戦闘で戦うのは敵と味方の「2つ」
 constexpr int kMaxFleetSize = 2;	//
-constexpr int kMaxUnitSize = 6;		//艦隊に含まれる最大艦数
+constexpr size_t kMaxUnitSize = 6;		//艦隊に含まれる最大艦数
 constexpr int kFriendSide = 0, kEnemySide = 1;	//味方および敵陣営の番号付け
 
 //typedef vector<size_t> KammusuIndex;

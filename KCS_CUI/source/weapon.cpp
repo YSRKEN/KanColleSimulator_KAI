@@ -11,6 +11,22 @@ Weapon::Weapon(
 	torpedo_(torpedo), bomb_(bomb), anti_air_(anti_air), anti_sub_(anti_sub), hit_(hit),
 	evade_(evade), search_(search), range_(range), level_(level), level_detail_(level_detail) {}
 
+// getter
+const std::wstring & Weapon::GetName() const noexcept { return name_; }
+WeaponClass Weapon::GetWeaponClass() const noexcept { return weapon_class_; }
+int Weapon::GetDefense() const noexcept { return defense_; }
+int Weapon::GetTorpedo() const noexcept { return torpedo_; }
+int Weapon::GetBomb() const noexcept { return bomb_; }
+int Weapon::GetAntiAir() const noexcept { return anti_air_; }
+int Weapon::GetHit() const noexcept { return hit_; }
+int Weapon::GetEvade() const noexcept { return evade_; }
+int Weapon::GetSearch() const noexcept { return search_; }
+Range Weapon::GetRange() const noexcept { return range_; }
+int Weapon::GetLevel() const noexcept { return level_; }
+// setter
+void Weapon::SetLevel(const int level) { level_ = level; }
+void Weapon::SetLevelDetail(const int level_detail) { level_detail_ = level_detail; }
+
 // 中身を表示する
 void Weapon::Put() const {
 	cout << *this;
