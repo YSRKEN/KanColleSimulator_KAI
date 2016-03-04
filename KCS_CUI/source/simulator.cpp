@@ -417,28 +417,28 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 		if(!has_bb) return;
 	}
 	// 攻撃順を決定する
-	vector<vector<KammusuIndex>> attack_list(kBattleSize);
+	vector<vector<std::pair<KammusuIndex, Range>>> attack_list(kBattleSize);
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
 		// 行動可能な艦娘一覧を作成する
 		if (bi == kFriendSide) {
 			for (auto ui = 0u; ui < fleet_[bi].GetUnit()[fleet_index].size(); ++ui) {
-				attack_list[bi].push_back({fleet_index, ui});
+				attack_list[bi].push_back(std::pair<KammusuIndex, Range>({fleet_index, ui}, fleet_[bi].GetUnit()[fleet_index][ui].MaxRange()));
 			}
 		}
 		else {
 			for (auto ui = 0u; ui < fleet_[bi].GetUnit()[0].size(); ++ui) {
-				attack_list[bi].push_back({ 0, ui });
+				attack_list[bi].push_back(std::pair<KammusuIndex, Range>({ 0, ui }, fleet_[bi].GetUnit()[0][ui].MaxRange()));
 			}
 		}
 		if (fire_turn == kFireFirst) {
 			// 一覧をシャッフルする
 			std::shuffle(attack_list[bi].begin(), attack_list[bi].end(), this->rand.get());
 			// 一覧を射程で安定ソートする
-			//std::stable_sort(attack_list[bi].begin(), attack_list[bi].end(), []() {});
+			std::stable_sort(attack_list[bi].begin(), attack_list[bi].end(), [](const std::pair<KammusuIndex, Range> &a, const std::pair<KammusuIndex, Range> &b) {return (b.second < a.second); });
 		}
 	}
 	// 決定した巡目に基づいて攻撃を行う
-
+	return;
 }
 
 // 夜戦フェイズ

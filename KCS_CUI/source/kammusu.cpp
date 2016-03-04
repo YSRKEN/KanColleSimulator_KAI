@@ -493,6 +493,15 @@ int Kammusu::AllDefense() const noexcept {
 	return defense_sum;
 }
 
+// 射程を返す
+Range Kammusu::MaxRange() const noexcept {
+	auto range = range_;
+	for (auto &it_w : weapons_) {
+		range = std::max(range, it_w.GetRange());
+	}
+	return range;
+}
+
 // ダメージを与える
 void Kammusu::MinusHP(const int &damage, const bool &stopper_flg) {
 	if (hp_ > damage) {
