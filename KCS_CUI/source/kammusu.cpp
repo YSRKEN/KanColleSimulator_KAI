@@ -693,6 +693,28 @@ bool Kammusu::IsMoveGun() const noexcept {
 	return true;
 }
 
+// 砲撃戦で攻撃可能な艦ならtrue
+bool Kammusu::IsFireGun() const noexcept {
+	// 撃沈していたら当然攻撃できない
+	if (Status() == kStatusLost) return false;
+	// 潜水艦系も砲撃フェイズでは攻撃できない
+	if (IsSubmarine()) return false;
+	// 艦載機が切れた空母も砲撃フェイズでは攻撃できない
+	// また、中破した空母系・大破した装甲空母も攻撃できない
+	switch (ship_class_) {
+	case kShipClassCVL:
+	case kShipClassCV:
+		return (HasAirAttack() && Status() != kStatusMiddleDamage);
+		break;
+	case kShipClassACV:
+		return (HasAirAttack() && Status() != kStatusHeavyDamage);
+		break;
+	default:
+		break;
+	}
+	return true;
+}
+
 std::ostream & operator<<(std::ostream & os, const Kammusu & conf)
 {
 	os 

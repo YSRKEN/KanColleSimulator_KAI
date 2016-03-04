@@ -253,16 +253,16 @@ void Simulator::AirWarPhase() {
 		auto other_side = kBattleSize - bi - 1;
 		auto &friend_unit = fleet_[bi].FirstUnit();
 		for (auto ui = 0u; ui < friend_unit.size(); ++ui) {
-			auto &friend_kammusu = friend_unit[ui];
-			auto &friend_weapon = friend_kammusu.GetWeapon();
+			auto &hunter_kammusu = friend_unit[ui];
+			auto &friend_weapon = hunter_kammusu.GetWeapon();
 			// 既に沈んでいる場合は攻撃できない
-			if (friend_kammusu.Status() == kStatusLost) continue;
+			if (hunter_kammusu.Status() == kStatusLost) continue;
 			// 敵に攻撃できない場合は次の艦娘にバトンタッチ
 			auto has_attacker = fleet_[other_side].RandomKammusuNonSS(false, kTargetTypeAll);
 			if (!std::get<0>(has_attacker)) continue;
 			// そうでない場合は、各スロットに対して攻撃対象を選択する
-			for (auto wi = 0; wi < friend_kammusu.GetSlots(); ++wi) {
-				if (friend_kammusu.GetAir()[wi] == 0 || !friend_weapon[wi].IsAirBomb()) continue;
+			for (auto wi = 0; wi < hunter_kammusu.GetSlots(); ++wi) {
+				if (hunter_kammusu.GetAir()[wi] == 0 || !friend_weapon[wi].IsAirBomb()) continue;
 				// 爆撃する対象を決定する(各スロット毎に、ランダムに対象を選択しなければならない)
 				auto target = std::get<1>(fleet_[other_side].RandomKammusuNonSS(false, kTargetTypeAll));
 				// 基礎攻撃力を算出する
@@ -357,16 +357,16 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 		auto other_side = kBattleSize - bi - 1;
 		auto &friend_unit = fleet_[bi].SecondUnit();
 		for (auto ui = 0u; ui < friend_unit.size(); ++ui) {
-			auto &friend_kammusu = friend_unit[ui];
+			auto &hunter_kammusu = friend_unit[ui];
 			// 魚雷が発射できるかどうかを判定する
-			if (!friend_kammusu.IsFireTorpedo(torpedo_turn)) continue;
+			if (!hunter_kammusu.IsFireTorpedo(torpedo_turn)) continue;
 			// 既に沈んでいる場合は攻撃できない
-			if (friend_kammusu.Status() == kStatusLost) continue;
+			if (hunter_kammusu.Status() == kStatusLost) continue;
 			// 敵に攻撃できない場合は次の艦娘にバトンタッチ
 			auto target = fleet_[other_side].RandomKammusuNonSS(true, kTargetTypeSecond);
 			if(!std::get<0>(target)) continue;
 			// 基礎攻撃力を算出する
-			int base_attack = friend_kammusu.AllTorpedo(true) + 5;
+			int base_attack = hunter_kammusu.AllTorpedo(true) + 5;
 			// 与えるダメージを計算する
 			KammusuIndex enemy_index = std::get<1>(target);
 			auto damage = CalcDamage((torpedo_turn == kTorpedoFirst ? kBattlePhaseFirstTorpedo : kBattlePhaseTorpedo), bi, KammusuIndex(0, ui), enemy_index, base_attack, false, 1.0);
@@ -443,7 +443,18 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 		}
 	}
 	// 決定した巡目に基づいて攻撃を行う
+	for (auto ui = 0; ui < kMaxUnitSize; ++ui) {
+		// 基本的に、敵と味方が交互に砲撃を行う
+		for (auto bi = 0; bi < kBattleSize; ++bi) {
+			// 一覧の範囲外なら飛ばす
+			if (attack_list[bi].size() <= ui) continue;
+			// 担当する艦娘が攻撃参加できない場合は飛ばす
+			auto &hunter_kammusu = fleet_[bi].GetUnit()[attack_list[bi][ui].first.fleet_no_][attack_list[bi][ui].first.fleet_i_];
+			if (!hunter_kammusu.IsFireGun()) continue;
+			// 攻撃の種類を判断する
 
+		}
+	}
 	return;
 }
 
