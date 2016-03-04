@@ -286,7 +286,7 @@ void Simulator::AirWarPhase() {
 		}
 	}
 	cout << endl;
-	cout << "受けたダメージ：" << endl;
+	cout << "航空戦で受けたダメージ：" << endl;
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
 		auto &friend_unit = fleet_[bi].FirstUnit();
 		for (auto ui = 0u; ui < friend_unit.size(); ++ui) {
@@ -356,7 +356,7 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 	}
 
 #ifdef _DEBUG
-	cout << "受けたダメージ：" << endl;
+	cout << (torpedo_turn == kTorpedoFirst ? "開幕雷撃で" : "雷撃戦で") << "受けたダメージ：" << endl;
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
 		auto &friend_unit = fleet_[bi].FirstUnit();
 		for (auto ui = 0u; ui < friend_unit.size(); ++ui) {
