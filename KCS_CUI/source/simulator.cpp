@@ -416,7 +416,26 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 		if(!has_bb) return;
 	}
 	// 攻撃順を決定する
+	vector<vector<KammusuIndex>> attack_list(kBattleSize);
+	for (auto bi = 0; bi < kBattleSize; ++bi) {
+		// 行動可能な艦娘一覧を作成する
+		if (bi == kFriendSide) {
+			for (auto ui = 0u; ui < fleet_[bi].GetUnit()[fleet_index].size(); ++ui) {
+				attack_list[bi].push_back({fleet_index, ui});
+			}
+		}
+		else {
+			for (auto ui = 0u; ui < fleet_[bi].GetUnit()[0].size(); ++ui) {
+				attack_list[bi].push_back({ 0, ui });
+			}
+		}
+		if (fire_turn == kFireFirst) {
+			// 一覧をシャッフルする
 
+			// 一覧を射程で安定ソートする
+			
+		}
+	}
 	// 決定した巡目に基づいて攻撃を行う
 
 }
