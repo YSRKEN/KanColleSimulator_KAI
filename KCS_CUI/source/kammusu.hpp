@@ -128,20 +128,24 @@ public:
 	double CL2ProbPlus() const noexcept;			//熟練艦載機によるCL2率上昇
 	double CL2AttackPlus() const noexcept;			//熟練艦載機によるダメージ補正
 	int AllDefense() const noexcept;				//総装甲を返す
+	Range MaxRange() const noexcept;				//射程を返す
 	void MinusHP(const int&, const bool&);			//ダメージを与える、ctorもしくはSetRandGenerator経由で乱数エンジンを渡している必要がある
 	void ConsumeMaterial() noexcept;				//弾薬・燃料を減少させる
 	bool HasAir() const noexcept;					//艦載機を保有していた場合はtrue
 	bool HasAirFight() const noexcept;				//航空戦に参加する艦載機を保有していた場合はtrue
 	bool HasAirTrailer() const noexcept;			//触接に参加する艦載機を保有していた場合はtrue
 	bool HasAirBomb() const noexcept;				//艦爆を保有していた場合はtrue
+	bool HasAirAttack() const noexcept;				// 昼戦に参加可能な場合はtrue
 	bool IsSubmarine() const noexcept;				//潜水艦系ならtrue
 	bool Include(const wstring& wstr) const noexcept;	//名前に特定の文字が含まれていればtrue
 	bool Include(const wchar_t* wstr) const noexcept;	//名前に特定の文字が含まれていればtrue
 	bool IncludeAnyOf(std::initializer_list<const wchar_t*> strings)  const;//いずれか一つが含まれていたらtrue
-	bool HasAntiSubSynergy() const noexcept;		//対潜シナジーを持っていたらtrue
-	bool IsSpecialEffectAP() const noexcept;		//徹甲弾補正を食らう側ならtrue
-	bool HasAirPss() const noexcept;				//彩雲を保有していた場合はtrue
+	bool HasAntiSubSynergy() const noexcept;				//対潜シナジーを持っていたらtrue
+	bool IsSpecialEffectAP() const noexcept;				//徹甲弾補正を食らう側ならtrue
+	bool HasAirPss() const noexcept;						//彩雲を保有していた場合はtrue
 	bool IsFireTorpedo(const TorpedoTurn&) const noexcept;	//魚雷を発射できればtrue
+	bool IsMoveGun() const noexcept;						//砲撃戦で行動可能な艦ならtrue
+	bool IsFireGun() const noexcept;						// 砲撃戦で攻撃可能な艦ならtrue
 	friend std::ostream& operator<<(std::ostream& os, const Kammusu& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Kammusu& conf);
 };

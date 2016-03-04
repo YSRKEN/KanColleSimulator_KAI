@@ -40,8 +40,10 @@ public:
 	auto& SecondUnit() { return unit_[unit_.size() - 1]; }
 	const auto& SecondUnit() const { return unit_[unit_.size() - 1]; }
 
-	size_t FleetSize() const noexcept { return unit_.size(); }	//「艦隊数」(通常艦隊だと1、連合艦隊だと2)
+	size_t FleetSize() const noexcept { return unit_.size(); }						//「艦隊数」(通常艦隊だと1、連合艦隊だと2)
 	size_t UnitSize(const size_t fi) const noexcept { return unit_[fi].size(); }	//「艦隊」における艦数
+	size_t FirstIndex() const noexcept { return 0; }								//第一艦隊のインデックス
+	size_t SecondIndex() const noexcept { return unit_.size() - 1;}					//第二艦隊のインデックス
 	void Put() const;							//中身を表示する
 	double SearchValue() const noexcept;		//索敵値を計算する
 	int AntiAirScore() const noexcept;			//制空値を計算する

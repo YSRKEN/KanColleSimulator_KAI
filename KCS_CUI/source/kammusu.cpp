@@ -493,6 +493,15 @@ int Kammusu::AllDefense() const noexcept {
 	return defense_sum;
 }
 
+// 射程を返す
+Range Kammusu::MaxRange() const noexcept {
+	auto range = range_;
+	for (auto &it_w : weapons_) {
+		range = std::max(range, it_w.GetRange());
+	}
+	return range;
+}
+
 // ダメージを与える
 void Kammusu::MinusHP(const int &damage, const bool &stopper_flg) {
 	if (hp_ > damage) {
@@ -545,6 +554,14 @@ bool Kammusu::HasAirBomb() const noexcept {
 	for (auto i = 0; i < slots_; ++i) {
 		auto weapon_class = weapons_[i].GetWeaponClass();
 		if ((weapon_class == kWeaponClassPB || weapon_class == kWeaponClassPBF) && airs_[i] > 0) return true;
+	}
+	return false;
+}
+
+// 昼戦に参加可能な場合はtrue
+bool Kammusu::HasAirAttack() const noexcept {
+	for (auto i = 0; i < slots_; ++i) {
+		if (weapons_[i].IsAirBomb() && airs_[i] > 0) return true;
 	}
 	return false;
 }
@@ -655,6 +672,47 @@ bool Kammusu::IsFireTorpedo(const TorpedoTurn &torpedo_turn) const noexcept {
 	default:
 		return false;
 	}
+}
+
+// 砲撃戦で行動可能な艦ならtrue
+bool Kammusu::IsMoveGun() const noexcept {
+	// 撃沈していたら当然行動できない
+	if (Status() == kStatusLost) return false;
+	// 潜水艦系も砲撃フェイズでは行動できない
+	if (IsSubmarine()) return false;
+	// 艦載機が切れた空母も砲撃フェイズでは行動できない
+	switch (ship_class_) {
+	case kShipClassCVL:
+	case kShipClassCV:
+	case kShipClassACV:
+		return HasAirAttack();
+		break;
+	default:
+		break;
+	}
+	return true;
+}
+
+// 砲撃戦で攻撃可能な艦ならtrue
+bool Kammusu::IsFireGun() const noexcept {
+	// 撃沈していたら当然攻撃できない
+	if (Status() == kStatusLost) return false;
+	// 潜水艦系も砲撃フェイズでは攻撃できない
+	if (IsSubmarine()) return false;
+	// 艦載機が切れた空母も砲撃フェイズでは攻撃できない
+	// また、中破した空母系・大破した装甲空母も攻撃できない
+	switch (ship_class_) {
+	case kShipClassCVL:
+	case kShipClassCV:
+		return (HasAirAttack() && Status() != kStatusMiddleDamage);
+		break;
+	case kShipClassACV:
+		return (HasAirAttack() && Status() != kStatusHeavyDamage);
+		break;
+	default:
+		break;
+	}
+	return true;
 }
 
 std::ostream & operator<<(std::ostream & os, const Kammusu & conf)
