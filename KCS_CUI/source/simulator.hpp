@@ -55,7 +55,7 @@ class Simulator {
 	// 戦闘終了を判断する
 	bool IsBattleTerminate() const noexcept;
 	// 昼戦での攻撃種別を判断する
-	DayFireType JudgeDayFireType(const KammusuIndex&, const KammusuIndex&) const noexcept;
+	DayFireType JudgeDayFireType(const int, const KammusuIndex&, const KammusuIndex&) const noexcept;
 public:
 	// コンストラクタ
 	Simulator(){}
