@@ -666,6 +666,11 @@ bool Kammusu::IsFireTorpedo(const TorpedoTurn &torpedo_turn) const noexcept {
 	}
 }
 
+// 砲撃戦で行動可能な艦ならtrue
+bool Kammusu::IsMoveGun() const noexcept {
+	return true;	//仮置き
+}
+
 std::ostream & operator<<(std::ostream & os, const Kammusu & conf)
 {
 	os 

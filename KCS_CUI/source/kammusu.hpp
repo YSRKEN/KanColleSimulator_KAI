@@ -139,10 +139,11 @@ public:
 	bool Include(const wstring& wstr) const noexcept;	//名前に特定の文字が含まれていればtrue
 	bool Include(const wchar_t* wstr) const noexcept;	//名前に特定の文字が含まれていればtrue
 	bool IncludeAnyOf(std::initializer_list<const wchar_t*> strings)  const;//いずれか一つが含まれていたらtrue
-	bool HasAntiSubSynergy() const noexcept;		//対潜シナジーを持っていたらtrue
-	bool IsSpecialEffectAP() const noexcept;		//徹甲弾補正を食らう側ならtrue
-	bool HasAirPss() const noexcept;				//彩雲を保有していた場合はtrue
+	bool HasAntiSubSynergy() const noexcept;				//対潜シナジーを持っていたらtrue
+	bool IsSpecialEffectAP() const noexcept;				//徹甲弾補正を食らう側ならtrue
+	bool HasAirPss() const noexcept;						//彩雲を保有していた場合はtrue
 	bool IsFireTorpedo(const TorpedoTurn&) const noexcept;	//魚雷を発射できればtrue
+	bool IsMoveGun() const noexcept;						//砲撃戦で行動可能な艦ならtrue
 	friend std::ostream& operator<<(std::ostream& os, const Kammusu& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Kammusu& conf);
 };

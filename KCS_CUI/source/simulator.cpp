@@ -419,15 +419,19 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 	// 攻撃順を決定する
 	vector<vector<std::pair<KammusuIndex, Range>>> attack_list(kBattleSize);
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
+		auto &unit = fleet_[bi].GetUnit();
 		// 行動可能な艦娘一覧を作成する
 		if (bi == kFriendSide) {
-			for (auto ui = 0u; ui < fleet_[bi].GetUnit()[fleet_index].size(); ++ui) {
-				attack_list[bi].push_back(std::pair<KammusuIndex, Range>({fleet_index, ui}, fleet_[bi].GetUnit()[fleet_index][ui].MaxRange()));
+			auto &unit2 = unit[fleet_index];
+			for (auto ui = 0u; ui < unit2.size(); ++ui) {
+				if (!unit2[ui].IsMoveGun()) continue;
+				attack_list[bi].push_back(std::pair<KammusuIndex, Range>({fleet_index, ui}, unit2[ui].MaxRange()));
 			}
 		}
 		else {
-			for (auto ui = 0u; ui < fleet_[bi].GetUnit()[0].size(); ++ui) {
-				attack_list[bi].push_back(std::pair<KammusuIndex, Range>({ 0, ui }, fleet_[bi].GetUnit()[0][ui].MaxRange()));
+			for (auto ui = 0u; ui < unit[0].size(); ++ui) {
+				if (!unit2[ui].IsMoveGun()) continue;
+				attack_list[bi].push_back(std::pair<KammusuIndex, Range>({ 0, ui }, unit[0][ui].MaxRange()));
 			}
 		}
 		if (fire_turn == kFireFirst) {
@@ -438,6 +442,7 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 		}
 	}
 	// 決定した巡目に基づいて攻撃を行う
+
 	return;
 }
 
