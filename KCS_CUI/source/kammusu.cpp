@@ -747,7 +747,61 @@ bool Kammusu::IsFireGun() const noexcept {
 
 // 昼戦で対潜可能な艦ならtrue
 bool Kammusu::IsAntiSubDay() const noexcept {
-	return false;	//仮置き
+	switch (ship_class_) {
+	case kShipClassCVL:
+	case kShipClassAF:
+		// 空母型対潜攻撃
+		return IsAntiSubDayPlane();
+		break;
+	case kShipClassBBV:
+	case kShipClassAV:
+	case kShipClassCAV:
+		// 航戦型対潜攻撃
+		return IsAntiSubDayWater();
+		break;
+	case kShipClassCL:
+	case kShipClassCLT:
+	case kShipClassDD:
+	case kShipClassCP:
+		// 水雷型対潜攻撃
+		if (anti_sub_ > 0) return true;
+		break;
+	case kShipClassAO:
+		// 上記3種類が合わさった速吸改は頭おかしい(褒め言葉)
+		return (IsAntiSubDayPlane() || IsAntiSubDayWater() || (anti_sub_ > 0));
+		break;
+	default:
+		break;
+	}
+	return false;
+}
+
+bool Kammusu::IsAntiSubDayPlane() const noexcept {
+	for (auto wi = 0; wi < slots_; ++wi) {
+		if (airs_[wi] == 0) continue;
+		switch (weapons_[wi].GetWeaponClass()) {
+		case kWeaponClassPBF:
+		case kWeaponClassPB:
+		case kWeaponClassPA:
+			return true;
+		default:
+			break;
+		}
+	}
+}
+
+bool Kammusu::IsAntiSubDayWater() const noexcept {
+	for (auto wi = 0; wi < slots_; ++wi) {
+		if (airs_[wi] == 0) continue;
+		switch (weapons_[wi].GetWeaponClass()) {
+		case kWeaponClassWB:
+		case kWeaponClassASPP:
+		case kWeaponClassAJ:
+			return true;
+		default:
+			break;
+		}
+	}
 }
 
 std::ostream & operator<<(std::ostream & os, const Kammusu & conf)
