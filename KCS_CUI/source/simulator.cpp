@@ -465,26 +465,6 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 			// 攻撃対象の種類によって、攻撃の種類を選ぶ
 			auto &enemy_index = std::get<1>(target);
 			auto fire_type = JudgeDayFireType(friend_index, enemy_index);
-			/*
-			if ( 防御側 == 陸上基地 && 対地装備 を装備している ) 攻撃種別 = 10(ロケット砲撃);
-			else if ( 攻撃側 == 速吸改 ) {
-				if ( 防御側 == ( 潜水艦 | 潜水空母 ) ) {
-					if ( ( ( 対潜 > 0 の艦上攻撃機 ) | 水上爆撃機 | オートジャイロ ) を装備している )
-						攻撃種別 = 7(空撃);
-					else
-						攻撃種別 = 8(爆雷攻撃);
-				} else if ( 艦上攻撃機 を装備している )
-					攻撃種別 = 7(空撃);
-				else 攻撃種別 = 0(砲撃);
-			}
-			else if ( 攻撃側 == ( 軽空母 | 正規空母 | 装甲空母 ) ) 攻撃種別 = 7(空撃);
-			else if ( 防御側 == ( 潜水艦 | 潜水空母 ) ) {
-				if ( 攻撃側 == ( 航空巡洋艦 | 航空戦艦 | 水上機母艦 | 揚陸艦 ) ) 攻撃種別 = 7(空撃);
-				else 攻撃種別 = 8(爆雷攻撃);
-			}
-			else if ( 最初の表示装備(api_si_list) == ( 魚雷 | 潜水艦魚雷 ) ) 攻撃種別 = 9(雷撃);
-			else 攻撃種別 = 0(砲撃);
-			*/
 		}
 	}
 	return;
@@ -815,5 +795,25 @@ bool Simulator::IsBattleTerminate() const noexcept {
 
 // 昼戦での攻撃種別を判断する
 DayFireType Simulator::JudgeDayFireType(const KammusuIndex&, const KammusuIndex&) const noexcept {
+	/*
+	if ( 防御側 == 陸上基地 && 対地装備 を装備している ) 攻撃種別 = 10(ロケット砲撃);
+	else if ( 攻撃側 == 速吸改 ) {
+	if ( 防御側 == ( 潜水艦 | 潜水空母 ) ) {
+	if ( ( ( 対潜 > 0 の艦上攻撃機 ) | 水上爆撃機 | オートジャイロ ) を装備している )
+	攻撃種別 = 7(空撃);
+	else
+	攻撃種別 = 8(爆雷攻撃);
+	} else if ( 艦上攻撃機 を装備している )
+	攻撃種別 = 7(空撃);
+	else 攻撃種別 = 0(砲撃);
+	}
+	else if ( 攻撃側 == ( 軽空母 | 正規空母 | 装甲空母 ) ) 攻撃種別 = 7(空撃);
+	else if ( 防御側 == ( 潜水艦 | 潜水空母 ) ) {
+	if ( 攻撃側 == ( 航空巡洋艦 | 航空戦艦 | 水上機母艦 | 揚陸艦 ) ) 攻撃種別 = 7(空撃);
+	else 攻撃種別 = 8(爆雷攻撃);
+	}
+	else if ( 最初の表示装備(api_si_list) == ( 魚雷 | 潜水艦魚雷 ) ) 攻撃種別 = 9(雷撃);
+	else 攻撃種別 = 0(砲撃);
+	*/
 	return kDayFireGun;	//仮置き
 }

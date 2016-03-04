@@ -64,6 +64,9 @@ class Kammusu {
 	int cond_;					//cond値
 	int ammo_;					//残弾薬割合
 	int fuel_;					//残燃料割合
+	// 内部用メンバ関数
+	bool IsAntiSubDayPlane() const noexcept;	//対潜判定(空母用)
+	bool IsAntiSubDayWater() const noexcept;	//対潜判定(航戦用)
 public:
 	struct DependOnLv;
 	// コンストラクタ
