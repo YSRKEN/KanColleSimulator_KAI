@@ -558,6 +558,14 @@ bool Kammusu::HasAirBomb() const noexcept {
 	return false;
 }
 
+// 昼戦に参加可能な場合はtrue
+bool Kammusu::HasAirAttack() const noexcept {
+	for (auto i = 0; i < slots_; ++i) {
+		if (weapons_[i].IsAirBomb() && airs_[i] > 0) return true;
+	}
+	return false;
+}
+
 // 潜水艦系ならtrue
 bool Kammusu::IsSubmarine() const noexcept {
 	if (ship_class_ == kShipClassSS || ship_class_ == kShipClassSSV) return true;
@@ -668,7 +676,21 @@ bool Kammusu::IsFireTorpedo(const TorpedoTurn &torpedo_turn) const noexcept {
 
 // 砲撃戦で行動可能な艦ならtrue
 bool Kammusu::IsMoveGun() const noexcept {
-	return true;	//仮置き
+	// 撃沈していたら当然行動できない
+	if (Status() == kStatusLost) return false;
+	// 潜水艦系も砲撃フェイズでは行動できない
+	if (IsSubmarine()) return false;
+	// 艦載機が切れた空母も砲撃フェイズでは行動できない
+	switch (ship_class_) {
+	case kShipClassCVL:
+	case kShipClassCV:
+	case kShipClassACV:
+		return HasAirAttack();
+		break;
+	default:
+		break;
+	}
+	return true;
 }
 
 std::ostream & operator<<(std::ostream & os, const Kammusu & conf)

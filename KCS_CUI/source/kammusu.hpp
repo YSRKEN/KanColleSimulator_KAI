@@ -135,6 +135,7 @@ public:
 	bool HasAirFight() const noexcept;				//航空戦に参加する艦載機を保有していた場合はtrue
 	bool HasAirTrailer() const noexcept;			//触接に参加する艦載機を保有していた場合はtrue
 	bool HasAirBomb() const noexcept;				//艦爆を保有していた場合はtrue
+	bool HasAirAttack() const noexcept;				// 昼戦に参加可能な場合はtrue
 	bool IsSubmarine() const noexcept;				//潜水艦系ならtrue
 	bool Include(const wstring& wstr) const noexcept;	//名前に特定の文字が含まれていればtrue
 	bool Include(const wchar_t* wstr) const noexcept;	//名前に特定の文字が含まれていればtrue
