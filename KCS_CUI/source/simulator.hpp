@@ -19,8 +19,6 @@ enum TorpedoTurn : std::uint8_t { kTorpedoFirst, kTorpedoSecond };
 // 砲撃戦の巡目(1巡目および2巡目)
 enum FireTurn { kFireFirst , kFireSecond };
 
-typedef vector<std::size_t> KammusuIndex;
-
 class Fleet;
 #include "result.hpp"
 #include "random.hpp"

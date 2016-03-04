@@ -286,7 +286,7 @@ void Simulator::AirWarPhase() {
 				KammusuIndex enemy_index = target;
 				auto damage = CalcDamage(kBattlePhaseAir, bi, { 0, ui }, enemy_index, base_attack, all_attack_plus, kBattlePositionSame, false, 1.0);
 				result_.AddDamage(bi, 0, ui, damage);
-				all_damage[other_side][enemy_index[0]][enemy_index[1]] += damage;
+				all_damage[other_side][enemy_index.fleet_no][enemy_index.fleet_i] += damage;
 			}
 		}
 	}
@@ -371,7 +371,7 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 			KammusuIndex enemy_index = std::get<1>(target);
 			auto damage = CalcDamage((torpedo_turn == kTorpedoFirst ? kBattlePhaseFirstTorpedo : kBattlePhaseTorpedo), bi, { 0, ui }, enemy_index, base_attack, false, 1.0);
 			result_.AddDamage(bi, 0, ui, damage);
-			all_damage[other_side][enemy_index[1]] += damage;
+			all_damage[other_side][enemy_index.fleet_i] += damage;
 		}
 	}
 	// ダメージ処理
@@ -493,8 +493,8 @@ int Simulator::CalcDamage(
 	ProtectOracle(other_side, enemy_index);
 	const auto &friend_side = fleet_[turn_player];
 	const auto &enemy_side  = fleet_[other_side];
-	const auto &hunter_kammusu = friend_side.GetUnit()[friend_index[0]][friend_index[1]];
-	const auto &target_kammusu = enemy_side.GetUnit()[enemy_index[0]][enemy_index[1]];
+	const auto &hunter_kammusu = friend_side.GetUnit()[friend_index.fleet_no][friend_index.fleet_i];
+	const auto &target_kammusu = enemy_side.GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i];
 	// 攻撃の命中率を計算する
 	double hit_prob = CalcHitProb(friend_side.GetFormation(), enemy_side.GetFormation(), hunter_kammusu, target_kammusu, battle_phase);
 	// 対潜攻撃かどうかを判断する
@@ -643,11 +643,11 @@ int Simulator::CalcDamage(
 // 「かばい」を確率的に発生させる
 void Simulator::ProtectOracle(const int &defense_side, KammusuIndex &defense_index) {
 	// 旗艦ではない場合、かばいは発生しない
-	if (defense_index[1] != 0) return;
+	if (defense_index.fleet_i != 0) return;
 	// 陸上型をかばう艦などいない
-	if (fleet_[defense_side].GetUnit()[defense_index[0]][0].GetShipClass() == kShipClassAF) return;
+	if (fleet_[defense_side].GetUnit()[defense_index.fleet_no][0].GetShipClass() == kShipClassAF) return;
 	// 水上艦は水上艦、潜水艦は潜水艦しかかばえないのでリストを作成する
-	auto &attendants = fleet_[defense_side].GetUnit()[defense_index[0]];
+	auto &attendants = fleet_[defense_side].GetUnit()[defense_index.fleet_no];
 	auto is_submarine = attendants[0].IsSubmarine();
 	vector<int> block_list;
 	for (auto ui = 1u; ui < attendants.size(); ++ui) {
@@ -658,7 +658,7 @@ void Simulator::ProtectOracle(const int &defense_side, KammusuIndex &defense_ind
 	if (block_list.size() == 0) return;
 	// かばいは確率的に発生し、どの艦がかばうかも確率的に決まる
 	if (rand.RandBool(0.4)) {	//とりあえず4割に設定している
-		defense_index[1] = block_list[rand.RandInt(block_list.size())];
+		defense_index.fleet_no = block_list[rand.RandInt(block_list.size())];
 	}
 	return;
 }

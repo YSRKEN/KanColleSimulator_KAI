@@ -39,7 +39,11 @@ constexpr int kMaxFleetSize = 2;	//
 constexpr int kMaxUnitSize = 6;		//艦隊に含まれる最大艦数
 constexpr int kFriendSide = 0, kEnemySide = 1;	//味方および敵陣営の番号付け
 
-typedef vector<size_t> KammusuIndex;
+//typedef vector<size_t> KammusuIndex;
+struct KammusuIndex {
+	std::size_t fleet_no;
+	std::size_t fleet_i;
+};
 
 // 射程
 enum Range { kRangeNone, kRangeShort, kRangeMiddle, kRangeLong, kRangeVeryLong };
