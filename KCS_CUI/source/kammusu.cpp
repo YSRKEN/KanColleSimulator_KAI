@@ -788,6 +788,7 @@ bool Kammusu::IsAntiSubDayPlane() const noexcept {
 			break;
 		}
 	}
+	return false;
 }
 
 bool Kammusu::IsAntiSubDayWater() const noexcept {
@@ -802,6 +803,7 @@ bool Kammusu::IsAntiSubDayWater() const noexcept {
 			break;
 		}
 	}
+	return false;
 }
 
 std::ostream & operator<<(std::ostream & os, const Kammusu & conf)
