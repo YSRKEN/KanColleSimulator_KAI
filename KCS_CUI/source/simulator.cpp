@@ -400,20 +400,20 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) {
 	// 2巡目は、どちらかの艦隊に戦艦か陸上型が存在していない場合には実行されない
 	if (fire_turn == kFireSecond) {
-		bool has_bb = false;
-		[&] {
-			for (auto &it_b : fleet_) {
+		const bool has_bb = [] (const vector<Fleet>& fleet) -> bool {
+			for (auto &it_b : fleet) {
 				for (auto &it_k : it_b.FirstUnit()) {
 					switch (it_k.GetShipClass()) {
 					case kShipClassBB:
 					case kShipClassBBV:
 					case kShipClassAF:
-						has_bb = true;
-						return;
+						return true;
+					default:;
 					}
 				}
 			}
-		}();
+			return false;
+		}(this->fleet_);
 		if(!has_bb) return;
 	}
 	// 攻撃順を決定する
@@ -421,24 +421,24 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
 		auto &unit = fleet_[bi].GetUnit();
 		// 行動可能な艦娘一覧を作成する
+		auto &unit2 = unit[fleet_index];
 		if (bi == kFriendSide) {
-			auto &unit2 = unit[fleet_index];
 			for (auto ui = 0u; ui < unit2.size(); ++ui) {
 				if (!unit2[ui].IsMoveGun()) continue;
-				attack_list[bi].push_back(std::pair<KammusuIndex, Range>({fleet_index, ui}, unit2[ui].MaxRange()));
+				attack_list[bi].push_back({{fleet_index, ui}, unit2[ui].MaxRange()});
 			}
 		}
 		else {
 			for (auto ui = 0u; ui < unit[0].size(); ++ui) {
 				if (!unit2[ui].IsMoveGun()) continue;
-				attack_list[bi].push_back(std::pair<KammusuIndex, Range>({ 0, ui }, unit[0][ui].MaxRange()));
+				attack_list[bi].push_back({ { 0, ui }, unit[0][ui].MaxRange() });
 			}
 		}
 		if (fire_turn == kFireFirst) {
 			// 一覧をシャッフルする
 			std::shuffle(attack_list[bi].begin(), attack_list[bi].end(), this->rand.get());
 			// 一覧を射程で安定ソートする
-			std::stable_sort(attack_list[bi].begin(), attack_list[bi].end(), [](const std::pair<KammusuIndex, Range> &a, const std::pair<KammusuIndex, Range> &b) {return (b.second < a.second); });
+			std::stable_sort(attack_list[bi].begin(), attack_list[bi].end(), [](const auto& a, const auto& b) {return (b.second < a.second); });
 		}
 	}
 	// 決定した巡目に基づいて攻撃を行う
