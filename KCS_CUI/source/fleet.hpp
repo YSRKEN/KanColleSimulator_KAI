@@ -7,9 +7,13 @@
 #include "char_convert.hpp"
 #include "simulator.hpp"
 #include "random.hpp"
+
 // 艦隊の形式
 enum FleetType {kFleetTypeNormal = 1, kFleetTypeCombinedAir, kFleetTypeCombinedGun, kFleetTypeCombinedDrum};
 const wstring kFleetTypeStr[] = {L"通常艦隊", L"空母機動部隊", L"水上打撃部隊", L"輸送護衛部隊" };
+
+// 標的(第一艦隊・第二艦隊・全体)
+enum TargetType { kTargetTypeFirst, kTargetTypeSecond, kTargetTypeAll };
 
 class Fleet {
 	Formation formation_;			//陣形
@@ -51,10 +55,10 @@ public:
 	friend std::wostream& operator<<(std::wostream& os, const Fleet& conf);
 
 	//ctorもしくはSetRandGenerator経由で乱数エンジンを渡している必要がある
-	double TrailerAircraftPlus();		//攻撃力補正を計算する
-	int AacType();					//発動する対空カットインの種類を判断する
+	double TrailerAircraftPlus();			//攻撃力補正を計算する
+	int AacType();							//発動する対空カットインの種類を判断する
 	int RandomKammusu();					//生存艦から艦娘をランダムに指定する
-	int RandomKammusuNonSS(const bool&);	//水上の生存艦から艦娘をランダムに指定する
+	tuple<bool, KammusuIndex> RandomKammusuNonSS(const bool&, const TargetType&);	//水上の生存艦から艦娘をランダムに指定する
 };
 std::ostream& operator<<(std::ostream& os, const Fleet& conf);
 std::wostream& operator<<(std::wostream& os, const Fleet& conf);

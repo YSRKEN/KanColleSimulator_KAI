@@ -169,8 +169,9 @@ private:
 	}
 public:
 	template<typename RandType, std::enable_if_t<std::is_integral<RandType>::value/*std::is_arithmetic<RandType>::value*/, std::nullptr_t> = nullptr>
-	std::vector<RandType> make_unique_rand_array(const std::size_t size, RandType rand_min, RandType rand_max) {
+	std::vector<RandType> make_unique_rand_array(const std::size_t size, RandType rand_min = std::numeric_limits<RandType>::min(), RandType rand_max = std::numeric_limits<RandType>::max()) {
 		if (rand_min > rand_max) std::swap(rand_min, rand_max);
+		if (1 == size) return{ this->generate(rand_min, rand_max) };
 		const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
 		INVAID_ARGUMENT_THROW_WITH_MESSAGE_IF(max_min_diff < size, "random generate range(" + std::to_string(rand_min) + "-->" + std::to_string(rand_max) + ") is small to make unique rand array.")
 
@@ -183,7 +184,7 @@ public:
 		}
 	}
 	template<typename ForwardIte, typename RandType, std::enable_if_t<std::is_arithmetic<RandType>::value, std::nullptr_t> = nullptr>
-	void generate(ForwardIte begin, ForwardIte end, RandType rand_min, RandType rand_max) {
+	void generate(ForwardIte begin, ForwardIte end, RandType rand_min = std::numeric_limits<RandType>::min(), RandType rand_max = std::numeric_limits<RandType>::max()) {
 		if (rand_min > rand_max) std::swap(rand_min, rand_max);
 		auto& engine = this->get();
 		distribution_t<RandType> distribution(rand_min, rand_max);
