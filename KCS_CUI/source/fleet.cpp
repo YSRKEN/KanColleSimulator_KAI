@@ -331,13 +331,13 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool &has_bomb, const 
 	vector<size_t> list;
 	switch (target_type) {
 	case kTargetTypeFirst:
-		list = { 0 };
+		list = { FirstIndex() };
 		break;
 	case kTargetTypeSecond:
-		list = { unit_.size() - 1 };
+		list = { SecondIndex() };
 		break;
 	case kTargetTypeAll:
-		list = { 0, unit_.size() - 1 };
+		list = { FirstIndex(), SecondIndex() };
 		break;
 	}
 	//生存する水上艦をリストアップ

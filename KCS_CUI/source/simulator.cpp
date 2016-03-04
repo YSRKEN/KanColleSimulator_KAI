@@ -369,8 +369,8 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 			int base_attack = hunter_kammusu.AllTorpedo(true) + 5;
 			// 与えるダメージを計算する
 			KammusuIndex enemy_index = std::get<1>(target);
-			auto damage = CalcDamage((torpedo_turn == kTorpedoFirst ? kBattlePhaseFirstTorpedo : kBattlePhaseTorpedo), bi, KammusuIndex{ 0, ui }, enemy_index, base_attack, false, 1.0);
-			result_.AddDamage(bi, 0, ui, damage);
+			auto damage = CalcDamage((torpedo_turn == kTorpedoFirst ? kBattlePhaseFirstTorpedo : kBattlePhaseTorpedo), bi, KammusuIndex{ fleet_[bi].SecondIndex(), ui }, enemy_index, base_attack, false, 1.0);
+			result_.AddDamage(bi, fleet_[bi].SecondIndex(), ui, damage);
 			all_damage[other_side][enemy_index.fleet_i] += damage;
 		}
 	}
