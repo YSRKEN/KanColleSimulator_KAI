@@ -41,11 +41,11 @@ constexpr int kFriendSide = 0, kEnemySide = 1;	//味方および敵陣営の番�
 
 //typedef vector<size_t> KammusuIndex;
 struct KammusuIndex {
-	std::size_t fleet_no;
-	std::size_t fleet_i;
-	KammusuIndex(const size_t no, const size_t i) noexcept{
-		fleet_no = no;
-		fleet_i = i;
+	std::size_t fleet_no_;
+	std::size_t fleet_i_;
+	KammusuIndex(const size_t fleet_no, const size_t fleet_i) noexcept{
+		fleet_no_ = fleet_no;
+		fleet_i_ = fleet_i;
 	}
 };
 
