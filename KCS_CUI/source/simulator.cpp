@@ -257,13 +257,13 @@ void Simulator::AirWarPhase() {
 			// 既に沈んでいる場合は攻撃できない
 			if (friend_kammusu.Status() == kStatusLost) continue;
 			// 敵に攻撃できない場合は次の艦娘にバトンタッチ
-			auto has_attacker = fleet_[other_side].RandomKammusuNonSS(friend_kammusu.HasAirBomb(), kTargetTypeAll);
+			auto has_attacker = fleet_[other_side].RandomKammusuNonSS(false, kTargetTypeAll);
 			if (!std::get<0>(has_attacker)) continue;
 			// そうでない場合は、各スロットに対して攻撃対象を選択する
 			for (auto wi = 0; wi < friend_kammusu.GetSlots(); ++wi) {
 				if (friend_kammusu.GetAir()[wi] == 0 || !friend_weapon[wi].IsAirBomb()) continue;
 				// 爆撃する対象を決定する(各スロット毎に、ランダムに対象を選択しなければならない)
-				auto target = std::get<1>(fleet_[other_side].RandomKammusuNonSS(friend_kammusu.HasAirBomb(), kTargetTypeAll));
+				auto target = std::get<1>(fleet_[other_side].RandomKammusuNonSS(false, kTargetTypeAll));
 				// 基礎攻撃力を算出する
 				int base_attack;
 				switch (friend_weapon[wi].GetWeaponClass()) {
@@ -397,11 +397,25 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 
 // 砲撃戦フェイズ
 void Simulator::FirePhase(const FireTurn &fire_turn) {
-	// 2巡目は、どちらかの艦隊に戦艦が存在していない場合には実行されない
+	// 2巡目は、どちらかの艦隊に戦艦か陸上型が存在していない場合には実行されない
 	if (fire_turn == kFireSecond) {
-
-		return;
+		bool has_bb = false;
+		[&] {
+			for (auto &it_b : fleet_) {
+				for (auto &it_k : it_b.FirstUnit()) {
+					switch (it_k.GetShipClass()) {
+					case kShipClassBB:
+					case kShipClassBBV:
+					case kShipClassAF:
+						has_bb = true;
+						return;
+					}
+				}
+			}
+		}();
+		if(!has_bb) return;
 	}
+	// 
 }
 
 // 夜戦フェイズ
@@ -602,6 +616,8 @@ int Simulator::CalcDamage(
 void Simulator::ProtectOracle(const int &defense_side, KammusuIndex &defense_index) {
 	// 旗艦ではない場合、かばいは発生しない
 	if (defense_index[1] != 0) return;
+	// 陸上型をかばう艦などいない
+	if (fleet_[defense_side].GetUnit()[defense_index[0]][0].GetShipClass() == kShipClassAF) return;
 	// 水上艦は水上艦、潜水艦は潜水艦しかかばえないのでリストを作成する
 	auto &attendants = fleet_[defense_side].GetUnit()[defense_index[0]];
 	auto is_submarine = attendants[0].IsSubmarine();
@@ -616,7 +632,7 @@ void Simulator::ProtectOracle(const int &defense_side, KammusuIndex &defense_ind
 	if (rand.RandBool(0.4)) {	//とりあえず4割に設定している
 		defense_index[1] = block_list[rand.RandInt(block_list.size())];
 	}
-	return;	//仮置き
+	return;
 }
 
 //命中率を計算する
