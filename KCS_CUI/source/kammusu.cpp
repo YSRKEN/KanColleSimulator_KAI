@@ -110,7 +110,7 @@ int Kammusu::AacType() const noexcept {
 	size_t sum_gunL = 0, sum_radarW = 0, sum_radarA = 0, sum_three = 0;
 	for (auto &it_w : weapons_) {
 		switch (it_w.GetWeaponClass()) {
-		case kWeaponClassGun:
+		case WeaponClass::Gun:
 			if (it_w.IsHAG()) {
 				if (it_w.Include(L"高射装置") || it_w.GetName() == L"90mm単装高角砲") {
 					++sum_hagX;
@@ -123,10 +123,10 @@ int Kammusu::AacType() const noexcept {
 				++sum_gunL;
 			}
 			break;
-		case kWeaponClassAAD:
+		case WeaponClass::AAD:
 			++sum_aad;
 			break;
-		case kWeaponClassAAG:
+		case WeaponClass::AAG:
 			if (it_w.Include(L"集中")) {
 				++sum_aagX;
 			}
@@ -134,11 +134,11 @@ int Kammusu::AacType() const noexcept {
 				++sum_aag;
 			}
 			break;
-		case kWeaponClassAAA:
+		case WeaponClass::AAA:
 			++sum_three;
 			break;
-		case kWeaponClassSmallR:
-		case kWeaponClassLargeR:
+		case WeaponClass::SmallR:
+		case WeaponClass::LargeR:
 			if (it_w.Include(L"対空")) {
 				++sum_radarA;
 			}
@@ -270,21 +270,21 @@ double Kammusu::AllAntiAir() const noexcept {
 			aaa = int(2.0 * sqrt(it_w.GetAntiAir()));
 		}
 		switch (it_w.GetWeaponClass()) {
-		case kWeaponClassAAG:
+		case WeaponClass::AAG:
 			aaa *= 6.0;
 			break;
-		case kWeaponClassAAD:
+		case WeaponClass::AAD:
 			aaa *= 4.0;
 			break;
-		case kWeaponClassLargeR:
-		case kWeaponClassSmallR:
+		case WeaponClass::LargeR:
+		case WeaponClass::SmallR:
 			aaa *= 3.0;
 			break;
-		case kWeaponClassPF:
-		case kWeaponClassAAA:
+		case WeaponClass::PF:
+		case WeaponClass::AAA:
 			aaa *= 0.0;
 			break;
-		case kWeaponClassGun:
+		case WeaponClass::Gun:
 			if (it_w.IsHAG()) aaa *= 4.0; else aaa *= 0.0;
 			break;
 		default:
@@ -404,8 +404,8 @@ int Kammusu::AllTorpedo(const bool &level_flg) const noexcept {
 		torpedo_sum += it_w.GetTorpedo();
 		if (level_flg) {
 			switch (it_w.GetAntiAir()) {
-			case kWeaponClassTorpedo:
-			case kWeaponClassAAG:
+			case WeaponClass::Torpedo:
+			case WeaponClass::AAG:
 				torpedo_sum += 1.2 * sqrt(it_w.GetLevel());
 			default:
 				break;
@@ -444,17 +444,17 @@ double Kammusu::SpecialEffectApPlus() const noexcept {
 	bool has_gun = false, has_ap = false, has_subgun = false, has_radar = false;
 	for (auto &it_w : weapons_) {
 		switch (it_w.GetWeaponClass()) {
-		case kWeaponClassGun:
+		case WeaponClass::Gun:
 			has_gun = true;
 			break;
-		case kWeaponClassAP:
+		case WeaponClass::AP:
 			has_ap = true;
 			break;
-		case kWeaponClassSubGun:
+		case WeaponClass::SubGun:
 			has_subgun = true;
 			break;
-		case kWeaponClassSmallR:
-		case kWeaponClassLargeR:
+		case WeaponClass::SmallR:
+		case WeaponClass::LargeR:
 			has_radar = true;
 			break;
 		default:
@@ -481,16 +481,8 @@ double Kammusu::SpecialEffectApPlus() const noexcept {
 double Kammusu::CL2ProbPlus() const noexcept {
 	double cl_prob_plus = 0.0;
 	for (auto &it_w : weapons_) {
-		switch (it_w.GetWeaponClass()) {
-		case kWeaponClassPA:
-		case kWeaponClassPB:
-		case kWeaponClassPBF:
-		case kWeaponClassWB:
+		if (it_w.Is(WeaponClass::AirBomb))
 			cl_prob_plus += 0.05 * it_w.GetLevel() / 7;
-			break;
-		default:
-			break;
-		}
 	}
 	return cl_prob_plus;
 }
@@ -500,16 +492,8 @@ double Kammusu::CL2AttackPlus() const noexcept {
 	double cl_attack_plus = 0.0;
 	for (auto wi = 0; wi < slots_; ++wi) {
 		auto &it_w = weapons_[wi];
-		switch (it_w.GetWeaponClass()) {
-		case kWeaponClassPA:
-		case kWeaponClassPB:
-		case kWeaponClassPBF:
-		case kWeaponClassWB:
+		if (it_w.Is(WeaponClass::AirBomb))
 			cl_attack_plus += (wi == 0 ? 0.2 : 0.1) * it_w.GetLevel() / 7;
-			break;
-		default:
-			break;
-		}
 	}
 	return cl_attack_plus;
 }
@@ -555,45 +539,36 @@ void Kammusu::ConsumeMaterial() noexcept {
 	fuel_ = (fuel_ - 20) | limit(0, 100);
 }
 
-// 艦載機を保有していた場合はtrue
-bool Kammusu::HasAir() const noexcept {
+bool Kammusu::HasWeaponClass(const WeaponClass& wc) const noexcept {
 	for (auto i = 0; i < slots_; ++i) {
-		if (weapons_[i].IsAir() && airs_[i] > 0) return true;
+		if (weapons_[i].Is(wc) && airs_[i] > 0) return true;
 	}
 	return false;
+}
+
+// 艦載機を保有していた場合はtrue
+bool Kammusu::HasAir() const noexcept {
+	return HasWeaponClass(WeaponClass::Air);
 }
 
 // 航空戦に参加する艦載機を保有していた場合はtrue
 bool Kammusu::HasAirFight() const noexcept {
-	for (auto i = 0; i < slots_; ++i) {
-		if (weapons_[i].IsAirFight() && airs_[i] > 0) return true;
-	}
-	return false;
+	return HasWeaponClass(WeaponClass::AirFight);
 }
 
 // 触接に参加する艦載機を保有していた場合はtrue
 bool Kammusu::HasAirTrailer() const noexcept {
-	for (auto i = 0; i < slots_; ++i) {
-		if (weapons_[i].IsAirTrailer() && airs_[i] > 0) return true;
-	}
-	return false;
+	return HasWeaponClass(WeaponClass::AirTrailer);
 }
 
 // 艦爆を保有していた場合はtrue
 bool Kammusu::HasAirBomb() const noexcept {
-	for (auto i = 0; i < slots_; ++i) {
-		auto weapon_class = weapons_[i].GetWeaponClass();
-		if ((weapon_class == kWeaponClassPB || weapon_class == kWeaponClassPBF) && airs_[i] > 0) return true;
-	}
-	return false;
+	return HasWeaponClass(WeaponClass::PB | WeaponClass::PBF);
 }
 
 // 昼戦に参加可能な場合はtrue
 bool Kammusu::HasAirAttack() const noexcept {
-	for (auto i = 0; i < slots_; ++i) {
-		if (weapons_[i].IsAirBomb() && airs_[i] > 0) return true;
-	}
-	return false;
+	return HasWeaponClass(WeaponClass::AirBomb);
 }
 
 // 潜水艦系ならtrue
@@ -622,10 +597,10 @@ bool Kammusu::HasAntiSubSynergy() const noexcept {
 	bool has_dp = false, has_sonar = false;
 	for (auto &it_w : weapons_) {
 		switch (it_w.GetWeaponClass()) {
-		case kWeaponClassDP:
+		case WeaponClass::DP:
 			has_dp = true;
 			break;
-		case kWeaponClassSonar:
+		case WeaponClass::Sonar:
 			has_sonar = true;
 			break;
 		default:
@@ -654,7 +629,7 @@ bool Kammusu::IsSpecialEffectAP() const noexcept {
 // 彩雲を保有していた場合はtrue
 bool Kammusu::HasAirPss() const noexcept {
 	for (auto &it_w : weapons_) {
-		if (it_w.GetWeaponClass() == kWeaponClassPSS) return true;
+		if (it_w.Is(WeaponClass::PSS)) return true;
 	}
 	return false;
 }
@@ -674,7 +649,7 @@ bool Kammusu::IsFireTorpedo(const TorpedoTurn &torpedo_turn) const noexcept {
 			case kShipClassCLT:
 			case kShipClassAV:*/
 				for (auto &it_w : weapons_) {
-					if (it_w.GetWeaponClass() == kWeaponClassSpecialSS) return true;
+					if (it_w.Is(WeaponClass::SpecialSS)) return true;
 				}
 			/*default:
 				break;
@@ -779,14 +754,8 @@ bool Kammusu::IsAntiSubDay() const noexcept {
 bool Kammusu::IsAntiSubDayPlane() const noexcept {
 	for (auto wi = 0; wi < slots_; ++wi) {
 		if (airs_[wi] == 0) continue;
-		switch (weapons_[wi].GetWeaponClass()) {
-		case kWeaponClassPBF:
-		case kWeaponClassPB:
-		case kWeaponClassPA:
+		if (weapons_[wi].Is(WeaponClass::PBF | WeaponClass::PB | WeaponClass::PA))
 			return true;
-		default:
-			break;
-		}
 	}
 	return false;
 }
@@ -794,14 +763,8 @@ bool Kammusu::IsAntiSubDayPlane() const noexcept {
 bool Kammusu::IsAntiSubDayWater() const noexcept {
 	for (auto wi = 0; wi < slots_; ++wi) {
 		if (airs_[wi] == 0) continue;
-		switch (weapons_[wi].GetWeaponClass()) {
-		case kWeaponClassWB:
-		case kWeaponClassASPP:
-		case kWeaponClassAJ:
+		if (weapons_[wi].Is(WeaponClass::WB | WeaponClass::ASPP | WeaponClass::AJ))
 			return true;
-		default:
-			break;
-		}
 	}
 	return false;
 }

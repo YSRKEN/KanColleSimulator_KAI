@@ -86,7 +86,7 @@ void Fleet::LoadJson(std::istream & file, const WeaponDB & weapon_db, const Kamm
 				auto& parts = temp_p.second.get<object>();
 				Weapon temp_w = weapon_db.Get(parts.at("id").to_str() | to_i());
 				// 改修・外部熟練度・内部熟練度の処理
-				if (temp_w.IsAir()) {
+				if (temp_w.Is(WeaponClass::Air)) {
 					level = parts.at("rf").to_str() | to_i_limit(0, 7);
 					int level_detail = 0;
 					auto it = parts.find("rf_detail");
@@ -182,29 +182,29 @@ double Fleet::SearchValue() const noexcept {
 			search_sum += sqrt(it_k.GetSearch()) * 1.6841056;
 			for (auto &it_w : it_k.GetWeapon()) {
 				switch (it_w.GetWeaponClass()) {
-				case kWeaponClassPB:	//艦爆
-				case kWeaponClassPBF:	//艦爆
+				case WeaponClass::PB:	//艦爆
+				case WeaponClass::PBF:	//艦爆
 					search_sum += it_w.GetSearch() * 1.0376255;
 					break;
-				case kWeaponClassWB:	//水爆
+				case WeaponClass::WB:	//水爆
 					search_sum += it_w.GetSearch() * 1.7787282;
 					break;
-				case kWeaponClassPA:	//艦攻
+				case WeaponClass::PA:	//艦攻
 					search_sum += it_w.GetSearch() * 1.3677954;
 					break;
-				case kWeaponClassPS:	//艦偵
+				case WeaponClass::PS:	//艦偵
 					search_sum += it_w.GetSearch() * 1.6592780;
 					break;
-				case kWeaponClassWS:	//水偵
+				case WeaponClass::WS:	//水偵
 					search_sum += it_w.GetSearch() * 2.0000000;
 					break;
-				case kWeaponClassSmallR:	//小型電探
+				case WeaponClass::SmallR:	//小型電探
 					search_sum += it_w.GetSearch() * 1.0045358;
 					break;
-				case kWeaponClassLargeR:	//大型電探
+				case WeaponClass::LargeR:	//大型電探
 					search_sum += it_w.GetSearch() * 0.9906638;
 					break;
-				case kWeaponClassSL:	//探照灯
+				case WeaponClass::SL:	//探照灯
 					search_sum += it_w.GetSearch() * 0.9067950;
 					break;
 				default:
@@ -222,7 +222,7 @@ int Fleet::AntiAirScore() const noexcept {
 	for (auto &it_k : FirstUnit()) {
 		if (it_k.Status() == kStatusLost) continue;
 		for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
-			if (!it_k.GetWeapon()[wi].IsAirFight()) continue;
+			if (!it_k.GetWeapon()[wi].Is(WeaponClass::AirFight)) continue;
 			anti_air_score += it_k.GetWeapon()[wi].AntiAirScore(it_k.GetAir()[wi]);
 		}
 	}
@@ -237,16 +237,8 @@ double Fleet::TrailerAircraftProb(const AirWarStatus &air_war_status) const {
 		if (it_k.Status() == kStatusLost) continue;
 		for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
 			auto it_w = it_k.GetWeapon()[wi];
-			switch (it_w.GetWeaponClass()) {
-			case kWeaponClassPS:
-			case kWeaponClassPSS:
-			case kWeaponClassDaiteiChan:
-			case kWeaponClassWS:
-			case kWeaponClassWSN:
+			if (it_w.Is(WeaponClass::PS | WeaponClass::PSS | WeaponClass::DaiteiChan | WeaponClass::WS | WeaponClass::WSN))
 				trailer_aircraft_prob += 0.04 * it_w.GetSearch() * sqrt(it_k.GetAir()[wi]);
-			default:
-				break;
-			}
 		}
 	}
 	// 制空段階によって補正を掛ける(航空優勢以外は試験実装)
@@ -275,7 +267,7 @@ double Fleet::TrailerAircraftPlus(){
 	for (auto &it_k :FirstUnit() ) {
 		if (it_k.Status() == kStatusLost) continue;
 		for (auto &it_w : it_k.GetWeapon()) {
-			if (!it_w.IsAirTrailer()) continue;
+			if (!it_w.Is(WeaponClass::AirTrailer)) continue;
 			if (0.07 * it_w.GetSearch() >= rand_.RandReal()) {
 				return all_attack_plus_list[it_w.GetHit()];
 			}
@@ -321,10 +313,10 @@ int Fleet::AntiAirBonus() const {
 				if (it_w.IsHAG() || it_w.Include(L"高射装置")) {
 					anti_air_bonus += 0.35 * it_w.GetAntiAir();
 				}
-				else if (it_w.GetWeaponClass() == kWeaponClassSmallR || it_w.GetWeaponClass() == kWeaponClassLargeR) {
+				else if (it_w.Is(WeaponClass::SmallR | WeaponClass::LargeR)) {
 					anti_air_bonus += 0.4 * it_w.GetAntiAir();
 				}
-				else if (it_w.GetWeaponClass() == kWeaponClassAAA) {
+				else if (it_w.Is(WeaponClass::AAA)) {
 					anti_air_bonus += 0.6 * it_w.GetAntiAir();
 				}
 				else {
