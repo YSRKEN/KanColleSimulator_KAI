@@ -12,6 +12,7 @@
 #include <unordered_set>
 #include <functional>
 #include <limits>
+#include <numeric>
 #include "exception.hpp"
 #ifdef max
 #undef max
@@ -143,10 +144,8 @@ private:
 		const auto max_min_diff = max_min_diff_tmp + 1;
 		INVAID_ARGUMENT_THROW_WITH_MESSAGE_IF(max_min_diff < size, "random generate range(" + std::to_string(rand_min) + "-->" + std::to_string(rand_max) + ") is small to make unique rand array.")
 
-		std::vector<RandType> tmp;
-		tmp.reserve(max_min_diff);
-
-		for (auto i = rand_min; i <= rand_max; ++i)tmp.push_back(i);
+		std::vector<RandType> tmp(max_min_diff);
+		std::iota(tmp.begin(), tmp.end(), rand_min);
 
 		auto& engine = this->get();
 		distribution_t<RandType> distribution(rand_min, rand_max);
@@ -168,8 +167,7 @@ private:
 		auto& engine = this->get();
 		distribution_t<RandType> distribution(rand_min, rand_max);
 		std::vector<RandType> re(size);
-		auto t = rand_min;
-		std::generate(re.begin(), re.end(), [&t]() { return t++; });
+		std::iota(re.begin(), re.end(), rand_min);
 		std::shuffle(re.begin(), re.end(), engine);
 		return re;
 	}
