@@ -42,6 +42,36 @@ void Kammusu::SetRandGenerator(const SharedRand & rand) {
 	this->rand_ = rand;
 }
 
+// getter
+int Kammusu::GetID() const noexcept { return id_; }
+wstring Kammusu::GetName() const { return name_; }
+ShipClass Kammusu::GetShipClass() const noexcept { return ship_class_; }
+int Kammusu::GetMaxHP() const noexcept { return max_hp_; }
+int Kammusu::GetTorpedo() const noexcept { return torpedo_; }
+int Kammusu::GetLuck() const noexcept { return luck_; }
+int Kammusu::GetSlots() const noexcept { return slots_; }
+int Kammusu::GetEvade() const noexcept { return evade_; }
+int Kammusu::GetAntiSub() const noexcept { return anti_sub_; }
+int Kammusu::GetSearch() const noexcept { return search_; }
+bool Kammusu::IsKammusu() const noexcept { return kammusu_flg_; }
+int Kammusu::GetLevel() const noexcept { return level_; }
+int Kammusu::GetHP() const noexcept { return hp_; }
+vector<int>& Kammusu::GetAir() noexcept { return airs_; }
+const vector<int>& Kammusu::GetAir() const noexcept { return airs_; }
+vector<Weapon>& Kammusu::GetWeapon() noexcept { return weapons_; }
+const vector<Weapon>& Kammusu::GetWeapon() const noexcept { return weapons_; }
+int Kammusu::GetAmmo() const noexcept { return ammo_; }
+// setter
+void Kammusu::SetMaxHP(const int max_hp) noexcept { max_hp_ = max_hp; }
+void Kammusu::SetLuck(const int luck) noexcept { luck_ = luck; }
+void Kammusu::SetEvade(const int evade) noexcept { evade_ = evade; }
+void Kammusu::SetAntiSub(const int anti_sub) noexcept { anti_sub_ = anti_sub; }
+void Kammusu::SetSearch(const int search) noexcept { search_ = search; }
+void Kammusu::SetLevel(const int level) noexcept { level_ = level; }
+void Kammusu::SetHP(const int hp) noexcept { hp_ = hp; }
+void Kammusu::SetWeapon(const int index, const Weapon & weapon) { weapons_[index] = weapon; }
+void Kammusu::SetCond(const int cond) noexcept { cond_ = cond; }
+
 // 中身を表示する
 void Kammusu::Put() const {
 	cout << *this;
@@ -717,7 +747,63 @@ bool Kammusu::IsFireGun() const noexcept {
 
 // 昼戦で対潜可能な艦ならtrue
 bool Kammusu::IsAntiSubDay() const noexcept {
-	return false;	//仮置き
+	switch (ship_class_) {
+	case kShipClassCVL:
+	case kShipClassAF:
+		// 空母型対潜攻撃
+		return IsAntiSubDayPlane();
+		break;
+	case kShipClassBBV:
+	case kShipClassAV:
+	case kShipClassCAV:
+		// 航戦型対潜攻撃
+		return IsAntiSubDayWater();
+		break;
+	case kShipClassCL:
+	case kShipClassCLT:
+	case kShipClassDD:
+	case kShipClassCP:
+		// 水雷型対潜攻撃
+		if (anti_sub_ > 0) return true;
+		break;
+	case kShipClassAO:
+		// 上記3種類が合わさった速吸改は頭おかしい(褒め言葉)
+		return (IsAntiSubDayPlane() || IsAntiSubDayWater() || (anti_sub_ > 0));
+		break;
+	default:
+		break;
+	}
+	return false;
+}
+
+bool Kammusu::IsAntiSubDayPlane() const noexcept {
+	for (auto wi = 0; wi < slots_; ++wi) {
+		if (airs_[wi] == 0) continue;
+		switch (weapons_[wi].GetWeaponClass()) {
+		case kWeaponClassPBF:
+		case kWeaponClassPB:
+		case kWeaponClassPA:
+			return true;
+		default:
+			break;
+		}
+	}
+	return false;
+}
+
+bool Kammusu::IsAntiSubDayWater() const noexcept {
+	for (auto wi = 0; wi < slots_; ++wi) {
+		if (airs_[wi] == 0) continue;
+		switch (weapons_[wi].GetWeaponClass()) {
+		case kWeaponClassWB:
+		case kWeaponClassASPP:
+		case kWeaponClassAJ:
+			return true;
+		default:
+			break;
+		}
+	}
+	return false;
 }
 
 std::ostream & operator<<(std::ostream & os, const Kammusu & conf)

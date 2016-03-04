@@ -55,12 +55,12 @@ class Simulator {
 	// 戦闘終了を判断する
 	bool IsBattleTerminate() const noexcept;
 	// 昼戦での攻撃種別を判断する
-	DayFireType JudgeDayFireType(const KammusuIndex&, const KammusuIndex&) const noexcept;
+	DayFireType JudgeDayFireType(const int, const KammusuIndex&, const KammusuIndex&) const noexcept;
 public:
 	// コンストラクタ
 	Simulator(){}
 	Simulator(const vector<Fleet> &fleet, const unsigned int seed, const SimulateMode& simulate_mode);
-	SharedRand GetGenerator() noexcept { return this->rand; }
+	SharedRand GetGenerator() noexcept;
 	// 計算用メソッド
 	Result Calc();
 };

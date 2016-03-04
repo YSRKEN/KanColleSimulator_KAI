@@ -213,6 +213,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="source\config.cpp" />
+    <ClCompile Include="source\exception.cpp" />
     <ClCompile Include="source\fleet.cpp" />
     <ClCompile Include="source\kammusu.cpp" />
     <ClCompile Include="source\main.cpp" />
