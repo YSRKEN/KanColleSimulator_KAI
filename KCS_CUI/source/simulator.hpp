@@ -19,6 +19,9 @@ enum TorpedoTurn : std::uint8_t { kTorpedoFirst, kTorpedoSecond };
 // 砲撃戦の巡目(1巡目および2巡目)
 enum FireTurn { kFireFirst , kFireSecond };
 
+// 昼戦における攻撃種別(砲撃・空撃・爆雷攻撃)
+enum DayFireType {kDayFireGun, kDayFireAir, kDayFireChage};
+
 class Fleet;
 #include "result.hpp"
 #include "random.hpp"
@@ -51,6 +54,8 @@ class Simulator {
 	double CalcHitProb(const Formation&, const Formation&, const Kammusu&, const Kammusu&, const BattlePhase&) const noexcept;
 	// 戦闘終了を判断する
 	bool IsBattleTerminate() const noexcept;
+	// 昼戦での攻撃種別を判断する
+	DayFireType JudgeDayFireType(const KammusuIndex&, const KammusuIndex&) const noexcept;
 public:
 	// コンストラクタ
 	Simulator(){}
