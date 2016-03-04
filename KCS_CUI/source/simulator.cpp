@@ -10,6 +10,8 @@ Simulator::Simulator(const vector<Fleet>& fleet, const unsigned int seed, const 
 	for (auto& f : this->fleet_) f.SetRandGenerator(rand);
 }
 
+SharedRand Simulator::GetGenerator() noexcept { return this->rand; }
+
 // 計算用メソッド
 Result Simulator::Calc() {
 	result_ = Result();

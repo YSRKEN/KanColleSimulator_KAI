@@ -42,6 +42,36 @@ void Kammusu::SetRandGenerator(const SharedRand & rand) {
 	this->rand_ = rand;
 }
 
+// getter
+int Kammusu::GetID() const noexcept { return id_; }
+wstring Kammusu::GetName() const { return name_; }
+ShipClass Kammusu::GetShipClass() const noexcept { return ship_class_; }
+int Kammusu::GetMaxHP() const noexcept { return max_hp_; }
+int Kammusu::GetTorpedo() const noexcept { return torpedo_; }
+int Kammusu::GetLuck() const noexcept { return luck_; }
+int Kammusu::GetSlots() const noexcept { return slots_; }
+int Kammusu::GetEvade() const noexcept { return evade_; }
+int Kammusu::GetAntiSub() const noexcept { return anti_sub_; }
+int Kammusu::GetSearch() const noexcept { return search_; }
+bool Kammusu::IsKammusu() const noexcept { return kammusu_flg_; }
+int Kammusu::GetLevel() const noexcept { return level_; }
+int Kammusu::GetHP() const noexcept { return hp_; }
+vector<int>& Kammusu::GetAir() noexcept { return airs_; }
+const vector<int>& Kammusu::GetAir() const noexcept { return airs_; }
+vector<Weapon>& Kammusu::GetWeapon() noexcept { return weapons_; }
+const vector<Weapon>& Kammusu::GetWeapon() const noexcept { return weapons_; }
+int Kammusu::GetAmmo() const noexcept { return ammo_; }
+// setter
+void Kammusu::SetMaxHP(const int max_hp) noexcept { max_hp_ = max_hp; }
+void Kammusu::SetLuck(const int luck) noexcept { luck_ = luck; }
+void Kammusu::SetEvade(const int evade) noexcept { evade_ = evade; }
+void Kammusu::SetAntiSub(const int anti_sub) noexcept { anti_sub_ = anti_sub; }
+void Kammusu::SetSearch(const int search) noexcept { search_ = search; }
+void Kammusu::SetLevel(const int level) noexcept { level_ = level; }
+void Kammusu::SetHP(const int hp) noexcept { hp_ = hp; }
+void Kammusu::SetWeapon(const int index, const Weapon & weapon) { weapons_[index] = weapon; }
+void Kammusu::SetCond(const int cond) noexcept { cond_ = cond; }
+
 // 中身を表示する
 void Kammusu::Put() const {
 	cout << *this;
