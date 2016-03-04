@@ -67,8 +67,8 @@ Result Simulator::Calc() {
 			break;
 		case kFleetTypeCombinedAir:
 		case kFleetTypeCombinedDrum:
-			// 空母機動・輸送護衛：第2艦隊→第1艦隊1巡目→第1艦隊2巡目
-			FirePhase(kFireSecond, 1);
+			// 空母機動・輸送護衛：第2艦隊(1巡目順)→第1艦隊1巡目→第1艦隊2巡目
+			FirePhase(kFireFirst, 1);
 			if (IsBattleTerminate()) goto SimulatorCalcExit;
 			FirePhase(kFireFirst, 0);
 			if (IsBattleTerminate()) goto SimulatorCalcExit;
@@ -76,12 +76,12 @@ Result Simulator::Calc() {
 			if (IsBattleTerminate()) goto SimulatorCalcExit;
 			break;
 		case kFleetTypeCombinedGun:
-			// 水上打撃：第1艦隊1巡目→第1艦隊2巡目→第2艦隊
+			// 水上打撃：第1艦隊1巡目→第1艦隊2巡目→第2艦隊(1巡目順)
 			FirePhase(kFireFirst, 0);
 			if (IsBattleTerminate()) goto SimulatorCalcExit;
 			FirePhase(kFireSecond, 0);
 			if (IsBattleTerminate()) goto SimulatorCalcExit;
-			FirePhase(kFireSecond, 1);
+			FirePhase(kFireFirst, 1);
 			if (IsBattleTerminate()) goto SimulatorCalcExit;
 			break;
 		}
