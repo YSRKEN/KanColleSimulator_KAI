@@ -20,10 +20,17 @@ Result Simulator::Calc() {
 	if (fleet_[kEnemySide].GetFleetType() != kFleetTypeNormal) return result_;
 
 	// 戦闘開始時の体力を入力する
+	stopper_ = vector<vector<bitset<kMaxUnitSize>>>(kBattleSize, vector<bitset<kMaxUnitSize>>(kMaxFleetSize, bitset<kMaxUnitSize>(false)));
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
 		for (auto fi = 0u; fi < fleet_[bi].FleetSize(); ++fi) {
 			for (auto ui = 0u; ui < fleet_[bi].UnitSize(fi); ++ui) {
 				result_.SetBeforeHP(bi, fi, ui, fleet_[bi].GetUnit()[fi][ui].GetHP());
+				if (bi == kFriendSide && fleet_[bi].GetUnit()[fi][ui].Status() < kStatusHeavyDamage) {
+					stopper_[bi][fi][ui] = true;
+				}
+				else {
+					stopper_[bi][fi][ui] = false;
+				}
 			}
 		}
 	}
@@ -320,7 +327,7 @@ void Simulator::AirWarPhase() {
 			auto &friend_unit = fleet_[bi].GetUnit()[fi];
 			for (auto ui = 0u; ui < friend_unit.size(); ++ui) {
 				friend_unit[ui].SetRandGenerator(this->rand);
-				friend_unit[ui].MinusHP(all_damage[bi][fi][ui], (bi == kFriendSide));
+				friend_unit[ui].MinusHP(all_damage[bi][fi][ui], stopper_[bi][fi][ui]);
 			}
 		}
 	}
@@ -403,7 +410,7 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 		auto &friend_unit = fleet_[bi].SecondUnit();
 		for (auto ui = 0u; ui < friend_unit.size(); ++ui) {
 			friend_unit[ui].SetRandGenerator(this->rand);
-			friend_unit[ui].MinusHP(all_damage[bi][ui], (bi == kFriendSide));
+			friend_unit[ui].MinusHP(all_damage[bi][ui], stopper_[bi][fleet_[bi].SecondIndex()][ui]);
 		}
 	}
 
@@ -515,12 +522,12 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 			// 与えるダメージを計算し、処理を行う
 			auto damage = CalcDamage(kBattlePhaseGun, bi, friend_index, enemy_index, base_attack, special_attack_flg, multiple);
 			result_.AddDamage(bi, friend_index.fleet_no, friend_index.fleet_i, damage);
-			fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].MinusHP(damage, (other_side == kFriendSide));
+			fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].MinusHP(damage, stopper_[other_side][enemy_index.fleet_no][enemy_index.fleet_i]);
 			if (double_flg) {
 				// 連撃
 				damage = CalcDamage(kBattlePhaseGun, bi, friend_index, enemy_index, base_attack, special_attack_flg, multiple);
 				result_.AddDamage(bi, friend_index.fleet_no, friend_index.fleet_i, damage);
-				fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].MinusHP(damage, (other_side == kFriendSide));
+				fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].MinusHP(damage, stopper_[other_side][enemy_index.fleet_no][enemy_index.fleet_i]);
 			}
 		}
 	}
