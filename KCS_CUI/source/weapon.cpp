@@ -15,9 +15,11 @@ Weapon::Weapon(
 const std::wstring & Weapon::GetName() const noexcept { return name_; }
 WeaponClass Weapon::GetWeaponClass() const noexcept { return weapon_class_; }
 int Weapon::GetDefense() const noexcept { return defense_; }
+int Weapon::GetAttack() const noexcept { return attack_; }
 int Weapon::GetTorpedo() const noexcept { return torpedo_; }
 int Weapon::GetBomb() const noexcept { return bomb_; }
 int Weapon::GetAntiAir() const noexcept { return anti_air_; }
+int Weapon::GetAntiSub() const noexcept { return anti_sub_; }
 int Weapon::GetHit() const noexcept { return hit_; }
 int Weapon::GetEvade() const noexcept { return evade_; }
 int Weapon::GetSearch() const noexcept { return search_; }

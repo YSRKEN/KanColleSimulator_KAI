@@ -72,9 +72,11 @@ public:
 	const std::wstring& GetName() const noexcept;
 	WeaponClass GetWeaponClass() const noexcept;
 	int GetDefense() const noexcept;
+	int GetAttack() const noexcept;
 	int GetTorpedo() const noexcept;
 	int GetBomb() const noexcept;
 	int GetAntiAir() const noexcept;
+	int GetAntiSub() const noexcept;
 	int GetHit() const noexcept;
 	int GetEvade() const noexcept;
 	int GetSearch() const noexcept;

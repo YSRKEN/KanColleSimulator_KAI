@@ -466,40 +466,42 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 			if (!std::get<0>(target)) continue;
 			// 攻撃対象の種類によって、攻撃の種類を選ぶ
 			auto &enemy_index = std::get<1>(target);
+			auto &target_kammusu = fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i];
 			auto fire_type = JudgeDayFireType(bi, friend_index, enemy_index);
 			// 攻撃の種類によって、基本攻撃力および倍率を算出する
-			int base_attack = 0;
+			auto base_attack = hunter_kammusu.DayAttack(fire_type, (target_kammusu.GetShipClass() == kShipClassAF));
 			bool special_attack_flg = false;
-			double multiple = 1.0;
-			switch (fire_type) {
-			case kDayFireAir:	//空撃
-				// 陸上型考慮に注意
-				base_attack = 5;	//仮置き
-				break;
-			case kDayFireChage:	//爆雷攻撃
-				base_attack = 5;	//仮置き
-				break;
-			case kDayFireGun:	//砲撃
-				// 陸上型考慮に注意
-				base_attack = 5;	//仮置き
-				// 弾着観測射撃補正
-				//発動可能な弾着の種類を判断する
+			int attack_count = 1;
+			auto multiple = 1.0;
+			// 弾着観測射撃補正
+/*			[&] {
+				// 砲撃時にのみ適用される
+				if (fire_type != kDayFireGun) return;
+				// 索敵に成功していないとダメな上、大破状態でも使えない
+				if (!search_result_[bi] || hunter_kammusu.Status() >= kStatusHeavyDamage) return;
+				// 航空優勢以上でないと使えない
+				if (bi == kFriendSide && std::get<0>(air_war_result_) > kAirWarStatusGood) return;
+				if (bi == other_side  && std::get<0>(air_war_result_) < kAirWarStatusBad)  return;
+				// 発動可能な弾着の種類を判断する
+				auto special_attack = JudgeDaySpecialAttack(bi, friend_index);
+				if (std::get<0>(special_attack) == 0) return;
+				// 弾着観測射撃は確率的に発生する
 
-				//索敵に成功していないとダメな上、大破状態でも使えない
-				if (!search_result_[bi] || hunter_kammusu.Status() >= kStatusHeavyDamage) break;
-				//航空優勢以上でないと使えない
-				if (bi == kFriendSide && std::get<0>(air_war_result_) > kAirWarStatusGood) break;
-				if (bi == other_side  && std::get<0>(air_war_result_) < kAirWarStatusBad)  break;
-				//弾着観測射撃は確率的に発生する
-
-				//弾着観測射撃による補正
-
-				break;
-			}
+				// 弾着観測射撃による補正
+				attack_count = std::get<0>(special_attack);
+				special_attack_flg = true;
+				multiple = std::get<1>(special_attack);
+			}();*/
 			// 与えるダメージを計算し、処理を行う
 			auto damage = CalcDamage(kBattlePhaseGun, bi, friend_index, enemy_index, base_attack, special_attack_flg, multiple);
 			result_.AddDamage(bi, friend_index.fleet_no, friend_index.fleet_i, damage);
 			fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].MinusHP(damage, (bi == kFriendSide));
+			if (attack_count > 1) {
+				// 連撃
+				damage = CalcDamage(kBattlePhaseGun, bi, friend_index, enemy_index, base_attack, special_attack_flg, multiple);
+				result_.AddDamage(bi, friend_index.fleet_no, friend_index.fleet_i, damage);
+				fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].MinusHP(damage, (bi == kFriendSide));
+			}
 		}
 	}
 	return;
@@ -837,4 +839,9 @@ DayFireType Simulator::JudgeDayFireType(const int turn_player, const KammusuInde
 	if (fleet_[turn_player].GetUnit()[attack_index.fleet_no][attack_index.fleet_i].GetShipClass()) return kDayFireAir;
 	// それ以外は全て砲撃
 	return kDayFireGun;
+}
+
+// 昼戦での特殊攻撃を判断する
+tuple<size_t, double> Simulator::JudgeDaySpecialAttack(const int turn_player, const KammusuIndex &attack_index) {
+	return tuple<size_t, double>(0, 1.0);
 }

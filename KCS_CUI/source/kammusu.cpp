@@ -407,6 +407,7 @@ int Kammusu::AllTorpedo(const bool &level_flg) const noexcept {
 			case WeaponClass::Torpedo:
 			case WeaponClass::AAG:
 				torpedo_sum += 1.2 * sqrt(it_w.GetLevel());
+				break;
 			default:
 				break;
 			}
@@ -514,6 +515,72 @@ Range Kammusu::MaxRange() const noexcept {
 		range = std::max(range, it_w.GetRange());
 	}
 	return range;
+}
+
+// 昼戦火力を返す
+int Kammusu::DayAttack(const DayFireType fire_type, const bool af_flg) const noexcept {
+	double base_attack = 0.0;
+	switch (fire_type) {
+	case kDayFireGun:	//砲撃
+		base_attack += attack_;
+		for (auto &it_w : weapons_) {
+			base_attack += it_w.GetAttack();
+			switch (it_w.GetWeaponClass()) {
+			case WeaponClass::Gun:
+				base_attack += (it_w.GetRange() >= kRangeLong ? 1.5 : 1.0) * sqrt(it_w.GetLevel());
+				break;
+			case WeaponClass::SubGun:
+			case WeaponClass::AAG:
+			case WeaponClass::AAD:
+			case WeaponClass::SL:
+				base_attack += sqrt(it_w.GetLevel());
+			case WeaponClass::Sonar:
+			case WeaponClass::DP:
+				base_attack += 0.75 * sqrt(it_w.GetLevel());
+			default:
+				break;
+			}
+		}
+		break;
+	case kDayFireAir:	//空撃
+		{
+			int all_torpedo = 0, all_bomb = 0;	//総雷装・総爆撃
+			double gamma = 0.0;					//装備改修補正
+			for (auto &it_w : weapons_) {
+				all_torpedo += it_w.GetTorpedo();
+				all_bomb += it_w.GetBomb();
+				if (it_w.GetWeaponClass() == WeaponClass::SubGun) gamma += sqrt(it_w.GetLevel());
+			}
+			if (af_flg) all_torpedo = 0;
+			// ※キャストだらけですがあくまでも仕様です
+			base_attack = int(1.5 * (attack_ + all_torpedo + int(1.3 * all_bomb) + gamma)) + 55;
+		}
+		break;
+	case kDayFireChage:	//爆雷攻撃
+		int base_sub = anti_sub_;
+		bool air_flg = false;
+		for (auto &it_w : weapons_) {
+			switch (it_w.GetWeaponClass()) {
+			case WeaponClass::DP:
+			case WeaponClass::Sonar:
+				base_attack += it_w.GetAntiSub() * 1.5;
+				base_attack += sqrt(it_w.GetLevel());
+				break;
+			case WeaponClass::PA:
+			case WeaponClass::AJ:
+			case WeaponClass::ASPP:
+				base_attack += it_w.GetAntiSub() * 1.5;
+				air_flg = true;
+				break;
+			default:
+				// 小口径主砲・水上偵察機・小型電探の対潜値は無視していい
+				break;
+			}
+		}
+		base_attack += sqrt(base_sub) * 2 + (air_flg ? 8 : 13);
+		break;
+	}
+	return int(base_attack);
 }
 
 // ダメージを与える

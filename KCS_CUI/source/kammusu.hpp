@@ -34,6 +34,9 @@ enum Status {kStatusNoDamage, kStatusVeryLightDamage, kStatusLightDamage, kStatu
 // 艦娘の疲労度(キラキラ状態・通常状態・橙疲労状態・赤疲労状態)
 enum Mood { kMoodHappy, kMoodNormal, kMoodOrange, kMoodRed };
 
+// 昼戦における攻撃種別(砲撃・空撃・爆雷攻撃)
+enum DayFireType { kDayFireGun, kDayFireAir, kDayFireChage };
+
 // 艦娘クラス
 class Kammusu {
 	// 変更しないもの
@@ -133,6 +136,7 @@ public:
 	double CL2AttackPlus() const noexcept;			//熟練艦載機によるダメージ補正
 	int AllDefense() const noexcept;				//総装甲を返す
 	Range MaxRange() const noexcept;				//射程を返す
+	int DayAttack(const DayFireType, const bool) const noexcept;	//昼戦火力を返す
 	void MinusHP(const int&, const bool&);			//ダメージを与える、ctorもしくはSetRandGenerator経由で乱数エンジンを渡している必要がある
 	void ConsumeMaterial() noexcept;				//弾薬・燃料を減少させる
 	bool HasAir() const noexcept;					//艦載機を保有していた場合はtrue

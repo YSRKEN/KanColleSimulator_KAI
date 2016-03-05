@@ -19,9 +19,6 @@ enum TorpedoTurn : std::uint8_t { kTorpedoFirst, kTorpedoSecond };
 // 砲撃戦の巡目(1巡目および2巡目)
 enum FireTurn { kFireFirst , kFireSecond };
 
-// 昼戦における攻撃種別(砲撃・空撃・爆雷攻撃)
-enum DayFireType {kDayFireGun, kDayFireAir, kDayFireChage};
-
 class Fleet;
 #include "result.hpp"
 #include "random.hpp"
@@ -56,6 +53,8 @@ class Simulator {
 	bool IsBattleTerminate() const noexcept;
 	// 昼戦での攻撃種別を判断する
 	DayFireType JudgeDayFireType(const int, const KammusuIndex&, const KammusuIndex&) const noexcept;
+	// 昼戦での特殊攻撃を判断する
+	tuple<size_t, double> Simulator::JudgeDaySpecialAttack(const int turn_player, const KammusuIndex &attack_index);
 public:
 	// コンストラクタ
 	Simulator(){}
