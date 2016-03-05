@@ -25,14 +25,14 @@ public:
 	// コンストラクタ
 	Result();
 	// getter
-	int GetHP(const int bi, const int fi, const int ui) const noexcept;
-	int GetDamage(const int bi, const int fi, const int ui, const bool special_mvp_flg = false) const noexcept;
-	int GerParam(const int type, const int bi, const int fi, const int ui) const noexcept;
+	int GetHP(const size_t bi, const size_t fi, const size_t ui) const noexcept;
+	int GetDamage(const size_t bi, const size_t fi, const size_t ui, const bool special_mvp_flg = false) const noexcept;
+	int GerParam(const size_t type, const size_t bi, const size_t fi, const size_t ui) const noexcept;
 	bool GetNightFlg() const noexcept;
 	// setter
-	void SetBeforeHP(const int bi, const int fi, const int ui, const int hp_before) noexcept { hp_before_[bi][fi][ui] = hp_before; }
-	void SetHP(const int bi, const int fi, const int ui, const int hp) noexcept { hp_[bi][fi][ui] = hp; }
-	void AddDamage(const int bi, const int fi, const int ui, const int damage) noexcept { damage_[bi][fi][ui] += damage; }
+	void SetBeforeHP(const size_t bi, const size_t fi, const size_t ui, const int hp_before) noexcept { hp_before_[bi][fi][ui] = hp_before; }
+	void SetHP(const size_t bi, const size_t fi, const size_t ui, const int hp) noexcept { hp_[bi][fi][ui] = hp; }
+	void AddDamage(const size_t bi, const size_t fi, const size_t ui, const int damage) noexcept { damage_[bi][fi][ui] += damage; }
 	void SetNightFlg(const bool night_flg) noexcept { night_flg_ = night_flg; }
 	// その他
 	string Put() const;

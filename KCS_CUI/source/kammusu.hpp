@@ -130,7 +130,7 @@ public:
 	void SetSearch(const int search) noexcept;
 	void SetLevel(const int level) noexcept;
 	void SetHP(const int hp) noexcept;
-	void SetWeapon(const int index, const Weapon &weapon);
+	void SetWeapon(const size_t index, const Weapon &weapon);
 	void SetCond(const int cond) noexcept;
 	// その他
 	void Put() const;						//中身を表示する

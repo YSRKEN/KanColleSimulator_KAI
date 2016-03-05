@@ -570,7 +570,7 @@ AirWarStatus Simulator::JudgeAirWarStatus(const vector<int> &anti_air_score) {
 
 // 与えるダメージ量を計算する
 int Simulator::CalcDamage(
-	const BattlePhase &battle_phase, const int &turn_player, const KammusuIndex &friend_index, KammusuIndex &enemy_index,
+	const BattlePhase &battle_phase, const size_t turn_player, const KammusuIndex &friend_index, KammusuIndex &enemy_index,
 	const int &base_attack, const vector<double> &all_attack_plus, const BattlePosition &battle_position,
 	const bool &is_special_attack, const double &multiple){
 	auto other_side = kBattleSize - turn_player - 1;
@@ -742,13 +742,13 @@ int Simulator::CalcDamage(
 	return int(damage);
 }
 int Simulator::CalcDamage(
-	const BattlePhase &battle_phase, const int &turn_player, const KammusuIndex &friend_index, KammusuIndex &enemy_index,
+	const BattlePhase &battle_phase, const size_t turn_player, const KammusuIndex &friend_index, KammusuIndex &enemy_index,
 	const int &base_attack, const bool &is_special_attack, const double &multiple) {
 	return CalcDamage(battle_phase, turn_player, friend_index, enemy_index, base_attack, std::get<1>(air_war_result_), battle_position_, is_special_attack, multiple);
 	}
 
 // 「かばい」を確率的に発生させる
-void Simulator::ProtectOracle(const int &defense_side, KammusuIndex &defense_index) {
+void Simulator::ProtectOracle(const size_t defense_side, KammusuIndex &defense_index) {
 	// 旗艦ではない場合、かばいは発生しない
 	if (defense_index.fleet_i != 0) return;
 	// 陸上型をかばう艦などいない
@@ -756,7 +756,7 @@ void Simulator::ProtectOracle(const int &defense_side, KammusuIndex &defense_ind
 	// 水上艦は水上艦、潜水艦は潜水艦しかかばえないのでリストを作成する
 	auto &attendants = fleet_[defense_side].GetUnit()[defense_index.fleet_no];
 	auto is_submarine = attendants[0].IsSubmarine();
-	vector<int> block_list;
+	vector<size_t> block_list;
 	for (size_t ui = 1; ui < attendants.size(); ++ui) {
 		if (attendants[ui].IsSubmarine() == is_submarine && attendants[ui].Status() < kStatusLightDamage) {
 			block_list.push_back(ui);
@@ -765,7 +765,7 @@ void Simulator::ProtectOracle(const int &defense_side, KammusuIndex &defense_ind
 	if (block_list.size() == 0) return;
 	// かばいは確率的に発生し、どの艦がかばうかも確率的に決まる
 	if (rand.RandBool(0.4)) {	//とりあえず4割に設定している
-		defense_index.fleet_i = block_list[rand.RandInt(block_list.size())];
+		defense_index.fleet_i = block_list[rand.generate<size_t>(0, block_list.size())];
 	}
 	return;
 }
@@ -773,7 +773,7 @@ void Simulator::ProtectOracle(const int &defense_side, KammusuIndex &defense_ind
 //命中率を計算する
 double Simulator::CalcHitProb(
 	const Formation friend_formation, const Formation enemy_formation, const Kammusu &hunter_kammusu,
-	const Kammusu &target_kammusu, const BattlePhase battle_phase, const int turn_player, const size_t index) const noexcept {
+	const Kammusu &target_kammusu, const BattlePhase battle_phase, const size_t turn_player, const size_t index) const noexcept {
 	double hit_prob = 1.0;
 	switch (battle_phase) {
 	case kBattlePhaseAir:
@@ -906,7 +906,7 @@ bool Simulator::IsBattleTerminate() const noexcept {
 }
 
 // 昼戦での攻撃種別を判断する
-DayFireType Simulator::JudgeDayFireType(const int turn_player, const KammusuIndex &attack_index, const KammusuIndex &defense_index) const noexcept {
+DayFireType Simulator::JudgeDayFireType(const size_t turn_player, const KammusuIndex &attack_index, const KammusuIndex &defense_index) const noexcept {
 	auto other_side = kBattleSize - turn_player - 1;
 	// 敵が潜水艦なら対潜攻撃
 	if (fleet_[other_side].GetUnit()[defense_index.fleet_no][defense_index.fleet_i].IsSubmarine()) return kDayFireChage;
@@ -919,7 +919,7 @@ DayFireType Simulator::JudgeDayFireType(const int turn_player, const KammusuInde
 }
 
 // 昼戦での特殊攻撃を判断する
-tuple<bool, double> Simulator::JudgeDaySpecialAttack(const int turn_player, const KammusuIndex &attack_index) {
+tuple<bool, double> Simulator::JudgeDaySpecialAttack(const size_t turn_player, const KammusuIndex &attack_index) {
 	// 主砲・副砲・徹甲弾・電探・偵察機の数を数える
 	auto &hunter_kammusu = fleet_[turn_player].GetUnit()[attack_index.fleet_no][attack_index.fleet_i];
 	size_t sum_gun = 0, sum_subgun = 0, sum_ap = 0, sum_radar = 0, sum_ws = 0;
