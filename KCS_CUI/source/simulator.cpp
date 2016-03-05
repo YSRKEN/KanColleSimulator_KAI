@@ -495,12 +495,12 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 			// 与えるダメージを計算し、処理を行う
 			auto damage = CalcDamage(kBattlePhaseGun, bi, friend_index, enemy_index, base_attack, special_attack_flg, multiple);
 			result_.AddDamage(bi, friend_index.fleet_no, friend_index.fleet_i, damage);
-			fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].MinusHP(damage, (bi == kFriendSide));
+			fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].MinusHP(damage, (other_side == kFriendSide));
 			if (attack_count > 1) {
 				// 連撃
 				damage = CalcDamage(kBattlePhaseGun, bi, friend_index, enemy_index, base_attack, special_attack_flg, multiple);
 				result_.AddDamage(bi, friend_index.fleet_no, friend_index.fleet_i, damage);
-				fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].MinusHP(damage, (bi == kFriendSide));
+				fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].MinusHP(damage, (other_side == kFriendSide));
 			}
 		}
 	}
