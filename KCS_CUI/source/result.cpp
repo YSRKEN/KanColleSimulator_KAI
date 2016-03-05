@@ -44,6 +44,64 @@ string Result::Put() const {
 
 // 勝利判定
 WinReason Result::JudgeWinReason() const noexcept {
-
-	return WinReason::S;	//仮置き
+	// 自艦隊および敵艦隊の生存数を数える
+	vector<int> alived_count_before(kBattleSize, 0);	//戦闘開始時の生存艦数
+	vector<int> alived_count(kBattleSize, 0);			//生存艦数
+	vector<int> dead_count(kBattleSize);				//撃沈艦数
+	vector<int> alived_count_head(kBattleSize, 0);		//敵旗艦を沈めたか？
+	vector<int> hp_before_sum(kBattleSize, 0);			//戦闘開始時の残耐久合計
+	vector<int> hp_sum(kBattleSize, 0);					//残耐久合計
+	for (auto bi = 0; bi < kBattleSize; ++bi) {
+		for (auto fi = 0; fi < kMaxFleetSize; ++fi) {
+			for (auto ui = 0; ui < kMaxUnitSize; ++ui) {
+				hp_before_sum[bi] += hp_before_[bi][fi][ui];
+				hp_sum[bi] += hp_[bi][fi][ui];
+				if (hp_before_[bi][fi][ui] == 0) continue;
+				++alived_count_before[bi];
+				if (hp_[bi][fi][ui] == 0) continue;
+				++alived_count[bi];
+				if (ui == 0) alived_count_head[bi] = 1;
+			}
+		}
+		dead_count[bi] = alived_count_before[bi] - alived_count[bi];
+	}
+	// 戦果ゲージを算出する
+	vector<double> result_per(kBattleSize);				//戦果ゲージ(敵艦隊の撃沈割合であることに注意)
+	for (auto bi = 0; bi < kBattleSize; ++bi) {
+		auto other_side = kBattleSize - bi - 1;
+		result_per[bi] = 1.0 * hp_sum[other_side] / hp_before_sum[other_side];
+	}
+	// 上記の条件から勝利判定を行う
+	static const int kill_half[] = {2, 1, 1, 2, 2, 3, 4};
+	if (dead_count[kFriendSide] == 0) {
+		// 自艦隊に撃沈艦が存在しない場合
+		// 　敵艦隊を全滅させた場合
+		if (alived_count[kEnemySide] == 0) {
+			// 自艦隊のダメージ0ならば完全勝利S、そうでない場合は勝利S
+			return (result_per[kEnemySide] == 0.0 ? WinReason::SS : WinReason::S);
+		}
+		// 　敵艦隊を半分以上沈めた場合
+		if (kill_half[alived_count_before[kEnemySide]] <= dead_count[kEnemySide]) return WinReason::A;
+		// 　敵旗艦を沈めた場合
+		if (!alived_count_head[kEnemySide]) return WinReason::B;
+		// 戦果ゲージによる判定
+		if (result_per[kFriendSide] >= result_per[kEnemySide] * 2.5) {
+			return WinReason::B;
+		}
+		else return (result_per[kFriendSide] >= result_per[kEnemySide] || result_per[kFriendSide] >= 0.5 ? WinReason::C : WinReason::D);
+	} else {
+		// 自艦隊に撃沈艦が存在する場合
+		// 　敵旗艦を沈めた場合
+		if (!alived_count_head[kEnemySide]) {
+			return (dead_count[kFriendSide] < dead_count[kEnemySide] ? WinReason::B : WinReason::C);
+		}
+		// 自艦隊が多く沈められた場合
+		if (kill_half[alived_count_before[kFriendSide]] <= dead_count[kFriendSide]) return WinReason::E;
+		// 戦果ゲージによる判定
+		if (result_per[kFriendSide] >= result_per[kEnemySide] * 2.5) {
+			return WinReason::B;
+		} else if (result_per[kFriendSide] >= result_per[kEnemySide]) {
+			return WinReason::C;
+		} else return (result_per[kFriendSide] >= 0.5 ? WinReason::D : WinReason::E);
+	}
 }
