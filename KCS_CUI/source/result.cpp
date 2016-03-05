@@ -1,6 +1,6 @@
 ﻿#include "base.hpp"
 #include "result.hpp"
-
+#include <array>
 // コンストラクタ
 Result::Result() {
 	hp_before_.resize(kBattleSize, vector<vector<int>>(kMaxFleetSize, vector<int>(kMaxUnitSize)));
@@ -45,12 +45,12 @@ string Result::Put() const {
 // 勝利判定
 WinReason Result::JudgeWinReason() const noexcept {
 	// 自艦隊および敵艦隊の生存数を数える
-	vector<int> alived_count_before(kBattleSize, 0);	//戦闘開始時の生存艦数
-	vector<int> alived_count(kBattleSize, 0);			//生存艦数
-	vector<int> dead_count(kBattleSize);				//撃沈艦数
-	vector<int> alived_count_head(kBattleSize, 0);		//敵旗艦を沈めたか？
-	vector<int> hp_before_sum(kBattleSize, 0);			//戦闘開始時の残耐久合計
-	vector<int> hp_sum(kBattleSize, 0);					//残耐久合計
+	std::array<int, kBattleSize> alived_count_before = {};	//戦闘開始時の生存艦数
+	std::array<int, kBattleSize> alived_count = {};			//生存艦数
+	std::array<int, kBattleSize> dead_count;				//撃沈艦数
+	std::array<int, kBattleSize> alived_count_head = {};		//敵旗艦を沈めたか？
+	std::array<int, kBattleSize> hp_before_sum = {};			//戦闘開始時の残耐久合計
+	std::array<int, kBattleSize> hp_sum = {};					//残耐久合計
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
 		for (auto fi = 0; fi < kMaxFleetSize; ++fi) {
 			for (auto ui = 0; ui < kMaxUnitSize; ++ui) {
