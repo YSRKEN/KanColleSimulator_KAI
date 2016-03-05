@@ -30,6 +30,7 @@ class Simulator {
 	bitset<kBattleSize> search_result_;	//索敵結果
 	tuple<AirWarStatus, vector<double>> air_war_result_;	//制空状態および触接倍率
 	BattlePosition battle_position_;	//陣形
+	vector<vector<bitset<kMaxUnitSize>>> stopper_;	//撃沈ストッパー
 	// 各フェーズ
 	void SearchPhase();
 	void AirWarPhase();
