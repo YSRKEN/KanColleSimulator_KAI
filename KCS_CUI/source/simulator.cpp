@@ -186,7 +186,7 @@ void Simulator::AirWarPhase() {
 			if (it_k.Status() == kStatusLost) continue;
 			for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
 				auto &it_w = it_k.GetWeapon()[wi];
-				if (!it_w.IsAirFight()) continue;
+				if (!it_w.Is(WeaponClass::AirFight)) continue;
 				it_k.GetAir()[wi] -= int(it_k.GetAir()[wi] * killed_airs_per[i]);
 			}
 		}
@@ -207,7 +207,7 @@ void Simulator::AirWarPhase() {
 			if (it_k.Status() == kStatusLost) continue;
 			for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
 				auto &it_w = it_k.GetWeapon()[wi];
-				if (!it_w.IsAirFight()) continue;
+				if (!it_w.Is(WeaponClass::AirFight)) continue;
 				Kammusu &intercept_kammusu = fleet_[i].FirstUnit()[fleet_[i].RandomKammusu()];	//迎撃艦
 				auto all_anti_air = intercept_kammusu.AllAntiAir();								//加重対空値
 				int killed_airs = 0;
@@ -264,19 +264,19 @@ void Simulator::AirWarPhase() {
 			if (!std::get<0>(has_attacker)) continue;
 			// そうでない場合は、各スロットに対して攻撃対象を選択する
 			for (auto wi = 0; wi < hunter_kammusu.GetSlots(); ++wi) {
-				if (hunter_kammusu.GetAir()[wi] == 0 || !friend_weapon[wi].IsAirBomb()) continue;
+				if (hunter_kammusu.GetAir()[wi] == 0 || !friend_weapon[wi].Is(WeaponClass::AirBomb)) continue;
 				// 爆撃する対象を決定する(各スロット毎に、ランダムに対象を選択しなければならない)
 				auto target = std::get<1>(fleet_[other_side].RandomKammusuNonSS(false, kTargetTypeAll));
 				// 基礎攻撃力を算出する
 				int base_attack;
 				switch (friend_weapon[wi].GetWeaponClass()) {
-				case kWeaponClassPBF:
-				case kWeaponClassPB:
-				case kWeaponClassWB:
+				case WeaponClass::PBF:
+				case WeaponClass::PB:
+				case WeaponClass::WB:
 					// 爆撃は等倍ダメージ
 					base_attack = int(friend_weapon[wi].GetBomb() * sqrt(hunter_kammusu.GetAir()[wi]) + 25);
 					break;
-				case kWeaponClassPA:
+				case WeaponClass::PA:
 					// 雷撃は150％か80％かがランダムで決まる
 					base_attack = int((rand.RandBool() ? 1.5 : 0.8) * (friend_weapon[wi].GetTorpedo() * sqrt(hunter_kammusu.GetAir()[wi]) + 25));
 					break;
@@ -566,7 +566,7 @@ int Simulator::CalcDamage(
 		bool has_aaa = false;
 		auto wg_count = 0;
 		for (auto &it_w : hunter_kammusu.GetWeapon()) {
-			if (it_w.GetWeaponClass() == kWeaponClassAAA) has_aaa = true;
+			if (it_w.Is(WeaponClass::AAA)) has_aaa = true;
 			if (it_w.GetName() == L"WG42") ++wg_count;
 		}
 		if (has_aaa) damage *= 2.5;
@@ -780,7 +780,7 @@ double Simulator::CalcHitProb(
 			hit_value += 0.009017 * hunter_kammusu.AllHit();
 			auto &hunter_weapon = hunter_kammusu.GetWeapon();
 			for (auto &it_w : hunter_weapon) {
-				if (it_w.GetWeaponClass() == kWeaponClassTorpedo) {
+				if (it_w.Is(WeaponClass::Torpedo)) {
 					hit_value += 0.02014 * sqrt(it_w.GetLevel());
 				}
 			}

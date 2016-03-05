@@ -67,6 +67,7 @@ class Kammusu {
 	// 内部用メンバ関数
 	bool IsAntiSubDayPlane() const noexcept;	//対潜判定(空母用)
 	bool IsAntiSubDayWater() const noexcept;	//対潜判定(航戦用)
+	bool HasWeaponClass(const WeaponClass& wc) const noexcept;	// 指定の艦載機を保有していた場合はtrue
 public:
 	struct DependOnLv;
 	// コンストラクタ
