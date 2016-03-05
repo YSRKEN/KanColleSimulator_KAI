@@ -245,7 +245,7 @@ ResultStat::ResultStat(const vector<Result> &result_db, const vector<vector<Kamm
 				// 残り耐久・与ダメージ
 				for (auto bi = 0u; bi < kBattleSize; ++bi) {
 					auto hp = result_db[ti].GetHP(bi, fi, ui);
-					auto damage = result_db[ti].GetDamage(bi, fi, ui, special_mvp_flg);
+					auto damage = result_db[ti].GetDamage(bi, fi, ui);
 					hp_min_[bi][fi][ui] = std::min(hp_min_[bi][fi][ui], hp);
 					hp_max_[bi][fi][ui] = std::max(hp_max_[bi][fi][ui], hp);
 					damage_min_[bi][fi][ui] = std::min(damage_min_[bi][fi][ui], damage);
