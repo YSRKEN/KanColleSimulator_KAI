@@ -7,6 +7,7 @@
 // コンストラクタ
 
 Result::Result() {
+	hp_before_.resize(kBattleSize, vector<vector<int>>(kMaxFleetSize, vector<int>(kMaxUnitSize)));
 	hp_.resize(kBattleSize, vector<vector<int>>(kMaxFleetSize, vector<int>(kMaxUnitSize)));
 	damage_.resize(kBattleSize, vector<vector<int>>(kMaxFleetSize, vector<int>(kMaxUnitSize, 0)));
 }
@@ -37,4 +38,9 @@ string Result::Put() const {
 		output << endl;
 	}
 	return output.str();
+}
+
+// 勝利判定
+WinReason Result::JudgeWinReason() const noexcept {
+
 }

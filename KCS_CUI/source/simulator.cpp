@@ -29,6 +29,15 @@ Result Simulator::Calc() {
 	// 今のところ、敵が連合艦隊である場合には対応していない
 	if (fleet_[kEnemySide].GetFleetType() != kFleetTypeNormal) return result_;
 
+	// 戦闘開始時の体力を入力する
+	for (auto bi = 0; bi < kBattleSize; ++bi) {
+		for (auto fi = 0u; fi < fleet_[bi].FleetSize(); ++fi) {
+			for (auto ui = 0u; ui < fleet_[bi].UnitSize(fi); ++ui) {
+				result_.SetBeforeHP(bi, fi, ui, fleet_[bi].GetUnit()[fi][ui].GetHP());
+			}
+		}
+	}
+
 	// 索敵フェイズ
 	SearchPhase();
 #ifdef _DEBUG
