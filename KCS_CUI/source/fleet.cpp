@@ -423,7 +423,7 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool &has_bomb, const 
 			auto &it_k = GetUnit()[fi][ui];
 			if (it_k.Status() == kStatusLost) continue;
 			if (it_k.IsSubmarine()) continue;
-			if (has_bomb && it_k.GetShipClass() == kShipClassAF) continue;
+			if (has_bomb && it_k.Is(ShipClass::AF)) continue;
 			alived_list.push_back({ fi, ui });
 		}
 	}

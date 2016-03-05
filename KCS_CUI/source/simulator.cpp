@@ -427,13 +427,8 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 		const bool has_bb = [] (const vector<Fleet>& fleet) -> bool {
 			for (auto &it_b : fleet) {
 				for (auto &it_k : it_b.FirstUnit()) {
-					switch (it_k.GetShipClass()) {
-					case kShipClassBB:
-					case kShipClassBBV:
-					case kShipClassAF:
+					if (it_k.Is(ShipClass::BB | ShipClass::BBV | ShipClass::AF))
 						return true;
-					default:;
-					}
 				}
 			}
 			return false;
@@ -491,7 +486,7 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 			auto &target_kammusu = fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i];
 			auto fire_type = JudgeDayFireType(bi, friend_index, enemy_index);
 			// 攻撃の種類によって、基本攻撃力および倍率を算出する
-			auto base_attack = hunter_kammusu.DayAttack(fire_type, (target_kammusu.GetShipClass() == kShipClassAF));
+			auto base_attack = hunter_kammusu.DayAttack(fire_type, target_kammusu.Is(ShipClass::AF));
 			bool special_attack_flg = false;
 			bool double_flg = false;
 			auto multiple = 1.0;
@@ -585,7 +580,7 @@ int Simulator::CalcDamage(
 		&& battle_phase != kBattlePhaseNight) return 0;		//砲撃戦および夜戦以外ではそもそも対潜攻撃を行わない
 	// 三式弾・WG42による対地上施設特効
 	double damage = base_attack;
-	if (target_kammusu.GetShipClass() == kShipClassAF) {
+	if (target_kammusu.Is(ShipClass::AF)) {
 		bool has_aaa = false;
 		auto wg_count = 0;
 		for (auto &it_w : hunter_kammusu.GetWeapon()) {
@@ -727,7 +722,7 @@ void Simulator::ProtectOracle(const int &defense_side, KammusuIndex &defense_ind
 	// 旗艦ではない場合、かばいは発生しない
 	if (defense_index.fleet_i != 0) return;
 	// 陸上型をかばう艦などいない
-	if (fleet_[defense_side].GetUnit()[defense_index.fleet_no][0].GetShipClass() == kShipClassAF) return;
+	if (fleet_[defense_side].GetUnit()[defense_index.fleet_no][0].Is(ShipClass::AF)) return;
 	// 水上艦は水上艦、潜水艦は潜水艦しかかばえないのでリストを作成する
 	auto &attendants = fleet_[defense_side].GetUnit()[defense_index.fleet_no];
 	auto is_submarine = attendants[0].IsSubmarine();
@@ -858,9 +853,8 @@ DayFireType Simulator::JudgeDayFireType(const int turn_player, const KammusuInde
 	if (fleet_[other_side].GetUnit()[defense_index.fleet_no][defense_index.fleet_i].IsSubmarine()) return kDayFireChage;
 	// 自身が空母系統なら空撃
 	auto &hunter_kammusu = fleet_[turn_player].GetUnit()[attack_index.fleet_no][attack_index.fleet_i];
-	auto ship_class = hunter_kammusu.GetShipClass();
-	if (ship_class == kShipClassCV || ship_class == kShipClassACV || ship_class == kShipClassCVL) return kDayFireAir;
-	if(ship_class == kShipClassAO && hunter_kammusu.IsFireGunPlane()) return kDayFireAir;
+	if (hunter_kammusu.Is(ShipClass::CV | ShipClass::ACV | ShipClass::CVL)) return kDayFireAir;
+	if(hunter_kammusu.Is(ShipClass::AO) && hunter_kammusu.IsFireGunPlane()) return kDayFireAir;
 	// それ以外は全て砲撃
 	return kDayFireGun;
 }

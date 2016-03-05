@@ -3,6 +3,7 @@
 #include "weapon.hpp"
 #include <iostream>
 #include <cstdint>
+#include <type_traits>
 #include "random.hpp"
 class WeaponDB;
 enum TorpedoTurn : std::uint8_t;
@@ -11,18 +12,32 @@ enum TorpedoTurn : std::uint8_t;
 // ただし、浮遊要塞・護衛要塞・泊地棲鬼/姫・南方棲鬼は「重巡洋艦」、
 // 南方棲戦鬼は「航空巡洋艦」、装甲空母鬼/姫・戦艦レ級は「航空戦艦」、
 // 秋津洲は「水上機母艦」カテゴリに入れている
-enum ShipClass {
-	kShipClassPT = 1, kShipClassDD, kShipClassCL, kShipClassCLT,				//重雷装巡洋艦まで
-	kShipClassCA, kShipClassCAV, kShipClassCVL, kShipClassCC, kShipClassBB,		//戦艦まで
-	kShipClassBBV, kShipClassCV, kShipClassAF, kShipClassSS, kShipClassSSV,		//潜水空母まで
-	kShipClassLST, kShipClassAV, kShipClassLHA, kShipClassACV, kShipClassAR,	//工作艦まで
-	kShipClassAS, kShipClassCP, kShipClassAO									//給油艦まで
+enum class ShipClass {
+	PT  = 0x00000001,	// 魚雷艇
+	DD  = 0x00000002,	// 駆逐艦
+	CL  = 0x00000004,	// 軽巡洋艦
+	CLT = 0x00000008,	// 重雷装巡洋艦
+	CA  = 0x00000010,	// 重巡洋艦
+	CAV = 0x00000020,	// 航空巡洋艦
+	CVL = 0x00000040,	// 軽空母
+	CC  = 0x00000080,	// 巡洋戦艦
+	BB  = 0x00000100,	// 戦艦
+	BBV = 0x00000200,	// 航空戦艦
+	CV  = 0x00000400,	// 正規空母
+	AF  = 0x00000800,	// 陸上型
+	SS  = 0x00001000,	// 潜水艦
+	SSV = 0x00002000,	// 潜水空母
+	LST = 0x00004000,	// 輸送艦
+	AV  = 0x00008000,	// 水上機母艦
+	LHA = 0x00010000,	// 揚陸艦
+	ACV = 0x00020000,	// 装甲空母
+	AR  = 0x00040000,	// 工作艦
+	AS  = 0x00080000,	// 潜水母艦
+	CP  = 0x00100000,	// 練習巡洋艦
+	AO  = 0x00200000,	// 給油艦
 };
-const wstring kShipClassStr[] = { L"", L"魚雷艇", L"駆逐艦", L"軽巡洋艦", L"重雷装巡洋艦",
-L"重巡洋艦", L"航空巡洋艦", L"軽空母", L"巡洋戦艦", L"戦艦", L"航空戦艦", L"正規空母",
-L"陸上型", L"潜水艦", L"潜水空母", L"輸送艦", L"水上機母艦", L"揚陸艦", L"装甲空母",
-L"工作艦", L"潜水母艦", L"練習巡洋艦", L"給油艦"
-};
+constexpr const auto& operator|(const ShipClass& l, const ShipClass& r) { return static_cast<ShipClass>(static_cast<std::underlying_type_t<ShipClass>>(l) | static_cast<std::underlying_type_t<ShipClass>>(r)); }
+const std::wstring& to_wstring(const ShipClass& sc);
 
 // 速力
 enum Speed { kSpeedNone, kSpeedLow, kSpeedHigh };
@@ -145,6 +160,7 @@ public:
 	bool HasAirTrailer() const noexcept;			//触接に参加する艦載機を保有していた場合はtrue
 	bool HasAirBomb() const noexcept;				//艦爆を保有していた場合はtrue
 	bool HasAirAttack() const noexcept;				// 昼戦に参加可能な場合はtrue
+	bool Is(const ShipClass& sc) const noexcept { return (static_cast<std::underlying_type_t<ShipClass>>(ship_class_) & static_cast<std::underlying_type_t<ShipClass>>(sc)) != 0; }
 	bool IsSubmarine() const noexcept;				//潜水艦系ならtrue
 	bool Include(const wstring& wstr) const noexcept;	//名前に特定の文字が含まれていればtrue
 	bool Include(const wchar_t* wstr) const noexcept;	//名前に特定の文字が含まれていればtrue
