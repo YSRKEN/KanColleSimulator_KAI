@@ -606,6 +606,11 @@ void Kammusu::ConsumeMaterial() noexcept {
 	fuel_ = (fuel_ - 20) | limit(0, 100);
 }
 
+// cond値を変化させる
+void Kammusu::ChangeCond(const int cond_change) noexcept {
+	cond_ = (cond_ + cond_change) | limit(0, 100);
+}
+
 bool Kammusu::HasWeaponClass(const WeaponClass& wc) const noexcept {
 	for (auto i = 0; i < slots_; ++i) {
 		if (weapons_[i].Is(wc) && airs_[i] > 0) return true;

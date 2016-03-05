@@ -15,16 +15,6 @@ SharedRand Simulator::GetGenerator() noexcept { return this->rand; }
 // 計算用メソッド
 Result Simulator::Calc() {
 	result_ = Result();
-#ifdef _DEBUG
-	for (auto bi = 0; bi < kBattleSize; ++bi) {
-		for (auto fi = 0u; fi < fleet_[bi].FleetSize(); ++fi) {
-			for (auto ui = 0u; ui < fleet_[bi].UnitSize(fi); ++ui) {
-				result_.SetHP(bi, fi, ui, fleet_[bi].GetUnit()[fi][ui].GetHP());
-			}
-		}
-	}
-	cout << result_.Put() << endl;
-#endif
 
 	// 今のところ、敵が連合艦隊である場合には対応していない
 	if (fleet_[kEnemySide].GetFleetType() != kFleetTypeNormal) return result_;
@@ -37,6 +27,17 @@ Result Simulator::Calc() {
 			}
 		}
 	}
+
+#ifdef _DEBUG
+	for (auto bi = 0; bi < kBattleSize; ++bi) {
+		for (auto fi = 0u; fi < fleet_[bi].FleetSize(); ++fi) {
+			for (auto ui = 0u; ui < fleet_[bi].UnitSize(fi); ++ui) {
+				result_.SetHP(bi, fi, ui, fleet_[bi].GetUnit()[fi][ui].GetHP());
+			}
+		}
+	}
+	cout << result_.Put() << endl;
+#endif
 
 	// 索敵フェイズ
 	SearchPhase();
@@ -101,9 +102,14 @@ Result Simulator::Calc() {
 		// 雷撃フェイズ(連合艦隊では第2艦隊のみ)
 		TorpedoPhase(kTorpedoSecond);
 		if (IsBattleTerminate()) goto SimulatorCalcExit;
+
+		// 夜戦フェイズ(連合艦隊では第2艦隊のみ)
+		NightPhase();
 	}
-	// 夜戦フェイズ(連合艦隊では第2艦隊のみ)
-	NightPhase();
+	else {
+		// 夜戦フェイズ(連合艦隊では第2艦隊のみ)
+		NightPhase();
+	}
 
 	// 終了処理
 SimulatorCalcExit:
@@ -122,6 +128,13 @@ SimulatorCalcExit:
 			}
 		}
 	}
+#ifdef _DEBUG
+	cout << result_.Put() << endl;
+#endif
+
+	// 勝利判定によって、cond値を変化させる
+	fleet_[kFriendSide].ChangeCond(simulate_mode_, result_);
+
 	return result_;
 }
 
@@ -516,7 +529,8 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 
 // 夜戦フェイズ
 void Simulator::NightPhase() {
-
+	result_.SetNightFlg(true);
+	// 夜戦でのダメージは、Result#damage_だけでなくResult#damage_night_にも代入すること
 }
 
 // 制空状態を判断する

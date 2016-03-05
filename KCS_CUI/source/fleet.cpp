@@ -168,6 +168,66 @@ void Fleet::Put() const {
 	cout << *this;
 }
 
+// cond値を変更する
+void Fleet::ChangeCond(const SimulateMode simulate_mode, const Result &result) noexcept {
+	// 全体に適用されるもの
+	int cond_change = 0;
+	switch (simulate_mode) {
+	case kSimulateModeDN:
+		cond_change -= 3;
+		if (result.GetNightFlg()) cond_change -= 2;
+		break;
+	case kSimulateModeD:
+		cond_change -= 3;
+		break;
+	case kSimulateModeN:
+		cond_change -= 2;
+		break;
+	}
+	switch (result.JudgeWinReason()) {
+	case WinReason::SS:
+	case WinReason::S:
+		cond_change += 4;
+		break;
+	case WinReason::A:
+		cond_change += 3;
+		break;
+	case WinReason::B:
+		cond_change += 2;
+		break;
+	case WinReason::C:
+		cond_change += 1;
+		break;
+	default:
+		break;
+	}
+	for (auto &it_u : unit_) {
+		for (auto &it_k : it_u) {
+			it_k.ChangeCond(cond_change);
+		}
+	}
+	// 個別に適用されるもの
+	for(auto fi = 0u; fi < FleetSize(); ++fi){
+		// 艦隊旗艦は無条件でcond値+3
+		unit_[fi][0].ChangeCond(3);
+		// 艦隊MVPはcond値+10(敗北Eの際を除く)
+		if (result.JudgeWinReason() != WinReason::E) {
+			// 連合艦隊の場合、夜戦に突入すると昼戦でのダメージがMVP計算に関係しなくなる(！？)
+			bool special_mvp_flg = result.GetNightFlg() && (fleet_type_ != kFleetTypeNormal);
+			// 計算を行う
+			size_t mvp_index = 0;
+			int mvp_damage = result.GetDamage(0, fi, 0, special_mvp_flg);
+			for (auto ui = 1u; ui < unit_[fi].size(); ++ui) {
+				if (mvp_damage < result.GetDamage(0, fi, ui, special_mvp_flg)) {
+					mvp_damage = result.GetDamage(0, fi, ui, special_mvp_flg);
+					mvp_index = ui;
+				}
+			}
+			unit_[fi][mvp_index].ChangeCond(10);
+		}
+	}
+}
+
 // 索敵値を計算する
 double Fleet::SearchValue() const noexcept {
 	// 2-5式(秋)を採用。将来的には複数形式を切り替えられるようにする

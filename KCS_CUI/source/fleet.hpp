@@ -45,6 +45,7 @@ public:
 	size_t FirstIndex() const noexcept;								//第一艦隊のインデックス
 	size_t SecondIndex() const noexcept;					//第二艦隊のインデックス
 	void Put() const;							//中身を表示する
+	void ChangeCond(const SimulateMode, const Result&) noexcept;	//cond値を変更する
 	double SearchValue() const noexcept;		//索敵値を計算する
 	int AntiAirScore() const noexcept;			//制空値を計算する
 	double TrailerAircraftProb(const AirWarStatus&) const;	//触接開始率を計算する
