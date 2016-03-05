@@ -8,9 +8,45 @@
 #include "fleet.hpp"
 #include "simulator.hpp"
 #include <algorithm>
+using namespace std::string_literals;
+
+const std::wstring& to_wstring(const ShipClass& sc) {
+	struct {
+		const std::wstring name;
+		ShipClass value;
+	} map[] = {
+		{ L"魚雷艇"s, ShipClass::PT },
+		{ L"駆逐艦"s, ShipClass::DD },
+		{ L"軽巡洋艦"s, ShipClass::CL },
+		{ L"重雷装巡洋艦"s, ShipClass::CLT },
+		{ L"重巡洋艦"s, ShipClass::CA },
+		{ L"航空巡洋艦"s, ShipClass::CAV },
+		{ L"軽空母"s, ShipClass::CVL },
+		{ L"巡洋戦艦"s, ShipClass::CC },
+		{ L"戦艦"s, ShipClass::BB },
+		{ L"航空戦艦", ShipClass::BBV },
+		{ L"正規空母"s, ShipClass::CV },
+		{ L"陸上型"s, ShipClass::AF },
+		{ L"潜水艦", ShipClass::SS },
+		{ L"潜水空母"s, ShipClass::SSV },
+		{ L"輸送艦"s, ShipClass::LST },
+		{ L"水上機母艦"s, ShipClass::AV },
+		{ L"揚陸艦"s, ShipClass::LHA },
+		{ L"装甲空母"s,ShipClass::ACV },
+		{ L"工作艦"s, ShipClass::AR },
+		{ L"潜水母艦"s, ShipClass::AS },
+		{ L"練習巡洋艦"s, ShipClass::CP },
+		{ L"給油艦"s, ShipClass::AO },
+	};
+	for (const auto& item : map)
+		if (item.value == sc)
+			return item.name;
+	throw std::runtime_error("invalid ShipClass value.");
+}
+
 // コンストラクタ
 Kammusu::Kammusu() 
-	:	Kammusu(-1, L"なし", kShipClassDD, 0, 0, 0, 0, 0, 0, kSpeedNone, kRangeNone,
+	:	Kammusu(-1, L"なし", ShipClass::DD, 0, 0, 0, 0, 0, 0, kSpeedNone, kRangeNone,
 		0, { 0, 0, 0, 0, 0 }, 0, 0, 0, { -1, -1, -1, -1, -1 }, true, 1) 
 {}
 
@@ -418,11 +454,7 @@ int Kammusu::AllTorpedo(const bool &level_flg) const noexcept {
 
 // 軽巡軽量砲補正
 double Kammusu::FitGunAttackPlus() const noexcept {
-	switch (ship_class_) {
-	case kShipClassCL:
-	case kShipClassCLT:
-	case kShipClassCP:
-	{
+	if (Is(ShipClass::CL | ShipClass::CLT | ShipClass::CP)) {
 		int light_gun_single = 0, light_gun_double = 0;
 		for (auto &it_w : weapons_) {
 			auto &name = it_w.GetName();
@@ -434,11 +466,8 @@ double Kammusu::FitGunAttackPlus() const noexcept {
 		}
 		return sqrt(light_gun_single) + 2.0 * sqrt(light_gun_double);
 	}
-		break;
-	default:
 		return 0.0;
 	}
-}
 
 // 徹甲弾補正
 double Kammusu::SpecialEffectApPlus() const noexcept {
@@ -645,8 +674,7 @@ bool Kammusu::HasAirAttack() const noexcept {
 
 // 潜水艦系ならtrue
 bool Kammusu::IsSubmarine() const noexcept {
-	if (ship_class_ == kShipClassSS || ship_class_ == kShipClassSSV) return true;
-	return false;
+	return Is(ShipClass::SS | ShipClass::SSV);
 }
 
 // 名前に特定の文字が含まれていればtrue
@@ -684,18 +712,7 @@ bool Kammusu::HasAntiSubSynergy() const noexcept {
 
 // 徹甲弾補正を食らう側ならtrue
 bool Kammusu::IsSpecialEffectAP() const noexcept {
-	switch (ship_class_) {
-	case kShipClassCA:
-	case kShipClassCAV:
-	case kShipClassBB:
-	case kShipClassBBV:
-	case kShipClassCV:
-	case kShipClassAF:
-	case kShipClassACV:
-		return true;
-	default:
-		return false;
-	}
+	return Is(ShipClass::CA | ShipClass::CAV | ShipClass::BB | ShipClass::BBV | ShipClass::CV | ShipClass::AF | ShipClass::ACV);
 }
 
 // 彩雲を保有していた場合はtrue
@@ -715,11 +732,11 @@ bool Kammusu::IsFireTorpedo(const TorpedoTurn &torpedo_turn) const noexcept {
 			// 甲標的を積んだ軽巡(事実上阿武隈改二のみ)・潜水系・雷巡・水母は飛ばせる
 			// (冷静に考えると、甲標的さえ載れば飛ばせるはず……)
 			/*switch (ship_class_) {
-			case kShipClassCL:
-			case kShipClassSS:
-			case kShipClassSSV:
-			case kShipClassCLT:
-			case kShipClassAV:*/
+			case ShipClass::CL:
+			case ShipClass::SS:
+			case ShipClass::SSV:
+			case ShipClass::CLT:
+			case ShipClass::AV:*/
 				for (auto &it_w : weapons_) {
 					if (it_w.Is(WeaponClass::SpecialSS)) return true;
 				}
@@ -758,15 +775,8 @@ bool Kammusu::IsMoveGun() const noexcept {
 	// 潜水艦系も砲撃フェイズでは行動できない
 	if (IsSubmarine()) return false;
 	// 艦載機が切れた空母も砲撃フェイズでは行動できない
-	switch (ship_class_) {
-	case kShipClassCVL:
-	case kShipClassCV:
-	case kShipClassACV:
+	if (Is(ShipClass::CVL | ShipClass::CV | ShipClass::ACV))
 		return HasAirAttack();
-		break;
-	default:
-		break;
-	}
 	return true;
 }
 
@@ -778,49 +788,27 @@ bool Kammusu::IsFireGun() const noexcept {
 	if (IsSubmarine()) return false;
 	// 艦載機が切れた空母も砲撃フェイズでは攻撃できない
 	// また、中破した空母系・大破した装甲空母も攻撃できない
-	switch (ship_class_) {
-	case kShipClassCVL:
-	case kShipClassCV:
-	case kShipClassAF:
+	if (Is(ShipClass::CVL | ShipClass::CV | ShipClass::AF))
 		return (HasAirAttack() && Status() != kStatusMiddleDamage);
-		break;
-	case kShipClassACV:
+	if (Is(ShipClass::ACV))
 		return (HasAirAttack() && Status() != kStatusHeavyDamage);
-		break;
-	default:
-		break;
-	}
 	return true;
 }
 
 // 昼戦で対潜可能な艦ならtrue
 bool Kammusu::IsAntiSubDay() const noexcept {
-	switch (ship_class_) {
-	case kShipClassCVL:
-	case kShipClassAF:
 		// 空母型対潜攻撃
+	if (Is(ShipClass::CVL | ShipClass::AF))
 		return IsAntiSubDayPlane();
-		break;
-	case kShipClassBBV:
-	case kShipClassAV:
-	case kShipClassCAV:
 		// 航戦型対潜攻撃
+	if (Is(ShipClass::BBV | ShipClass::AV | ShipClass::CAV))
 		return IsAntiSubDayWater();
-		break;
-	case kShipClassCL:
-	case kShipClassCLT:
-	case kShipClassDD:
-	case kShipClassCP:
 		// 水雷型対潜攻撃
-		if (anti_sub_ > 0) return true;
-		break;
-	case kShipClassAO:
+	if (Is(ShipClass::CL | ShipClass::CLT | ShipClass::DD | ShipClass::CP))
+		return anti_sub_ > 0;
 		// 上記3種類が合わさった速吸改は頭おかしい(褒め言葉)
+	if (Is(ShipClass::AO))
 		return (IsAntiSubDayPlane() || IsAntiSubDayWater() || (anti_sub_ > 0));
-		break;
-	default:
-		break;
-	}
 	return false;
 }
 
@@ -851,7 +839,7 @@ std::ostream & operator<<(std::ostream & os, const Kammusu & conf)
 {
 	os 
 		<< "艦船ID：" << conf.id_ << endl
-		<< "　艦名：" << char_cvt::utf_16_to_shift_jis(conf.name_) << "　艦種：" << char_cvt::utf_16_to_shift_jis(kShipClassStr[conf.ship_class_]) << endl
+		<< "　艦名：" << char_cvt::utf_16_to_shift_jis(conf.name_) << "　艦種：" << char_cvt::utf_16_to_shift_jis(to_wstring(conf.ship_class_)) << endl
 		<< "　最大耐久：" << conf.max_hp_ << "　装甲：" << conf.defense_ << "　火力：" << conf.attack_ << "　雷撃：" << conf.torpedo_ << endl
 		<< "　対空：" << conf.anti_air_ << "　運：" << conf.luck_ << "　速力：" << char_cvt::utf_16_to_shift_jis(kSpeedStr[conf.speed_]) << "　射程：" << char_cvt::utf_16_to_shift_jis(kRangeStr[conf.range_]) << endl
 		<< "　スロット数：" << conf.slots_ << "　最大搭載数：";
@@ -877,7 +865,7 @@ std::wostream & operator<<(std::wostream & os, const Kammusu & conf)
 {
 	os
 		<< L"艦船ID：" << conf.id_ << endl
-		<< L"　艦名：" << conf.name_ << L"　艦種：" << kShipClassStr[conf.ship_class_] << endl
+		<< L"　艦名：" << conf.name_ << L"　艦種：" << to_wstring(conf.ship_class_) << endl
 		<< L"　最大耐久：" << conf.max_hp_ << L"　装甲：" << conf.defense_ << L"　火力：" << conf.attack_ << L"　雷撃：" << conf.torpedo_ << endl
 		<< L"　対空：" << conf.anti_air_ << L"　運：" << conf.luck_ << L"　速力：" << kSpeedStr[conf.speed_] << L"　射程：" << kRangeStr[conf.range_] << endl
 		<< L"　スロット数：" << conf.slots_ << L"　最大搭載数：";

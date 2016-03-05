@@ -138,7 +138,7 @@ KammusuDB::KammusuDB(const char* csv_name) {
 		auto list           = temp_str | Split(',');
 
 		const int id              = list[header.at("艦船ID")] | to_i();
-		const ShipClass shipclass = static_cast<ShipClass>(list[header.at("艦種")] | to_i());
+		const ShipClass shipclass = static_cast<ShipClass>(1 << ((list[header.at("艦種")] | to_i()) - 1));
 		const Speed speed         = list[header.at("速力")] | ToSpeed();
 		const Range range         = static_cast<Range>(list[header.at("射程")] | to_i());
 		const int slots           = list[header.at("スロット数")] | to_i();
