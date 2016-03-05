@@ -82,6 +82,7 @@ MITライセンスとします。
 - YSR https://github.com/YSRKEN
 - yumetodo https://github.com/yumetodo
 - Cranberries https://github.com/LoliGothick
+- sayurin https://github.com/sayurin
 
 ## 参考資料
 - ほっぽアルファのデータライブラリからships0209.csvとslotitems0209.csvを頂いた  

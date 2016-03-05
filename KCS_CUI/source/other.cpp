@@ -230,9 +230,14 @@ ResultStat::ResultStat(const vector<Result> &result_db, const vector<vector<Kamm
 
 	mvp_count_.resize(kMaxFleetSize, vector<int>(kMaxUnitSize, 0));
 	heavy_damage_count_.resize(kMaxFleetSize, vector<int>(kMaxUnitSize, 0));
+
+	win_reason_count_.resize(int(WinReason::Types), 0);
+
 	all_count_ = result_db.size();
 	reader_killed_count_ = 0;
-	for (auto ti = 0; ti < all_count_; ++ti) {
+
+	for (auto ti = 0u; ti < all_count_; ++ti) {
+		++win_reason_count_[int(result_db[ti].JudgeWinReason())];
 		bool special_mvp_flg = result_db[ti].GetNightFlg() && (unit.size() > 1);
 		for (auto fi = 0u; fi < unit.size(); ++fi) {
 			auto mvp_index = 0, mvp_damage = -1;
@@ -273,7 +278,7 @@ ResultStat::ResultStat(const vector<Result> &result_db, const vector<vector<Kamm
 	}
 	// 標本標準偏差
 	if (all_count_ > 1) {
-		for (auto ti = 0; ti < all_count_; ++ti) {
+		for (auto ti = 0u; ti < all_count_; ++ti) {
 			for (auto bi = 0u; bi < kBattleSize; ++bi) {
 				for (auto fi = 0u; fi < kMaxFleetSize; ++fi) {
 					for (auto ui = 0u; ui < kMaxUnitSize; ++ui) {
@@ -318,6 +323,11 @@ void ResultStat::Put(const vector<Fleet> &fleet) const noexcept {
 		}
 	}
 	wcout << L"旗艦撃破率：" << (100.0 * reader_killed_count_ / all_count_) << L"％" << endl;
+	wcout << L"勝率：" << (100.0 * (win_reason_count_[int(WinReason::SS)] + win_reason_count_[int(WinReason::S)]
+		+ win_reason_count_[int(WinReason::A)] + win_reason_count_[int(WinReason::B)]) / all_count_) << L"％" << endl;
+	for (auto i = 0; i < int(WinReason::Types); ++i) {
+		wcout << L"　" << kWinReasonStrL[i] << L"：" << (100.0 * win_reason_count_[i] / all_count_) << L"％" << endl;
+	}
 }
 
 // 結果をJSONファイルに出力する
@@ -326,6 +336,13 @@ void ResultStat::Put(const vector<Fleet> &fleet, const string &file_name, const 
 	FILE_THROW_WITH_MESSAGE_IF(!fout.is_open(), "計算結果が正常に保存できませんでした.")
 	picojson::object o;
 	o["reader_killed_per"] = picojson::value(100.0 * reader_killed_count_ / all_count_);
+	o["win_per"] = picojson::value(100.0 * (win_reason_count_[int(WinReason::SS)] + win_reason_count_[int(WinReason::S)] +
+		win_reason_count_[int(WinReason::A)] + win_reason_count_[int(WinReason::B)]) / all_count_);
+	picojson::object ox;
+	for (auto i = 0; i < int(WinReason::Types); ++i) {
+		ox[kWinReasonStrS[i]] = picojson::value(100.0 * win_reason_count_[i] / all_count_);
+	}
+	o["win_reason_per"] = picojson::value(ox);
 	for (auto bi = 0; bi < kBattleSize; ++bi) {
 		picojson::object o1;
 		const auto &unit = fleet[bi].GetUnit();
@@ -361,6 +378,7 @@ void ResultStat::Put(const vector<Fleet> &fleet, const string &file_name, const 
 		}
 		o["b" + to_string(bi + 1)] = picojson::value(o1);
 	}
+
 	fout << picojson::value(o).serialize(json_prettify_flg) << endl;
 }
 

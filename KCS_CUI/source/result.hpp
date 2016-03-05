@@ -9,8 +9,11 @@ enum class WinReason : std::uint_fast8_t {
 	C = 4,
 	D = 5,
 	E = 6,
+	Types = 7,
 };
 const string kWinReasonStr[] = { "完全勝利SS", "勝利S", "勝利A", "戦術的勝利B", "戦術的敗北C", "敗北D", "敗北E" };
+const wstring kWinReasonStrL[] = { L"完全勝利SS", L"勝利S", L"勝利A", L"戦術的勝利B", L"戦術的敗北C", L"敗北D", L"敗北E" };
+const string kWinReasonStrS[] = { "SS", "S", "A", "B", "C", "D", "E" };
 
 class Result {
 	vector<vector<vector<int>>> hp_before_;
