@@ -36,7 +36,7 @@ enum class ShipClass {
 	CP  = 0x00100000,	// 練習巡洋艦
 	AO  = 0x00200000,	// 給油艦
 };
-constexpr const auto& operator|(const ShipClass& l, const ShipClass& r) { return static_cast<ShipClass>(static_cast<std::underlying_type_t<ShipClass>>(l) | static_cast<std::underlying_type_t<ShipClass>>(r)); }
+constexpr inline auto operator|(const ShipClass& l, const ShipClass& r) { return static_cast<ShipClass>(static_cast<std::underlying_type_t<ShipClass>>(l) | static_cast<std::underlying_type_t<ShipClass>>(r)); }
 const std::wstring& to_wstring(const ShipClass& sc);
 
 // 速力

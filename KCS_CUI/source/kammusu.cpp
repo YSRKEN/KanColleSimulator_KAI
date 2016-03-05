@@ -10,7 +10,7 @@
 #include <algorithm>
 using namespace std::string_literals;
 
-const std::wstring & to_wstring(const ShipClass & sc) {
+const std::wstring& to_wstring(const ShipClass& sc) {
 	struct {
 		const std::wstring name;
 		ShipClass value;
@@ -41,7 +41,7 @@ const std::wstring & to_wstring(const ShipClass & sc) {
 	for (const auto& item : map)
 		if (item.value == sc)
 			return item.name;
-	return L""s;
+	throw std::runtime_error("invalid ShipClass value.");
 }
 
 // コンストラクタ
