@@ -54,7 +54,7 @@ class Simulator {
 	// 昼戦での攻撃種別を判断する
 	DayFireType JudgeDayFireType(const int, const KammusuIndex&, const KammusuIndex&) const noexcept;
 	// 昼戦での特殊攻撃を判断する
-	tuple<size_t, double> Simulator::JudgeDaySpecialAttack(const int turn_player, const KammusuIndex &attack_index);
+	tuple<size_t, double> JudgeDaySpecialAttack(const int turn_player, const KammusuIndex &attack_index);
 public:
 	// コンストラクタ
 	Simulator(){}
