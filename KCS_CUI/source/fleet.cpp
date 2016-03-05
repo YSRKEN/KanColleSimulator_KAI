@@ -81,7 +81,7 @@ void Fleet::LoadJson(std::istream & file, const WeaponDB & weapon_db, const Kamm
 				temp_k.SetCond(unit["cond"].to_str() | to_i_limit(0, 100));
 			}
 			// 装備ID・改修/熟練度・内部熟練度から装備を設定する
-			int wi = 0;
+			size_t wi = 0;
 			for (auto &temp_p : unit.at("items").get<object>()) {
 				auto& parts = temp_p.second.get<object>();
 				Weapon temp_w = weapon_db.Get(parts.at("id").to_str() | to_i());
@@ -202,7 +202,7 @@ void Fleet::ChangeCond(const SimulateMode simulate_mode, const Result &result) n
 		}
 	}
 	// 個別に適用されるもの
-	for(auto fi = 0u; fi < FleetSize(); ++fi){
+	for(size_t fi = 0; fi < FleetSize(); ++fi){
 		// 艦隊旗艦は無条件でcond値+3
 		unit_[fi][0].ChangeCond(3);
 		// 艦隊MVPはcond値+10(敗北Eの際を除く)
@@ -212,7 +212,7 @@ void Fleet::ChangeCond(const SimulateMode simulate_mode, const Result &result) n
 			// 計算を行う
 			size_t mvp_index = 0;
 			int mvp_damage = result.GetDamage(0, fi, 0, special_mvp_flg);
-			for (auto ui = 1u; ui < unit_[fi].size(); ++ui) {
+			for (size_t ui = 1; ui < unit_[fi].size(); ++ui) {
 				if (mvp_damage < result.GetDamage(0, fi, ui, special_mvp_flg)) {
 					mvp_damage = result.GetDamage(0, fi, ui, special_mvp_flg);
 					mvp_index = ui;
@@ -276,7 +276,7 @@ int Fleet::AntiAirScore() const noexcept {
 	int anti_air_score = 0;
 	for (auto &it_k : FirstUnit()) {
 		if (it_k.Status() == kStatusLost) continue;
-		for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
+		for (size_t wi = 0; wi < it_k.GetSlots(); ++wi) {
 			if (!it_k.GetWeapon()[wi].Is(WeaponClass::AirFight)) continue;
 			anti_air_score += it_k.GetWeapon()[wi].AntiAirScore(it_k.GetAir()[wi]);
 		}
@@ -290,7 +290,7 @@ double Fleet::TrailerAircraftProb(const AirWarStatus &air_war_status) const {
 	double trailer_aircraft_prob = 0.0;
 	for (auto &it_k : FirstUnit()) {
 		if (it_k.Status() == kStatusLost) continue;
-		for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
+		for (size_t wi = 0; wi < it_k.GetSlots(); ++wi) {
 			auto it_w = it_k.GetWeapon()[wi];
 			if (it_w.Is(WeaponClass::PS | WeaponClass::PSS | WeaponClass::DaiteiChan | WeaponClass::WS | WeaponClass::WSN))
 				trailer_aircraft_prob += 0.04 * it_w.GetSearch() * sqrt(it_k.GetAir()[wi]);
@@ -388,7 +388,7 @@ int Fleet::AntiAirBonus() const {
 int Fleet::RandomKammusu() {
 	//生存艦をリストアップ
 	vector<int> alived_list;
-	for (auto ui = 0u; ui < FirstUnit().size(); ++ui) {
+	for (size_t ui = 0; ui < FirstUnit().size(); ++ui) {
 		if (FirstUnit()[ui].Status() != kStatusLost) alived_list.push_back(ui);
 	}
 	if (alived_list.size() == 0) return -1;
@@ -414,7 +414,7 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool &has_bomb, const 
 	//生存する水上艦をリストアップ
 	vector<KammusuIndex> alived_list;
 	for (auto &fi : list) {
-		for (auto ui = 0u; ui < GetUnit()[fi].size(); ++ui) {
+		for (size_t ui = 0; ui < GetUnit()[fi].size(); ++ui) {
 			auto &it_k = GetUnit()[fi][ui];
 			if (it_k.Status() == kStatusLost) continue;
 			if (it_k.IsSubmarine()) continue;
@@ -441,7 +441,7 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuSS(const size_t &fleet_index) {
 	//生存する水上艦をリストアップ
 	vector<KammusuIndex> alived_list;
 	for (auto &fi : list) {
-		for (auto ui = 0u; ui < GetUnit()[fi].size(); ++ui) {
+		for (size_t ui = 0; ui < GetUnit()[fi].size(); ++ui) {
 			auto &it_k = GetUnit()[fi][ui];
 			if (it_k.Status() == kStatusLost) continue;
 			if (!it_k.IsSubmarine()) continue;
@@ -485,7 +485,7 @@ bool Fleet::HasAirPss() const noexcept {
 std::ostream & operator<<(std::ostream & os, const Fleet & conf)
 {
 	os << "陣形：" << char_cvt::utf_16_to_shift_jis(kFormationStr[conf.formation_]) << "　司令部レベル：" << conf.level_ << "　形式：" << char_cvt::utf_16_to_shift_jis(kFleetTypeStr[conf.fleet_type_ - 1]) << endl;
-	for (auto fi = 0u; fi < conf.unit_.size(); ++fi) {
+	for (size_t fi = 0; fi < conf.unit_.size(); ++fi) {
 		os << "　第" << (fi + 1) << "艦隊：" << endl;
 		for (auto &it_k : conf.unit_[fi]) {
 			os << "　　" << char_cvt::utf_16_to_shift_jis(it_k.GetNameLv()) << endl;
@@ -498,7 +498,7 @@ std::ostream & operator<<(std::ostream & os, const Fleet & conf)
 std::wostream & operator<<(std::wostream & os, const Fleet & conf)
 {
 	os << L"陣形：" << kFormationStr[conf.formation_] << L"　司令部レベル：" << conf.level_ << L"　形式：" << kFleetTypeStr[conf.fleet_type_ - 1] << endl;
-	for (auto fi = 0u; fi < conf.unit_.size(); ++fi) {
+	for (size_t fi = 0; fi < conf.unit_.size(); ++fi) {
 		os << L"　第" << (fi + 1) << L"艦隊：" << endl;
 		for (auto &it_k : conf.unit_[fi]) {
 			os << L"　　" << it_k.GetNameLv() << endl;

@@ -67,7 +67,7 @@ class Kammusu {
 	int luck_;						//運
 	Speed speed_;					//速力
 	Range range_;					//射程
-	int slots_;						//スロット数
+	size_t slots_;					//スロット数
 	vector<int> max_airs_;			//最大搭載数
 	int evade_;						//回避
 	int anti_sub_;					//対潜
@@ -110,7 +110,7 @@ public:
 	int GetMaxHP() const noexcept;
 	int GetTorpedo() const noexcept;
 	int GetLuck() const noexcept;
-	int GetSlots() const noexcept;
+	size_t GetSlots() const noexcept;
 	int GetEvade() const noexcept;
 	int GetAntiSub() const noexcept;
 	int GetSearch() const noexcept;

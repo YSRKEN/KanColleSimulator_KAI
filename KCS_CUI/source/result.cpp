@@ -21,18 +21,18 @@ bool Result::GetNightFlg() const noexcept { return night_flg_;}
 string Result::Put() const {
 	std::stringstream output;
 	output << "残/元HP：" << endl;
-	for (auto bi = 0; bi < kBattleSize; ++bi) {
-		for (auto fi = 0u; fi < kMaxFleetSize; ++fi) {
-			for (auto ui = 0u; ui < kMaxUnitSize; ++ui) {
+	for (size_t bi = 0; bi < kBattleSize; ++bi) {
+		for (size_t fi = 0; fi < kMaxFleetSize; ++fi) {
+			for (size_t ui = 0; ui < kMaxUnitSize; ++ui) {
 				output << hp_[bi][fi][ui] << "/" << hp_before_[bi][fi][ui] << ",";
 			}
 		}
 		output << endl;
 	}
 	output << "与ダメージ：" << endl;
-	for (auto bi = 0; bi < kBattleSize; ++bi) {
-		for (auto fi = 0u; fi < kMaxFleetSize; ++fi) {
-			for (auto ui = 0u; ui < kMaxUnitSize; ++ui) {
+	for (size_t bi = 0; bi < kBattleSize; ++bi) {
+		for (size_t fi = 0; fi < kMaxFleetSize; ++fi) {
+			for (size_t ui = 0; ui < kMaxUnitSize; ++ui) {
 				output << damage_[bi][fi][ui] << ",";
 			}
 		}
@@ -51,9 +51,9 @@ WinReason Result::JudgeWinReason() const noexcept {
 	std::array<int, kBattleSize> alived_count_head = {};		//敵旗艦を沈めたか？
 	std::array<int, kBattleSize> hp_before_sum = {};			//戦闘開始時の残耐久合計
 	std::array<int, kBattleSize> hp_sum = {};					//残耐久合計
-	for (auto bi = 0; bi < kBattleSize; ++bi) {
-		for (auto fi = 0; fi < kMaxFleetSize; ++fi) {
-			for (auto ui = 0; ui < kMaxUnitSize; ++ui) {
+	for (size_t bi = 0; bi < kBattleSize; ++bi) {
+		for (size_t fi = 0; fi < kMaxFleetSize; ++fi) {
+			for (size_t ui = 0; ui < kMaxUnitSize; ++ui) {
 				hp_before_sum[bi] += hp_before_[bi][fi][ui];
 				hp_sum[bi] += hp_[bi][fi][ui];
 				if (hp_before_[bi][fi][ui] == 0) continue;
@@ -67,7 +67,7 @@ WinReason Result::JudgeWinReason() const noexcept {
 	}
 	// 戦果ゲージを算出する
 	vector<double> result_per(kBattleSize);				//戦果ゲージ(敵艦隊の撃沈割合であることに注意)
-	for (auto bi = 0; bi < kBattleSize; ++bi) {
+	for (size_t bi = 0; bi < kBattleSize; ++bi) {
 		auto other_side = kBattleSize - bi - 1;
 		result_per[bi] = 1.0 * hp_sum[other_side] / hp_before_sum[other_side];
 	}

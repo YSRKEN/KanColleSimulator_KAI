@@ -85,7 +85,7 @@ ShipClass Kammusu::GetShipClass() const noexcept { return ship_class_; }
 int Kammusu::GetMaxHP() const noexcept { return max_hp_; }
 int Kammusu::GetTorpedo() const noexcept { return torpedo_; }
 int Kammusu::GetLuck() const noexcept { return luck_; }
-int Kammusu::GetSlots() const noexcept { return slots_; }
+size_t Kammusu::GetSlots() const noexcept { return slots_; }
 int Kammusu::GetEvade() const noexcept { return evade_; }
 int Kammusu::GetAntiSub() const noexcept { return anti_sub_; }
 int Kammusu::GetSearch() const noexcept { return search_; }
@@ -131,7 +131,7 @@ Kammusu Kammusu::Reset() {
 // 変更可な部分をリセットする(初期装備)
 Kammusu Kammusu::Reset(const WeaponDB &weapon_db) {
 	this->Reset();
-	for (auto i = 0; i < slots_; ++i) {
+	for (size_t i = 0; i < slots_; ++i) {
 		weapons_[i] = weapon_db.Get(first_weapons_[i], std::nothrow);
 	}
 	return *this;
@@ -520,7 +520,7 @@ double Kammusu::CL2ProbPlus() const noexcept {
 // 熟練艦載機によるダメージ補正
 double Kammusu::CL2AttackPlus() const noexcept {
 	double cl_attack_plus = 0.0;
-	for (auto wi = 0; wi < slots_; ++wi) {
+	for (size_t wi = 0; wi < slots_; ++wi) {
 		auto &it_w = weapons_[wi];
 		if (it_w.Is(WeaponClass::AirBomb))
 			cl_attack_plus += (wi == 0 ? 0.2 : 0.1) * it_w.GetLevel() / 7;
@@ -672,7 +672,7 @@ void Kammusu::ChangeCond(const int cond_change) noexcept {
 }
 
 bool Kammusu::HasWeaponClass(const WeaponClass& wc) const noexcept {
-	for (auto i = 0; i < slots_; ++i) {
+	for (size_t i = 0; i < slots_; ++i) {
 		if (weapons_[i].Is(wc) && airs_[i] > 0) return true;
 	}
 	return false;
@@ -849,7 +849,7 @@ bool Kammusu::IsFireGunPlane() const noexcept {
 }
 
 bool Kammusu::IsAntiSubDayPlane() const noexcept {
-	for (auto wi = 0; wi < slots_; ++wi) {
+	for (size_t wi = 0; wi < slots_; ++wi) {
 		if (airs_[wi] == 0) continue;
 		if (weapons_[wi].Is(WeaponClass::PBF | WeaponClass::PB | WeaponClass::PA))
 			return true;
@@ -858,7 +858,7 @@ bool Kammusu::IsAntiSubDayPlane() const noexcept {
 }
 
 bool Kammusu::IsAntiSubDayWater() const noexcept {
-	for (auto wi = 0; wi < slots_; ++wi) {
+	for (size_t wi = 0; wi < slots_; ++wi) {
 		if (airs_[wi] == 0) continue;
 		if (weapons_[wi].Is(WeaponClass::WB | WeaponClass::ASPP | WeaponClass::AJ))
 			return true;
@@ -874,7 +874,7 @@ std::ostream & operator<<(std::ostream & os, const Kammusu & conf)
 		<< "　最大耐久：" << conf.max_hp_ << "　装甲：" << conf.defense_ << "　火力：" << conf.attack_ << "　雷撃：" << conf.torpedo_ << endl
 		<< "　対空：" << conf.anti_air_ << "　運：" << conf.luck_ << "　速力：" << char_cvt::utf_16_to_shift_jis(kSpeedStr[conf.speed_]) << "　射程：" << char_cvt::utf_16_to_shift_jis(kRangeStr[conf.range_]) << endl
 		<< "　スロット数：" << conf.slots_ << "　最大搭載数：";
-	for (auto i = 0; i < conf.slots_; ++i) {
+	for (size_t i = 0; i < conf.slots_; ++i) {
 		if (i != 0) os << ",";
 		os << conf.max_airs_[i];
 	}
@@ -882,7 +882,7 @@ std::ostream & operator<<(std::ostream & os, const Kammusu & conf)
 		<< "　回避：" << conf.evade_ << "　対潜：" << conf.anti_sub_ << endl
 		<< "　索敵：" << conf.search_ << "　艦娘か？：" << (conf.kammusu_flg_ ? "はい" : "いいえ") << "　レベル：" << conf.level_ << "　現耐久：" << conf.hp_ << endl
 		<< "　装備：";
-	for (auto i = 0; i < conf.slots_; ++i) {
+	for (size_t i = 0; i < conf.slots_; ++i) {
 		if (i != 0) os << ",";
 		os << char_cvt::utf_16_to_shift_jis(conf.weapons_[i].GetName()) << "(" << conf.airs_[i] << ")";
 	}
@@ -900,7 +900,7 @@ std::wostream & operator<<(std::wostream & os, const Kammusu & conf)
 		<< L"　最大耐久：" << conf.max_hp_ << L"　装甲：" << conf.defense_ << L"　火力：" << conf.attack_ << L"　雷撃：" << conf.torpedo_ << endl
 		<< L"　対空：" << conf.anti_air_ << L"　運：" << conf.luck_ << L"　速力：" << kSpeedStr[conf.speed_] << L"　射程：" << kRangeStr[conf.range_] << endl
 		<< L"　スロット数：" << conf.slots_ << L"　最大搭載数：";
-	for (auto i = 0; i < conf.slots_; ++i) {
+	for (size_t i = 0; i < conf.slots_; ++i) {
 		if (i != 0) os << ",";
 		os << conf.max_airs_[i];
 	}
@@ -908,7 +908,7 @@ std::wostream & operator<<(std::wostream & os, const Kammusu & conf)
 		<< L"　回避：" << conf.evade_ << L"　対潜：" << conf.anti_sub_ << endl
 		<< L"　索敵：" << conf.search_ << L"　艦娘か？：" << (conf.kammusu_flg_ ? L"はい" : L"いいえ") << L"　レベル：" << conf.level_ << L"　現耐久：" << conf.hp_ << endl
 		<< L"　装備：";
-	for (auto i = 0; i < conf.slots_; ++i) {
+	for (size_t i = 0; i < conf.slots_; ++i) {
 		if (i != 0) os << ",";
 		os << conf.weapons_[i].GetName() << L"(" << conf.airs_[i] << ")";
 	}
