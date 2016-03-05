@@ -392,7 +392,7 @@ size_t Fleet::RandomKammusu() {
 		if (FirstUnit()[ui].Status() != kStatusLost) alived_list.push_back(ui);
 	}
 	if (alived_list.size() == 0) return -1;
-	return alived_list[rand_.generate<size_t>(0, alived_list.size())];
+	return rand_.select_random_in_range(alived_list);
 }
 
 // 生存する水上艦から艦娘をランダムに指定する
@@ -423,7 +423,7 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool &has_bomb, const 
 		}
 	}
 	if (alived_list.size() == 0) return tuple<bool, KammusuIndex>(false, { 0 , 0 });
-	return tuple<bool, KammusuIndex>(true, alived_list[rand_.generate<size_t>(0, alived_list.size())]);
+	return tuple<bool, KammusuIndex>(true, rand_.select_random_in_range(alived_list));
 }
 
 // 潜水の生存艦から艦娘をランダムに指定する
@@ -449,7 +449,7 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuSS(const size_t &fleet_index) {
 		}
 	}
 	if (alived_list.size() == 0) return tuple<bool, KammusuIndex>(false, { 0 , 0 });
-	return tuple<bool, KammusuIndex>(true, alived_list[rand_.generate<size_t>(0, alived_list.size())]);
+	return tuple<bool, KammusuIndex>(true, rand_.select_random_in_range(alived_list));
 }
 
 template<typename CondFunc>
