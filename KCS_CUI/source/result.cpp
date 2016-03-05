@@ -10,11 +10,11 @@ Result::Result() {
 }
 
 // getter
-int Result::GetHP(const int bi, const int fi, const int ui) const noexcept { return hp_[bi][fi][ui]; }
-int Result::GetDamage(const int bi, const int fi, const int ui, const bool special_mvp_flg) const noexcept {
+int Result::GetHP(const size_t bi, const size_t fi, const size_t ui) const noexcept { return hp_[bi][fi][ui]; }
+int Result::GetDamage(const size_t bi, const size_t fi, const size_t ui, const bool special_mvp_flg) const noexcept {
 	return (special_mvp_flg ? damage_night_[bi][fi][ui] : damage_[bi][fi][ui]);
 }
-int Result::GerParam(const int type, const int bi, const int fi, const int ui) const noexcept { return (type == 0 ? GetHP(bi, fi, ui) : GetDamage(bi, fi, ui)); }
+int Result::GerParam(const size_t type, const size_t bi, const size_t fi, const size_t ui) const noexcept { return (type == 0 ? GetHP(bi, fi, ui) : GetDamage(bi, fi, ui)); }
 bool Result::GetNightFlg() const noexcept { return night_flg_;}
 
 // その他

@@ -105,7 +105,7 @@ void Kammusu::SetAntiSub(const int anti_sub) noexcept { anti_sub_ = anti_sub; }
 void Kammusu::SetSearch(const int search) noexcept { search_ = search; }
 void Kammusu::SetLevel(const int level) noexcept { level_ = level; }
 void Kammusu::SetHP(const int hp) noexcept { hp_ = hp; }
-void Kammusu::SetWeapon(const int index, const Weapon & weapon) { weapons_[index] = weapon; }
+void Kammusu::SetWeapon(const size_t index, const Weapon & weapon) { weapons_[index] = weapon; }
 void Kammusu::SetCond(const int cond) noexcept { cond_ = cond; }
 
 // 中身を表示する

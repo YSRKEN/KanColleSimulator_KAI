@@ -140,14 +140,14 @@ void Config::Put() const{
 
 // getter
 
-const string & Config::GetInputFilename(const int n) const noexcept { return this->pimpl->e.input_filename_[n]; }
+const string & Config::GetInputFilename(const size_t n) const noexcept { return this->pimpl->e.input_filename_[n]; }
 
 std::wstring Config::GetInputFilenameW(const int n) const
 {
 	return char_cvt::shift_jis_to_utf_16(this->pimpl->e.input_filename_[n]);
 }
 
-Formation Config::GetFormation(const int n) const noexcept { return this->pimpl->e.formation_[n]; }
+Formation Config::GetFormation(const size_t n) const noexcept { return this->pimpl->e.formation_[n]; }
 
 int Config::GetTimes() const noexcept { return this->pimpl->e.times_; }
 

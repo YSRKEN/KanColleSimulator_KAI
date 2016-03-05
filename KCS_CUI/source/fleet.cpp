@@ -385,14 +385,14 @@ int Fleet::AntiAirBonus() const {
 }
 
 // 生存艦から艦娘をランダムに指定する(航空戦用)
-int Fleet::RandomKammusu() {
+size_t Fleet::RandomKammusu() {
 	//生存艦をリストアップ
-	vector<int> alived_list;
+	vector<size_t> alived_list;
 	for (size_t ui = 0; ui < FirstUnit().size(); ++ui) {
 		if (FirstUnit()[ui].Status() != kStatusLost) alived_list.push_back(ui);
 	}
 	if (alived_list.size() == 0) return -1;
-	return alived_list[rand_.RandInt(alived_list.size())];
+	return alived_list[rand_.generate<size_t>(0, alived_list.size())];
 }
 
 // 生存する水上艦から艦娘をランダムに指定する
@@ -423,7 +423,7 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool &has_bomb, const 
 		}
 	}
 	if (alived_list.size() == 0) return tuple<bool, KammusuIndex>(false, { 0 , 0 });
-	return tuple<bool, KammusuIndex>(true, alived_list[rand_.RandInt(alived_list.size())]);
+	return tuple<bool, KammusuIndex>(true, alived_list[rand_.generate<size_t>(0, alived_list.size())]);
 }
 
 // 潜水の生存艦から艦娘をランダムに指定する
@@ -449,7 +449,7 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuSS(const size_t &fleet_index) {
 		}
 	}
 	if (alived_list.size() == 0) return tuple<bool, KammusuIndex>(false, { 0 , 0 });
-	return tuple<bool, KammusuIndex>(true, alived_list[rand_.RandInt(alived_list.size())]);
+	return tuple<bool, KammusuIndex>(true, alived_list[rand_.generate<size_t>(0, alived_list.size())]);
 }
 
 template<typename CondFunc>

@@ -240,7 +240,8 @@ ResultStat::ResultStat(const vector<Result> &result_db, const vector<vector<Kamm
 		++win_reason_count_[int(result_db[ti].JudgeWinReason())];
 		bool special_mvp_flg = result_db[ti].GetNightFlg() && (unit.size() > 1);
 		for (size_t fi = 0; fi < unit.size(); ++fi) {
-			auto mvp_index = 0, mvp_damage = -1;
+			size_t mvp_index = 0;
+			int mvp_damage = -1;
 			for (size_t ui = 0; ui < kMaxUnitSize; ++ui) {
 				// 残り耐久・与ダメージ
 				for (size_t bi = 0; bi < kBattleSize; ++bi) {
