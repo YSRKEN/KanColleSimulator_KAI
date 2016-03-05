@@ -403,7 +403,7 @@ int Kammusu::AllTorpedo(const bool &level_flg) const noexcept {
 	for (auto &it_w : weapons_) {
 		torpedo_sum += it_w.GetTorpedo();
 		if (level_flg) {
-			switch (it_w.GetAntiAir()) {
+			switch (it_w.GetWeaponClass()) {
 			case WeaponClass::Torpedo:
 			case WeaponClass::AAG:
 				torpedo_sum += 1.2 * sqrt(it_w.GetLevel());
