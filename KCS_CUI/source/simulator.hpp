@@ -49,7 +49,7 @@ class Simulator {
 	//「かばい」を確率的に発生させる
 	void ProtectOracle(const int&, KammusuIndex&);
 	//命中率を計算する
-	double CalcHitProb(const Formation&, const Formation&, const Kammusu&, const Kammusu&, const BattlePhase&) const noexcept;
+	double CalcHitProb(const Formation, const Formation, const Kammusu&, const Kammusu&, const BattlePhase, const int, const size_t) const noexcept;
 	// 戦闘終了を判断する
 	bool IsBattleTerminate() const noexcept;
 	// 昼戦での攻撃種別を判断する

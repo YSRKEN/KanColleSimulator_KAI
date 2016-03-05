@@ -6,6 +6,7 @@
 #include <type_traits>
 #include "random.hpp"
 class WeaponDB;
+enum FleetType;
 enum TorpedoTurn : std::uint8_t;
 
 // 艦種(厳密な綴りはShip Classificationsである)
@@ -152,7 +153,7 @@ public:
 	double CL2AttackPlus() const noexcept;			//熟練艦載機によるダメージ補正
 	int AllDefense() const noexcept;				//総装甲を返す
 	Range MaxRange() const noexcept;				//射程を返す
-	int DayAttack(const DayFireType, const bool) const noexcept;	//昼戦火力を返す
+	int DayAttack(const DayFireType, const bool, const FleetType, const size_t) const noexcept;	//昼戦火力を返す
 	void MinusHP(const int&, const bool&);			//ダメージを与える、ctorもしくはSetRandGenerator経由で乱数エンジンを渡している必要がある
 	void ConsumeMaterial() noexcept;				//弾薬・燃料を減少させる
 	bool HasAir() const noexcept;					//艦載機を保有していた場合はtrue

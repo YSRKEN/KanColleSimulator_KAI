@@ -547,7 +547,7 @@ Range Kammusu::MaxRange() const noexcept {
 }
 
 // 昼戦火力を返す
-int Kammusu::DayAttack(const DayFireType fire_type, const bool af_flg) const noexcept {
+int Kammusu::DayAttack(const DayFireType fire_type, const bool af_flg, const FleetType fleet_type, const size_t index) const noexcept {
 	double base_attack = 0.0;
 	switch (fire_type) {
 	case kDayFireGun:	//砲撃
@@ -570,9 +570,24 @@ int Kammusu::DayAttack(const DayFireType fire_type, const bool af_flg) const noe
 				break;
 			}
 		}
+		switch (fleet_type) {
+		case kFleetTypeNormal:
+			base_attack += 5.0;
+			break;
+		case kFleetTypeCombinedAir:
+			if (index == 0) base_attack += 7.0; else base_attack += 15.0;
+			break;
+		case kFleetTypeCombinedGun:
+			if (index == 0) base_attack += 15.0; else base_attack += 0.0;
+			break;
+		case kFleetTypeCombinedDrum:
+			if (index == 0) base_attack += 0.0; else base_attack += 15.0;
+			break;
+		}
 		break;
 	case kDayFireAir:	//空撃
 		{
+			// 総雷装・総爆撃・装備改修補正をカウントする
 			int all_torpedo = 0, all_bomb = 0;	//総雷装・総爆撃
 			double gamma = 0.0;					//装備改修補正
 			for (auto &it_w : weapons_) {
@@ -580,9 +595,25 @@ int Kammusu::DayAttack(const DayFireType fire_type, const bool af_flg) const noe
 				all_bomb += it_w.GetBomb();
 				if (it_w.GetWeaponClass() == WeaponClass::SubGun) gamma += sqrt(it_w.GetLevel());
 			}
+			// 陸上型相手だと雷装値が無効になる
 			if (af_flg) all_torpedo = 0;
+			// 連合艦隊における補正
+			int offset = 0;
+			switch (fleet_type) {
+			case kFleetTypeCombinedAir:
+				if (index == 0) offset = 2; else offset = 10;
+				break;
+			case kFleetTypeCombinedGun:
+				if (index == 0) offset = 10; else offset = -5;
+				break;
+			case kFleetTypeCombinedDrum:
+				if (index == 0) offset = -5; else offset = 10;
+				break;
+			default:
+				break;
+			}
 			// ※キャストだらけですがあくまでも仕様です
-			base_attack = int(1.5 * (attack_ + all_torpedo + int(1.3 * all_bomb) + gamma)) + 55;
+			base_attack = int(1.5 * (attack_ + all_torpedo + int(1.3 * all_bomb) + offset + gamma)) + 55;
 		}
 		break;
 	case kDayFireChage:	//爆雷攻撃

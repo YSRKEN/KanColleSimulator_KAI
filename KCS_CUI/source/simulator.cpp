@@ -397,7 +397,8 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 			auto target = fleet_[other_side].RandomKammusuNonSS(true, kTargetTypeSecond);
 			if(!std::get<0>(target)) continue;
 			// 基礎攻撃力を算出する
-			int base_attack = hunter_kammusu.AllTorpedo(true) + 5;
+			int base_attack = hunter_kammusu.AllTorpedo(true);
+			if(fleet_[bi].FleetSize() == 1) base_attack += 5;
 			// 与えるダメージを計算する
 			KammusuIndex enemy_index = std::get<1>(target);
 			auto damage = CalcDamage((torpedo_turn == kTorpedoFirst ? kBattlePhaseFirstTorpedo : kBattlePhaseTorpedo), bi, KammusuIndex{ fleet_[bi].SecondIndex(), ui }, enemy_index, base_attack, false, 1.0);
@@ -493,7 +494,7 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 			auto &target_kammusu = fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i];
 			auto fire_type = JudgeDayFireType(bi, friend_index, enemy_index);
 			// 攻撃の種類によって、基本攻撃力および倍率を算出する
-			auto base_attack = hunter_kammusu.DayAttack(fire_type, target_kammusu.Is(ShipClass::AF));
+			auto base_attack = hunter_kammusu.DayAttack(fire_type, target_kammusu.Is(ShipClass::AF), fleet_[bi].GetFleetType(), friend_index.fleet_no);
 			bool special_attack_flg = false;
 			bool double_flg = false;
 			auto multiple = 1.0;
@@ -580,7 +581,7 @@ int Simulator::CalcDamage(
 	const auto &hunter_kammusu = friend_side.GetUnit()[friend_index.fleet_no][friend_index.fleet_i];
 	const auto &target_kammusu = enemy_side.GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i];
 	// 攻撃の命中率を計算する
-	double hit_prob = CalcHitProb(friend_side.GetFormation(), enemy_side.GetFormation(), hunter_kammusu, target_kammusu, battle_phase);
+	double hit_prob = CalcHitProb(friend_side.GetFormation(), enemy_side.GetFormation(), hunter_kammusu, target_kammusu, battle_phase, turn_player, friend_index.fleet_no);
 	// 対潜攻撃かどうかを判断する
 	auto is_target_submarine = target_kammusu.IsSubmarine();
 	if (is_target_submarine && battle_phase != kBattlePhaseGun
@@ -617,22 +618,44 @@ int Simulator::CalcDamage(
 				break;
 			}
 			// 攻撃側陣形補正
-			switch (friend_side.GetFormation()) {
-			case kFormationTrail:
-				damage *= (is_target_submarine) ? 0.60 : 1.0;
-				break;
-			case kFormationSubTrail:
-				damage *= (is_target_submarine) ? 0.80 : 0.8;
-				break;
-			case kFormationCircle:
-				damage *= (is_target_submarine) ? 1.2 : 0.7;
-				break;
-			case kFormationEchelon:
-				damage *= (is_target_submarine) ? 1.0 : 0.6;
-				break;
-			case kFormationAbreast:
-				damage *= (is_target_submarine) ? 1.3 : 0.6;
-				break;
+			if (friend_side.FleetSize() == 1) {
+				// 通常艦隊
+				switch (friend_side.GetFormation()) {
+				case kFormationTrail:		//単縦陣
+					damage *= (is_target_submarine) ? 0.6 : 1.0;
+					break;
+				case kFormationSubTrail:	//複縦陣
+					damage *= (is_target_submarine) ? 0.8 : 0.8;
+					break;
+				case kFormationCircle:		//輪形陣
+					damage *= (is_target_submarine) ? 1.2 : 0.7;
+					break;
+				case kFormationEchelon:		//梯形陣
+					damage *= (is_target_submarine) ? 1.0 : 0.6;
+					break;
+				case kFormationAbreast:		//単横陣
+					damage *= (is_target_submarine) ? 1.3 : 0.6;
+					break;
+				}
+			}
+			else {
+				//連合艦隊
+				switch (friend_side.GetFormation()) {
+				case kFormationTrail:		//第四警戒航行序列(戦闘隊形)＝単縦陣
+					damage *= (is_target_submarine) ? 0.7 : 1.1;
+					break;
+				case kFormationSubTrail:	//第二警戒航行序列(前方警戒)＝複縦陣
+					damage *= (is_target_submarine) ? 1.1 : 1.0;
+					break;
+				case kFormationCircle:		//第三警戒航行序列(輪形陣)＝輪形陣
+					damage *= (is_target_submarine) ? 1.0 : 0.7;
+					break;
+				case kFormationAbreast:		//第一警戒航行序列(対潜警戒)＝単横陣
+					damage *= (is_target_submarine) ? 1.3 : 0.8;
+					break;
+				default:	//「梯形陣」は読み込み時に排除している
+					break;
+				}
 			}
 		}
 		else {
@@ -749,8 +772,9 @@ void Simulator::ProtectOracle(const int &defense_side, KammusuIndex &defense_ind
 
 //命中率を計算する
 double Simulator::CalcHitProb(
-	const Formation &friend_formation, const Formation &enemy_formation, const Kammusu &hunter_kammusu,
-	const Kammusu &target_kammusu, const BattlePhase &battle_phase) const noexcept {
+	const Formation friend_formation, const Formation enemy_formation, const Kammusu &hunter_kammusu,
+	const Kammusu &target_kammusu, const BattlePhase battle_phase, const int turn_player, const size_t index) const noexcept {
+	double hit_prob = 1.0;
 	switch (battle_phase) {
 	case kBattlePhaseAir:
 	case kBattlePhaseGun:
@@ -789,8 +813,7 @@ double Simulator::CalcHitProb(
 				break;
 			}
 			//引き算により命中率を決定する(上限あり)
-			const double hit_prob = std::min(hit_value - evade_value, 0.97);
-			return hit_prob;
+			hit_prob = std::min(hit_value - evade_value, 0.97);
 		}
 	break;
 	case kBattlePhaseFirstTorpedo:
@@ -798,32 +821,46 @@ double Simulator::CalcHitProb(
 		{
 			// 雷撃戦命中率
 			//命中側
-			double hit_value = 0.9272;	//命中項
-			hit_value += 0.02178 * sqrt(hunter_kammusu.GetLevel() - 1);
-			hit_value += 0.001518 * hunter_kammusu.AllTorpedo(false);
-			hit_value += 0.000540 * hunter_kammusu.GetTorpedo();
-			hit_value += 0.009017 * hunter_kammusu.AllHit();
+			double hit_value = 0.91587;	//命中項
+			double T = 1.0;
+			switch (battle_position_) {
+			case kBattlePositionSame:
+				T = 1.0;
+				break;
+			case kBattlePositionReverse:
+				T = 0.8242;
+				break;
+			case kBattlePositionGoodT:
+				T = 1.191;
+				break;
+			case kBattlePositionBadT:
+				T = 0.6046;
+				break;
+			}
+			hit_value += 0.02188 * sqrt(hunter_kammusu.GetLevel() - 1);
+			hit_value += T * int(0.001426 * hunter_kammusu.AllTorpedo(false) + 0.000836 * hunter_kammusu.GetTorpedo());
+			hit_value += 0.01009 * hunter_kammusu.AllHit();
 			auto &hunter_weapon = hunter_kammusu.GetWeapon();
 			for (auto &it_w : hunter_weapon) {
 				if (it_w.Is(WeaponClass::Torpedo)) {
-					hit_value += 0.02014 * sqrt(it_w.GetLevel());
+					hit_value += 0.02104 * sqrt(it_w.GetLevel());
 				}
 			}
-			hit_value += 0.001463 * hunter_kammusu.GetLuck();
+			hit_value += 0.001482 * hunter_kammusu.GetLuck();
 			//回避側
 			double a;
 			switch (enemy_formation) {
 			case kFormationTrail:
-				a = 37.40;
+				a = 38.63;
 				break;
 			case kFormationSubTrail:
-				a = 37.16;
+				a = 38.4;
 				break;
 			case kFormationCircle:
-				a = 32.77;
+				a = 33.69;
 				break;
 			default:
-				a = 37.40;
+				a = 38.63;
 				break;
 			}
 			double evade_sum = target_kammusu.AllEvade();
@@ -835,12 +872,27 @@ double Simulator::CalcHitProb(
 				evade_value = evade_sum / (evade_sum + a);
 			}
 			//引き算により命中率を決定する(上限あり)
-			const double hit_prob = std::min(hit_value - evade_value, 0.9691);
-			return hit_prob;
+			hit_prob = std::min(hit_value - evade_value, 0.9698);
 		}
 	break;
 	}
-	return 0.0;
+	// 連合艦隊における命中率補正を試験的に実装
+	switch (fleet_[kFriendSide].GetFleetType()) {
+	case kFleetTypeCombinedAir:
+	case kFleetTypeCombinedDrum:
+		hit_prob /= 2.0;
+		if (turn_player == kFriendSide && index == 0) hit_prob += 0.2;
+		hit_prob = hit_prob | limit(0.3, 0.97);
+		break;
+	case kFleetTypeCombinedGun:
+		hit_prob /= 2.0;
+		if (turn_player == kFriendSide && index == 1) hit_prob += 0.2;
+		hit_prob = hit_prob | limit(0.3, 0.97);
+		break;
+	default:
+		break;
+	}
+	return hit_prob;
 }
 
 // 戦闘終了を判断する
