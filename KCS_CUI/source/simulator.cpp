@@ -471,10 +471,10 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 			// 攻撃の種類によって、基本攻撃力および倍率を算出する
 			auto base_attack = hunter_kammusu.DayAttack(fire_type, (target_kammusu.GetShipClass() == kShipClassAF));
 			bool special_attack_flg = false;
-			int attack_count = 1;
+			bool double_flg = false;
 			auto multiple = 1.0;
 			// 弾着観測射撃補正
-/*			[&] {
+			[&] {
 				// 砲撃時にのみ適用される
 				if (fire_type != kDayFireGun) return;
 				// 索敵に成功していないとダメな上、大破状態でも使えない
@@ -484,19 +484,17 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 				if (bi == other_side  && std::get<0>(air_war_result_) < kAirWarStatusBad)  return;
 				// 発動可能な弾着の種類を判断する
 				auto special_attack = JudgeDaySpecialAttack(bi, friend_index);
-				if (std::get<0>(special_attack) == 0) return;
-				// 弾着観測射撃は確率的に発生する
-
+				if (std::get<1>(special_attack) == 1.0) return;
 				// 弾着観測射撃による補正
-				attack_count = std::get<0>(special_attack);
+				double_flg = std::get<0>(special_attack);
 				special_attack_flg = true;
 				multiple = std::get<1>(special_attack);
-			}();*/
+			}();
 			// 与えるダメージを計算し、処理を行う
 			auto damage = CalcDamage(kBattlePhaseGun, bi, friend_index, enemy_index, base_attack, special_attack_flg, multiple);
 			result_.AddDamage(bi, friend_index.fleet_no, friend_index.fleet_i, damage);
 			fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].MinusHP(damage, (other_side == kFriendSide));
-			if (attack_count > 1) {
+			if (double_flg) {
 				// 連撃
 				damage = CalcDamage(kBattlePhaseGun, bi, friend_index, enemy_index, base_attack, special_attack_flg, multiple);
 				result_.AddDamage(bi, friend_index.fleet_no, friend_index.fleet_i, damage);
@@ -845,6 +843,66 @@ DayFireType Simulator::JudgeDayFireType(const int turn_player, const KammusuInde
 }
 
 // 昼戦での特殊攻撃を判断する
-tuple<size_t, double> Simulator::JudgeDaySpecialAttack(const int turn_player, const KammusuIndex &attack_index) {
-	return tuple<size_t, double>(0, 1.0);
+tuple<bool, double> Simulator::JudgeDaySpecialAttack(const int turn_player, const KammusuIndex &attack_index) {
+	// 主砲・副砲・徹甲弾・電探・偵察機の数を数える
+	auto &hunter_kammusu = fleet_[turn_player].GetUnit()[attack_index.fleet_no][attack_index.fleet_i];
+	size_t sum_gun = 0, sum_subgun = 0, sum_ap = 0, sum_radar = 0, sum_ws = 0;
+	for (auto &it_w : hunter_kammusu.GetWeapon()) {
+		switch (it_w.GetWeaponClass()) {
+		case WeaponClass::Gun:
+			++sum_gun;
+			break;
+		case WeaponClass::SubGun:
+			++sum_subgun;
+			break;
+		case WeaponClass::AP:
+			++sum_ap;
+			break;
+		case WeaponClass::SmallR:
+		case WeaponClass::LargeR:
+			++sum_radar;
+			break;
+		case WeaponClass::WB:
+		case WeaponClass::WS:
+		case WeaponClass::WSN:
+			++sum_ws;
+		default:
+			break;
+		}
+	}
+	// 発動可能な攻撃方法を判断する
+	if(sum_ws == 0) return tuple<bool, double>(false, 1.0);
+	bool cutin_gg_flg = (sum_gun == 2 && sum_subgun == 0 && sum_ap == 1 && sum_radar == 0);
+	bool cutin_ga_flg = (sum_gun == 1 && sum_subgun == 1 && sum_ap == 1 && sum_radar == 0);
+	bool cutin_gr_flg = (sum_gun == 1 && sum_subgun == 1 && sum_ap == 0 && sum_radar == 1);
+	bool cutin_gs_flg = (sum_gun >= 1 && sum_subgun >= 1);
+	bool double_flg = (sum_gun >= 2);
+	/* 発動確率は「艦隊の索敵が高い」「複合する」場合に高くなる
+	 * また、連撃とカットインが複合した場合は1：2ぐらいの割合で後者が優先されるらしい
+	 * ……どう実装しろっていうのさ日向？ 結構適当に実装するけどいいの？ */
+	if (cutin_gg_flg || cutin_ga_flg || cutin_gr_flg || cutin_gs_flg || double_flg) {
+		double oracle = 0.0;
+		oracle += (cutin_gg_flg ? 0.2 : 0.0);
+		oracle += (cutin_ga_flg ? 0.2 : 0.0);
+		oracle += (cutin_gr_flg ? 0.2 : 0.0);
+		oracle += (cutin_gs_flg ? 0.2 : 0.0);
+		oracle += (double_flg ? 0.2 : 0.0);
+		oracle += 0.06 * fleet_[turn_player].SearchValue();
+		oracle += (attack_index.fleet_i == 0 ? 0.1 : 0.0);
+		oracle += (std::get<0>(air_war_result_) == kAirWarStatusBest ? 0.1 : 0.0);
+		oracle = oracle | limit(0.0, 0.99);
+		if (rand.RandBool(oracle)) {
+			vector<int> roulette;
+			if (cutin_gg_flg) { roulette.push_back(0); roulette.push_back(0);}
+			if (cutin_ga_flg) { roulette.push_back(1); roulette.push_back(1); }
+			if (cutin_gr_flg) { roulette.push_back(2); roulette.push_back(2); }
+			if (cutin_gs_flg) { roulette.push_back(3); roulette.push_back(3); }
+			if (double_flg)   { roulette.push_back(4); }
+			std::shuffle(roulette.begin(), roulette.end(), this->rand.get());
+			static const bool dflg[] = { false, false, false, false, true };
+			static const double mlt[] = { 1.5, 1.3, 1.2, 1.1, 1.2 };
+			return tuple<bool, double>(dflg[roulette[0]], mlt[roulette[0]] );
+		}
+	}
+	return tuple<bool, double>(false, 1.0);
 }
