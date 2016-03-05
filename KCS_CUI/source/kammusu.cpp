@@ -776,6 +776,7 @@ bool Kammusu::IsFireGun() const noexcept {
 	switch (ship_class_) {
 	case kShipClassCVL:
 	case kShipClassCV:
+	case kShipClassAF:
 		return (HasAirAttack() && Status() != kStatusMiddleDamage);
 		break;
 	case kShipClassACV:
@@ -816,6 +817,11 @@ bool Kammusu::IsAntiSubDay() const noexcept {
 		break;
 	}
 	return false;
+}
+
+// 空撃可能ならtrue
+bool Kammusu::IsFireGunPlane() const noexcept {
+	return IsAntiSubDayPlane();
 }
 
 bool Kammusu::IsAntiSubDayPlane() const noexcept {

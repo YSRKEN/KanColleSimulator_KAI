@@ -836,7 +836,10 @@ DayFireType Simulator::JudgeDayFireType(const int turn_player, const KammusuInde
 	// 敵が潜水艦なら対潜攻撃
 	if (fleet_[other_side].GetUnit()[defense_index.fleet_no][defense_index.fleet_i].IsSubmarine()) return kDayFireChage;
 	// 自身が空母系統なら空撃
-	if (fleet_[turn_player].GetUnit()[attack_index.fleet_no][attack_index.fleet_i].GetShipClass()) return kDayFireAir;
+	auto &hunter_kammusu = fleet_[turn_player].GetUnit()[attack_index.fleet_no][attack_index.fleet_i];
+	auto ship_class = hunter_kammusu.GetShipClass();
+	if (ship_class == kShipClassCV || ship_class == kShipClassACV || ship_class == kShipClassCVL) return kDayFireAir;
+	if(ship_class == kShipClassAO && hunter_kammusu.IsFireGunPlane()) return kDayFireAir;
 	// それ以外は全て砲撃
 	return kDayFireGun;
 }
