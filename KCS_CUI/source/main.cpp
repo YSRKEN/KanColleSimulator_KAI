@@ -24,19 +24,19 @@ int main(int argc, char *argv[]) {
 			fleet[i].Put();
 		}
 		// シミュレータを構築し、並列演算を行う
-		auto seed = make_SharedRand().make_unique_rand_array<unsigned int>(config.GetThreads());
+		auto seed = make_SharedRand().make_unique_rand_array<unsigned int>(config.CalcSeedArrSize());
 		vector<Result> result_db(config.GetTimes());
 #if defined(KCS_MEASURE_PROCESS_TIME)
 		const auto process_begin_time = std::chrono::high_resolution_clock::now();
 #endif
-		#pragma omp parallel for num_threads(config.GetThreads())
-		for (int n = 0; n < config.GetTimes(); ++n) {
+#if defined(_OPENMP)
+#pragma omp parallel for num_threads(config.GetThreads())
+#endif
+		for (size_t n = 0; n < config.GetTimes(); ++n) {
 			vector<Fleet> fleet_ = fleet;	//ハードコピーしないと徐々に体力が削られるだけなのでダメ
 
-			// OpenMP有効時は上をONにして、無効時は下をONにする
-			// (そうしないとデバッグできませんので……お願いしますrevertしないでください)
 #if defined(_OPENMP)
-			Simulator simulator(fleet_, seed[omp_get_thread_num()], kSimulateModeDN);	//戦闘のたびにSimulatorインスタンスを設定する
+			Simulator simulator(fleet_, seed[n * config.GetThreads() + omp_get_thread_num()], kSimulateModeDN);	//戦闘のたびにSimulatorインスタンスを設定する
 #else
 			Simulator simulator(fleet_, seed[n], kSimulateModeDN);	//戦闘のたびにSimulatorインスタンスを設定する
 #endif

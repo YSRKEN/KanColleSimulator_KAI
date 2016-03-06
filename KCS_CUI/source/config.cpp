@@ -16,8 +16,8 @@ struct ForConfigImpl {
 	ForConfigImpl() : input_filename_(), formation_({{ kFormationTrail , kFormationTrail }}), times_(1), threads_(1), json_prettify_flg_(true) {}
 	std::array<string, kBattleSize> input_filename_;	//入力ファイル名
 	std::array<Formation, kBattleSize> formation_;		//陣形指定
-	int times_;		//試行回数
-	int threads_;	//スレッド数
+	size_t times_;		//試行回数
+	size_t threads_;	//スレッド数
 	string output_filename_;	//出力ファイル名
 	bool json_prettify_flg_;	//出力ファイルを整形するか
 };
@@ -66,10 +66,10 @@ namespace detail {
 		};
 		unordered_map<string, function<void(const char*)>> case_one_arg = {
 			{ "-n", [&re](const char*arg) {
-				re.times_ = std::max(1, arg | to_i());
+				re.times_ = std::max<size_t>(1, arg | to_sz());
 			}},
 			{ "-t", [&re](const char*arg) {
-				re.threads_ = std::max(1, arg | to_i());
+				re.threads_ = std::max<size_t>(1, arg | to_sz());
 			}},
 			{ "-o", [&re](const char*arg) {
 				re.output_filename_ = arg;
@@ -149,9 +149,15 @@ std::wstring Config::GetInputFilenameW(const int n) const
 
 Formation Config::GetFormation(const size_t n) const noexcept { return this->pimpl->e.formation_[n]; }
 
-int Config::GetTimes() const noexcept { return this->pimpl->e.times_; }
+size_t Config::GetTimes() const noexcept { return this->pimpl->e.times_; }
 
-int Config::GetThreads() const noexcept { return this->pimpl->e.threads_; }
+size_t Config::GetThreads() const noexcept { return this->pimpl->e.threads_; }
+
+#if defined(_OPENMP)
+size_t Config::CalcSeedArrSize() const noexcept { return GetTimes() * GetThreads(); }
+#else
+size_t Config::CalcSeedArrSize() const noexcept { return GetTimes(); }
+#endif
 
 const string & Config::GetOutputFilename() noexcept { return this->pimpl->e.output_filename_; }
 

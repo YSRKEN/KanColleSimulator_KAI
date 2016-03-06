@@ -43,7 +43,7 @@ namespace detail {
 detail::Split_helper Split(char delim) noexcept { return{ delim }; }
 namespace detail {
 	// 文字列配列を数字配列に変換する
-	inline vector<int> operator|(const vector<string> &arr_str, to_i_helper) {
+	inline vector<int> operator|(const vector<string> &arr_str, to_i_helper<int>) {
 		vector<int> arr_int;
 		for (auto &it : arr_str) {
 			arr_int.push_back(it | to_i());
