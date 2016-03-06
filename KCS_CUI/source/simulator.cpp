@@ -432,6 +432,9 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 
 // 砲撃戦フェイズ
 void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) {
+#ifdef _DEBUG
+	cout << "砲撃ターン(" << (fire_turn == kFireFirst ? "1巡目" : "2巡目") << ", 第" << (fleet_index + 1) << "艦隊)" << endl;
+#endif
 	// 2巡目は、どちらかの艦隊に戦艦か陸上型が存在していない場合には実行されない
 	if (fire_turn == kFireSecond) {
 		const bool has_bb = [] (const vector<Fleet>& fleet) -> bool {
@@ -518,15 +521,28 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 				multiple = std::get<1>(special_attack);
 			}();
 			// 与えるダメージを計算し、処理を行う
+#ifdef _DEBUG
+			wcout << hunter_kammusu.GetName() << L"(" << (bi == kFriendSide ? L"自" : L"敵") << L")が" << target_kammusu.GetName() << L"に攻撃！ " << endl;
+			cout << "基礎攻撃力：" << base_attack << " 弾着観測射撃：" << special_attack_flg << " 連撃：" << double_flg << "倍率：" << multiple << endl;
+#endif
 			auto damage = CalcDamage(kBattlePhaseGun, bi, friend_index, enemy_index, base_attack, special_attack_flg, multiple);
+#ifdef _DEBUG
+			cout << damage << "ダメージ！" << endl;
+#endif
 			result_.AddDamage(bi, friend_index.fleet_no, friend_index.fleet_i, damage);
 			fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].MinusHP(damage, stopper_[other_side][enemy_index.fleet_no][enemy_index.fleet_i]);
 			if (double_flg) {
 				// 連撃
 				damage = CalcDamage(kBattlePhaseGun, bi, friend_index, enemy_index, base_attack, special_attack_flg, multiple);
+#ifdef _DEBUG
+				cout << damage << "ダメージ！" << endl;
+#endif
 				result_.AddDamage(bi, friend_index.fleet_no, friend_index.fleet_i, damage);
 				fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].MinusHP(damage, stopper_[other_side][enemy_index.fleet_no][enemy_index.fleet_i]);
 			}
+#ifdef _DEBUG
+			cout << endl;
+#endif
 		}
 	}
 	return;
