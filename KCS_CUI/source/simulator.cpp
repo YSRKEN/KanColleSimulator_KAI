@@ -845,16 +845,18 @@ void Simulator::ProtectOracle(const size_t defense_side, KammusuIndex &defense_i
 	// 水上艦は水上艦、潜水艦は潜水艦しかかばえないのでリストを作成する
 	auto &attendants = fleet_[defense_side].GetUnit()[defense_index.fleet_no];
 	auto is_submarine = attendants[0].IsSubmarine();
-	vector<size_t> block_list;
+	std::array<size_t, kMaxUnitSize> block_list;
+	size_t block_list_size = 0;
 	for (size_t ui = 1; ui < attendants.size(); ++ui) {
 		if (attendants[ui].IsSubmarine() == is_submarine && attendants[ui].Status() < kStatusLightDamage) {
-			block_list.push_back(ui);
+			block_list[block_list_size] = ui;
+			++block_list_size;
 		}
 	}
-	if (block_list.size() == 0) return;
+	if (block_list_size == 0) return;
 	// かばいは確率的に発生し、どの艦がかばうかも確率的に決まる
 	if (rand.RandBool(0.4)) {	//とりあえず4割に設定している
-		defense_index.fleet_i = rand.select_random_in_range(block_list);
+		defense_index.fleet_i = block_list[rand.RandInt(block_list_size)];
 	}
 	return;
 }

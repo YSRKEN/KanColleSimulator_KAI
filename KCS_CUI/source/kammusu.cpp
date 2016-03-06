@@ -388,8 +388,7 @@ int Kammusu::AllHit() const noexcept {
 
 // フィット砲補正
 double Kammusu::FitGunHitPlus() const noexcept {
-	if (!Is(ShipClass::BB | ShipClass::BBV)) return 1.0;
-	double hit_plus = 0.0;
+	if (!Is(ShipClass::BB | ShipClass::BBV)) return 0.0;
 	// 通常命中率低下は赤疲労検証での減少率÷2ぐらいでちょうどいいのでは？
 	const double fit[] = { 0.0, 0.01365, 0.0315, 0.0261, 0.0319 };
 	const double unfit_small[] = { 0.0, -0.00845, -0.04, -0.0422, -0.04255 };
@@ -432,40 +431,64 @@ double Kammusu::FitGunHitPlus() const noexcept {
 		}
 	}
 	// 種類により減衰量を決定する
-	//伊勢型および扶桑型
-	if (IncludeAnyOf({ L"伊勢", L"日向", L"扶桑", L"山城" })) {
-			if(Include(L"改")) {
-				// 航戦
-				hit_plus = fit[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];
-			}
-			else {
-				// 戦艦
-				hit_plus = fit[sum_356] + fit[sum_38] + fit[sum_381] + unfit_large[sum_46] + unfit_small[sum_46X];
-				if (IncludeAnyOf({ L"扶桑", L"山城" })) {
-					hit_plus += fit[sum_41];
-				}
-			}
+	switch (id_) {
+	case 26:
+	case 27:
+	case 77:
+	case 87:
+		// 伊勢・扶桑型戦艦
+		return fit[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];
+	case 82:
+	case 88:
+	case 286:
+	case 287:
+		// 伊勢型・扶桑型航戦
+		return fit[sum_356] + fit[sum_38] + fit[sum_381] + unfit_large[sum_46] + unfit_small[sum_46X];
+	case 411:
+	case 412:
+		// 扶桑型航戦改二
+		return fit[sum_356] + fit[sum_38] + fit[sum_381] + fit[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];
+	case 78:
+	case 79:
+	case 85:
+	case 86:
+	case 209:
+	case 210:
+	case 211:
+	case 212:
+	case 149:
+	case 150:
+	case 151:
+	case 152:
+		// 金剛型改二
+		return fit[sum_356] + fit[sum_38] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];
+	case 171:
+	case 172:
+	case 173:
+	case 178:
+		// Bismarck型
+		return fit[sum_356] + fit[sum_38] - unfit_small[sum_381]  + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];
+	case 441:
+	case 442:
+	case 446:
+	case 447:
+		// イタリア艦
+		return fit[sum_356] + fit[sum_381] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];
+	case 80:
+	case 81:
+	case 275:
+	case 276:
+		// 長門型
+		return fit[sum_356] + fit[sum_381] + fit[sum_41] + unfit_small[sum_46] + unfit_small[sum_46X];
+	case 131:
+	case 136:
+	case 143:
+	case 148:
+		// 大和型
+		return fit[sum_41];
+	default:
+		return 0.0;
 	}
-	//金剛型およびビスマルク
-	if (IncludeAnyOf({ L"金剛", L"比叡", L"榛名", L"霧島", L"Bismarck" })) {
-		hit_plus = fit[sum_356] + fit[sum_38] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];
-		if (Include(L"Bismarck")) {
-			hit_plus += unfit_small[sum_381];
-		}
-	}
-	//イタリア艦
-	if (IncludeAnyOf({ L"Littorio", L"Italia", L"Roma" })) {
-		hit_plus = fit[sum_356] + fit[sum_381] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];
-	}
-	//長門型
-	if (IncludeAnyOf({ L"長門", L"陸奥" })) {
-		hit_plus = fit[sum_356] + fit[sum_381] + fit[sum_41] + unfit_small[sum_46] + unfit_small[sum_46X];
-	}
-	//大和型
-	if (IncludeAnyOf({ L"大和", L"武蔵" })) {
-		hit_plus = fit[sum_41];
-	}
-	return hit_plus;
 }
 
 // 総雷装を返す

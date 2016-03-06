@@ -387,12 +387,16 @@ int Fleet::AntiAirBonus() const {
 // 生存艦から艦娘をランダムに指定する(航空戦用)
 tuple<bool, size_t> Fleet::RandomKammusu() {
 	//生存艦をリストアップ
-	vector<size_t> alived_list;
+	std::array<size_t, kMaxUnitSize> alived_list;
+	size_t alived_list_size = 0;
 	for (size_t ui = 0; ui < FirstUnit().size(); ++ui) {
-		if (FirstUnit()[ui].Status() != kStatusLost) alived_list.push_back(ui);
+		if (FirstUnit()[ui].Status() != kStatusLost) {
+			alived_list[alived_list_size] = ui;
+			++alived_list_size;
+		}
 	}
-	if (alived_list.size() == 0) return tuple<bool, size_t>(false, 0);
-	return tuple<bool, size_t>(true, rand_.select_random_in_range(alived_list));
+	if (alived_list_size == 0) return tuple<bool, size_t>(false, 0);
+	return tuple<bool, size_t>(true, alived_list[rand_.RandInt(alived_list_size)]);
 }
 
 // 生存する水上艦から艦娘をランダムに指定する
