@@ -9,7 +9,7 @@
 #include "random.hpp"
 
 // 艦隊の形式
-enum FleetType {kFleetTypeNormal = 1, kFleetTypeCombinedAir, kFleetTypeCombinedGun, kFleetTypeCombinedDrum};
+enum FleetType : std::uint8_t {kFleetTypeNormal = 1, kFleetTypeCombinedAir, kFleetTypeCombinedGun, kFleetTypeCombinedDrum};
 const wstring kFleetTypeStr[] = {L"通常艦隊", L"空母機動部隊", L"水上打撃部隊", L"輸送護衛部隊" };
 
 // 標的(第一艦隊・第二艦隊・全体)

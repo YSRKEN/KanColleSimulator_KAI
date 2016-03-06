@@ -856,7 +856,7 @@ void Simulator::ProtectOracle(const size_t defense_side, KammusuIndex &defense_i
 	if (block_list_size == 0) return;
 	// かばいは確率的に発生し、どの艦がかばうかも確率的に決まる
 	if (rand.RandBool(0.4)) {	//とりあえず4割に設定している
-		defense_index.fleet_i = block_list[rand.RandInt(block_list_size)];
+		defense_index.fleet_i = rand.select_random_in_range(block_list);
 	}
 	return;
 }
