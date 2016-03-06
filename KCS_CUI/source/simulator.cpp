@@ -604,7 +604,7 @@ void Simulator::NightPhase() {
 #ifdef _DEBUG
 			cout << damage << "ダメージ！" << endl;
 #endif
-			result_.AddDamage(bi, friend_index.fleet_no, friend_index.fleet_i, damage);
+			result_.AddDamage(bi, friend_index.fleet_no, friend_index.fleet_i, damage, true);
 			fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].MinusHP(damage, stopper_[other_side][enemy_index.fleet_no][enemy_index.fleet_i]);
 			if (double_flg) {
 				// 連撃
@@ -612,7 +612,7 @@ void Simulator::NightPhase() {
 #ifdef _DEBUG
 				cout << damage << "ダメージ！" << endl;
 #endif
-				result_.AddDamage(bi, friend_index.fleet_no, friend_index.fleet_i, damage);
+				result_.AddDamage(bi, friend_index.fleet_no, friend_index.fleet_i, damage, true);
 				fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].MinusHP(damage, stopper_[other_side][enemy_index.fleet_no][enemy_index.fleet_i]);
 			}
 #ifdef _DEBUG

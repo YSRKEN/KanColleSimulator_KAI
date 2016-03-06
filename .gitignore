@@ -198,3 +198,5 @@ html/
 /ships_null.csv
 /設計方針.txt
 output.json
+*.zip
+KCS_CUI */
