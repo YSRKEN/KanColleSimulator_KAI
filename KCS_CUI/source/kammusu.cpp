@@ -702,6 +702,7 @@ int Kammusu::NightAttack(const NightFireType fire_type, const bool af_flg) const
 
 // ダメージを与える
 void Kammusu::MinusHP(const int &damage, const bool &stopper_flg) {
+	if (hp_ <= 0) return;
 	if (hp_ > damage) {
 		// 残り耐久＞ダメージなら普通に減算
 		hp_ -= damage;

@@ -32,7 +32,10 @@ public:
 	// setter
 	void SetBeforeHP(const size_t bi, const size_t fi, const size_t ui, const int hp_before) noexcept { hp_before_[bi][fi][ui] = hp_before; }
 	void SetHP(const size_t bi, const size_t fi, const size_t ui, const int hp) noexcept { hp_[bi][fi][ui] = hp; }
-	void AddDamage(const size_t bi, const size_t fi, const size_t ui, const int damage) noexcept { damage_[bi][fi][ui] += damage; }
+	void AddDamage(const size_t bi, const size_t fi, const size_t ui, const int damage, const bool night_flg = false) noexcept {
+		damage_[bi][fi][ui] += damage;
+		if(night_flg) damage_night_[bi][fi][ui] += damage;
+	}
 	void SetNightFlg(const bool night_flg) noexcept { night_flg_ = night_flg; }
 	// その他
 	string Put() const;
