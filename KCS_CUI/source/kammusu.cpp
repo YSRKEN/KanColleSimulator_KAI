@@ -630,16 +630,16 @@ int Kammusu::DayAttack(const DayFireType fire_type, const bool af_flg, const Fle
 			}
 		}
 		switch (fleet_type) {
-		case kFleetTypeNormal:
+		case FleetType::Normal:
 			base_attack += 5.0;
 			break;
-		case kFleetTypeCombinedAir:
+		case FleetType::CombinedAir:
 			if (index == 0) base_attack += 7.0; else base_attack += 15.0;
 			break;
-		case kFleetTypeCombinedGun:
+		case FleetType::CombinedGun:
 			if (index == 0) base_attack += 15.0; else base_attack += 0.0;
 			break;
-		case kFleetTypeCombinedDrum:
+		case FleetType::CombinedDrum:
 			if (index == 0) base_attack += 0.0; else base_attack += 15.0;
 			break;
 		}
@@ -659,13 +659,13 @@ int Kammusu::DayAttack(const DayFireType fire_type, const bool af_flg, const Fle
 			// 連合艦隊における補正
 			int offset = 0;
 			switch (fleet_type) {
-			case kFleetTypeCombinedAir:
+			case FleetType::CombinedAir:
 				if (index == 0) offset = 2; else offset = 10;
 				break;
-			case kFleetTypeCombinedGun:
+			case FleetType::CombinedGun:
 				if (index == 0) offset = 10; else offset = -5;
 				break;
-			case kFleetTypeCombinedDrum:
+			case FleetType::CombinedDrum:
 				if (index == 0) offset = -5; else offset = 10;
 				break;
 			default:

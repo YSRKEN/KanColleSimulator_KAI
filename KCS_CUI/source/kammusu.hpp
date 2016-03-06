@@ -6,7 +6,7 @@
 #include <type_traits>
 #include "random.hpp"
 class WeaponDB;
-enum FleetType;
+enum class FleetType : std::uint8_t;
 enum TorpedoTurn : std::uint8_t;
 
 // 艦種(厳密な綴りはShip Classificationsである)

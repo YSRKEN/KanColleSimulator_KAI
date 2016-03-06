@@ -17,7 +17,7 @@ Result Simulator::Calc() {
 	result_ = Result();
 
 	// 今のところ、敵が連合艦隊である場合には対応していない
-	if (fleet_[kEnemySide].GetFleetType() != kFleetTypeNormal) return result_;
+	if (fleet_[kEnemySide].GetFleetType() != FleetType::Normal) return result_;
 
 	// 戦闘開始時の体力を入力する
 	stopper_ = vector<vector<bitset<kMaxUnitSize>>>(kBattleSize, vector<bitset<kMaxUnitSize>>(kMaxFleetSize, bitset<kMaxUnitSize>(false)));
@@ -78,15 +78,15 @@ Result Simulator::Calc() {
 
 		// 砲撃戦フェイズ
 		switch (fleet_[kFriendSide].GetFleetType()) {
-		case kFleetTypeNormal:
+		case FleetType::Normal:
 			// 通常艦隊：1巡目→2巡目
 			FirePhase(kFireFirst);
 			if (IsBattleTerminate()) goto SimulatorCalcExit;
 			FirePhase(kFireSecond);
 			if (IsBattleTerminate()) goto SimulatorCalcExit;
 			break;
-		case kFleetTypeCombinedAir:
-		case kFleetTypeCombinedDrum:
+		case FleetType::CombinedAir:
+		case FleetType::CombinedDrum:
 			// 空母機動・輸送護衛：第2艦隊(1巡目順)→第1艦隊1巡目→第1艦隊2巡目
 			FirePhase(kFireFirst, 1);
 			if (IsBattleTerminate()) goto SimulatorCalcExit;
@@ -95,7 +95,7 @@ Result Simulator::Calc() {
 			FirePhase(kFireSecond, 0);
 			if (IsBattleTerminate()) goto SimulatorCalcExit;
 			break;
-		case kFleetTypeCombinedGun:
+		case FleetType::CombinedGun:
 			// 水上打撃：第1艦隊1巡目→第1艦隊2巡目→第2艦隊(1巡目順)
 			FirePhase(kFireFirst, 0);
 			if (IsBattleTerminate()) goto SimulatorCalcExit;
@@ -586,7 +586,7 @@ void Simulator::NightPhase() {
 			// 夜間特殊攻撃補正
 			[&] {
 				// 砲撃時にのみ適用される
-				if (fire_type != kDayFireGun) return;
+				if (fire_type != kNightFireGun) return;
 				// 発動可能な弾着の種類を判断する
 				auto special_attack = JudgeNightSpecialAttack(bi, friend_index, target_kammusu.Is(ShipClass::AF));
 				if (std::get<1>(special_attack) == 1.0) return;
@@ -823,7 +823,7 @@ int Simulator::CalcDamage(
 		if (is_special_attack) damage = 0.0; else return 0;
 	}
 	// 夜戦における対潜攻撃は常にカスダメ(ただし開幕夜戦および連合艦隊では無視される)
-	if (friend_side.GetFleetType() == kFleetTypeNormal && simulate_mode_ != kSimulateModeN && is_target_submarine && battle_phase == kBattlePhaseNight) damage = 0.0;
+	if (friend_side.GetFleetType() == FleetType::Normal && simulate_mode_ != kSimulateModeN && is_target_submarine && battle_phase == kBattlePhaseNight) damage = 0.0;
 	// カスダメの際は相手残り耐久の6～14％を与える
 	if (damage < 1.0) {
 		damage = 0.06 * target_kammusu.GetHP() + 0.08 * rand.RandInt(target_kammusu.GetHP());
@@ -977,13 +977,13 @@ double Simulator::CalcHitProb(
 	// 連合艦隊における命中率補正を試験的に実装
 	if (battle_phase != kBattlePhaseNight) {
 		switch (fleet_[kFriendSide].GetFleetType()) {
-		case kFleetTypeCombinedAir:
-		case kFleetTypeCombinedDrum:
+		case FleetType::CombinedAir:
+		case FleetType::CombinedDrum:
 			hit_prob /= 2.0;
 			if (turn_player == kFriendSide && index == 0) hit_prob += 0.2;
 			hit_prob = hit_prob | limit(0.3, 0.97);
 			break;
-		case kFleetTypeCombinedGun:
+		case FleetType::CombinedGun:
 			hit_prob /= 2.0;
 			if (turn_player == kFriendSide && index == 1) hit_prob += 0.2;
 			hit_prob = hit_prob | limit(0.3, 0.97);
@@ -1108,6 +1108,8 @@ tuple<bool, double> Simulator::JudgeNightSpecialAttack(const size_t turn_player,
 		case WeaponClass::Torpedo:
 			// 恐ろしいことに、敵が地上型なら魚雷を持ってない扱いにされる！
 			if(!af_flg) ++sum_torpedo;
+			break;
+		default:
 			break;
 		}
 	}

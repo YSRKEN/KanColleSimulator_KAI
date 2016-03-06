@@ -44,12 +44,12 @@ void Fleet::LoadJson(std::istream & file, const WeaponDB & weapon_db, const Kamm
 	//司令部レベル
 	level_ = o | GetWithLimitOrDefault("lv", 1, 120, 120);
 	//艦隊の形式
-	fleet_type_ = o | GetWithLimitOrDefault("type", kFleetTypeNormal, kFleetTypeCombinedDrum, kFleetTypeNormal);
-	if (fleet_type_ != kFleetTypeNormal && formation_ == kFormationEchelon) {
+	fleet_type_ = FleetType(o | GetWithLimitOrDefault("type", int(FleetType::Normal), int(FleetType::CombinedDrum), int(FleetType::Normal)));
+	if (fleet_type_ != FleetType::Normal && formation_ == kFormationEchelon) {
 		// 連合艦隊に梯形陣は存在しないので、とりあえず単横陣(第一警戒航行序列)に変更しておく
 		formation_ = kFormationAbreast;
 	}
-	if (fleet_type_ == kFleetTypeNormal) {
+	if (fleet_type_ == FleetType::Normal) {
 		// 通常艦隊
 		unit_.resize(1);
 	}
@@ -61,7 +61,7 @@ void Fleet::LoadJson(std::istream & file, const WeaponDB & weapon_db, const Kamm
 	int fi = 0;	//読み込む際のインデックス
 	for (auto &temp_f : o) {
 		// 艦隊の形式によって、読まなければならない艦隊数は異なる
-		if (fleet_type_ == kFleetTypeNormal) {
+		if (fleet_type_ == FleetType::Normal) {
 			if (fi >= 1) break;
 		}
 		else {
@@ -208,7 +208,7 @@ void Fleet::ChangeCond(const SimulateMode simulate_mode, const Result &result) n
 		// 艦隊MVPはcond値+10(敗北Eの際を除く)
 		if (result.JudgeWinReason() != WinReason::E) {
 			// 連合艦隊の場合、夜戦に突入すると昼戦でのダメージがMVP計算に関係しなくなる(！？)
-			bool special_mvp_flg = result.GetNightFlg() && (fleet_type_ != kFleetTypeNormal);
+			bool special_mvp_flg = result.GetNightFlg() && (fleet_type_ != FleetType::Normal);
 			// 計算を行う
 			size_t mvp_index = 0;
 			int mvp_damage = result.GetDamage(0, fi, 0, special_mvp_flg);
@@ -521,7 +521,7 @@ bool Fleet::HasLights() const noexcept {
 
 std::ostream & operator<<(std::ostream & os, const Fleet & conf)
 {
-	os << "陣形：" << char_cvt::utf_16_to_shift_jis(kFormationStr[conf.formation_]) << "　司令部レベル：" << conf.level_ << "　形式：" << char_cvt::utf_16_to_shift_jis(kFleetTypeStr[conf.fleet_type_ - 1]) << endl;
+	os << "陣形：" << char_cvt::utf_16_to_shift_jis(kFormationStr[conf.formation_]) << "　司令部レベル：" << conf.level_ << "　形式：" << char_cvt::utf_16_to_shift_jis(kFleetTypeStr[int(conf.fleet_type_) - 1]) << endl;
 	for (size_t fi = 0; fi < conf.unit_.size(); ++fi) {
 		os << "　第" << (fi + 1) << "艦隊：" << endl;
 		for (auto &it_k : conf.unit_[fi]) {
@@ -534,7 +534,7 @@ std::ostream & operator<<(std::ostream & os, const Fleet & conf)
 
 std::wostream & operator<<(std::wostream & os, const Fleet & conf)
 {
-	os << L"陣形：" << kFormationStr[conf.formation_] << L"　司令部レベル：" << conf.level_ << L"　形式：" << kFleetTypeStr[conf.fleet_type_ - 1] << endl;
+	os << L"陣形：" << kFormationStr[conf.formation_] << L"　司令部レベル：" << conf.level_ << L"　形式：" << kFleetTypeStr[int(conf.fleet_type_) - 1] << endl;
 	for (size_t fi = 0; fi < conf.unit_.size(); ++fi) {
 		os << L"　第" << (fi + 1) << L"艦隊：" << endl;
 		for (auto &it_k : conf.unit_[fi]) {
