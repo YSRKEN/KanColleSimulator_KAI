@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
 #if defined(_OPENMP)
 #pragma omp parallel for num_threads(config.GetThreads())
 #endif
-		for (size_t n = 0; n < config.GetTimes(); ++n) {
+		for (int n = 0; n < config.GetTimes(); ++n) {
 			vector<Fleet> fleet_ = fleet;	//ハードコピーしないと徐々に体力が削られるだけなのでダメ
 
 #if defined(_OPENMP)
