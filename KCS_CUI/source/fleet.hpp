@@ -60,7 +60,7 @@ public:
 	//ctorもしくはSetRandGenerator経由で乱数エンジンを渡している必要がある
 	double TrailerAircraftPlus();			//攻撃力補正を計算する
 	int AacType();							//発動する対空カットインの種類を判断する
-	size_t RandomKammusu();					//生存艦から艦娘をランダムに指定する
+	tuple<bool, size_t> RandomKammusu();					//生存艦から艦娘をランダムに指定する
 	tuple<bool, KammusuIndex> RandomKammusuNonSS(const bool&, const TargetType&);	//水上の生存艦から艦娘をランダムに指定する
 	tuple<bool, KammusuIndex> RandomKammusuSS(const size_t&);						//潜水の生存艦から艦娘をランダムに指定する
 };

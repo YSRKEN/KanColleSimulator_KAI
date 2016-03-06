@@ -237,7 +237,9 @@ void Simulator::AirWarPhase() {
 			for (size_t wi = 0; wi < it_k.GetSlots(); ++wi) {
 				auto &it_w = it_k.GetWeapon()[wi];
 				if (!it_w.Is(WeaponClass::AirFight)) continue;
-				Kammusu &intercept_kammusu = fleet_[i].FirstUnit()[fleet_[i].RandomKammusu()];	//迎撃艦
+				auto intercept_index = fleet_[i].RandomKammusu();
+				if (!std::get<0>(intercept_index)) continue;
+				Kammusu &intercept_kammusu = fleet_[i].FirstUnit()[std::get<1>(intercept_index)];	//迎撃艦
 				auto all_anti_air = intercept_kammusu.AllAntiAir();								//加重対空値
 				int killed_airs = 0;
 				//固定撃墜
