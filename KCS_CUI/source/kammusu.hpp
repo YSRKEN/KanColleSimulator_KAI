@@ -174,6 +174,8 @@ public:
 	bool IsFireGun() const noexcept;						//砲撃戦で攻撃可能な艦ならtrue
 	bool IsAntiSubDay() const noexcept;						//昼戦で対潜可能な艦ならtrue
 	bool IsFireGunPlane() const noexcept;					//空撃可能ならtrue
+	bool IsFireNight() const noexcept;						//夜戦で攻撃可能な艦ならtrue
+	bool IsAntiSubNight() const noexcept;					//夜戦で対潜可能な艦ならtrue
 	friend std::ostream& operator<<(std::ostream& os, const Kammusu& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Kammusu& conf);
 };

@@ -397,7 +397,7 @@ tuple<bool, size_t> Fleet::RandomKammusu() {
 
 // 生存する水上艦から艦娘をランダムに指定する
 // ただしhas_bombがtrueの際は陸上型棲姫を避けるようになる
-tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool &has_bomb, const TargetType &target_type) {
+tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const TargetType target_type, const bool has_sl) {	//has_slは仮置き
 	// 攻撃する艦隊の対象を選択する
 	vector<size_t> list;
 	switch (target_type) {
@@ -427,7 +427,7 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool &has_bomb, const 
 }
 
 // 潜水の生存艦から艦娘をランダムに指定する
-tuple<bool, KammusuIndex> Fleet::RandomKammusuSS(const size_t &fleet_index) {
+tuple<bool, KammusuIndex> Fleet::RandomKammusuSS(const size_t fleet_index) {
 	// 攻撃する艦隊の対象を選択する
 	vector<size_t> list;
 	switch (fleet_index) {

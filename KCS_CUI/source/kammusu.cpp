@@ -875,6 +875,16 @@ bool Kammusu::IsAntiSubDayWater() const noexcept {
 	return false;
 }
 
+// 夜戦で攻撃可能な艦ならtrue
+bool Kammusu::IsFireNight() const noexcept {
+	return true;	//仮置き
+}
+
+// 夜戦で対潜可能な艦ならtrue
+bool Kammusu::IsAntiSubNight() const noexcept {
+	return false;	//仮置き
+}
+
 std::ostream & operator<<(std::ostream & os, const Kammusu & conf)
 {
 	os 

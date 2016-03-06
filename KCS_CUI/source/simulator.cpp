@@ -433,7 +433,7 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 // 砲撃戦フェイズ
 void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) {
 #ifdef _DEBUG
-	cout << "砲撃ターン(" << (fire_turn == kFireFirst ? "1巡目" : "2巡目") << ", 第" << (fleet_index + 1) << "艦隊)" << endl;
+	cout << "【砲撃フェイズ(" << (fire_turn == kFireFirst ? "1巡目" : "2巡目") << ", 第" << (fleet_index + 1) << "艦隊)】" << endl << endl;
 #endif
 	// 2巡目は、どちらかの艦隊に戦艦か陸上型が存在していない場合には実行されない
 	if (fire_turn == kFireSecond) {
@@ -550,8 +550,83 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 
 // 夜戦フェイズ
 void Simulator::NightPhase() {
+#ifdef _DEBUG
+	cout << "【夜戦フェイズ】" << endl << endl;
+#endif
 	result_.SetNightFlg(true);
 	// 夜戦でのダメージは、Result#damage_だけでなくResult#damage_night_にも代入すること
+	for (size_t ui = 0; ui < kMaxUnitSize; ++ui) {
+		for (size_t bi = 0; bi < kBattleSize; ++bi) {
+			auto other_side = kBattleSize - bi - 1;
+			// 単純に範囲外なら飛ばす
+			if (fleet_[bi].SecondUnit().size() <= ui) continue;
+			// 担当する艦娘が攻撃参加できない場合は飛ばす
+			auto friend_index = KammusuIndex{ fleet_[bi].SecondIndex(), ui };
+			auto &hunter_kammusu = fleet_[bi].SecondUnit()[ui];
+			if (!hunter_kammusu.IsFireNight()) continue;
+			// 攻撃の種類を判断し、攻撃対象を選択する
+			tuple<bool, KammusuIndex> target(false, { 0, 0 });
+			if (hunter_kammusu.IsAntiSubNight()) {
+				target = fleet_[other_side].RandomKammusuSS(1);
+			}
+			if (!std::get<0>(target)) {
+				target = fleet_[other_side].RandomKammusuNonSS(hunter_kammusu.HasAirBomb(), kTargetTypeSecond, true);
+			}
+			if (!std::get<0>(target)) continue;
+			// 攻撃対象の種類によって、攻撃の種類を選ぶ
+			auto &enemy_index = std::get<1>(target);
+			auto &target_kammusu = fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i];
+			auto fire_type = JudgeDayFireType(bi, friend_index, enemy_index);
+			// 攻撃の種類によって、基本攻撃力および倍率を算出する
+			/*auto base_attack = hunter_kammusu.NightAttack(fire_type, target_kammusu.Is(ShipClass::AF), fleet_[bi].GetFleetType(), friend_index.fleet_no);
+			bool special_attack_flg = false;
+			bool double_flg = false;
+			auto multiple = 1.0;*/
+			// 夜間特殊攻撃補正
+			/*[&] {
+				// 砲撃時にのみ適用される
+				if (fire_type != kDayFireGun) return;
+				// 索敵に成功していないとダメな上、大破状態でも使えない
+				if (!search_result_[bi] || hunter_kammusu.Status() >= kStatusHeavyDamage) return;
+				// 航空優勢以上でないと使えない
+				if (bi == kFriendSide && std::get<0>(air_war_result_) > kAirWarStatusGood) return;
+				if (bi == other_side  && std::get<0>(air_war_result_) < kAirWarStatusBad)  return;
+				// 発動可能な弾着の種類を判断する
+				auto special_attack = JudgeDaySpecialAttack(bi, friend_index);
+				if (std::get<1>(special_attack) == 1.0) return;
+				// 弾着観測射撃による補正
+				double_flg = std::get<0>(special_attack);
+				special_attack_flg = true;
+				multiple = std::get<1>(special_attack);
+			}();*/
+			// 与えるダメージを計算し、処理を行う
+/*#ifdef _DEBUG
+			wcout << hunter_kammusu.GetName() << L"(" << (bi == kFriendSide ? L"自" : L"敵") << L")が" << target_kammusu.GetName() << L"に攻撃！ " << endl;
+			cout << "基礎攻撃力：" << base_attack << " 弾着観測射撃：" << special_attack_flg << " 連撃：" << double_flg << "倍率：" << multiple << endl;
+#endif
+			auto damage = CalcDamage(kBattlePhaseGun, bi, friend_index, enemy_index, base_attack, special_attack_flg, multiple);
+#ifdef _DEBUG
+			cout << damage << "ダメージ！" << endl;
+#endif
+			result_.AddDamage(bi, friend_index.fleet_no, friend_index.fleet_i, damage);
+			fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].MinusHP(damage, stopper_[other_side][enemy_index.fleet_no][enemy_index.fleet_i]);
+			if (double_flg) {
+				// 連撃
+				damage = CalcDamage(kBattlePhaseGun, bi, friend_index, enemy_index, base_attack, special_attack_flg, multiple);
+#ifdef _DEBUG
+				cout << damage << "ダメージ！" << endl;
+#endif
+				result_.AddDamage(bi, friend_index.fleet_no, friend_index.fleet_i, damage);
+				fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].MinusHP(damage, stopper_[other_side][enemy_index.fleet_no][enemy_index.fleet_i]);
+			}
+#ifdef _DEBUG
+			cout << endl;
+#endif*/
+#ifdef _DEBUG
+	wcout << hunter_kammusu.GetNameLv() << endl << endl;
+#endif
+		}
+	}
 }
 
 // 制空状態を判断する
