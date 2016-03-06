@@ -154,9 +154,12 @@ size_t Config::GetTimes() const noexcept { return this->pimpl->e.times_; }
 size_t Config::GetThreads() const noexcept { return this->pimpl->e.threads_; }
 
 #if defined(_OPENMP)
+#include <omp.h>//omp_get_thread_num()
 size_t Config::CalcSeedArrSize() const noexcept { return GetTimes() * GetThreads(); }
+size_t Config::CalcSeedVNo(int n) const noexcept { return static_cast<size_t>(n) * GetThreads() + omp_get_thread_num(); }
 #else
 size_t Config::CalcSeedArrSize() const noexcept { return GetTimes(); }
+size_t Config::CalcSeedVNo(int n) const noexcept { return static_cast<size_t>(n); }
 #endif
 
 const string & Config::GetOutputFilename() noexcept { return this->pimpl->e.output_filename_; }
