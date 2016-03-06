@@ -195,7 +195,7 @@ int Kammusu::AacType() const noexcept {
 	//電探を持っていたらtrue
 	auto has_radar = [sum_radarW, sum_radarA]() -> bool { return (sum_radarW + sum_radarA >= 1); };
 	// まず、固有カットインを判定する
-	if (IncludeAnyOf({ L"秋月", L"照月", L"初月" })) {
+	if (id_ == 421 || id_ == 330 || id_ == 422 || id_ == 346 || id_ == 423 || id_ == 357 ) {
 		/* 秋月型……ご存知防空駆逐艦。対空カットイン無しでも圧倒的な対空値により艦載機を殲滅する。
 		* 二次創作界隈ではまさma氏が有名であるが、秋月型がこれ以上増えると投稿時のタイトルが長くなりすぎることから
 		* 嬉しい悲鳴を上げていたとか。なお史実上では後9隻居るが、有名なのは涼月などだろう……  */
@@ -203,13 +203,13 @@ int Kammusu::AacType() const noexcept {
 		if (has_hag() && has_radar()) return 2;
 		if (sum_hag + sum_hagX >= 2) return 3;
 	}
-	if (name_ == L"摩耶改二") {
+	if (id_ == 428) {
 		/* 摩耶改二……麻耶ではない。対空兵装により「洋上の対空要塞」(by 青島文化教材社)となったため、
 		* 重巡にしては驚異的な対空値を誇る。ついでに服装もかなりプリティーに進化した(妹の鳥海も同様) */
 		if (has_hag() && sum_aagX >= 1 && sum_radarA >= 1) return 10;
 		if (has_hag() && sum_aagX >= 1) return 11;
 	}
-	if (name_ == L"五十鈴改二") {
+	if (id_ == 141) {
 		/* 五十鈴改二…… 名前通りLv50からの改装である。防空巡洋艦になった史実から、射程が短となり、
 		* 防空力が大幅にアップした。しかし搭載数0で火力面で使いづらくなった上、対潜は装備対潜のウェイトが高いため
 		* 彼女を最適解に出来る状況は限られている。また、改二なのに金レアで固有カットインがゴミクズ「だった」ことから、
@@ -217,7 +217,7 @@ int Kammusu::AacType() const noexcept {
 		if (has_hag() && has_aag() && sum_radarA >= 1) return 14;
 		if (has_hag() && has_aag()) return 15;
 	}
-	if (name_ == L"霞改二乙") {
+	if (id_ == 470) {
 		/* 霞改二乙…… Lv88という驚異的な練度を要求するだけあり、内蔵されたギミックは特殊である。
 		* まず霞改二でも積めた大発に加え、大型電探も装備可能になった(代償に艦隊司令部施設が積めなくなった)。
 		* また、対空値も上昇し、固有カットインも実装された。ポスト秋月型＋アルファとも言えるだろう。
@@ -225,7 +225,7 @@ int Kammusu::AacType() const noexcept {
 		if (has_hag() && has_aag() && sum_radarA >= 1) return 16;
 		if (has_hag() && has_aag()) return 17;
 	}
-	if (name_ == L"皐月改二") {
+	if (id_ == 418) {
 		/* 皐月改二…… うるう年の2/29に実装された、皐月改二における固有の対空カットイン。
 		 * この調子では改二が出るたびに新型カットインが出るのではないかと一部で危惧されている。*/
 		if (sum_aagX >= 1) return 18;
