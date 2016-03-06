@@ -45,6 +45,7 @@ public:
 	size_t FirstIndex() const noexcept;								//第一艦隊のインデックス
 	size_t SecondIndex() const noexcept;					//第二艦隊のインデックス
 	void Put() const;							//中身を表示する
+	void ChangeCond(const SimulateMode, const Result&) noexcept;	//cond値を変更する
 	double SearchValue() const noexcept;		//索敵値を計算する
 	int AntiAirScore() const noexcept;			//制空値を計算する
 	double TrailerAircraftProb(const AirWarStatus&) const;	//触接開始率を計算する
@@ -59,9 +60,10 @@ public:
 	//ctorもしくはSetRandGenerator経由で乱数エンジンを渡している必要がある
 	double TrailerAircraftPlus();			//攻撃力補正を計算する
 	int AacType();							//発動する対空カットインの種類を判断する
-	int RandomKammusu();					//生存艦から艦娘をランダムに指定する
-	tuple<bool, KammusuIndex> RandomKammusuNonSS(const bool&, const TargetType&);	//水上の生存艦から艦娘をランダムに指定する
-	tuple<bool, KammusuIndex> RandomKammusuSS(const size_t&);						//潜水の生存艦から艦娘をランダムに指定する
+	tuple<bool, size_t> RandomKammusu();					//生存艦から艦娘をランダムに指定する
+	tuple<bool, KammusuIndex> RandomKammusuNonSS(const bool, const TargetType, const bool has_sl = false);	//水上の生存艦から艦娘をランダムに指定する
+	tuple<bool, KammusuIndex> RandomKammusuSS(const size_t);												//潜水の生存艦から艦娘をランダムに指定する
+	bool HasLights() const noexcept;		//探照灯や照明弾をいずれかの艦が保有していた場合はtrue
 };
 std::ostream& operator<<(std::ostream& os, const Fleet& conf);
 std::wostream& operator<<(std::wostream& os, const Fleet& conf);

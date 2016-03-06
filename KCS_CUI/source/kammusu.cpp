@@ -8,9 +8,45 @@
 #include "fleet.hpp"
 #include "simulator.hpp"
 #include <algorithm>
+using namespace std::string_literals;
+
+const std::wstring& to_wstring(const ShipClass& sc) {
+	struct {
+		const std::wstring name;
+		ShipClass value;
+	} map[] = {
+		{ L"魚雷艇"s, ShipClass::PT },
+		{ L"駆逐艦"s, ShipClass::DD },
+		{ L"軽巡洋艦"s, ShipClass::CL },
+		{ L"重雷装巡洋艦"s, ShipClass::CLT },
+		{ L"重巡洋艦"s, ShipClass::CA },
+		{ L"航空巡洋艦"s, ShipClass::CAV },
+		{ L"軽空母"s, ShipClass::CVL },
+		{ L"巡洋戦艦"s, ShipClass::CC },
+		{ L"戦艦"s, ShipClass::BB },
+		{ L"航空戦艦", ShipClass::BBV },
+		{ L"正規空母"s, ShipClass::CV },
+		{ L"陸上型"s, ShipClass::AF },
+		{ L"潜水艦", ShipClass::SS },
+		{ L"潜水空母"s, ShipClass::SSV },
+		{ L"輸送艦"s, ShipClass::LST },
+		{ L"水上機母艦"s, ShipClass::AV },
+		{ L"揚陸艦"s, ShipClass::LHA },
+		{ L"装甲空母"s,ShipClass::ACV },
+		{ L"工作艦"s, ShipClass::AR },
+		{ L"潜水母艦"s, ShipClass::AS },
+		{ L"練習巡洋艦"s, ShipClass::CP },
+		{ L"給油艦"s, ShipClass::AO },
+	};
+	for (const auto& item : map)
+		if (item.value == sc)
+			return item.name;
+	throw std::runtime_error("invalid ShipClass value.");
+}
+
 // コンストラクタ
 Kammusu::Kammusu() 
-	:	Kammusu(-1, L"なし", kShipClassDD, 0, 0, 0, 0, 0, 0, kSpeedNone, kRangeNone,
+	:	Kammusu(-1, L"なし", ShipClass::DD, 0, 0, 0, 0, 0, 0, kSpeedNone, kRangeNone,
 		0, { 0, 0, 0, 0, 0 }, 0, 0, 0, { -1, -1, -1, -1, -1 }, true, 1) 
 {}
 
@@ -49,7 +85,7 @@ ShipClass Kammusu::GetShipClass() const noexcept { return ship_class_; }
 int Kammusu::GetMaxHP() const noexcept { return max_hp_; }
 int Kammusu::GetTorpedo() const noexcept { return torpedo_; }
 int Kammusu::GetLuck() const noexcept { return luck_; }
-int Kammusu::GetSlots() const noexcept { return slots_; }
+size_t Kammusu::GetSlots() const noexcept { return slots_; }
 int Kammusu::GetEvade() const noexcept { return evade_; }
 int Kammusu::GetAntiSub() const noexcept { return anti_sub_; }
 int Kammusu::GetSearch() const noexcept { return search_; }
@@ -69,7 +105,7 @@ void Kammusu::SetAntiSub(const int anti_sub) noexcept { anti_sub_ = anti_sub; }
 void Kammusu::SetSearch(const int search) noexcept { search_ = search; }
 void Kammusu::SetLevel(const int level) noexcept { level_ = level; }
 void Kammusu::SetHP(const int hp) noexcept { hp_ = hp; }
-void Kammusu::SetWeapon(const int index, const Weapon & weapon) { weapons_[index] = weapon; }
+void Kammusu::SetWeapon(const size_t index, const Weapon & weapon) { weapons_[index] = weapon; }
 void Kammusu::SetCond(const int cond) noexcept { cond_ = cond; }
 
 // 中身を表示する
@@ -95,7 +131,7 @@ Kammusu Kammusu::Reset() {
 // 変更可な部分をリセットする(初期装備)
 Kammusu Kammusu::Reset(const WeaponDB &weapon_db) {
 	this->Reset();
-	for (auto i = 0; i < slots_; ++i) {
+	for (size_t i = 0; i < slots_; ++i) {
 		weapons_[i] = weapon_db.Get(first_weapons_[i], std::nothrow);
 	}
 	return *this;
@@ -110,7 +146,7 @@ int Kammusu::AacType() const noexcept {
 	size_t sum_gunL = 0, sum_radarW = 0, sum_radarA = 0, sum_three = 0;
 	for (auto &it_w : weapons_) {
 		switch (it_w.GetWeaponClass()) {
-		case kWeaponClassGun:
+		case WeaponClass::Gun:
 			if (it_w.IsHAG()) {
 				if (it_w.Include(L"高射装置") || it_w.GetName() == L"90mm単装高角砲") {
 					++sum_hagX;
@@ -123,10 +159,10 @@ int Kammusu::AacType() const noexcept {
 				++sum_gunL;
 			}
 			break;
-		case kWeaponClassAAD:
+		case WeaponClass::AAD:
 			++sum_aad;
 			break;
-		case kWeaponClassAAG:
+		case WeaponClass::AAG:
 			if (it_w.Include(L"集中")) {
 				++sum_aagX;
 			}
@@ -134,11 +170,11 @@ int Kammusu::AacType() const noexcept {
 				++sum_aag;
 			}
 			break;
-		case kWeaponClassAAA:
+		case WeaponClass::AAA:
 			++sum_three;
 			break;
-		case kWeaponClassSmallR:
-		case kWeaponClassLargeR:
+		case WeaponClass::SmallR:
+		case WeaponClass::LargeR:
 			if (it_w.Include(L"対空")) {
 				++sum_radarA;
 			}
@@ -149,36 +185,45 @@ int Kammusu::AacType() const noexcept {
 			break;
 		}
 	}
+	// 特定のパターンは先に関数化しておく
+	//高角砲を持っていたらtrue
+	auto has_hag = [sum_hag, sum_hagX]() -> bool { return (sum_hag + sum_hagX >= 1); };
+	//対空機銃を持っていたらtrue
+	auto has_aag = [sum_aag, sum_aagX]() -> bool { return (sum_aag + sum_aagX >= 1); };
+	//高射装置を持っていたらtrue
+	auto has_aad = [sum_hagX, sum_aad]() -> bool { return (sum_hagX + sum_aad >= 1); };
+	//電探を持っていたらtrue
+	auto has_radar = [sum_radarW, sum_radarA]() -> bool { return (sum_radarW + sum_radarA >= 1); };
 	// まず、固有カットインを判定する
 	if (IncludeAnyOf({ L"秋月", L"照月", L"初月" })) {
 		/* 秋月型……ご存知防空駆逐艦。対空カットイン無しでも圧倒的な対空値により艦載機を殲滅する。
 		* 二次創作界隈ではまさma氏が有名であるが、秋月型がこれ以上増えると投稿時のタイトルが長くなりすぎることから
 		* 嬉しい悲鳴を上げていたとか。なお史実上では後9隻居るが、有名なのは涼月などだろう……  */
-		if (sum_hag + sum_hagX >= 2 && sum_radarW + sum_radarA >= 1) return 1;
-		if (sum_hag + sum_hagX >= 1 && sum_radarW + sum_radarA >= 1) return 2;
+		if (sum_hag + sum_hagX >= 2 && has_radar()) return 1;
+		if (has_hag() && has_radar()) return 2;
 		if (sum_hag + sum_hagX >= 2) return 3;
 	}
 	if (name_ == L"摩耶改二") {
 		/* 摩耶改二……麻耶ではない。対空兵装により「洋上の対空要塞」(by 青島文化教材社)となったため、
 		* 重巡にしては驚異的な対空値を誇る。ついでに服装もかなりプリティーに進化した(妹の鳥海も同様) */
-		if (sum_hag + sum_hagX >= 1 && sum_aagX >= 1 && sum_radarA >= 1) return 10;
-		if (sum_hag + sum_hagX >= 1 && sum_aagX >= 1) return 11;
+		if (has_hag() && sum_aagX >= 1 && sum_radarA >= 1) return 10;
+		if (has_hag() && sum_aagX >= 1) return 11;
 	}
 	if (name_ == L"五十鈴改二") {
 		/* 五十鈴改二…… 名前通りLv50からの改装である。防空巡洋艦になった史実から、射程が短となり、
 		* 防空力が大幅にアップした。しかし搭載数0で火力面で使いづらくなった上、対潜は装備対潜のウェイトが高いため
 		* 彼女を最適解に出来る状況は限られている。また、改二なのに金レアで固有カットインがゴミクズ「だった」ことから、
 		* しばしば不遇改二の代表例として挙げられていた。逆に言えば、新人向けに便利とも言えるが…… */
-		if (sum_hag + sum_hagX >= 1 && sum_aag + sum_aagX >= 1 && sum_radarA >= 1) return 14;
-		if (sum_hag + sum_hagX >= 1 && sum_aag + sum_aagX >= 1) return 15;
+		if (has_hag() && has_aag() && sum_radarA >= 1) return 14;
+		if (has_hag() && has_aag()) return 15;
 	}
 	if (name_ == L"霞改二乙") {
 		/* 霞改二乙…… Lv88という驚異的な練度を要求するだけあり、内蔵されたギミックは特殊である。
 		* まず霞改二でも積めた大発に加え、大型電探も装備可能になった(代償に艦隊司令部施設が積めなくなった)。
 		* また、対空値も上昇し、固有カットインも実装された。ポスト秋月型＋アルファとも言えるだろう。
 		* なお紐が霞改二と違い赤色であるが、どちらにせよランドｓゲフンゲフン */
-		if (sum_hag + sum_hagX >= 1 && sum_aag + sum_aagX >= 1 && sum_radarA >= 1) return 16;
-		if (sum_hag + sum_hagX >= 1 && sum_aag + sum_aagX >= 1) return 17;
+		if (has_hag() && has_aag() && sum_radarA >= 1) return 16;
+		if (has_hag() && has_aag()) return 17;
 	}
 	if (name_ == L"皐月改二") {
 		/* 皐月改二…… うるう年の2/29に実装された、皐月改二における固有の対空カットイン。
@@ -186,12 +231,12 @@ int Kammusu::AacType() const noexcept {
 		if (sum_aagX >= 1) return 18;
 	}
 	// 次に一般カットインを判定する
-	if (sum_gunL >= 1 && sum_three >= 1 && sum_hagX + sum_aad >= 1 && sum_radarA >= 1) return 4;
+	if (sum_gunL >= 1 && sum_three >= 1 && has_aad() && sum_radarA >= 1) return 4;
 	if (sum_hagX >= 2 && sum_radarA >= 1) return 5;
-	if (sum_gunL >= 1 && sum_three >= 1 && sum_hagX + sum_aad >= 1) return 6;
-	if (sum_hag + sum_hagX >= 1 && sum_aad >= 1 && sum_radarA >= 1) return 7;
+	if (sum_gunL >= 1 && sum_three >= 1 && has_aad()) return 6;
+	if (has_hag() && sum_aad >= 1 && sum_radarA >= 1) return 7;
 	if (sum_hagX >= 1 && sum_radarA >= 1) return 8;
-	if (sum_hag + sum_hagX >= 1 && sum_aad >= 1) return 9;
+	if (has_hag() && sum_aad >= 1) return 9;
 	if (sum_aagX >= 1 && sum_aag >= 1 && sum_radarA >= 1) return 12;
 	return 0;
 }
@@ -270,21 +315,21 @@ double Kammusu::AllAntiAir() const noexcept {
 			aaa = int(2.0 * sqrt(it_w.GetAntiAir()));
 		}
 		switch (it_w.GetWeaponClass()) {
-		case kWeaponClassAAG:
+		case WeaponClass::AAG:
 			aaa *= 6.0;
 			break;
-		case kWeaponClassAAD:
+		case WeaponClass::AAD:
 			aaa *= 4.0;
 			break;
-		case kWeaponClassLargeR:
-		case kWeaponClassSmallR:
+		case WeaponClass::LargeR:
+		case WeaponClass::SmallR:
 			aaa *= 3.0;
 			break;
-		case kWeaponClassPF:
-		case kWeaponClassAAA:
+		case WeaponClass::PF:
+		case WeaponClass::AAA:
 			aaa *= 0.0;
 			break;
-		case kWeaponClassGun:
+		case WeaponClass::Gun:
 			if (it_w.IsHAG()) aaa *= 4.0; else aaa *= 0.0;
 			break;
 		default:
@@ -403,10 +448,11 @@ int Kammusu::AllTorpedo(const bool &level_flg) const noexcept {
 	for (auto &it_w : weapons_) {
 		torpedo_sum += it_w.GetTorpedo();
 		if (level_flg) {
-			switch (it_w.GetAntiAir()) {
-			case kWeaponClassTorpedo:
-			case kWeaponClassAAG:
+			switch (it_w.GetWeaponClass()) {
+			case WeaponClass::Torpedo:
+			case WeaponClass::AAG:
 				torpedo_sum += 1.2 * sqrt(it_w.GetLevel());
+				break;
 			default:
 				break;
 			}
@@ -417,11 +463,7 @@ int Kammusu::AllTorpedo(const bool &level_flg) const noexcept {
 
 // 軽巡軽量砲補正
 double Kammusu::FitGunAttackPlus() const noexcept {
-	switch (ship_class_) {
-	case kShipClassCL:
-	case kShipClassCLT:
-	case kShipClassCP:
-	{
+	if (Is(ShipClass::CL | ShipClass::CLT | ShipClass::CP)) {
 		int light_gun_single = 0, light_gun_double = 0;
 		for (auto &it_w : weapons_) {
 			auto &name = it_w.GetName();
@@ -433,28 +475,25 @@ double Kammusu::FitGunAttackPlus() const noexcept {
 		}
 		return sqrt(light_gun_single) + 2.0 * sqrt(light_gun_double);
 	}
-		break;
-	default:
 		return 0.0;
 	}
-}
 
 // 徹甲弾補正
 double Kammusu::SpecialEffectApPlus() const noexcept {
 	bool has_gun = false, has_ap = false, has_subgun = false, has_radar = false;
 	for (auto &it_w : weapons_) {
 		switch (it_w.GetWeaponClass()) {
-		case kWeaponClassGun:
+		case WeaponClass::Gun:
 			has_gun = true;
 			break;
-		case kWeaponClassAP:
+		case WeaponClass::AP:
 			has_ap = true;
 			break;
-		case kWeaponClassSubGun:
+		case WeaponClass::SubGun:
 			has_subgun = true;
 			break;
-		case kWeaponClassSmallR:
-		case kWeaponClassLargeR:
+		case WeaponClass::SmallR:
+		case WeaponClass::LargeR:
 			has_radar = true;
 			break;
 		default:
@@ -481,16 +520,8 @@ double Kammusu::SpecialEffectApPlus() const noexcept {
 double Kammusu::CL2ProbPlus() const noexcept {
 	double cl_prob_plus = 0.0;
 	for (auto &it_w : weapons_) {
-		switch (it_w.GetWeaponClass()) {
-		case kWeaponClassPA:
-		case kWeaponClassPB:
-		case kWeaponClassPBF:
-		case kWeaponClassWB:
+		if (it_w.Is(WeaponClass::AirBomb))
 			cl_prob_plus += 0.05 * it_w.GetLevel() / 7;
-			break;
-		default:
-			break;
-		}
 	}
 	return cl_prob_plus;
 }
@@ -498,18 +529,10 @@ double Kammusu::CL2ProbPlus() const noexcept {
 // 熟練艦載機によるダメージ補正
 double Kammusu::CL2AttackPlus() const noexcept {
 	double cl_attack_plus = 0.0;
-	for (auto wi = 0; wi < slots_; ++wi) {
+	for (size_t wi = 0; wi < slots_; ++wi) {
 		auto &it_w = weapons_[wi];
-		switch (it_w.GetWeaponClass()) {
-		case kWeaponClassPA:
-		case kWeaponClassPB:
-		case kWeaponClassPBF:
-		case kWeaponClassWB:
+		if (it_w.Is(WeaponClass::AirBomb))
 			cl_attack_plus += (wi == 0 ? 0.2 : 0.1) * it_w.GetLevel() / 7;
-			break;
-		default:
-			break;
-		}
 	}
 	return cl_attack_plus;
 }
@@ -530,6 +553,151 @@ Range Kammusu::MaxRange() const noexcept {
 		range = std::max(range, it_w.GetRange());
 	}
 	return range;
+}
+
+// 昼戦火力を返す
+int Kammusu::DayAttack(const DayFireType fire_type, const bool af_flg, const FleetType fleet_type, const size_t index) const noexcept {
+	double base_attack = 0.0;
+	switch (fire_type) {
+	case kDayFireGun:	//砲撃
+		base_attack += attack_;
+		for (auto &it_w : weapons_) {
+			base_attack += it_w.GetAttack();
+			switch (it_w.GetWeaponClass()) {
+			case WeaponClass::Gun:
+				base_attack += (it_w.GetRange() >= kRangeLong ? 1.5 : 1.0) * sqrt(it_w.GetLevel());
+				break;
+			case WeaponClass::SubGun:
+			case WeaponClass::AAG:
+			case WeaponClass::AAD:
+			case WeaponClass::SL:
+				base_attack += sqrt(it_w.GetLevel());
+			case WeaponClass::Sonar:
+			case WeaponClass::DP:
+				base_attack += 0.75 * sqrt(it_w.GetLevel());
+			default:
+				break;
+			}
+		}
+		switch (fleet_type) {
+		case kFleetTypeNormal:
+			base_attack += 5.0;
+			break;
+		case kFleetTypeCombinedAir:
+			if (index == 0) base_attack += 7.0; else base_attack += 15.0;
+			break;
+		case kFleetTypeCombinedGun:
+			if (index == 0) base_attack += 15.0; else base_attack += 0.0;
+			break;
+		case kFleetTypeCombinedDrum:
+			if (index == 0) base_attack += 0.0; else base_attack += 15.0;
+			break;
+		}
+		break;
+	case kDayFireAir:	//空撃
+		{
+			// 総雷装・総爆撃・装備改修補正をカウントする
+			int all_torpedo = 0, all_bomb = 0;	//総雷装・総爆撃
+			double gamma = 0.0;					//装備改修補正
+			for (auto &it_w : weapons_) {
+				all_torpedo += it_w.GetTorpedo();
+				all_bomb += it_w.GetBomb();
+				if (it_w.GetWeaponClass() == WeaponClass::SubGun) gamma += sqrt(it_w.GetLevel());
+			}
+			// 陸上型相手だと雷装値が無効になる
+			if (af_flg) all_torpedo = 0;
+			// 連合艦隊における補正
+			int offset = 0;
+			switch (fleet_type) {
+			case kFleetTypeCombinedAir:
+				if (index == 0) offset = 2; else offset = 10;
+				break;
+			case kFleetTypeCombinedGun:
+				if (index == 0) offset = 10; else offset = -5;
+				break;
+			case kFleetTypeCombinedDrum:
+				if (index == 0) offset = -5; else offset = 10;
+				break;
+			default:
+				break;
+			}
+			// ※キャストだらけですがあくまでも仕様です
+			base_attack = int(1.5 * (attack_ + all_torpedo + int(1.3 * all_bomb) + offset + gamma)) + 55;
+		}
+		break;
+	case kDayFireChage:	//爆雷攻撃
+		int base_sub = anti_sub_;
+		bool air_flg = false;
+		for (auto &it_w : weapons_) {
+			switch (it_w.GetWeaponClass()) {
+			case WeaponClass::DP:
+			case WeaponClass::Sonar:
+				base_attack += it_w.GetAntiSub() * 1.5;
+				base_attack += sqrt(it_w.GetLevel());
+				break;
+			case WeaponClass::PA:
+			case WeaponClass::AJ:
+			case WeaponClass::ASPP:
+				base_attack += it_w.GetAntiSub() * 1.5;
+				air_flg = true;
+				break;
+			default:
+				// 小口径主砲・水上偵察機・小型電探の対潜値は無視していい
+				break;
+			}
+		}
+		base_attack += sqrt(base_sub) * 2 + (air_flg ? 8 : 13);
+		break;
+	}
+	return int(base_attack);
+}
+
+// 夜戦火力を返す
+int Kammusu::NightAttack(const NightFireType fire_type, const bool af_flg) const noexcept {
+	double base_attack = 0.0;
+	switch (fire_type) {
+	case kNightFireGun:	//砲撃
+		base_attack += attack_;
+		if (!af_flg) base_attack += torpedo_;
+		for (auto &it_w : weapons_) {
+			base_attack += it_w.GetAttack();
+			if (!af_flg) base_attack += it_w.GetTorpedo();
+			switch (it_w.GetWeaponClass()) {
+			case WeaponClass::Gun:
+				base_attack += (it_w.GetRange() >= kRangeLong ? 1.5 : 1.0) * sqrt(it_w.GetLevel());
+				break;
+			case WeaponClass::SubGun:
+			case WeaponClass::AAG:
+			case WeaponClass::AAD:
+			case WeaponClass::SL:
+				base_attack += sqrt(it_w.GetLevel());
+			case WeaponClass::Sonar:
+			case WeaponClass::DP:
+				base_attack += 0.75 * sqrt(it_w.GetLevel());
+			default:
+				break;
+			}
+		}
+		break;
+	case kNightFireChage:	//爆雷攻撃
+		int base_sub = anti_sub_;
+		for (auto &it_w : weapons_) {
+			switch (it_w.GetWeaponClass()) {
+			case WeaponClass::DP:
+			case WeaponClass::Sonar:
+				base_attack += it_w.GetAntiSub() * 1.5;
+				base_attack += sqrt(it_w.GetLevel());
+				break;
+			default:
+				// 夜戦での対潜は、航空対潜ではありえないので除外
+				// 小口径主砲・水上偵察機・小型電探の対潜値は無視していい
+				break;
+			}
+		}
+		base_attack += sqrt(base_sub) * 2 + 13;
+		break;
+	}
+	return int(base_attack);
 }
 
 // ダメージを与える
@@ -555,51 +723,46 @@ void Kammusu::ConsumeMaterial() noexcept {
 	fuel_ = (fuel_ - 20) | limit(0, 100);
 }
 
-// 艦載機を保有していた場合はtrue
-bool Kammusu::HasAir() const noexcept {
-	for (auto i = 0; i < slots_; ++i) {
-		if (weapons_[i].IsAir() && airs_[i] > 0) return true;
+// cond値を変化させる
+void Kammusu::ChangeCond(const int cond_change) noexcept {
+	cond_ = (cond_ + cond_change) | limit(0, 100);
+}
+
+bool Kammusu::HasWeaponClass(const WeaponClass& wc) const noexcept {
+	for (size_t i = 0; i < slots_; ++i) {
+		if (weapons_[i].Is(wc) && airs_[i] > 0) return true;
 	}
 	return false;
+}
+
+// 艦載機を保有していた場合はtrue
+bool Kammusu::HasAir() const noexcept {
+	return HasWeaponClass(WeaponClass::Air);
 }
 
 // 航空戦に参加する艦載機を保有していた場合はtrue
 bool Kammusu::HasAirFight() const noexcept {
-	for (auto i = 0; i < slots_; ++i) {
-		if (weapons_[i].IsAirFight() && airs_[i] > 0) return true;
-	}
-	return false;
+	return HasWeaponClass(WeaponClass::AirFight);
 }
 
 // 触接に参加する艦載機を保有していた場合はtrue
 bool Kammusu::HasAirTrailer() const noexcept {
-	for (auto i = 0; i < slots_; ++i) {
-		if (weapons_[i].IsAirTrailer() && airs_[i] > 0) return true;
-	}
-	return false;
+	return HasWeaponClass(WeaponClass::AirTrailer);
 }
 
 // 艦爆を保有していた場合はtrue
 bool Kammusu::HasAirBomb() const noexcept {
-	for (auto i = 0; i < slots_; ++i) {
-		auto weapon_class = weapons_[i].GetWeaponClass();
-		if ((weapon_class == kWeaponClassPB || weapon_class == kWeaponClassPBF) && airs_[i] > 0) return true;
-	}
-	return false;
+	return HasWeaponClass(WeaponClass::PB | WeaponClass::PBF);
 }
 
 // 昼戦に参加可能な場合はtrue
 bool Kammusu::HasAirAttack() const noexcept {
-	for (auto i = 0; i < slots_; ++i) {
-		if (weapons_[i].IsAirBomb() && airs_[i] > 0) return true;
-	}
-	return false;
+	return HasWeaponClass(WeaponClass::AirBomb);
 }
 
 // 潜水艦系ならtrue
 bool Kammusu::IsSubmarine() const noexcept {
-	if (ship_class_ == kShipClassSS || ship_class_ == kShipClassSSV) return true;
-	return false;
+	return Is(ShipClass::SS | ShipClass::SSV);
 }
 
 // 名前に特定の文字が含まれていればtrue
@@ -622,10 +785,10 @@ bool Kammusu::HasAntiSubSynergy() const noexcept {
 	bool has_dp = false, has_sonar = false;
 	for (auto &it_w : weapons_) {
 		switch (it_w.GetWeaponClass()) {
-		case kWeaponClassDP:
+		case WeaponClass::DP:
 			has_dp = true;
 			break;
-		case kWeaponClassSonar:
+		case WeaponClass::Sonar:
 			has_sonar = true;
 			break;
 		default:
@@ -637,24 +800,13 @@ bool Kammusu::HasAntiSubSynergy() const noexcept {
 
 // 徹甲弾補正を食らう側ならtrue
 bool Kammusu::IsSpecialEffectAP() const noexcept {
-	switch (ship_class_) {
-	case kShipClassCA:
-	case kShipClassCAV:
-	case kShipClassBB:
-	case kShipClassBBV:
-	case kShipClassCV:
-	case kShipClassAF:
-	case kShipClassACV:
-		return true;
-	default:
-		return false;
-	}
+	return Is(ShipClass::CA | ShipClass::CAV | ShipClass::BB | ShipClass::BBV | ShipClass::CV | ShipClass::AF | ShipClass::ACV);
 }
 
 // 彩雲を保有していた場合はtrue
 bool Kammusu::HasAirPss() const noexcept {
 	for (auto &it_w : weapons_) {
-		if (it_w.GetWeaponClass() == kWeaponClassPSS) return true;
+		if (it_w.Is(WeaponClass::PSS)) return true;
 	}
 	return false;
 }
@@ -668,13 +820,13 @@ bool Kammusu::IsFireTorpedo(const TorpedoTurn &torpedo_turn) const noexcept {
 			// 甲標的を積んだ軽巡(事実上阿武隈改二のみ)・潜水系・雷巡・水母は飛ばせる
 			// (冷静に考えると、甲標的さえ載れば飛ばせるはず……)
 			/*switch (ship_class_) {
-			case kShipClassCL:
-			case kShipClassSS:
-			case kShipClassSSV:
-			case kShipClassCLT:
-			case kShipClassAV:*/
+			case ShipClass::CL:
+			case ShipClass::SS:
+			case ShipClass::SSV:
+			case ShipClass::CLT:
+			case ShipClass::AV:*/
 				for (auto &it_w : weapons_) {
-					if (it_w.GetWeaponClass() == kWeaponClassSpecialSS) return true;
+					if (it_w.Is(WeaponClass::SpecialSS)) return true;
 				}
 			/*default:
 				break;
@@ -711,15 +863,8 @@ bool Kammusu::IsMoveGun() const noexcept {
 	// 潜水艦系も砲撃フェイズでは行動できない
 	if (IsSubmarine()) return false;
 	// 艦載機が切れた空母も砲撃フェイズでは行動できない
-	switch (ship_class_) {
-	case kShipClassCVL:
-	case kShipClassCV:
-	case kShipClassACV:
+	if (Is(ShipClass::CVL | ShipClass::CV | ShipClass::ACV))
 		return HasAirAttack();
-		break;
-	default:
-		break;
-	}
 	return true;
 }
 
@@ -731,77 +876,86 @@ bool Kammusu::IsFireGun() const noexcept {
 	if (IsSubmarine()) return false;
 	// 艦載機が切れた空母も砲撃フェイズでは攻撃できない
 	// また、中破した空母系・大破した装甲空母も攻撃できない
-	switch (ship_class_) {
-	case kShipClassCVL:
-	case kShipClassCV:
+	if (Is(ShipClass::CVL | ShipClass::CV | ShipClass::AF))
 		return (HasAirAttack() && Status() != kStatusMiddleDamage);
-		break;
-	case kShipClassACV:
+	if (Is(ShipClass::ACV))
 		return (HasAirAttack() && Status() != kStatusHeavyDamage);
-		break;
-	default:
-		break;
-	}
 	return true;
 }
 
 // 昼戦で対潜可能な艦ならtrue
 bool Kammusu::IsAntiSubDay() const noexcept {
-	switch (ship_class_) {
-	case kShipClassCVL:
-	case kShipClassAF:
 		// 空母型対潜攻撃
+	if (Is(ShipClass::CVL | ShipClass::AF))
 		return IsAntiSubDayPlane();
-		break;
-	case kShipClassBBV:
-	case kShipClassAV:
-	case kShipClassCAV:
 		// 航戦型対潜攻撃
+	if (Is(ShipClass::BBV | ShipClass::AV | ShipClass::CAV))
 		return IsAntiSubDayWater();
-		break;
-	case kShipClassCL:
-	case kShipClassCLT:
-	case kShipClassDD:
-	case kShipClassCP:
 		// 水雷型対潜攻撃
-		if (anti_sub_ > 0) return true;
-		break;
-	case kShipClassAO:
+	if (Is(ShipClass::CL | ShipClass::CLT | ShipClass::DD | ShipClass::CP))
+		return anti_sub_ > 0;
 		// 上記3種類が合わさった速吸改は頭おかしい(褒め言葉)
+	if (Is(ShipClass::AO))
 		return (IsAntiSubDayPlane() || IsAntiSubDayWater() || (anti_sub_ > 0));
-		break;
-	default:
-		break;
-	}
 	return false;
 }
 
+// 空撃可能ならtrue
+bool Kammusu::IsFireGunPlane() const noexcept {
+	return IsAntiSubDayPlane();
+}
+
 bool Kammusu::IsAntiSubDayPlane() const noexcept {
-	for (auto wi = 0; wi < slots_; ++wi) {
+	for (size_t wi = 0; wi < slots_; ++wi) {
 		if (airs_[wi] == 0) continue;
-		switch (weapons_[wi].GetWeaponClass()) {
-		case kWeaponClassPBF:
-		case kWeaponClassPB:
-		case kWeaponClassPA:
+		if (weapons_[wi].Is(WeaponClass::PBF | WeaponClass::PB | WeaponClass::PA))
 			return true;
-		default:
-			break;
-		}
 	}
 	return false;
 }
 
 bool Kammusu::IsAntiSubDayWater() const noexcept {
-	for (auto wi = 0; wi < slots_; ++wi) {
+	for (size_t wi = 0; wi < slots_; ++wi) {
 		if (airs_[wi] == 0) continue;
-		switch (weapons_[wi].GetWeaponClass()) {
-		case kWeaponClassWB:
-		case kWeaponClassASPP:
-		case kWeaponClassAJ:
+		if (weapons_[wi].Is(WeaponClass::WB | WeaponClass::ASPP | WeaponClass::AJ))
 			return true;
-		default:
-			break;
+	}
+	return false;
+}
+
+// 夜戦で攻撃可能な艦ならtrue
+bool Kammusu::IsFireNight() const noexcept {
+	// 大破していたら攻撃不可
+	if (Status() >= kStatusHeavyDamage) return false;
+	// 空母系は一部を覗いて攻撃不可
+	if (Is(ShipClass::CV | ShipClass::CVL | ShipClass::ACV)) {
+		if (kammusu_flg_) {
+			if (name_ == L"Graf") return true;
+			return false;
 		}
+		else {
+			if (Include(L"flagship")) return true;
+			if (IncludeAnyOf({ L"ヲ", L"ヌ" })) return false;
+			return true;
+		}
+	}
+	// それ以外は攻撃可能
+	return true;
+}
+
+// 夜戦で対潜可能な艦ならtrue
+bool Kammusu::IsAntiSubNight() const noexcept {
+	if (Is(ShipClass::CL | ShipClass::CLT | ShipClass::DD | ShipClass::CP | ShipClass::AO)) {
+		return anti_sub_ > 0;
+	}
+	return false;
+}
+
+// 探照灯や照明弾を保有していた場合はtrue
+bool Kammusu::HasLights() const noexcept {
+	for (auto &it_w : weapons_) {
+		if (it_w.Is(WeaponClass::SL)) return true;
+		if (it_w.Is(WeaponClass::LB)) return true;
 	}
 	return false;
 }
@@ -810,11 +964,11 @@ std::ostream & operator<<(std::ostream & os, const Kammusu & conf)
 {
 	os 
 		<< "艦船ID：" << conf.id_ << endl
-		<< "　艦名：" << char_cvt::utf_16_to_shift_jis(conf.name_) << "　艦種：" << char_cvt::utf_16_to_shift_jis(kShipClassStr[conf.ship_class_]) << endl
+		<< "　艦名：" << char_cvt::utf_16_to_shift_jis(conf.name_) << "　艦種：" << char_cvt::utf_16_to_shift_jis(to_wstring(conf.ship_class_)) << endl
 		<< "　最大耐久：" << conf.max_hp_ << "　装甲：" << conf.defense_ << "　火力：" << conf.attack_ << "　雷撃：" << conf.torpedo_ << endl
 		<< "　対空：" << conf.anti_air_ << "　運：" << conf.luck_ << "　速力：" << char_cvt::utf_16_to_shift_jis(kSpeedStr[conf.speed_]) << "　射程：" << char_cvt::utf_16_to_shift_jis(kRangeStr[conf.range_]) << endl
 		<< "　スロット数：" << conf.slots_ << "　最大搭載数：";
-	for (auto i = 0; i < conf.slots_; ++i) {
+	for (size_t i = 0; i < conf.slots_; ++i) {
 		if (i != 0) os << ",";
 		os << conf.max_airs_[i];
 	}
@@ -822,7 +976,7 @@ std::ostream & operator<<(std::ostream & os, const Kammusu & conf)
 		<< "　回避：" << conf.evade_ << "　対潜：" << conf.anti_sub_ << endl
 		<< "　索敵：" << conf.search_ << "　艦娘か？：" << (conf.kammusu_flg_ ? "はい" : "いいえ") << "　レベル：" << conf.level_ << "　現耐久：" << conf.hp_ << endl
 		<< "　装備：";
-	for (auto i = 0; i < conf.slots_; ++i) {
+	for (size_t i = 0; i < conf.slots_; ++i) {
 		if (i != 0) os << ",";
 		os << char_cvt::utf_16_to_shift_jis(conf.weapons_[i].GetName()) << "(" << conf.airs_[i] << ")";
 	}
@@ -836,11 +990,11 @@ std::wostream & operator<<(std::wostream & os, const Kammusu & conf)
 {
 	os
 		<< L"艦船ID：" << conf.id_ << endl
-		<< L"　艦名：" << conf.name_ << L"　艦種：" << kShipClassStr[conf.ship_class_] << endl
+		<< L"　艦名：" << conf.name_ << L"　艦種：" << to_wstring(conf.ship_class_) << endl
 		<< L"　最大耐久：" << conf.max_hp_ << L"　装甲：" << conf.defense_ << L"　火力：" << conf.attack_ << L"　雷撃：" << conf.torpedo_ << endl
 		<< L"　対空：" << conf.anti_air_ << L"　運：" << conf.luck_ << L"　速力：" << kSpeedStr[conf.speed_] << L"　射程：" << kRangeStr[conf.range_] << endl
 		<< L"　スロット数：" << conf.slots_ << L"　最大搭載数：";
-	for (auto i = 0; i < conf.slots_; ++i) {
+	for (size_t i = 0; i < conf.slots_; ++i) {
 		if (i != 0) os << ",";
 		os << conf.max_airs_[i];
 	}
@@ -848,7 +1002,7 @@ std::wostream & operator<<(std::wostream & os, const Kammusu & conf)
 		<< L"　回避：" << conf.evade_ << L"　対潜：" << conf.anti_sub_ << endl
 		<< L"　索敵：" << conf.search_ << L"　艦娘か？：" << (conf.kammusu_flg_ ? L"はい" : L"いいえ") << L"　レベル：" << conf.level_ << L"　現耐久：" << conf.hp_ << endl
 		<< L"　装備：";
-	for (auto i = 0; i < conf.slots_; ++i) {
+	for (size_t i = 0; i < conf.slots_; ++i) {
 		if (i != 0) os << ",";
 		os << conf.weapons_[i].GetName() << L"(" << conf.airs_[i] << ")";
 	}

@@ -66,8 +66,13 @@
 - クリティカル発動率
 - 弾薬量補正
 - 弾着観測射撃(カットイン)成功時における命中率補正
+- 弾着観測射撃の発動確率
+- 連合艦隊における命中率補正
+- 探照灯による誘引率
 
 ## 注意点
+- ダメコンおよび戦闘兵食・給油艦による補給には対応していません。
+- 護衛退避には対応していません。
 - 補強増設には対応していません。
 - 航空戦マス、および空襲戦マスには対応していません。
 - 支援艦隊には対応していません。
@@ -79,6 +84,7 @@ MITライセンスとします。
 - YSR https://github.com/YSRKEN
 - yumetodo https://github.com/yumetodo
 - Cranberries https://github.com/LoliGothick
+- sayurin https://github.com/sayurin
 
 ## 参考資料
 - ほっぽアルファのデータライブラリからships0209.csvとslotitems0209.csvを頂いた  
@@ -100,6 +106,6 @@ http://ja.kancolle.wikia.com/wiki/%E8%89%A6%E3%81%93%E3%82%8C_%E6%A4%9C%E8%A8%BC
 https://github.com/andanteyk/ElectronicObserver/blob/master/ElectronicObserver/Other/Information/kcmemo.md#%E8%89%A6%E3%81%93%E3%82%8C%E3%81%AE%E4%BB%95%E6%A7%98%E3%81%AB%E9%96%A2%E3%81%99%E3%82%8B%E9%9B%91%E5%A4%9A%E3%81%AA%E3%83%A1%E3%83%A2
 http://kancollecalc.web.fc2.com/damage_formula.html
 http://bs-arekore.at.webry.info/201502/article_4.html
-https://twitter.com/Xe_UCH/status/700169825121804288
+https://twitter.com/Xe_UCH/status/705281106011029505
 - おのれSourceTree……勝手に特定拡張子を自動で除外するとは……  
 http://tech.nitoyon.com/ja/blog/2013/04/05/sourcetree/

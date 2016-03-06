@@ -81,12 +81,12 @@ void Fleet::LoadJson(std::istream & file, const WeaponDB & weapon_db, const Kamm
 				temp_k.SetCond(unit["cond"].to_str() | to_i_limit(0, 100));
 			}
 			// 装備ID・改修/熟練度・内部熟練度から装備を設定する
-			int wi = 0;
+			size_t wi = 0;
 			for (auto &temp_p : unit.at("items").get<object>()) {
 				auto& parts = temp_p.second.get<object>();
 				Weapon temp_w = weapon_db.Get(parts.at("id").to_str() | to_i());
 				// 改修・外部熟練度・内部熟練度の処理
-				if (temp_w.IsAir()) {
+				if (temp_w.Is(WeaponClass::Air)) {
 					level = parts.at("rf").to_str() | to_i_limit(0, 7);
 					int level_detail = 0;
 					auto it = parts.find("rf_detail");
@@ -149,23 +149,78 @@ vector<Kammusu>& Fleet::FirstUnit() { return unit_[0]; }
 const vector<Kammusu>& Fleet::FirstUnit() const { return unit_[0]; }
 vector<Kammusu>& Fleet::SecondUnit() { return unit_[unit_.size() - 1]; }
 const vector<Kammusu>& Fleet::SecondUnit() const { return unit_[unit_.size() - 1]; }
-size_t Fleet::FleetSize() const noexcept { return unit_.size(); }
-
 //「艦隊数」(通常艦隊だと1、連合艦隊だと2)
-
-size_t Fleet::UnitSize(const size_t fi) const noexcept { return unit_[fi].size(); }
-
+size_t Fleet::FleetSize() const noexcept { return unit_.size(); }
 //「艦隊」における艦数
-
-size_t Fleet::FirstIndex() const noexcept { return 0; }
-
+size_t Fleet::UnitSize(const size_t fi) const noexcept { return unit_[fi].size(); }
 //第一艦隊のインデックス
-
+size_t Fleet::FirstIndex() const noexcept { return 0; }
+//第ニ艦隊のインデックス
 size_t Fleet::SecondIndex() const noexcept { return unit_.size() - 1; }
 
 // 中身を表示する
 void Fleet::Put() const {
 	cout << *this;
+}
+
+// cond値を変更する
+void Fleet::ChangeCond(const SimulateMode simulate_mode, const Result &result) noexcept {
+	// 全体に適用されるもの
+	int cond_change = 0;
+	switch (simulate_mode) {
+	case kSimulateModeDN:
+		cond_change -= 3;
+		if (result.GetNightFlg()) cond_change -= 2;
+		break;
+	case kSimulateModeD:
+		cond_change -= 3;
+		break;
+	case kSimulateModeN:
+		cond_change -= 2;
+		break;
+	}
+	switch (result.JudgeWinReason()) {
+	case WinReason::SS:
+	case WinReason::S:
+		cond_change += 4;
+		break;
+	case WinReason::A:
+		cond_change += 3;
+		break;
+	case WinReason::B:
+		cond_change += 2;
+		break;
+	case WinReason::C:
+		cond_change += 1;
+		break;
+	default:
+		break;
+	}
+	for (auto &it_u : unit_) {
+		for (auto &it_k : it_u) {
+			it_k.ChangeCond(cond_change);
+		}
+	}
+	// 個別に適用されるもの
+	for(size_t fi = 0; fi < FleetSize(); ++fi){
+		// 艦隊旗艦は無条件でcond値+3
+		unit_[fi][0].ChangeCond(3);
+		// 艦隊MVPはcond値+10(敗北Eの際を除く)
+		if (result.JudgeWinReason() != WinReason::E) {
+			// 連合艦隊の場合、夜戦に突入すると昼戦でのダメージがMVP計算に関係しなくなる(！？)
+			bool special_mvp_flg = result.GetNightFlg() && (fleet_type_ != kFleetTypeNormal);
+			// 計算を行う
+			size_t mvp_index = 0;
+			int mvp_damage = result.GetDamage(0, fi, 0, special_mvp_flg);
+			for (size_t ui = 1; ui < unit_[fi].size(); ++ui) {
+				if (mvp_damage < result.GetDamage(0, fi, ui, special_mvp_flg)) {
+					mvp_damage = result.GetDamage(0, fi, ui, special_mvp_flg);
+					mvp_index = ui;
+				}
+			}
+			unit_[fi][mvp_index].ChangeCond(10);
+		}
+	}
 }
 
 // 索敵値を計算する
@@ -182,29 +237,29 @@ double Fleet::SearchValue() const noexcept {
 			search_sum += sqrt(it_k.GetSearch()) * 1.6841056;
 			for (auto &it_w : it_k.GetWeapon()) {
 				switch (it_w.GetWeaponClass()) {
-				case kWeaponClassPB:	//艦爆
-				case kWeaponClassPBF:	//艦爆
+				case WeaponClass::PB:	//艦爆
+				case WeaponClass::PBF:	//艦爆
 					search_sum += it_w.GetSearch() * 1.0376255;
 					break;
-				case kWeaponClassWB:	//水爆
+				case WeaponClass::WB:	//水爆
 					search_sum += it_w.GetSearch() * 1.7787282;
 					break;
-				case kWeaponClassPA:	//艦攻
+				case WeaponClass::PA:	//艦攻
 					search_sum += it_w.GetSearch() * 1.3677954;
 					break;
-				case kWeaponClassPS:	//艦偵
+				case WeaponClass::PS:	//艦偵
 					search_sum += it_w.GetSearch() * 1.6592780;
 					break;
-				case kWeaponClassWS:	//水偵
+				case WeaponClass::WS:	//水偵
 					search_sum += it_w.GetSearch() * 2.0000000;
 					break;
-				case kWeaponClassSmallR:	//小型電探
+				case WeaponClass::SmallR:	//小型電探
 					search_sum += it_w.GetSearch() * 1.0045358;
 					break;
-				case kWeaponClassLargeR:	//大型電探
+				case WeaponClass::LargeR:	//大型電探
 					search_sum += it_w.GetSearch() * 0.9906638;
 					break;
-				case kWeaponClassSL:	//探照灯
+				case WeaponClass::SL:	//探照灯
 					search_sum += it_w.GetSearch() * 0.9067950;
 					break;
 				default:
@@ -221,8 +276,8 @@ int Fleet::AntiAirScore() const noexcept {
 	int anti_air_score = 0;
 	for (auto &it_k : FirstUnit()) {
 		if (it_k.Status() == kStatusLost) continue;
-		for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
-			if (!it_k.GetWeapon()[wi].IsAirFight()) continue;
+		for (size_t wi = 0; wi < it_k.GetSlots(); ++wi) {
+			if (!it_k.GetWeapon()[wi].Is(WeaponClass::AirFight)) continue;
 			anti_air_score += it_k.GetWeapon()[wi].AntiAirScore(it_k.GetAir()[wi]);
 		}
 	}
@@ -235,18 +290,10 @@ double Fleet::TrailerAircraftProb(const AirWarStatus &air_war_status) const {
 	double trailer_aircraft_prob = 0.0;
 	for (auto &it_k : FirstUnit()) {
 		if (it_k.Status() == kStatusLost) continue;
-		for (auto wi = 0; wi < it_k.GetSlots(); ++wi) {
+		for (size_t wi = 0; wi < it_k.GetSlots(); ++wi) {
 			auto it_w = it_k.GetWeapon()[wi];
-			switch (it_w.GetWeaponClass()) {
-			case kWeaponClassPS:
-			case kWeaponClassPSS:
-			case kWeaponClassDaiteiChan:
-			case kWeaponClassWS:
-			case kWeaponClassWSN:
+			if (it_w.Is(WeaponClass::PS | WeaponClass::PSS | WeaponClass::DaiteiChan | WeaponClass::WS | WeaponClass::WSN))
 				trailer_aircraft_prob += 0.04 * it_w.GetSearch() * sqrt(it_k.GetAir()[wi]);
-			default:
-				break;
-			}
 		}
 	}
 	// 制空段階によって補正を掛ける(航空優勢以外は試験実装)
@@ -275,7 +322,7 @@ double Fleet::TrailerAircraftPlus(){
 	for (auto &it_k :FirstUnit() ) {
 		if (it_k.Status() == kStatusLost) continue;
 		for (auto &it_w : it_k.GetWeapon()) {
-			if (!it_w.IsAirTrailer()) continue;
+			if (!it_w.Is(WeaponClass::AirTrailer)) continue;
 			if (0.07 * it_w.GetSearch() >= rand_.RandReal()) {
 				return all_attack_plus_list[it_w.GetHit()];
 			}
@@ -321,10 +368,10 @@ int Fleet::AntiAirBonus() const {
 				if (it_w.IsHAG() || it_w.Include(L"高射装置")) {
 					anti_air_bonus += 0.35 * it_w.GetAntiAir();
 				}
-				else if (it_w.GetWeaponClass() == kWeaponClassSmallR || it_w.GetWeaponClass() == kWeaponClassLargeR) {
+				else if (it_w.Is(WeaponClass::SmallR | WeaponClass::LargeR)) {
 					anti_air_bonus += 0.4 * it_w.GetAntiAir();
 				}
-				else if (it_w.GetWeaponClass() == kWeaponClassAAA) {
+				else if (it_w.Is(WeaponClass::AAA)) {
 					anti_air_bonus += 0.6 * it_w.GetAntiAir();
 				}
 				else {
@@ -338,19 +385,19 @@ int Fleet::AntiAirBonus() const {
 }
 
 // 生存艦から艦娘をランダムに指定する(航空戦用)
-int Fleet::RandomKammusu() {
+tuple<bool, size_t> Fleet::RandomKammusu() {
 	//生存艦をリストアップ
-	vector<int> alived_list;
-	for (auto ui = 0u; ui < FirstUnit().size(); ++ui) {
+	vector<size_t> alived_list;
+	for (size_t ui = 0; ui < FirstUnit().size(); ++ui) {
 		if (FirstUnit()[ui].Status() != kStatusLost) alived_list.push_back(ui);
 	}
-	if (alived_list.size() == 0) return -1;
-	return alived_list[rand_.RandInt(alived_list.size())];
+	if (alived_list.size() == 0) return tuple<bool, size_t>(false, 0);
+	return tuple<bool, size_t>(true, rand_.select_random_in_range(alived_list));
 }
 
 // 生存する水上艦から艦娘をランダムに指定する
 // ただしhas_bombがtrueの際は陸上型棲姫を避けるようになる
-tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool &has_bomb, const TargetType &target_type) {
+tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const TargetType target_type, const bool has_sl) {
 	// 攻撃する艦隊の対象を選択する
 	vector<size_t> list;
 	switch (target_type) {
@@ -367,20 +414,48 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool &has_bomb, const 
 	//生存する水上艦をリストアップ
 	vector<KammusuIndex> alived_list;
 	for (auto &fi : list) {
-		for (auto ui = 0u; ui < GetUnit()[fi].size(); ++ui) {
+		for (size_t ui = 0; ui < GetUnit()[fi].size(); ++ui) {
 			auto &it_k = GetUnit()[fi][ui];
 			if (it_k.Status() == kStatusLost) continue;
 			if (it_k.IsSubmarine()) continue;
-			if (has_bomb && it_k.GetShipClass() == kShipClassAF) continue;
+			if (has_bomb && it_k.Is(ShipClass::AF)) continue;
 			alived_list.push_back({ fi, ui });
 		}
 	}
+	// 対象が存在しない場合はfalseを返す
 	if (alived_list.size() == 0) return tuple<bool, KammusuIndex>(false, { 0 , 0 });
-	return tuple<bool, KammusuIndex>(true, alived_list[rand_.RandInt(alived_list.size())]);
+	// 夜戦だと探照灯を考慮しなければならない
+	if (has_sl) {
+		// 探照灯の位置を探す
+		int large_sl_index = -1, small_sl_index = -1;
+		for (auto &fi : list) {
+			for (size_t ui = 0; ui < GetUnit()[fi].size(); ++ui) {
+				auto &it_k = GetUnit()[fi][ui];
+				for (auto &it_w : it_k.GetWeapon()) {
+					if (it_w.GetWeaponClass() != WeaponClass::SL) continue;
+					if (it_w.Include(L"96式")) {
+						if(rand_.RandBool(0.3 + 0.01 * it_w.GetLevel())) large_sl_index = ui;
+					}
+					else {
+						if (rand_.RandBool(0.2 + 0.01 * it_w.GetLevel())) small_sl_index = ui;
+					}
+					break;
+				}
+			}
+		}
+		// 発動した場合、そちらに攻撃が誘引される
+		if (large_sl_index >= 0) {
+			return tuple<bool, KammusuIndex>(true, KammusuIndex{ SecondIndex() , size_t(large_sl_index) });
+		}
+		else if (small_sl_index >= 0) {
+			return tuple<bool, KammusuIndex>(true, KammusuIndex{ SecondIndex() , size_t(small_sl_index) });
+		}
+	}
+	return tuple<bool, KammusuIndex>(true, rand_.select_random_in_range(alived_list));
 }
 
 // 潜水の生存艦から艦娘をランダムに指定する
-tuple<bool, KammusuIndex> Fleet::RandomKammusuSS(const size_t &fleet_index) {
+tuple<bool, KammusuIndex> Fleet::RandomKammusuSS(const size_t fleet_index) {
 	// 攻撃する艦隊の対象を選択する
 	vector<size_t> list;
 	switch (fleet_index) {
@@ -394,7 +469,7 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuSS(const size_t &fleet_index) {
 	//生存する水上艦をリストアップ
 	vector<KammusuIndex> alived_list;
 	for (auto &fi : list) {
-		for (auto ui = 0u; ui < GetUnit()[fi].size(); ++ui) {
+		for (size_t ui = 0; ui < GetUnit()[fi].size(); ++ui) {
 			auto &it_k = GetUnit()[fi][ui];
 			if (it_k.Status() == kStatusLost) continue;
 			if (!it_k.IsSubmarine()) continue;
@@ -402,7 +477,7 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuSS(const size_t &fleet_index) {
 		}
 	}
 	if (alived_list.size() == 0) return tuple<bool, KammusuIndex>(false, { 0 , 0 });
-	return tuple<bool, KammusuIndex>(true, alived_list[rand_.RandInt(alived_list.size())]);
+	return tuple<bool, KammusuIndex>(true, rand_.select_random_in_range(alived_list));
 }
 
 template<typename CondFunc>
@@ -435,10 +510,15 @@ bool Fleet::HasAirPss() const noexcept {
 	return std::any_of(this->FirstUnit().begin(), this->FirstUnit().end(), [](const Kammusu& it_k) -> bool { return it_k.HasAirPss(); });
 }
 
+// 探照灯や照明弾をいずれかの艦が保有していた場合はtrue
+bool Fleet::HasLights() const noexcept {
+	return any_of(this->unit_, [](const Kammusu& it_k) -> bool { return it_k.HasLights(); });
+}
+
 std::ostream & operator<<(std::ostream & os, const Fleet & conf)
 {
 	os << "陣形：" << char_cvt::utf_16_to_shift_jis(kFormationStr[conf.formation_]) << "　司令部レベル：" << conf.level_ << "　形式：" << char_cvt::utf_16_to_shift_jis(kFleetTypeStr[conf.fleet_type_ - 1]) << endl;
-	for (auto fi = 0u; fi < conf.unit_.size(); ++fi) {
+	for (size_t fi = 0; fi < conf.unit_.size(); ++fi) {
 		os << "　第" << (fi + 1) << "艦隊：" << endl;
 		for (auto &it_k : conf.unit_[fi]) {
 			os << "　　" << char_cvt::utf_16_to_shift_jis(it_k.GetNameLv()) << endl;
@@ -451,7 +531,7 @@ std::ostream & operator<<(std::ostream & os, const Fleet & conf)
 std::wostream & operator<<(std::wostream & os, const Fleet & conf)
 {
 	os << L"陣形：" << kFormationStr[conf.formation_] << L"　司令部レベル：" << conf.level_ << L"　形式：" << kFleetTypeStr[conf.fleet_type_ - 1] << endl;
-	for (auto fi = 0u; fi < conf.unit_.size(); ++fi) {
+	for (size_t fi = 0; fi < conf.unit_.size(); ++fi) {
 		os << L"　第" << (fi + 1) << L"艦隊：" << endl;
 		for (auto &it_k : conf.unit_[fi]) {
 			os << L"　　" << it_k.GetNameLv() << endl;

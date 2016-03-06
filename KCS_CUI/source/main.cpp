@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
 		KammusuDB kammusu_db("ships.csv");
 		// ファイルから艦隊を読み込む
 		vector<Fleet> fleet(kBattleSize);
-		for (auto i = 0; i < kBattleSize; ++i) {
+		for (size_t i = 0; i < kBattleSize; ++i) {
 			fleet[i] = Fleet(config.GetInputFilename(i), config.GetFormation(i), weapon_db, kammusu_db);
 			fleet[i].Put();
 		}
