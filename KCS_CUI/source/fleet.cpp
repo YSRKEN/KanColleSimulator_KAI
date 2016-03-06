@@ -528,7 +528,7 @@ std::ostream & operator<<(std::ostream & os, const Fleet & conf)
 	for (size_t fi = 0; fi < conf.unit_.size(); ++fi) {
 		os << "　第" << (fi + 1) << "艦隊：" << endl;
 		for (auto &it_k : conf.unit_[fi]) {
-			os << "　　" << char_cvt::utf_16_to_shift_jis(it_k.GetNameLv()) << endl;
+			os << "　　" << char_cvt::utf_16_to_shift_jis(it_k.GetNameLv()) << " " << it_k.GetHP() << "/" << it_k.GetMaxHP() <<  endl;
 		}
 	}
 	os << endl;
@@ -541,7 +541,7 @@ std::wostream & operator<<(std::wostream & os, const Fleet & conf)
 	for (size_t fi = 0; fi < conf.unit_.size(); ++fi) {
 		os << L"　第" << (fi + 1) << L"艦隊：" << endl;
 		for (auto &it_k : conf.unit_[fi]) {
-			os << L"　　" << it_k.GetNameLv() << endl;
+			os << L"　　" << it_k.GetNameLv() << L" " << it_k.GetHP() << L"/" << it_k.GetMaxHP() << endl;
 		}
 	}
 	os << endl;
