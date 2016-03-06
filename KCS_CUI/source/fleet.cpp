@@ -397,7 +397,7 @@ tuple<bool, size_t> Fleet::RandomKammusu() {
 
 // 生存する水上艦から艦娘をランダムに指定する
 // ただしhas_bombがtrueの際は陸上型棲姫を避けるようになる
-tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const TargetType target_type, const bool has_sl) {	//has_slは仮置き
+tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const TargetType target_type, const bool has_sl) {
 	// 攻撃する艦隊の対象を選択する
 	vector<size_t> list;
 	switch (target_type) {
@@ -422,7 +422,35 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const T
 			alived_list.push_back({ fi, ui });
 		}
 	}
+	// 対象が存在しない場合はfalseを返す
 	if (alived_list.size() == 0) return tuple<bool, KammusuIndex>(false, { 0 , 0 });
+	// 夜戦だと探照灯を考慮しなければならない
+	if (has_sl) {
+		// 探照灯の位置を探す
+		int large_sl_index = -1, small_sl_index = -1;
+		for (auto &fi : list) {
+			for (size_t ui = 0; ui < GetUnit()[fi].size(); ++ui) {
+				auto &it_k = GetUnit()[fi][ui];
+				for (auto &it_w : it_k.GetWeapon()) {
+					if (it_w.GetWeaponClass() != WeaponClass::SL) continue;
+					if (it_w.Include(L"96式")) {
+						if(rand_.RandBool(0.3 + 0.01 * it_w.GetLevel())) large_sl_index = ui;
+					}
+					else {
+						if (rand_.RandBool(0.2 + 0.01 * it_w.GetLevel())) small_sl_index = ui;
+					}
+					break;
+				}
+			}
+		}
+		// 発動した場合、そちらに攻撃が誘引される
+		if (large_sl_index >= 0) {
+			return tuple<bool, KammusuIndex>(true, KammusuIndex{ SecondIndex() , large_sl_index });
+		}
+		else if (small_sl_index >= 0) {
+			return tuple<bool, KammusuIndex>(true, KammusuIndex{ SecondIndex() , small_sl_index });
+		}
+	}
 	return tuple<bool, KammusuIndex>(true, rand_.select_random_in_range(alived_list));
 }
 

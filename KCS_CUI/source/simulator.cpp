@@ -576,8 +576,9 @@ void Simulator::NightPhase() {
 			// 攻撃対象の種類によって、攻撃の種類を選ぶ
 			auto &enemy_index = std::get<1>(target);
 			auto &target_kammusu = fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i];
-			auto fire_type = JudgeDayFireType(bi, friend_index, enemy_index);
+			auto fire_type = JudgeNightFireType(bi, friend_index, enemy_index);
 			// 攻撃の種類によって、基本攻撃力および倍率を算出する
+			// 夜戦速吸は対潜を常に爆雷で行う
 			/*auto base_attack = hunter_kammusu.NightAttack(fire_type, target_kammusu.Is(ShipClass::AF), fleet_[bi].GetFleetType(), friend_index.fleet_no);
 			bool special_attack_flg = false;
 			bool double_flg = false;
@@ -1074,4 +1075,13 @@ tuple<bool, double> Simulator::JudgeDaySpecialAttack(const size_t turn_player, c
 		}
 	}
 	return tuple<bool, double>(false, 1.0);
+}
+
+// 夜戦での攻撃種別を判断する
+NightFireType Simulator::JudgeNightFireType(const size_t turn_player, const KammusuIndex &attack_index, const KammusuIndex &defense_index) const noexcept {
+	auto other_side = kBattleSize - turn_player - 1;
+	// 敵が潜水艦なら対潜攻撃
+	if (fleet_[other_side].GetUnit()[defense_index.fleet_no][defense_index.fleet_i].IsSubmarine()) return kNightFireChage;
+	// それ以外は全て砲撃
+	return kNightFireGun;
 }

@@ -877,12 +877,30 @@ bool Kammusu::IsAntiSubDayWater() const noexcept {
 
 // 夜戦で攻撃可能な艦ならtrue
 bool Kammusu::IsFireNight() const noexcept {
-	return true;	//仮置き
+	// 大破していたら攻撃不可
+	if (Status() >= kStatusHeavyDamage) return false;
+	// 空母系は一部を覗いて攻撃不可
+	if (Is(ShipClass::CV | ShipClass::CVL | ShipClass::ACV)) {
+		if (kammusu_flg_) {
+			if (name_ == L"Graf") return true;
+			return false;
+		}
+		else {
+			if (Include(L"flagship")) return true;
+			if (IncludeAnyOf({ L"ヲ", L"ヌ" })) return false;
+			return true;
+		}
+	}
+	// それ以外は攻撃可能
+	return true;
 }
 
 // 夜戦で対潜可能な艦ならtrue
 bool Kammusu::IsAntiSubNight() const noexcept {
-	return false;	//仮置き
+	if (Is(ShipClass::CL | ShipClass::CLT | ShipClass::DD | ShipClass::CP | ShipClass::AO)) {
+		return anti_sub_ > 0;
+	}
+	return false;
 }
 
 std::ostream & operator<<(std::ostream & os, const Kammusu & conf)

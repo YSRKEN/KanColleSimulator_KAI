@@ -53,6 +53,9 @@ enum Mood { kMoodHappy, kMoodNormal, kMoodOrange, kMoodRed };
 // 昼戦における攻撃種別(砲撃・空撃・爆雷攻撃)
 enum DayFireType { kDayFireGun, kDayFireAir, kDayFireChage };
 
+// 夜戦における攻撃種別(砲撃・爆雷攻撃)
+enum NightFireType { kNightFireGun, kNightFireChage };
+
 // 艦娘クラス
 class Kammusu {
 	// 変更しないもの
