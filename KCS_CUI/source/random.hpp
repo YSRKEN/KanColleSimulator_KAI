@@ -110,7 +110,10 @@ public:
 	template<typename T> const T& select_random_in_range(const std::vector<T>& v) {
 		return v[this->generate<size_t>(0, v.size() - 1)];
 	}
-	template<typename T, size_t N> const T& select_random_in_range(const std::array<T, N>& v, size_t size = N) {
+	template<typename T, size_t N> const T& select_random_in_range(const std::array<T, N>& v) {
+		return v[this->generate<size_t>(0, v.size() - 1)];
+	}
+	template<typename T, size_t N> const T& select_random_in_range(const std::array<T, N>& v, size_t size) {
 		return v[this->generate<size_t>(0, size - 1)];
 	}
 private:
