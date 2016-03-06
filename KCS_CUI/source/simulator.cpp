@@ -869,25 +869,32 @@ double Simulator::CalcHitProb(
 	case kBattlePhaseGun:
 	case kBattlePhaseNight:
 		{
-			// 昼砲撃戦命中率
-			//回避側
-			double evade_sum = target_kammusu.AllEvade();	//回避値
+			/* 昼砲撃戦命中率 */
+			// 回避側
+			//まずは回避値を出す
+			double evade_sum = target_kammusu.AllEvade();
 			if (enemy_formation == kFormationEchelon || enemy_formation == kFormationAbreast) evade_sum *= 1.2;
 			if (target_kammusu.Mood() == kMoodHappy) evade_sum *= 1.8;
-			double evade_value;		//回避項
+			//そこから回避項を求める
+			double evade_value;
 			if (evade_sum <= 40) {
 				evade_value = 0.03 + evade_sum / 80;
 			}
 			else {
 				evade_value = 0.03 + evade_sum / (evade_sum + 40);
 			}
-			//命中側
-			double hit_value = 1.0 + sqrt(hunter_kammusu.GetLevel() - 1) / 50;	//練度による命中率補正
-			hit_value += hunter_kammusu.AllHit() / 100;							//装備による明示的な命中率補正
-			if (hunter_kammusu.Mood() == kMoodRed) hit_value /= 1.9;	//赤疲労状態だと命中率が激減する
-			hit_value += hunter_kammusu.GetLuck() * 0.0015;				//命中率の運補正
-			hit_value += hunter_kammusu.FitGunHitPlus();				//フィット砲補正
-																		//命中率の陣形補正
+			// 命中側
+			//練度による命中率補正
+			double hit_value = 1.0 + sqrt(hunter_kammusu.GetLevel() - 1) / 50;
+			//装備による明示的な命中率補正
+			hit_value += hunter_kammusu.AllHit() / 100;
+			//赤疲労状態だと命中率が激減する
+			if (hunter_kammusu.Mood() == kMoodRed) hit_value /= 1.9;
+			//命中率の運補正
+			hit_value += hunter_kammusu.GetLuck() * 0.0015;
+			//フィット砲補正
+			hit_value += hunter_kammusu.FitGunHitPlus();
+			//命中率の陣形補正
 			switch (friend_formation) {
 			case kFormationSubTrail:
 				if (enemy_formation != kFormationAbreast) hit_value += 0.2;

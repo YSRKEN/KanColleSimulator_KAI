@@ -388,6 +388,7 @@ int Kammusu::AllHit() const noexcept {
 
 // フィット砲補正
 double Kammusu::FitGunHitPlus() const noexcept {
+	if (!Is(ShipClass::BB | ShipClass::BBV)) return 1.0;
 	double hit_plus = 0.0;
 	// 通常命中率低下は赤疲労検証での減少率÷2ぐらいでちょうどいいのでは？
 	const double fit[] = { 0.0, 0.01365, 0.0315, 0.0261, 0.0319 };
@@ -396,12 +397,38 @@ double Kammusu::FitGunHitPlus() const noexcept {
 	// 数を数えておく
 	int sum_356 = 0, sum_38 = 0, sum_381 = 0, sum_41 = 0, sum_46 = 0, sum_46X = 0;
 	for (auto &it_w : weapons_) {
-		if (it_w.Include(L"35.6cm")) ++sum_356;
-		if (it_w.Include(L"38cm")) ++sum_38;
-		if (it_w.Include(L"381mm")) ++sum_381;
-		if (it_w.Include(L"41cm")) ++sum_41;
-		if (it_w.Include(L"46cm")) {
-			if (it_w.Include(L"試製")) ++sum_46X; else ++sum_46;
+		switch (it_w.GetID()) {
+		case 7:
+		case 103:
+		case 104:
+			// 35.6cm
+			++sum_356;
+			break;
+		case 76:
+		case 114:
+			// 38cm
+			++sum_38;
+			break;
+		case 133:
+		case 137:
+			// 381mm
+			++sum_381;
+			break;
+		case 8:
+		case 105:
+			// 41cm
+			++sum_41;
+			break;
+		case 9:
+			// 46cm
+			++sum_46;
+			break;
+		case 117:
+			// 試製46cm
+			++sum_46X;
+			break;
+		default:
+			break;
 		}
 	}
 	// 種類により減衰量を決定する
