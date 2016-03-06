@@ -1,6 +1,7 @@
 ﻿#include "base.hpp"
 #include "fleet.hpp"
 #include "utf8bomskip.hpp"
+#include <limits>
 namespace detail {
 	template<typename T>
 	struct to_i_limit_helper {
@@ -396,7 +397,7 @@ tuple<bool, size_t> Fleet::RandomKammusu() {
 		}
 	}
 	if (alived_list_size == 0) return tuple<bool, size_t>(false, 0);
-	return tuple<bool, size_t>(true, alived_list[rand_.RandInt(alived_list_size)]);
+	return tuple<bool, size_t>(true, rand_.select_random_in_range(alived_list));
 }
 
 // 生存する水上艦から艦娘をランダムに指定する
@@ -406,13 +407,13 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const T
 	std::array<size_t, kMaxFleetSize> list;
 	switch (target_type) {
 	case kTargetTypeFirst:
-		list = { FirstIndex(), FirstIndex() };
+		list = {{ FirstIndex(), FirstIndex() }};
 		break;
 	case kTargetTypeSecond:
-		list = { SecondIndex(), SecondIndex() };
+		list = {{ SecondIndex(), SecondIndex() }};
 		break;
 	case kTargetTypeAll:
-		list = { FirstIndex(), SecondIndex() };
+		list = {{ FirstIndex(), SecondIndex() }};
 		break;
 	}
 	//生存する水上艦をリストアップ
@@ -433,7 +434,9 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const T
 	// 夜戦だと探照灯を考慮しなければならない
 	if (has_sl) {
 		// 探照灯の位置を探す
-		int large_sl_index = -1, small_sl_index = -1;
+		constexpr size_t sz_max = std::numeric_limits<size_t>::max();
+		size_t large_sl_index = sz_max;
+		size_t small_sl_index = sz_max;
 		for (size_t i = 0; i < alived_list_size; ++i) {
 			auto &it_k = GetUnit()[alived_list[i].fleet_no][alived_list[i].fleet_i];
 			for (auto &it_w : it_k.GetWeapon()) {
@@ -448,14 +451,14 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const T
 			}
 		}
 		// 発動した場合、そちらに攻撃が誘引される
-		if (large_sl_index >= 0) {
+		if (large_sl_index != sz_max) {
 			return tuple<bool, KammusuIndex>(true, alived_list[large_sl_index]);
 		}
-		else if (small_sl_index >= 0) {
+		else if (small_sl_index != sz_max) {
 			return tuple<bool, KammusuIndex>(true, alived_list[small_sl_index]);
 		}
 	}
-	return tuple<bool, KammusuIndex>(true, alived_list[rand_.RandInt(alived_list_size)]);
+	return tuple<bool, KammusuIndex>(true, rand_.select_random_in_range(alived_list, alived_list_size));
 }
 
 // 潜水の生存艦から艦娘をランダムに指定する
