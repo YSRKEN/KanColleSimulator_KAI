@@ -531,7 +531,7 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 #endif
 			result_.AddDamage(bi, friend_index.fleet_no, friend_index.fleet_i, damage);
 			fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].MinusHP(damage, stopper_[other_side][enemy_index.fleet_no][enemy_index.fleet_i]);
-			if (double_flg) {
+			if (double_flg && fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].GetHP() > 0) {
 				// 連撃
 				damage = CalcDamage(kBattlePhaseGun, bi, friend_index, enemy_index, base_attack, special_attack_flg, multiple);
 #ifdef _DEBUG
@@ -606,7 +606,7 @@ void Simulator::NightPhase() {
 #endif
 			result_.AddDamage(bi, friend_index.fleet_no, friend_index.fleet_i, damage, true);
 			fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].MinusHP(damage, stopper_[other_side][enemy_index.fleet_no][enemy_index.fleet_i]);
-			if (double_flg) {
+			if (double_flg && fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].GetHP() > 0) {
 				// 連撃
 				damage = CalcDamage(kBattlePhaseNight, bi, friend_index, enemy_index, base_attack, special_attack_flg, multiple);
 #ifdef _DEBUG
