@@ -3,24 +3,32 @@
 #include "fleet.hpp"
 #include "simulator.hpp"
 #include <algorithm>
+#include <cassert>
 
 Simulator::Simulator(const vector<Fleet>& fleet, const unsigned int seed, const SimulateMode& simulate_mode)
-	: fleet_(fleet), rand(seed), simulate_mode_(simulate_mode)
+	: fleet_(fleet), result_(), rand(seed), simulate_mode_(simulate_mode), search_result_(),
+	stopper_(),
+	is_calculated()
 {
 	for (auto& f : this->fleet_) f.SetRandGenerator(rand);
 }
 
 SharedRand Simulator::GetGenerator() noexcept { return this->rand; }
 
-// 計算用メソッド
-Result Simulator::Calc() {
-	result_ = Result();
+inline void Simulator::Flush_Calc_Result(const vector<Fleet>& fleet) {
+	this->fleet_ = fleet;
+	this->is_calculated = false; 
+}
 
+// 計算用メソッド
+tuple<Result, vector<Fleet>> Simulator::Calc() {
 	// 今のところ、敵が連合艦隊である場合には対応していない
-	if (fleet_[kEnemySide].GetFleetType() != FleetType::Normal) return result_;
+	if (fleet_[kEnemySide].GetFleetType() != FleetType::Normal) return {};
+	// すでに計算されていたら再計算しない
+	RUNTIME_ERROR_THROW_WITH_MESSAGE_IF(this->is_calculated, "call Flush_Calc_Result() to re-calclate.");
 
 	// 戦闘開始時の体力を入力する
-	stopper_ = vector<vector<bitset<kMaxUnitSize>>>(kBattleSize, vector<bitset<kMaxUnitSize>>(kMaxFleetSize, bitset<kMaxUnitSize>(false)));
+	//stopper_ is initialised at ctor
 	for (size_t bi = 0; bi < kBattleSize; ++bi) {
 		for (size_t fi = 0; fi < fleet_[bi].FleetSize(); ++fi) {
 			for (size_t ui = 0; ui < fleet_[bi].UnitSize(fi); ++ui) {
@@ -127,6 +135,8 @@ SimulatorCalcExit:
 		}
 	}
 
+	//フラグ切り替え
+	this->is_calculated = true;
 	// 結果を出力する
 	for (size_t bi = 0; bi < kBattleSize; ++bi) {
 		for (size_t fi = 0; fi < fleet_[bi].FleetSize(); ++fi) {
@@ -142,7 +152,7 @@ SimulatorCalcExit:
 	// 勝利判定によって、cond値を変化させる
 	fleet_[kFriendSide].ChangeCond(simulate_mode_, result_);
 
-	return result_;
+	return std::make_tuple(result_, move(this->fleet_));
 }
 
 // 索敵フェイズ
@@ -150,7 +160,7 @@ void Simulator::SearchPhase() {
 	// 索敵の成功条件がよく分からないので、とりあえず次のように定めた
 	// ・艦載機があれば無条件で成功
 	// ・艦載機が存在しない場合、索敵値が0より大なら成功
-	search_result_ = bitset<kBattleSize>(kBattleSize);
+	assert(kBattleSize == search_result_.size());
 	for (size_t i = 0; i < kBattleSize; ++i) {
 		auto search_value = fleet_[i].SearchValue();
 		search_result_[i] = (search_value > 0.0 || fleet_[i].HasAir());
@@ -358,7 +368,7 @@ void Simulator::AirWarPhase() {
 	cout << endl;
 #endif
 
-	air_war_result_ = tuple<AirWarStatus, vector<double>>(air_war_status, all_attack_plus) ;
+	air_war_result_ = std::make_tuple(air_war_status, move(all_attack_plus));
 }
 
 // 交戦形態を確率的に決定する

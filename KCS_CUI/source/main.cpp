@@ -7,7 +7,10 @@
 #include "result.hpp"
 #include "simulator.hpp"
 #include "random.hpp"
+#include <cassert>
+#if defined(_OPENMP)
 #include <omp.h>//omp_get_thread_num()
+#endif
 #define KCS_MEASURE_PROCESS_TIME
 int main(int argc, char *argv[]) {
 	try {
@@ -18,11 +21,13 @@ int main(int argc, char *argv[]) {
 		WeaponDB weapon_db("slotitems.csv");
 		KammusuDB kammusu_db("ships.csv");
 		// ファイルから艦隊を読み込む
-		vector<Fleet> fleet(kBattleSize);
+		vector<Fleet> fleet;
+		fleet.reserve(kBattleSize);
+		assert(fleet.empty());
 		for (size_t i = 0; i < kBattleSize; ++i) {
-			fleet[i] = Fleet(config.GetInputFilename(i), config.GetFormation(i), weapon_db, kammusu_db);
-			fleet[i].Put();
+			fleet.emplace_back(config.GetInputFilename(i), config.GetFormation(i), weapon_db, kammusu_db);
 		}
+		for (const auto& f : fleet) f.Put();
 		// シミュレータを構築し、並列演算を行う
 		auto seed = make_SharedRand().make_unique_rand_array<unsigned int>(config.CalcSeedArrSize());
 		vector<Result> result_db(config.GetTimes());
@@ -30,18 +35,12 @@ int main(int argc, char *argv[]) {
 		const auto process_begin_time = std::chrono::high_resolution_clock::now();
 #endif
 #if defined(_OPENMP)
-#pragma omp parallel for num_threads(config.GetThreads())
+#pragma omp parallel for num_threads(static_cast<int>(config.GetThreads()))
 #endif
-		for (size_t n = 0; n < config.GetTimes(); ++n) {
-			vector<Fleet> fleet_ = fleet;	//ハードコピーしないと徐々に体力が削られるだけなのでダメ
-
-#if defined(_OPENMP)
-			Simulator simulator(fleet_, seed[n * config.GetThreads() + omp_get_thread_num()], kSimulateModeDN);	//戦闘のたびにSimulatorインスタンスを設定する
-#else
-			Simulator simulator(fleet_, seed[n], kSimulateModeDN);	//戦闘のたびにSimulatorインスタンスを設定する
-#endif
-
-			result_db[n] = simulator.Calc();
+		for (int n = 0; n < static_cast<int>(config.GetTimes()); ++n) {
+			Simulator simulator(fleet, seed[config.CalcSeedVNo(n)], kSimulateModeDN);//戦闘のたびにSimulatorインスタンスを設定する
+			vector<Fleet> fleet_;
+			std::tie(result_db[n], fleet_) = simulator.Calc();
 		}
 #if defined(KCS_MEASURE_PROCESS_TIME)
 		const auto process_end_time = std::chrono::high_resolution_clock::now();
