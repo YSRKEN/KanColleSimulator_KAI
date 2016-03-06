@@ -397,7 +397,7 @@ tuple<bool, size_t> Fleet::RandomKammusu() {
 		}
 	}
 	if (alived_list_size == 0) return tuple<bool, size_t>(false, 0);
-	return tuple<bool, size_t>(true, rand_.select_random_in_range(alived_list));
+	return tuple<bool, size_t>(true, rand_.select_random_in_range(alived_list, alived_list_size));
 }
 
 // 生存する水上艦から艦娘をランダムに指定する
