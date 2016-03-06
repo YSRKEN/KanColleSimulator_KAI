@@ -888,8 +888,9 @@ bool Kammusu::IsFireTorpedo(const TorpedoTurn &torpedo_turn) const noexcept {
 		else {
 			// elite以上の潜水艦なら開幕魚雷を撃てる(ただし潜水棲姫は除く。なんでや！)
 			if (IsSubmarine() && IncludeAnyOf({ L"elite", L"flagship" })) return true;
-			// エリレ級と水母棲姫と駆逐水鬼(甲作戦最終形態,艦船ID=649)は無条件で撃てる
-			if (name_ == L"戦艦レ級elite" || name_ == L"水母棲姫" || id_ == 649) return true;
+			// エリレ級と水母棲姫と駆逐水鬼(甲作戦最終形態,艦船ID=649)と
+			// 重巡棲姫(最終形態,艦船ID=660,662,664)は無条件で撃てる
+			if (id_ == 562 || name_ == L"水母棲姫" || id_ == 649 || id_ == 660 || id_ == 662 || id_ == 664) return true;
 		}
 		return false;
 		break;
@@ -899,7 +900,7 @@ bool Kammusu::IsFireTorpedo(const TorpedoTurn &torpedo_turn) const noexcept {
 		// 素雷装が0なら不可
 		if (torpedo_ == 0) return false;
 		// 秋津洲および未改造の千歳型は不可
-		if (Include(L"秋津洲") || name_ == L"千歳" || name_ == L"千代田") return false;
+		if (Include(L"秋津洲") || id_ == 102 || id_ == 103) return false;
 		return true;
 		break;
 	default:
