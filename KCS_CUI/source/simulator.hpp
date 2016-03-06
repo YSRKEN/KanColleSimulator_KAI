@@ -19,9 +19,6 @@ enum TorpedoTurn : std::uint8_t { kTorpedoFirst, kTorpedoSecond };
 // 砲撃戦の巡目(1巡目および2巡目)
 enum FireTurn { kFireFirst , kFireSecond };
 
-// 昼戦における攻撃種別(砲撃・空撃・爆雷攻撃)
-enum DayFireType {kDayFireGun, kDayFireAir, kDayFireChage};
-
 class Fleet;
 #include "result.hpp"
 #include "random.hpp"
@@ -33,6 +30,7 @@ class Simulator {
 	bitset<kBattleSize> search_result_;	//索敵結果
 	tuple<AirWarStatus, vector<double>> air_war_result_;	//制空状態および触接倍率
 	BattlePosition battle_position_;	//陣形
+	vector<vector<bitset<kMaxUnitSize>>> stopper_;	//撃沈ストッパー
 	// 各フェーズ
 	void SearchPhase();
 	void AirWarPhase();
@@ -45,17 +43,23 @@ class Simulator {
 	AirWarStatus JudgeAirWarStatus(const vector<int>&);
 	//与えるダメージ量を計算する
 	int CalcDamage(
-		const BattlePhase&, const int&, const KammusuIndex&, KammusuIndex&, const int&,
+		const BattlePhase&, const size_t, const KammusuIndex&, KammusuIndex&, const int&,
 		const vector<double>&, const BattlePosition&, const bool&, const double&);
-	int CalcDamage(const BattlePhase&, const int&, const KammusuIndex&, KammusuIndex&, const int&, const bool&, const double&);
+	int CalcDamage(const BattlePhase&, const size_t, const KammusuIndex&, KammusuIndex&, const int&, const bool&, const double&);
 	//「かばい」を確率的に発生させる
-	void ProtectOracle(const int&, KammusuIndex&);
+	void ProtectOracle(const size_t, KammusuIndex&);
 	//命中率を計算する
-	double CalcHitProb(const Formation&, const Formation&, const Kammusu&, const Kammusu&, const BattlePhase&) const noexcept;
+	double CalcHitProb(const Formation, const Formation, const Kammusu&, const Kammusu&, const BattlePhase, const size_t, const size_t) const noexcept;
 	// 戦闘終了を判断する
 	bool IsBattleTerminate() const noexcept;
 	// 昼戦での攻撃種別を判断する
-	DayFireType JudgeDayFireType(const int, const KammusuIndex&, const KammusuIndex&) const noexcept;
+	DayFireType JudgeDayFireType(const size_t, const KammusuIndex&, const KammusuIndex&) const noexcept;
+	// 昼戦での特殊攻撃を判断する
+	tuple<bool, double> JudgeDaySpecialAttack(const size_t turn_player, const KammusuIndex &attack_index);
+	// 夜戦での攻撃種別を判断する
+	NightFireType JudgeNightFireType(const size_t, const KammusuIndex&) const noexcept;
+	// 夜戦での特殊攻撃を判断する
+	tuple<bool, double> JudgeNightSpecialAttack(const size_t turn_player, const KammusuIndex &attack_index, const bool);
 public:
 	// コンストラクタ
 	Simulator(){}

@@ -107,6 +107,9 @@ public:
 	bool RandBool(double rate = 0.5) {
 		return std::bernoulli_distribution(rate)(this->get());
 	}
+	template<typename T> const T& select_random_in_range(const std::vector<T>& v) {
+		return v[this->generate<size_t>(0, v.size() - 1)];
+	}
 private:
 	template<typename RandType> std::vector<RandType> make_unique_rand_array_unique(const std::size_t size, RandType rand_min, RandType rand_max) {
 		if (rand_min > rand_max) std::swap(rand_min, rand_max);

@@ -2,7 +2,7 @@
 #include "weapon.hpp"
 #include "char_convert.hpp"
 // コンストラクタ
-Weapon::Weapon() noexcept : Weapon(-1, {}, kWeaponClassOther, 0, 0, 0, 0, 0, 0, 0, 0, 0, kRangeNone, 0, 0) {}
+Weapon::Weapon() noexcept : Weapon(-1, {}, WeaponClass::Other, 0, 0, 0, 0, 0, 0, 0, 0, 0, kRangeNone, 0, 0) {}
 Weapon::Weapon(
 	const int id, wstring name, const WeaponClass weapon_class, const int defense,
 	const int attack, const int torpedo, const int bomb, const int anti_air, const int anti_sub,
@@ -15,9 +15,11 @@ Weapon::Weapon(
 const std::wstring & Weapon::GetName() const noexcept { return name_; }
 WeaponClass Weapon::GetWeaponClass() const noexcept { return weapon_class_; }
 int Weapon::GetDefense() const noexcept { return defense_; }
+int Weapon::GetAttack() const noexcept { return attack_; }
 int Weapon::GetTorpedo() const noexcept { return torpedo_; }
 int Weapon::GetBomb() const noexcept { return bomb_; }
 int Weapon::GetAntiAir() const noexcept { return anti_air_; }
+int Weapon::GetAntiSub() const noexcept { return anti_sub_; }
 int Weapon::GetHit() const noexcept { return hit_; }
 int Weapon::GetEvade() const noexcept { return evade_; }
 int Weapon::GetSearch() const noexcept { return search_; }
@@ -36,74 +38,13 @@ void Weapon::Put() const {
 int Weapon::AntiAirScore(const int &airs) const noexcept {
 	static const double kBonusPF[] = { 0,0,2,5,9,14,14,22 }, kBonusWB[] = { 0,0,1,1,1,3,3,6 };
 	double anti_air_score = anti_air_ * sqrt(airs) + sqrt(1.0 * level_detail_ / 10);
-	if (weapon_class_ == kWeaponClassPF) {
+	if (weapon_class_ == WeaponClass::PF) {
 		anti_air_score += kBonusPF[level_];
 	}
-	else if (weapon_class_ == kWeaponClassWB) {
+	else if (weapon_class_ == WeaponClass::WB) {
 		anti_air_score += kBonusWB[level_];
 	}
 	return int(anti_air_score);
-}
-
-// (熟練度が存在する)艦載機ならtrue
-bool Weapon::IsAir() const noexcept {
-	switch (weapon_class_) {
-	case kWeaponClassPF:
-	case kWeaponClassPBF:
-	case kWeaponClassPB:
-	case kWeaponClassWB:
-	case kWeaponClassPA:
-	case kWeaponClassPS:
-	case kWeaponClassPSS:
-	case kWeaponClassDaiteiChan:
-	case kWeaponClassWS:
-	case kWeaponClassWSN:
-		return true;
-	default:
-		return false;
-	}
-}
-
-// 航空戦に参加する艦載機ならtrue
-bool Weapon::IsAirFight() const noexcept {
-	switch (weapon_class_) {
-	case kWeaponClassPF:
-	case kWeaponClassPBF:
-	case kWeaponClassPB:
-	case kWeaponClassWB:
-	case kWeaponClassPA:
-		return true;
-	default:
-		return false;
-	}
-}
-
-// 触接に参加する艦載機ならtrue
-bool Weapon::IsAirTrailer() const noexcept {
-	switch (weapon_class_) {
-	case kWeaponClassPA:
-	case kWeaponClassPS:
-	case kWeaponClassPSS:
-	case kWeaponClassDaiteiChan:
-	case kWeaponClassWS:
-	case kWeaponClassWSN:
-		return true;
-	default:
-		return false;
-	}
-}
-
-// 開幕爆撃に参加する艦載機ならtrue
-bool Weapon::IsAirBomb() const noexcept {
-	switch (weapon_class_) {
-	case kWeaponClassPBF:
-	case kWeaponClassPB:
-	case kWeaponClassWB:
-	case kWeaponClassPA:
-		return true;
-	default:
-		return false;
-	}
 }
 
 // 高角砲ならtrue
@@ -140,10 +81,47 @@ std::wostream & operator<<(std::wostream & os, const Weapon & conf)
 
 // 文字列を種別に変換する
 WeaponClass ToWC(const string str) {
-	for (auto i = 0u; i < kWeaponClassStr.size(); ++i) {
-		if (str == kWeaponClassStr[i]) return static_cast<WeaponClass>(i);
-	}
-	return kWeaponClassOther;
+	struct {
+		const char* name;
+		WeaponClass value;
+	} map[] = {
+		{ "主砲", WeaponClass::Gun },
+		{ "対艦強化弾", WeaponClass::AP },
+		{ "副砲", WeaponClass::SubGun },
+		{ "魚雷", WeaponClass::Torpedo },
+		{ "特殊潜航艇", WeaponClass::SpecialSS },
+		{ "艦上戦闘機", WeaponClass::PF },
+		{ "艦上爆撃機", WeaponClass::PB },
+		{ "艦上爆撃機(爆戦)", WeaponClass::PBF },
+		{ "水上爆撃機", WeaponClass::WB },
+		{ "艦上攻撃機", WeaponClass::PA },
+		{ "艦上偵察機", WeaponClass::PS },
+		{ "艦上偵察機(彩雲)", WeaponClass::PSS },
+		{ "大型飛行艇", WeaponClass::DaiteiChan },
+		{ "水上偵察機", WeaponClass::WS },
+		{ "水上偵察機(夜偵)", WeaponClass::WSN },
+		{ "対潜哨戒機", WeaponClass::ASPP },
+		{ "オートジャイロ", WeaponClass::AJ },
+		{ "小型電探", WeaponClass::SmallR },
+		{ "大型電探", WeaponClass::LargeR },
+		{ "対空機銃", WeaponClass::AAG },
+		{ "対空強化弾", WeaponClass::AAA },
+		{ "高射装置", WeaponClass::AAD },
+		{ "爆雷", WeaponClass::DP },
+		{ "ソナー", WeaponClass::Sonar },
+		{ "応急修理要員", WeaponClass::DC },
+		{ "探照灯", WeaponClass::SL },
+		{ "照明弾", WeaponClass::LB },
+		{ "艦隊司令部施設", WeaponClass::HQ },
+		{ "水上艦要員", WeaponClass::SSP },
+		{ "戦闘糧食", WeaponClass::CR },
+		{ "洋上補給", WeaponClass::OS },
+		{ "その他", WeaponClass::Other },
+	};
+	for (const auto& item : map)
+		if (str == item.name)
+			return item.value;
+	return WeaponClass::Other;
 }
 
 // 外部熟練度(Simple)を内部熟練度(Detail)に変換する

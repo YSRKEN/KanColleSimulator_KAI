@@ -19,9 +19,9 @@ public:
 	// 中身を表示する
 	void Put() const;
 	// getter
-	const string& GetInputFilename(const int n) const noexcept;
+	const string& GetInputFilename(const size_t n) const noexcept;
 	std::wstring GetInputFilenameW(const int n) const;
-	Formation GetFormation(const int n) const noexcept;
+	Formation GetFormation(const size_t n) const noexcept;
 	int GetTimes() const noexcept;
 	int GetThreads() const noexcept;
 	const string& GetOutputFilename() noexcept;
