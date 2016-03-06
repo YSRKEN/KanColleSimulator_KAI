@@ -1,4 +1,4 @@
-﻿/* KanColleSimulator Ver.1.0 */
+﻿/* KanColleSimulator Ver.1.0.0 */
 
 #include "base.hpp"
 #include "config.hpp"
@@ -32,7 +32,15 @@ int main(int argc, char *argv[]) {
 		#pragma omp parallel for num_threads(config.GetThreads())
 		for (int n = 0; n < config.GetTimes(); ++n) {
 			vector<Fleet> fleet_ = fleet;	//ハードコピーしないと徐々に体力が削られるだけなのでダメ
+
+			// OpenMP有効時は上をONにして、無効時は下をONにする
+			// (そうしないとデバッグできませんので……お願いしますrevertしないでください)
+#if defined(_OPENMP)
 			Simulator simulator(fleet_, seed[omp_get_thread_num()], kSimulateModeDN);	//戦闘のたびにSimulatorインスタンスを設定する
+#else
+			Simulator simulator(fleet_, seed[n], kSimulateModeDN);	//戦闘のたびにSimulatorインスタンスを設定する
+#endif
+
 			result_db[n] = simulator.Calc();
 		}
 #if defined(KCS_MEASURE_PROCESS_TIME)

@@ -12,6 +12,7 @@ Weapon::Weapon(
 	evade_(evade), search_(search), range_(range), level_(level), level_detail_(level_detail) {}
 
 // getter
+int Weapon::GetID() const noexcept { return id_; }
 const std::wstring & Weapon::GetName() const noexcept { return name_; }
 WeaponClass Weapon::GetWeaponClass() const noexcept { return weapon_class_; }
 int Weapon::GetDefense() const noexcept { return defense_; }

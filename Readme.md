@@ -107,5 +107,6 @@ https://github.com/andanteyk/ElectronicObserver/blob/master/ElectronicObserver/O
 http://kancollecalc.web.fc2.com/damage_formula.html
 http://bs-arekore.at.webry.info/201502/article_4.html
 https://twitter.com/Xe_UCH/status/705281106011029505
+http://ch.nicovideo.jp/biikame/blomaga/ar850895
 - おのれSourceTree……勝手に特定拡張子を自動で除外するとは……  
 http://tech.nitoyon.com/ja/blog/2013/04/05/sourcetree/
