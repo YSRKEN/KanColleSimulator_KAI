@@ -531,7 +531,7 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 #endif
 			result_.AddDamage(bi, friend_index.fleet_no, friend_index.fleet_i, damage);
 			fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].MinusHP(damage, stopper_[other_side][enemy_index.fleet_no][enemy_index.fleet_i]);
-			if (double_flg) {
+			if (double_flg && fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].GetHP() > 0) {
 				// 連撃
 				damage = CalcDamage(kBattlePhaseGun, bi, friend_index, enemy_index, base_attack, special_attack_flg, multiple);
 #ifdef _DEBUG
@@ -606,7 +606,7 @@ void Simulator::NightPhase() {
 #endif
 			result_.AddDamage(bi, friend_index.fleet_no, friend_index.fleet_i, damage, true);
 			fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].MinusHP(damage, stopper_[other_side][enemy_index.fleet_no][enemy_index.fleet_i]);
-			if (double_flg) {
+			if (double_flg && fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].GetHP() > 0) {
 				// 連撃
 				damage = CalcDamage(kBattlePhaseNight, bi, friend_index, enemy_index, base_attack, special_attack_flg, multiple);
 #ifdef _DEBUG
@@ -845,16 +845,18 @@ void Simulator::ProtectOracle(const size_t defense_side, KammusuIndex &defense_i
 	// 水上艦は水上艦、潜水艦は潜水艦しかかばえないのでリストを作成する
 	auto &attendants = fleet_[defense_side].GetUnit()[defense_index.fleet_no];
 	auto is_submarine = attendants[0].IsSubmarine();
-	vector<size_t> block_list;
+	std::array<size_t, kMaxUnitSize> block_list;
+	size_t block_list_size = 0;
 	for (size_t ui = 1; ui < attendants.size(); ++ui) {
 		if (attendants[ui].IsSubmarine() == is_submarine && attendants[ui].Status() < kStatusLightDamage) {
-			block_list.push_back(ui);
+			block_list[block_list_size] = ui;
+			++block_list_size;
 		}
 	}
-	if (block_list.size() == 0) return;
+	if (block_list_size == 0) return;
 	// かばいは確率的に発生し、どの艦がかばうかも確率的に決まる
 	if (rand.RandBool(0.4)) {	//とりあえず4割に設定している
-		defense_index.fleet_i = rand.select_random_in_range(block_list);
+		defense_index.fleet_i = block_list[rand.RandInt(block_list_size)];
 	}
 	return;
 }
@@ -869,25 +871,32 @@ double Simulator::CalcHitProb(
 	case kBattlePhaseGun:
 	case kBattlePhaseNight:
 		{
-			// 昼砲撃戦命中率
-			//回避側
-			double evade_sum = target_kammusu.AllEvade();	//回避値
+			/* 昼砲撃戦命中率 */
+			// 回避側
+			//まずは回避値を出す
+			double evade_sum = target_kammusu.AllEvade();
 			if (enemy_formation == kFormationEchelon || enemy_formation == kFormationAbreast) evade_sum *= 1.2;
 			if (target_kammusu.Mood() == kMoodHappy) evade_sum *= 1.8;
-			double evade_value;		//回避項
+			//そこから回避項を求める
+			double evade_value;
 			if (evade_sum <= 40) {
 				evade_value = 0.03 + evade_sum / 80;
 			}
 			else {
 				evade_value = 0.03 + evade_sum / (evade_sum + 40);
 			}
-			//命中側
-			double hit_value = 1.0 + sqrt(hunter_kammusu.GetLevel() - 1) / 50;	//練度による命中率補正
-			hit_value += hunter_kammusu.AllHit() / 100;							//装備による明示的な命中率補正
-			if (hunter_kammusu.Mood() == kMoodRed) hit_value /= 1.9;	//赤疲労状態だと命中率が激減する
-			hit_value += hunter_kammusu.GetLuck() * 0.0015;				//命中率の運補正
-			hit_value += hunter_kammusu.FitGunHitPlus();				//フィット砲補正
-																		//命中率の陣形補正
+			// 命中側
+			//練度による命中率補正
+			double hit_value = 1.0 + sqrt(hunter_kammusu.GetLevel() - 1) / 50;
+			//装備による明示的な命中率補正
+			hit_value += hunter_kammusu.AllHit() / 100;
+			//赤疲労状態だと命中率が激減する
+			if (hunter_kammusu.Mood() == kMoodRed) hit_value /= 1.9;
+			//命中率の運補正
+			hit_value += hunter_kammusu.GetLuck() * 0.0015;
+			//フィット砲補正
+			hit_value += hunter_kammusu.FitGunHitPlus();
+			//命中率の陣形補正
 			switch (friend_formation) {
 			case kFormationSubTrail:
 				if (enemy_formation != kFormationAbreast) hit_value += 0.2;

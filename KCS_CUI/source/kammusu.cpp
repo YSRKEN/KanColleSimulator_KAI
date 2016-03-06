@@ -195,7 +195,7 @@ int Kammusu::AacType() const noexcept {
 	//電探を持っていたらtrue
 	auto has_radar = [sum_radarW, sum_radarA]() -> bool { return (sum_radarW + sum_radarA >= 1); };
 	// まず、固有カットインを判定する
-	if (IncludeAnyOf({ L"秋月", L"照月", L"初月" })) {
+	if (id_ == 421 || id_ == 330 || id_ == 422 || id_ == 346 || id_ == 423 || id_ == 357 ) {
 		/* 秋月型……ご存知防空駆逐艦。対空カットイン無しでも圧倒的な対空値により艦載機を殲滅する。
 		* 二次創作界隈ではまさma氏が有名であるが、秋月型がこれ以上増えると投稿時のタイトルが長くなりすぎることから
 		* 嬉しい悲鳴を上げていたとか。なお史実上では後9隻居るが、有名なのは涼月などだろう……  */
@@ -203,13 +203,13 @@ int Kammusu::AacType() const noexcept {
 		if (has_hag() && has_radar()) return 2;
 		if (sum_hag + sum_hagX >= 2) return 3;
 	}
-	if (name_ == L"摩耶改二") {
+	if (id_ == 428) {
 		/* 摩耶改二……麻耶ではない。対空兵装により「洋上の対空要塞」(by 青島文化教材社)となったため、
 		* 重巡にしては驚異的な対空値を誇る。ついでに服装もかなりプリティーに進化した(妹の鳥海も同様) */
 		if (has_hag() && sum_aagX >= 1 && sum_radarA >= 1) return 10;
 		if (has_hag() && sum_aagX >= 1) return 11;
 	}
-	if (name_ == L"五十鈴改二") {
+	if (id_ == 141) {
 		/* 五十鈴改二…… 名前通りLv50からの改装である。防空巡洋艦になった史実から、射程が短となり、
 		* 防空力が大幅にアップした。しかし搭載数0で火力面で使いづらくなった上、対潜は装備対潜のウェイトが高いため
 		* 彼女を最適解に出来る状況は限られている。また、改二なのに金レアで固有カットインがゴミクズ「だった」ことから、
@@ -217,7 +217,7 @@ int Kammusu::AacType() const noexcept {
 		if (has_hag() && has_aag() && sum_radarA >= 1) return 14;
 		if (has_hag() && has_aag()) return 15;
 	}
-	if (name_ == L"霞改二乙") {
+	if (id_ == 470) {
 		/* 霞改二乙…… Lv88という驚異的な練度を要求するだけあり、内蔵されたギミックは特殊である。
 		* まず霞改二でも積めた大発に加え、大型電探も装備可能になった(代償に艦隊司令部施設が積めなくなった)。
 		* また、対空値も上昇し、固有カットインも実装された。ポスト秋月型＋アルファとも言えるだろう。
@@ -225,7 +225,7 @@ int Kammusu::AacType() const noexcept {
 		if (has_hag() && has_aag() && sum_radarA >= 1) return 16;
 		if (has_hag() && has_aag()) return 17;
 	}
-	if (name_ == L"皐月改二") {
+	if (id_ == 418) {
 		/* 皐月改二…… うるう年の2/29に実装された、皐月改二における固有の対空カットイン。
 		 * この調子では改二が出るたびに新型カットインが出るのではないかと一部で危惧されている。*/
 		if (sum_aagX >= 1) return 18;
@@ -388,7 +388,7 @@ int Kammusu::AllHit() const noexcept {
 
 // フィット砲補正
 double Kammusu::FitGunHitPlus() const noexcept {
-	double hit_plus = 0.0;
+	if (!Is(ShipClass::BB | ShipClass::BBV)) return 0.0;
 	// 通常命中率低下は赤疲労検証での減少率÷2ぐらいでちょうどいいのでは？
 	const double fit[] = { 0.0, 0.01365, 0.0315, 0.0261, 0.0319 };
 	const double unfit_small[] = { 0.0, -0.00845, -0.04, -0.0422, -0.04255 };
@@ -396,49 +396,99 @@ double Kammusu::FitGunHitPlus() const noexcept {
 	// 数を数えておく
 	int sum_356 = 0, sum_38 = 0, sum_381 = 0, sum_41 = 0, sum_46 = 0, sum_46X = 0;
 	for (auto &it_w : weapons_) {
-		if (it_w.Include(L"35.6cm")) ++sum_356;
-		if (it_w.Include(L"38cm")) ++sum_38;
-		if (it_w.Include(L"381mm")) ++sum_381;
-		if (it_w.Include(L"41cm")) ++sum_41;
-		if (it_w.Include(L"46cm")) {
-			if (it_w.Include(L"試製")) ++sum_46X; else ++sum_46;
+		switch (it_w.GetID()) {
+		case 7:
+		case 103:
+		case 104:
+			// 35.6cm
+			++sum_356;
+			break;
+		case 76:
+		case 114:
+			// 38cm
+			++sum_38;
+			break;
+		case 133:
+		case 137:
+			// 381mm
+			++sum_381;
+			break;
+		case 8:
+		case 105:
+			// 41cm
+			++sum_41;
+			break;
+		case 9:
+			// 46cm
+			++sum_46;
+			break;
+		case 117:
+			// 試製46cm
+			++sum_46X;
+			break;
+		default:
+			break;
 		}
 	}
 	// 種類により減衰量を決定する
-	//伊勢型および扶桑型
-	if (IncludeAnyOf({ L"伊勢", L"日向", L"扶桑", L"山城" })) {
-			if(Include(L"改")) {
-				// 航戦
-				hit_plus = fit[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];
-			}
-			else {
-				// 戦艦
-				hit_plus = fit[sum_356] + fit[sum_38] + fit[sum_381] + unfit_large[sum_46] + unfit_small[sum_46X];
-				if (IncludeAnyOf({ L"扶桑", L"山城" })) {
-					hit_plus += fit[sum_41];
-				}
-			}
+	switch (id_) {
+	case 26:
+	case 27:
+	case 77:
+	case 87:
+		// 伊勢・扶桑型戦艦
+		return fit[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];
+	case 82:
+	case 88:
+	case 286:
+	case 287:
+		// 伊勢型・扶桑型航戦
+		return fit[sum_356] + fit[sum_38] + fit[sum_381] + unfit_large[sum_46] + unfit_small[sum_46X];
+	case 411:
+	case 412:
+		// 扶桑型航戦改二
+		return fit[sum_356] + fit[sum_38] + fit[sum_381] + fit[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];
+	case 78:
+	case 79:
+	case 85:
+	case 86:
+	case 209:
+	case 210:
+	case 211:
+	case 212:
+	case 149:
+	case 150:
+	case 151:
+	case 152:
+		// 金剛型改二
+		return fit[sum_356] + fit[sum_38] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];
+	case 171:
+	case 172:
+	case 173:
+	case 178:
+		// Bismarck型
+		return fit[sum_356] + fit[sum_38] - unfit_small[sum_381]  + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];
+	case 441:
+	case 442:
+	case 446:
+	case 447:
+		// イタリア艦
+		return fit[sum_356] + fit[sum_381] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];
+	case 80:
+	case 81:
+	case 275:
+	case 276:
+		// 長門型
+		return fit[sum_356] + fit[sum_381] + fit[sum_41] + unfit_small[sum_46] + unfit_small[sum_46X];
+	case 131:
+	case 136:
+	case 143:
+	case 148:
+		// 大和型
+		return fit[sum_41];
+	default:
+		return 0.0;
 	}
-	//金剛型およびビスマルク
-	if (IncludeAnyOf({ L"金剛", L"比叡", L"榛名", L"霧島", L"Bismarck" })) {
-		hit_plus = fit[sum_356] + fit[sum_38] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];
-		if (Include(L"Bismarck")) {
-			hit_plus += unfit_small[sum_381];
-		}
-	}
-	//イタリア艦
-	if (IncludeAnyOf({ L"Littorio", L"Italia", L"Roma" })) {
-		hit_plus = fit[sum_356] + fit[sum_381] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];
-	}
-	//長門型
-	if (IncludeAnyOf({ L"長門", L"陸奥" })) {
-		hit_plus = fit[sum_356] + fit[sum_381] + fit[sum_41] + unfit_small[sum_46] + unfit_small[sum_46X];
-	}
-	//大和型
-	if (IncludeAnyOf({ L"大和", L"武蔵" })) {
-		hit_plus = fit[sum_41];
-	}
-	return hit_plus;
 }
 
 // 総雷装を返す

@@ -69,6 +69,7 @@ public:
 		const int, wstring, const WeaponClass, const int, const int, const int, const int,
 		const int, const int, const int, const int, const int, const Range, const int, const int) noexcept;
 	// getter
+	int GetID() const noexcept;
 	const std::wstring& GetName() const noexcept;
 	WeaponClass GetWeaponClass() const noexcept;
 	int GetDefense() const noexcept;
