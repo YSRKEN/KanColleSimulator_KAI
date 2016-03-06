@@ -157,6 +157,7 @@ public:
 	int AllDefense() const noexcept;				//総装甲を返す
 	Range MaxRange() const noexcept;				//射程を返す
 	int DayAttack(const DayFireType, const bool, const FleetType, const size_t) const noexcept;	//昼戦火力を返す
+	int NightAttack(const NightFireType, const bool) const noexcept;	//夜戦火力を返す
 	void MinusHP(const int&, const bool&);			//ダメージを与える、ctorもしくはSetRandGenerator経由で乱数エンジンを渡している必要がある
 	void ConsumeMaterial() noexcept;				//弾薬・燃料を減少させる
 	bool HasAir() const noexcept;					//艦載機を保有していた場合はtrue
@@ -179,6 +180,7 @@ public:
 	bool IsFireGunPlane() const noexcept;					//空撃可能ならtrue
 	bool IsFireNight() const noexcept;						//夜戦で攻撃可能な艦ならtrue
 	bool IsAntiSubNight() const noexcept;					//夜戦で対潜可能な艦ならtrue
+	bool HasLights() const noexcept;						//探照灯や照明弾を保有していた場合はtrue
 	friend std::ostream& operator<<(std::ostream& os, const Kammusu& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Kammusu& conf);
 };

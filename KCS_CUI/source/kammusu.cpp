@@ -652,6 +652,54 @@ int Kammusu::DayAttack(const DayFireType fire_type, const bool af_flg, const Fle
 	return int(base_attack);
 }
 
+// 夜戦火力を返す
+int Kammusu::NightAttack(const NightFireType fire_type, const bool af_flg) const noexcept {
+	double base_attack = 0.0;
+	switch (fire_type) {
+	case kNightFireGun:	//砲撃
+		base_attack += attack_;
+		if (!af_flg) base_attack += torpedo_;
+		for (auto &it_w : weapons_) {
+			base_attack += it_w.GetAttack();
+			if (!af_flg) base_attack += it_w.GetTorpedo();
+			switch (it_w.GetWeaponClass()) {
+			case WeaponClass::Gun:
+				base_attack += (it_w.GetRange() >= kRangeLong ? 1.5 : 1.0) * sqrt(it_w.GetLevel());
+				break;
+			case WeaponClass::SubGun:
+			case WeaponClass::AAG:
+			case WeaponClass::AAD:
+			case WeaponClass::SL:
+				base_attack += sqrt(it_w.GetLevel());
+			case WeaponClass::Sonar:
+			case WeaponClass::DP:
+				base_attack += 0.75 * sqrt(it_w.GetLevel());
+			default:
+				break;
+			}
+		}
+		break;
+	case kNightFireChage:	//爆雷攻撃
+		int base_sub = anti_sub_;
+		for (auto &it_w : weapons_) {
+			switch (it_w.GetWeaponClass()) {
+			case WeaponClass::DP:
+			case WeaponClass::Sonar:
+				base_attack += it_w.GetAntiSub() * 1.5;
+				base_attack += sqrt(it_w.GetLevel());
+				break;
+			default:
+				// 夜戦での対潜は、航空対潜ではありえないので除外
+				// 小口径主砲・水上偵察機・小型電探の対潜値は無視していい
+				break;
+			}
+		}
+		base_attack += sqrt(base_sub) * 2 + 13;
+		break;
+	}
+	return int(base_attack);
+}
+
 // ダメージを与える
 void Kammusu::MinusHP(const int &damage, const bool &stopper_flg) {
 	if (hp_ > damage) {
@@ -899,6 +947,15 @@ bool Kammusu::IsFireNight() const noexcept {
 bool Kammusu::IsAntiSubNight() const noexcept {
 	if (Is(ShipClass::CL | ShipClass::CLT | ShipClass::DD | ShipClass::CP | ShipClass::AO)) {
 		return anti_sub_ > 0;
+	}
+	return false;
+}
+
+// 探照灯や照明弾を保有していた場合はtrue
+bool Kammusu::HasLights() const noexcept {
+	for (auto &it_w : weapons_) {
+		if (it_w.Is(WeaponClass::SL)) return true;
+		if (it_w.Is(WeaponClass::LB)) return true;
 	}
 	return false;
 }

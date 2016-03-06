@@ -135,6 +135,7 @@ KammusuDB::KammusuDB(const char* csv_name) {
 	getline(ifs, temp_str);
 	auto header = temp_str | Split(',') | ToHash();
 	while (getline(ifs, temp_str)) {
+		if (temp_str.find("null") != string::npos) continue;
 		auto list           = temp_str | Split(',');
 
 		const int id              = list[header.at("艦船ID")] | to_i();

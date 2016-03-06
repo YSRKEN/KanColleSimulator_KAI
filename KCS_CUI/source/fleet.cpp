@@ -445,10 +445,10 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const T
 		}
 		// 発動した場合、そちらに攻撃が誘引される
 		if (large_sl_index >= 0) {
-			return tuple<bool, KammusuIndex>(true, KammusuIndex{ SecondIndex() , large_sl_index });
+			return tuple<bool, KammusuIndex>(true, KammusuIndex{ SecondIndex() , size_t(large_sl_index) });
 		}
 		else if (small_sl_index >= 0) {
-			return tuple<bool, KammusuIndex>(true, KammusuIndex{ SecondIndex() , small_sl_index });
+			return tuple<bool, KammusuIndex>(true, KammusuIndex{ SecondIndex() , size_t(small_sl_index) });
 		}
 	}
 	return tuple<bool, KammusuIndex>(true, rand_.select_random_in_range(alived_list));
@@ -508,6 +508,11 @@ bool Fleet::HasAirTrailer() const noexcept {
 // 彩雲をいずれかの艦が保有していた場合はtrue
 bool Fleet::HasAirPss() const noexcept {
 	return std::any_of(this->FirstUnit().begin(), this->FirstUnit().end(), [](const Kammusu& it_k) -> bool { return it_k.HasAirPss(); });
+}
+
+// 探照灯や照明弾をいずれかの艦が保有していた場合はtrue
+bool Fleet::HasLights() const noexcept {
+	return any_of(this->unit_, [](const Kammusu& it_k) -> bool { return it_k.HasLights(); });
 }
 
 std::ostream & operator<<(std::ostream & os, const Fleet & conf)

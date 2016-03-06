@@ -576,36 +576,31 @@ void Simulator::NightPhase() {
 			// 攻撃対象の種類によって、攻撃の種類を選ぶ
 			auto &enemy_index = std::get<1>(target);
 			auto &target_kammusu = fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i];
-			auto fire_type = JudgeNightFireType(bi, friend_index, enemy_index);
+			auto fire_type = JudgeNightFireType(bi, enemy_index);
 			// 攻撃の種類によって、基本攻撃力および倍率を算出する
 			// 夜戦速吸は対潜を常に爆雷で行う
-			/*auto base_attack = hunter_kammusu.NightAttack(fire_type, target_kammusu.Is(ShipClass::AF), fleet_[bi].GetFleetType(), friend_index.fleet_no);
+			auto base_attack = hunter_kammusu.NightAttack(fire_type, target_kammusu.Is(ShipClass::AF));
 			bool special_attack_flg = false;
 			bool double_flg = false;
-			auto multiple = 1.0;*/
+			auto multiple = 1.0;
 			// 夜間特殊攻撃補正
-			/*[&] {
+			[&] {
 				// 砲撃時にのみ適用される
 				if (fire_type != kDayFireGun) return;
-				// 索敵に成功していないとダメな上、大破状態でも使えない
-				if (!search_result_[bi] || hunter_kammusu.Status() >= kStatusHeavyDamage) return;
-				// 航空優勢以上でないと使えない
-				if (bi == kFriendSide && std::get<0>(air_war_result_) > kAirWarStatusGood) return;
-				if (bi == other_side  && std::get<0>(air_war_result_) < kAirWarStatusBad)  return;
 				// 発動可能な弾着の種類を判断する
-				auto special_attack = JudgeDaySpecialAttack(bi, friend_index);
+				auto special_attack = JudgeNightSpecialAttack(bi, friend_index, target_kammusu.Is(ShipClass::AF));
 				if (std::get<1>(special_attack) == 1.0) return;
 				// 弾着観測射撃による補正
 				double_flg = std::get<0>(special_attack);
 				special_attack_flg = true;
 				multiple = std::get<1>(special_attack);
-			}();*/
+			}();
 			// 与えるダメージを計算し、処理を行う
-/*#ifdef _DEBUG
+#ifdef _DEBUG
 			wcout << hunter_kammusu.GetName() << L"(" << (bi == kFriendSide ? L"自" : L"敵") << L")が" << target_kammusu.GetName() << L"に攻撃！ " << endl;
-			cout << "基礎攻撃力：" << base_attack << " 弾着観測射撃：" << special_attack_flg << " 連撃：" << double_flg << "倍率：" << multiple << endl;
+			cout << "基礎攻撃力：" << base_attack << " 夜間特殊攻撃：" << special_attack_flg << " 連撃：" << double_flg << "倍率：" << multiple << endl;
 #endif
-			auto damage = CalcDamage(kBattlePhaseGun, bi, friend_index, enemy_index, base_attack, special_attack_flg, multiple);
+			auto damage = CalcDamage(kBattlePhaseNight, bi, friend_index, enemy_index, base_attack, special_attack_flg, multiple);
 #ifdef _DEBUG
 			cout << damage << "ダメージ！" << endl;
 #endif
@@ -613,7 +608,7 @@ void Simulator::NightPhase() {
 			fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].MinusHP(damage, stopper_[other_side][enemy_index.fleet_no][enemy_index.fleet_i]);
 			if (double_flg) {
 				// 連撃
-				damage = CalcDamage(kBattlePhaseGun, bi, friend_index, enemy_index, base_attack, special_attack_flg, multiple);
+				damage = CalcDamage(kBattlePhaseNight, bi, friend_index, enemy_index, base_attack, special_attack_flg, multiple);
 #ifdef _DEBUG
 				cout << damage << "ダメージ！" << endl;
 #endif
@@ -622,7 +617,7 @@ void Simulator::NightPhase() {
 			}
 #ifdef _DEBUG
 			cout << endl;
-#endif*/
+#endif
 #ifdef _DEBUG
 	wcout << hunter_kammusu.GetNameLv() << endl << endl;
 #endif
@@ -789,7 +784,7 @@ int Simulator::CalcDamage(
 	{
 		// 徹甲弾補正
 		if (target_kammusu.IsSpecialEffectAP()) {
-			damage = int(hunter_kammusu.SpecialEffectApPlus());	//※この切り捨ては仕様です
+			damage *= int(hunter_kammusu.SpecialEffectApPlus());	//※この切り捨ては仕様です
 		}
 		// クリティカル補正
 		double prob_per;
@@ -971,20 +966,22 @@ double Simulator::CalcHitProb(
 	break;
 	}
 	// 連合艦隊における命中率補正を試験的に実装
-	switch (fleet_[kFriendSide].GetFleetType()) {
-	case kFleetTypeCombinedAir:
-	case kFleetTypeCombinedDrum:
-		hit_prob /= 2.0;
-		if (turn_player == kFriendSide && index == 0) hit_prob += 0.2;
-		hit_prob = hit_prob | limit(0.3, 0.97);
-		break;
-	case kFleetTypeCombinedGun:
-		hit_prob /= 2.0;
-		if (turn_player == kFriendSide && index == 1) hit_prob += 0.2;
-		hit_prob = hit_prob | limit(0.3, 0.97);
-		break;
-	default:
-		break;
+	if (battle_phase != kBattlePhaseNight) {
+		switch (fleet_[kFriendSide].GetFleetType()) {
+		case kFleetTypeCombinedAir:
+		case kFleetTypeCombinedDrum:
+			hit_prob /= 2.0;
+			if (turn_player == kFriendSide && index == 0) hit_prob += 0.2;
+			hit_prob = hit_prob | limit(0.3, 0.97);
+			break;
+		case kFleetTypeCombinedGun:
+			hit_prob /= 2.0;
+			if (turn_player == kFriendSide && index == 1) hit_prob += 0.2;
+			hit_prob = hit_prob | limit(0.3, 0.97);
+			break;
+		default:
+			break;
+		}
 	}
 	return hit_prob;
 }
@@ -1078,10 +1075,102 @@ tuple<bool, double> Simulator::JudgeDaySpecialAttack(const size_t turn_player, c
 }
 
 // 夜戦での攻撃種別を判断する
-NightFireType Simulator::JudgeNightFireType(const size_t turn_player, const KammusuIndex &attack_index, const KammusuIndex &defense_index) const noexcept {
+NightFireType Simulator::JudgeNightFireType(const size_t turn_player, const KammusuIndex &defense_index) const noexcept {
 	auto other_side = kBattleSize - turn_player - 1;
 	// 敵が潜水艦なら対潜攻撃
 	if (fleet_[other_side].GetUnit()[defense_index.fleet_no][defense_index.fleet_i].IsSubmarine()) return kNightFireChage;
 	// それ以外は全て砲撃
 	return kNightFireGun;
+}
+
+// 夜戦での特殊攻撃を判断する
+tuple<bool, double> Simulator::JudgeNightSpecialAttack(const size_t turn_player, const KammusuIndex &attack_index, const bool af_flg) {
+	// 主砲・副砲・魚雷の数を数える
+	auto &hunter_kammusu = fleet_[turn_player].GetUnit()[attack_index.fleet_no][attack_index.fleet_i];
+	size_t sum_gun = 0, sum_subgun = 0, sum_torpedo = 0;
+	for (auto &it_w : hunter_kammusu.GetWeapon()) {
+		switch (it_w.GetWeaponClass()) {
+		case WeaponClass::Gun:
+			++sum_gun;
+			break;
+		case WeaponClass::SubGun:
+			++sum_subgun;
+			break;
+		case WeaponClass::Torpedo:
+			// 恐ろしいことに、敵が地上型なら魚雷を持ってない扱いにされる！
+			if(!af_flg) ++sum_torpedo;
+			break;
+		}
+	}
+	// 発動可能な攻撃方法を判断する
+	size_t attack_type = 0;
+	if (sum_torpedo >= 2) {
+		attack_type = 1;	//魚雷カットイン
+	}
+	else if (sum_gun >= 3){
+		attack_type = 2;	//主砲カットイン
+	}
+	else if (sum_gun >= 2 && sum_subgun >= 1) {
+		attack_type = 3;	//主砲カットイン
+	}
+	else if ((sum_gun == 2 && sum_subgun == 0 && sum_torpedo == 1)
+		|| (sum_gun == 1 && sum_torpedo == 1)) {
+		attack_type = 4;	//主魚カットイン
+	}
+	else if ((sum_gun == 2 && sum_subgun == 0 && sum_torpedo == 0)
+		|| (sum_gun == 1 && sum_subgun >= 1 && sum_torpedo == 1)
+		|| (sum_gun == 0 && sum_subgun >= 2)) {
+		attack_type = 5;	//連撃
+	}
+	// 発動確率は、連撃が99％、他はキャップに従って計算される
+	if (attack_type == 5) {
+		if (rand.RandBool(0.99)) {
+			return tuple<bool, double>(true, 1.2);
+		}
+		else {
+			return tuple<bool, double>(false, 1.0);
+		}
+	}
+	if (attack_type == 0) return tuple<bool, double>(false, 1.0);
+	double oracle = 0.0;
+	// 熟練見張員補正
+	auto has_ssp = [&hunter_kammusu]() -> bool {
+		for (auto &it_w : hunter_kammusu.GetWeapon())
+			if (it_w.GetWeaponClass() == WeaponClass::SSP) return true;
+		return false; };
+	// 運による発動率上昇は、運キャップによる上限がある
+	switch (attack_type) {
+	case 1:
+		oracle += sqrt(70.0 * std::max(hunter_kammusu.GetLuck() + (has_ssp() ? 5 : 0), 60)) / 100;
+		break;
+	case 2:
+		oracle += sqrt(50.0 * std::max(hunter_kammusu.GetLuck() + (has_ssp() ? 5 : 0), 55)) / 100;
+		break;
+	case 3:
+		oracle += sqrt(50.0 * std::max(hunter_kammusu.GetLuck() + (has_ssp() ? 5 : 0), 55)) / 100;
+		break;
+	case 4:
+		oracle += sqrt(70.0 * std::max(hunter_kammusu.GetLuck() + (has_ssp() ? 5 : 0), 75)) / 100;
+		break;
+	default:
+		break;
+	}
+	// 配置補正
+	if (attack_index.fleet_i == 0) oracle += 0.125;
+	// 損傷補正
+	if (hunter_kammusu.Status() == kStatusMiddleDamage) oracle += 0.2;
+	// 探照灯・照明弾補正
+	auto other_side = kBattleSize - turn_player - 1;
+	if (fleet_[turn_player].HasLights()) oracle += 0.05;
+	if (fleet_[other_side].HasLights()) oracle -= 0.10;
+	// 乱数によって決定される
+	oracle = oracle | limit(0.0, 0.99);
+	if (rand.RandBool(oracle)) {
+		static const bool dflg[] = { false, true, false, false, true };
+		static const double mlt[] = { 1.0, 1.5, 2.0, 1.75, 1.3 };
+		return tuple<bool, double>(dflg[attack_type], mlt[attack_type]);
+	}
+	else {
+		return tuple<bool, double>(false, 1.0);
+	}
 }
