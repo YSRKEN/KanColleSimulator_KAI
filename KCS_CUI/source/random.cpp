@@ -49,17 +49,17 @@ namespace intrin {
 		const auto id = get_cpuid(0);
 		union {
 			uint32_t u32[4];
-			char u8[16];
+			char str[16];
 		} vender = { id.EBX, id.EDX, id.ECX , 0 };
-		return (0 == std::strcmp(vender.u8, "GenuineIntel"));
+		return (0 == std::strcmp(vender.str, "GenuineIntel"));
 	}
 	bool IsAMDCPU() {
 		const auto id = get_cpuid(0);
 		union {
 			uint32_t u32[4];
-			char u8[16];
+			char str[16];
 		} vender = { id.EBX, id.EDX, id.ECX , 0 };
-		return (0 == std::strcmp(vender.u8, "AuthenticAMD"));
+		return (0 == std::strcmp(vender.str, "AuthenticAMD"));
 	}
 	bool IsRDRANDsupport() {
 		if (!IsIntelCPU() && !IsAMDCPU()) return false;
