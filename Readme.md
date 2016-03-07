@@ -80,10 +80,12 @@
 MITライセンスとします。
 
 ## 開発者
-- YSR https://github.com/YSRKEN
-- yumetodo https://github.com/yumetodo
-- Cranberries https://github.com/LoliGothick
-- sayurin https://github.com/sayurin
+|名前       |GitHub                        |Twitter                      |
+|-----------|------------------------------|-----------------------------|
+|YSR        |https://github.com/YSRKE N    |https://twitter.com/YSRKEN   |
+|yumetodo   |https://github.com/yumetodo   |https://twitter.com/yumetodo |
+|Cranberries|https://github.com/LoliGothick|https://twitter.com/_EnumHack|
+|sayurin    |https://github.com/sayurin    |https://twitter.com/haxe     |
 
 ## バージョン履歴
 ### Ver.1.0.2
