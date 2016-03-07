@@ -2,14 +2,14 @@
 #include "weapon.hpp"
 #include "char_convert.hpp"
 // コンストラクタ
-Weapon::Weapon() noexcept : Weapon(-1, {}, WeaponClass::Other, 0, 0, 0, 0, 0, 0, 0, 0, 0, kRangeNone, 0, 0) {}
+Weapon::Weapon() noexcept : Weapon(-1, {}, WeaponClass::Other, 0, 0, 0, 0, 0, 0, 0, 0, 0, kRangeNone, 0, 0, -1) {}
 Weapon::Weapon(
 	const int id, wstring name, const WeaponClass weapon_class, const int defense,
 	const int attack, const int torpedo, const int bomb, const int anti_air, const int anti_sub,
-	const int hit, const int evade, const int search, const Range range, const int level, const int level_detail) noexcept :
+	const int hit, const int evade, const int search, const Range range, const int level, const int level_detail, const int air) noexcept :
 	id_(id), name_(move(name)), weapon_class_(weapon_class), defense_(defense), attack_(attack),
 	torpedo_(torpedo), bomb_(bomb), anti_air_(anti_air), anti_sub_(anti_sub), hit_(hit),
-	evade_(evade), search_(search), range_(range), level_(level), level_detail_(level_detail) {}
+	evade_(evade), search_(search), range_(range), level_(level), level_detail_(level_detail), air_(air) {}
 
 // getter
 int Weapon::GetID() const noexcept { return id_; }
@@ -26,9 +26,11 @@ int Weapon::GetEvade() const noexcept { return evade_; }
 int Weapon::GetSearch() const noexcept { return search_; }
 Range Weapon::GetRange() const noexcept { return range_; }
 int Weapon::GetLevel() const noexcept { return level_; }
+int Weapon::GetAir() const noexcept { return air_; }
 // setter
 void Weapon::SetLevel(const int level) { level_ = level; }
 void Weapon::SetLevelDetail(const int level_detail) { level_detail_ = level_detail; }
+void Weapon::SetAir(const int air) { air_ = air; }
 
 // 中身を表示する
 void Weapon::Put() const {
