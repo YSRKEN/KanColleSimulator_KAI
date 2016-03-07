@@ -53,3 +53,6 @@ vector<int> ToInt(const vector<string>&);
 //// 配列をハッシュに変換する
 //template<typename T>
 //unordered_map<T, size_t> ToHash(const vector<T>&);
+
+// 文字列(ファイル名)から拡張子を取り出す
+string GetExtension(const string&);
