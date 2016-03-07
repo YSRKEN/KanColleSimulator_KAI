@@ -23,9 +23,9 @@
 - --no-result-json-prettifyを指定すると、出力するJSONが整形されないようになる
 
 ## 使用例
-`KCS_CUI -i "sample\fleet sample1.json" "sample\fleet sample2.json" -f 0 0 -n 1`
+`KCS_CUI -i "sample\sample1.json" "sample\sample2.json" -f 0 0 -n 1`
 
-`KCS_CUI -i "sample\fleet 3-5.json" "sample\map 3-5 high.map" -f 0 0 -n 100000 -t 4 -o output.json`
+`KCS_CUI -i "sample\3-5.json" "sample\3-5 high.map" -f 0 0 -n 100000 -t 4 -o output.json`
 
 ## JSONデータの書式(艦隊編)
 - UTF-8で保存してください(どうせASCII文字しか無いと思いますが)
