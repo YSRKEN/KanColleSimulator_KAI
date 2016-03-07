@@ -2,7 +2,7 @@
 #include "weapon.hpp"
 #include "char_convert.hpp"
 // コンストラクタ
-Weapon::Weapon() noexcept : Weapon(-1, {}, WeaponClass::Other, 0, 0, 0, 0, 0, 0, 0, 0, 0, kRangeNone, 0, 0, -1) {}
+Weapon::Weapon() noexcept : Weapon(-1, {}, WeaponClass::Other, 0, 0, 0, 0, 0, 0, 0, 0, 0, kRangeNone, 0, 0, 0) {}
 Weapon::Weapon(
 	const int id, wstring name, const WeaponClass weapon_class, const int defense,
 	const int attack, const int torpedo, const int bomb, const int anti_air, const int anti_sub,

@@ -89,7 +89,7 @@ WeaponDB::WeaponDB(const char* csv_name) {
 		auto range        = static_cast<Range>(list[header.at("射程")] | to_i());
 		auto level        = 0;
 		auto level_detail = 0;
-		auto air          = -1;
+		auto air          = 0;
 		
 		hash_[id] = Weapon(
 			id, name, weapon_class, defense, attack, torpedo, bomb, anti_air,
