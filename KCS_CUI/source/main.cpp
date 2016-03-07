@@ -53,7 +53,9 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		else if (ext == "map") {	//マップモード
-			cout << config.GetInputFilename(kEnemySide) << endl;
+			MapData map_Data(config.GetInputFilename(kEnemySide), weapon_db, kammusu_db);
+			Fleet my_fleet(config.GetInputFilename(kFriendSide), config.GetFormation(i), weapon_db, kammusu_db);
+
 		}
 	}
 	catch (const KCS_except::successful_termination&) {
