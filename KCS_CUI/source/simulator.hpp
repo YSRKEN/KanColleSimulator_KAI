@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <cstdint>
 #include "kammusu.hpp"
+#include <array>
 // 制空状態(制空権確保・航空優勢・制空拮抗・航空劣勢・制空権喪失)
 enum AirWarStatus { kAirWarStatusBest, kAirWarStatusGood, kAirWarStatusNormal, kAirWarStatusBad, kAirWarStatusWorst};
 
@@ -30,7 +31,8 @@ class Simulator {
 	bitset<kBattleSize> search_result_;	//索敵結果
 	tuple<AirWarStatus, vector<double>> air_war_result_;	//制空状態および触接倍率
 	BattlePosition battle_position_;	//陣形
-	vector<vector<bitset<kMaxUnitSize>>> stopper_;	//撃沈ストッパー
+	std::array<std::array<bitset<kMaxUnitSize>, kMaxFleetSize>, kBattleSize> stopper_;	//撃沈ストッパー
+	bool is_calculated;
 	// 各フェーズ
 	void SearchPhase();
 	void AirWarPhase();
@@ -65,6 +67,7 @@ public:
 	Simulator(){}
 	Simulator(const vector<Fleet> &fleet, const unsigned int seed, const SimulateMode& simulate_mode);
 	SharedRand GetGenerator() noexcept;
+	void Flush_Calc_Result(const vector<Fleet>& fleet);
 	// 計算用メソッド
-	Result Calc();
+	tuple<Result, vector<Fleet>> Calc();
 };

@@ -3,6 +3,7 @@
 #include "fleet.hpp"
 #include "result.hpp"
 #include "char_convert.hpp"
+#include <cctype>
 #include <algorithm>
 enum class CsvParseLevel : std::size_t { kLevel1 = 0, kLevel99 = 1 };
 namespace detail {
@@ -43,7 +44,7 @@ namespace detail {
 detail::Split_helper Split(char delim) noexcept { return{ delim }; }
 namespace detail {
 	// 文字列配列を数字配列に変換する
-	inline vector<int> operator|(const vector<string> &arr_str, to_i_helper) {
+	inline vector<int> operator|(const vector<string> &arr_str, to_i_helper<int>) {
 		vector<int> arr_int;
 		for (auto &it : arr_str) {
 			arr_int.push_back(it | to_i());
@@ -89,10 +90,11 @@ WeaponDB::WeaponDB(const char* csv_name) {
 		auto range        = static_cast<Range>(list[header.at("射程")] | to_i());
 		auto level        = 0;
 		auto level_detail = 0;
+		auto air          = 0;
 		
 		hash_[id] = Weapon(
 			id, name, weapon_class, defense, attack, torpedo, bomb, anti_air,
-			anti_sub, hit, evade, search, range, level, level_detail
+			anti_sub, hit, evade, search, range, level, level_detail, air
 		);
 	}
 	// ダミーデータを代入する
@@ -394,3 +396,16 @@ void ResultStat::Put(const vector<Fleet> &fleet, const string &file_name, const 
 //	re.emplace_back(str, current, str.size() - current);
 //	return re;
 //}
+
+// 文字列(ファイル名)から拡張子を取り出す
+// 参考：http://qiita.com/selflash/items/d6bdd0fcb677f4f8ca24
+string GetExtension(const string &path) {
+	// ドットの位置を検出する
+	auto dot_pos = path.find_last_of('.');
+	if (dot_pos == string::npos) return "";
+	// 切り取る
+	auto ext = path.substr(dot_pos + 1, path.find_last_not_of(' ') - dot_pos);
+	// 拡張子を小文字化する
+	for (auto& c : ext) c = std::tolower(c);
+	return ext;
+}

@@ -6,6 +6,8 @@
 #define SUCCESSFUL_TERMINATION_THROW_WITH_MESSAGE( MESSAGE ) throw KCS_except::successful_termination(__FILE__, __FUNCTION__, __LINE__, MESSAGE);
 #define INVAID_ARGUMENT_THROW_WITH_MESSAGE( MESSAGE ) throw KCS_except::invalid_argument(__FILE__, __FUNCTION__, __LINE__, MESSAGE);
 #define INVAID_ARGUMENT_THROW_WITH_MESSAGE_IF( EXPR, MESSAGE ) if( EXPR ){ throw KCS_except::invalid_argument(__FILE__, __FUNCTION__, __LINE__, #EXPR, MESSAGE); }
+#define RUNTIME_ERROR_THROW_WITH_MESSAGE( MESSAGE ) throw KCS_except::runtime_error(__FILE__, __FUNCTION__, __LINE__, MESSAGE);
+#define RUNTIME_ERROR_THROW_WITH_MESSAGE_IF( EXPR, MESSAGE ) if( EXPR ){ throw KCS_except::runtime_error(__FILE__, __FUNCTION__, __LINE__, #EXPR, MESSAGE); }
 #define CONFIG_THROW_WITH_MESSAGE( MESSAGE ) throw KCS_except::config_error(__FILE__, __FUNCTION__, __LINE__, MESSAGE);
 #define CONFIG_THROW_WITH_MESSAGE_IF( EXPR, MESSAGE ) if( EXPR ){ throw KCS_except::config_error(__FILE__, __FUNCTION__, __LINE__, #EXPR, MESSAGE); }
 #define MISSING_RAND_GENERATOR_THROW_WITH_MESSAGE( MESSAGE ) throw KCS_except::missing_rand_generator(__FILE__, __FUNCTION__, __LINE__, MESSAGE);
@@ -34,27 +36,18 @@ namespace KCS_except {
 	{
 	public:
 		config_error(const char* sorce_name, const char* func_name, uint64_t line, const char* expression, const std::string& msg);
-		config_error(const char* sorce_name, const char* func_name, uint64_t line, const std::string& msg)
-			: std::invalid_argument(
-				std::string("excetopn : config_error\n")
-				+ " in " + sorce_name +  "\n" 
-				+ "  " + func_name + "() (line." + std::to_string(line) + ")\n"
-				+ ((msg.empty() || msg[0] == '\0') ? "\n" : " MESSAGE : " + msg + "\n")
-			)
-		{}
+		config_error(const char* sorce_name, const char* func_name, uint64_t line, const std::string& msg);
+	};
+	class runtime_error : public std::runtime_error {
+	public:
+		runtime_error(const char* sorce_name, const char* func_name, uint64_t line, const char* expression, const std::string& msg);
+		runtime_error(const char* sorce_name, const char* func_name, uint64_t line, const std::string& msg);
 	};
 	class missing_rand_generator : public std::runtime_error
 	{
 	public:
 		missing_rand_generator(const char* sorce_name, const char* func_name, uint64_t line, const char* expression, const std::string& msg);
-		missing_rand_generator(const char* sorce_name, const char* func_name, uint64_t line, const std::string& msg)
-			: std::runtime_error(
-				std::string("excetopn : missing_rand_generator\n")
-				+ " in " + sorce_name +  "\n" 
-				+ "  " + func_name + "() (line." + std::to_string(line) + ")\n"
-				+ ((msg.empty() || msg[0] == '\0') ? "\n" : " MESSAGE : " + msg + "\n")
-			)
-		{}
+		missing_rand_generator(const char* sorce_name, const char* func_name, uint64_t line, const std::string& msg);
 	};
 	class file_error : public std::runtime_error
 	{
