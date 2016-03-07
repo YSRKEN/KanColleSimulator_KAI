@@ -62,12 +62,13 @@ class Weapon {
 	Range range_;				//射程
 	int level_;					//装備改修度(0-10)、外部熟練度(0-7)
 	int level_detail_;			//内部熟練度(0-120)
+	int air_;					//現搭載数
 public:
 	// コンストラクタ
 	Weapon() noexcept;
 	Weapon(
 		const int, wstring, const WeaponClass, const int, const int, const int, const int,
-		const int, const int, const int, const int, const int, const Range, const int, const int) noexcept;
+		const int, const int, const int, const int, const int, const Range, const int, const int, const int) noexcept;
 	// getter
 	int GetID() const noexcept;
 	const std::wstring& GetName() const noexcept;
@@ -83,9 +84,11 @@ public:
 	int GetSearch() const noexcept;
 	Range GetRange() const noexcept;
 	int GetLevel() const noexcept;
+	int GetAir() const noexcept;
 	// setter
 	void SetLevel(const int level);
 	void SetLevelDetail(const int level_detail);
+	void SetAir(const int air);
 	// その他
 	void Put() const;					//中身を表示する
 	int AntiAirScore(const int&) const noexcept;	//制空値を計算する

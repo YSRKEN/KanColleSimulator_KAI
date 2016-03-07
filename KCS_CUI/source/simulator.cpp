@@ -223,10 +223,9 @@ void Simulator::AirWarPhase() {
 	for (size_t i = 0; i < kBattleSize; ++i) {
 		for (auto &it_k : fleet_[i].FirstUnit()) {
 			if (it_k.Status() == kStatusLost) continue;
-			for (size_t wi = 0; wi < it_k.GetSlots(); ++wi) {
-				auto &it_w = it_k.GetWeapon()[wi];
+			for (auto& it_w : it_k.GetWeapon()) {
 				if (!it_w.Is(WeaponClass::AirFight)) continue;
-				it_k.GetAir()[wi] -= int(it_k.GetAir()[wi] * killed_airs_per[i]);
+				it_w.SetAir(it_w.GetAir() - int(it_w.GetAir() * killed_airs_per[i]));
 			}
 		}
 	}
@@ -244,8 +243,7 @@ void Simulator::AirWarPhase() {
 		auto other_side = kBattleSize - i - 1;	//自分にとっての敵、敵にとっての自分
 		for (auto &it_k : fleet_[other_side].FirstUnit()) {
 			if (it_k.Status() == kStatusLost) continue;
-			for (size_t wi = 0; wi < it_k.GetSlots(); ++wi) {
-				auto &it_w = it_k.GetWeapon()[wi];
+			for (auto& it_w : it_k.GetWeapon()) {
 				if (!it_w.Is(WeaponClass::AirFight)) continue;
 				auto intercept_index = fleet_[i].RandomKammusu();
 				if (!std::get<0>(intercept_index)) continue;
@@ -273,17 +271,17 @@ void Simulator::AirWarPhase() {
 					}
 				}
 				//割合撃墜
-				if (rand.RandBool()) killed_airs += int(int(0.9 * all_anti_air) * it_k.GetAir()[wi] / 360);
+				if (rand.RandBool()) killed_airs += int(int(0.9 * all_anti_air) * it_w.GetAir() / 360);
 				//対空カットイン成功時の固定ボーナス
 				killed_airs += aac_bonus_add1[aac_type];
 				//艦娘限定ボーナス
 				if (intercept_kammusu.IsKammusu()) killed_airs += 1;
 				//撃墜処理
-				if (it_k.GetAir()[wi] > killed_airs) {
-					it_k.GetAir()[wi] -= killed_airs;
+				if (it_w.GetAir() > killed_airs) {
+					it_w.SetAir(it_w.GetAir() - killed_airs);
 				}
 				else {
-					it_k.GetAir()[wi] = 0;
+					it_w.SetAir(0);
 				}
 			}
 		}
@@ -297,29 +295,28 @@ void Simulator::AirWarPhase() {
 		auto &friend_unit = fleet_[bi].FirstUnit();
 		for (size_t ui = 0; ui < friend_unit.size(); ++ui) {
 			auto &hunter_kammusu = friend_unit[ui];
-			auto &friend_weapon = hunter_kammusu.GetWeapon();
 			// 既に沈んでいる場合は攻撃できない
 			if (hunter_kammusu.Status() == kStatusLost) continue;
 			// 敵に攻撃できない場合は次の艦娘にバトンタッチ
 			auto has_attacker = fleet_[other_side].RandomKammusuNonSS(false, kTargetTypeAll);
 			if (!std::get<0>(has_attacker)) continue;
 			// そうでない場合は、各スロットに対して攻撃対象を選択する
-			for (size_t wi = 0; wi < hunter_kammusu.GetSlots(); ++wi) {
-				if (hunter_kammusu.GetAir()[wi] == 0 || !friend_weapon[wi].Is(WeaponClass::AirBomb)) continue;
+			for (const auto& it_w : hunter_kammusu.GetWeapon()) {
+				if (it_w.GetAir() == 0 || !it_w.Is(WeaponClass::AirBomb)) continue;
 				// 爆撃する対象を決定する(各スロット毎に、ランダムに対象を選択しなければならない)
 				auto target = std::get<1>(fleet_[other_side].RandomKammusuNonSS(false, kTargetTypeAll));
 				// 基礎攻撃力を算出する
 				int base_attack;
-				switch (friend_weapon[wi].GetWeaponClass()) {
+				switch (it_w.GetWeaponClass()) {
 				case WeaponClass::PBF:
 				case WeaponClass::PB:
 				case WeaponClass::WB:
 					// 爆撃は等倍ダメージ
-					base_attack = int(friend_weapon[wi].GetBomb() * sqrt(hunter_kammusu.GetAir()[wi]) + 25);
+					base_attack = int(it_w.GetBomb() * sqrt(it_w.GetAir()) + 25);
 					break;
 				case WeaponClass::PA:
 					// 雷撃は150％か80％かがランダムで決まる
-					base_attack = int((rand.RandBool() ? 1.5 : 0.8) * (friend_weapon[wi].GetTorpedo() * sqrt(hunter_kammusu.GetAir()[wi]) + 25));
+					base_attack = int((rand.RandBool() ? 1.5 : 0.8) * (it_w.GetTorpedo() * sqrt(it_w.GetAir()) + 25));
 					break;
 				default:
 					base_attack = 0;
@@ -348,8 +345,8 @@ void Simulator::AirWarPhase() {
 	cout << "残機：" << endl;
 	for (size_t i = 0; i < kBattleSize; ++i) {
 		for (auto &it_k : fleet_[i].FirstUnit()) {
-			for (size_t wi = 0; wi < it_k.GetSlots(); ++wi) {
-				cout << it_k.GetAir()[wi] << " ";
+			for (const auto& it_w : it_k.GetWeapon()) {
+				cout << it_w.GetAir() << " ";
 			}
 			cout << endl;
 		}
