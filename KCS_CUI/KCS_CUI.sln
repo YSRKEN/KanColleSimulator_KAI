@@ -13,6 +13,8 @@ Global
 		clang_Release|x86 = clang_Release|x86
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release(OpenMP)|x64 = Release(OpenMP)|x64
+		Release(OpenMP)|x86 = Release(OpenMP)|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
@@ -29,6 +31,10 @@ Global
 		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.Debug|x64.Build.0 = Debug|x64
 		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.Debug|x86.ActiveCfg = Debug|Win32
 		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.Debug|x86.Build.0 = Debug|Win32
+		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.Release(OpenMP)|x64.ActiveCfg = Release(OpenMP)|x64
+		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.Release(OpenMP)|x64.Build.0 = Release(OpenMP)|x64
+		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.Release(OpenMP)|x86.ActiveCfg = Release(OpenMP)|Win32
+		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.Release(OpenMP)|x86.Build.0 = Release(OpenMP)|Win32
 		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.Release|x64.ActiveCfg = Release|x64
 		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.Release|x64.Build.0 = Release|x64
 		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.Release|x86.ActiveCfg = Release|Win32

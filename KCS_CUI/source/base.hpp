@@ -15,6 +15,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <type_traits>
 #include "exception.hpp"
 #include "arithmetic_convert.hpp"
 #pragma warning( disable : 4592)
@@ -42,6 +43,7 @@ constexpr size_t kMaxUnitSize = 6;		//艦隊に含まれる最大艦数
 constexpr int kFriendSide = 0;
 constexpr size_t kEnemySide = 1;	//味方および敵陣営の番号付け
 
+enum class WeaponClass : std::uint64_t;
 
 struct KammusuIndex {
 	std::size_t fleet_no;
@@ -66,13 +68,13 @@ constexpr double LimitCap(const double &val, const double &val_cap) {
 }
 
 namespace detail {
-	struct to_i_helper {};
-	template<typename CharType>
-	inline int operator|(const std::basic_string<CharType>& str, to_i_helper) {
+	template<typename T, std::enable_if_t<std::is_arithmetic<T>::value, std::nullptr_t> = nullptr> struct to_i_helper {};
+	template<typename CharType, typename T>
+	inline int operator|(const std::basic_string<CharType>& str, to_i_helper<T>) {
 		return atithmetic_cvt::from_str<int>(str);
 	}
-	template<typename CharType>
-	inline int operator|(const CharType* str, to_i_helper) {
+	template<typename CharType, typename T>
+	inline T operator|(const CharType* str, to_i_helper<T>) {
 		return atithmetic_cvt::from_str<int>(std::basic_string<CharType>(str));
 	}
 	template<typename T>
@@ -86,6 +88,8 @@ namespace detail {
 		return (val < info.min) ? info.min : (info.max < val) ? info.max : val;
 	}
 }
-inline detail::to_i_helper to_i() noexcept { return{}; }
+inline detail::to_i_helper<int> to_i() noexcept { return{}; }
+inline detail::to_i_helper<size_t> to_sz() noexcept { return{}; }
+
 template<typename T>
 inline constexpr detail::limit_helper<T> limit(const T &val_min, const T &val_max) noexcept { return{ val_min, val_max }; }

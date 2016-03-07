@@ -1,0 +1,7 @@
+{
+	"version": "map",
+	"A":[{"fleets":[532], "form":0, "mode":1}],
+	"B":[{"fleets":[532,530,530], "form":3, "mode":1}],
+	"C":[{"fleets":[533,532,530,530], "form":4, "mode":1}],
+	"I":[{"fleets":[535,532,532,530], "form":3, "mode":1}]
+}

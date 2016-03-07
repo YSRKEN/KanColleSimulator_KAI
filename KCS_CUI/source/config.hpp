@@ -22,10 +22,13 @@ public:
 	const string& GetInputFilename(const size_t n) const noexcept;
 	std::wstring GetInputFilenameW(const int n) const;
 	Formation GetFormation(const size_t n) const noexcept;
-	int GetTimes() const noexcept;
-	int GetThreads() const noexcept;
+	size_t GetTimes() const noexcept;
+	size_t GetThreads() const noexcept;
 	const string& GetOutputFilename() noexcept;
 	bool GetJsonPrettifyFlg() const noexcept;
+	//calc
+	size_t CalcSeedArrSize() const noexcept;
+	size_t CalcSeedVNo(int n) const noexcept;
 	//
 	friend std::ostream& operator<<(std::ostream& os, const Config& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Config& conf);

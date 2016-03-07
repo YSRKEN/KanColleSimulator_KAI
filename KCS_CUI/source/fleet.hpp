@@ -9,7 +9,7 @@
 #include "random.hpp"
 
 // 艦隊の形式
-enum FleetType {kFleetTypeNormal = 1, kFleetTypeCombinedAir, kFleetTypeCombinedGun, kFleetTypeCombinedDrum};
+enum class FleetType : std::uint8_t {Normal = 1, CombinedAir, CombinedGun, CombinedDrum};
 const wstring kFleetTypeStr[] = {L"通常艦隊", L"空母機動部隊", L"水上打撃部隊", L"輸送護衛部隊" };
 
 // 標的(第一艦隊・第二艦隊・全体)
@@ -24,7 +24,7 @@ class Fleet {
 	void LoadJson(std::istream &file, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, char_cvt::char_enc fileenc);
 public:
 	// コンストラクタ
-	Fleet() { formation_ = kFormationTrail; level_ = 120; fleet_type_ = kFleetTypeNormal; }
+	Fleet() { formation_ = kFormationTrail; level_ = 120; fleet_type_ = FleetType::Normal; }
 	Fleet(const string &file_name, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, const SharedRand& rand = {}, char_cvt::char_enc fileenc = char_cvt::char_enc::utf8);
 	Fleet(std::istream &file, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, const SharedRand& rand = {}, char_cvt::char_enc fileenc = char_cvt::char_enc::utf8);
 	// setter

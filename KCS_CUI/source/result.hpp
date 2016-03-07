@@ -38,6 +38,7 @@ public:
 	}
 	void SetNightFlg(const bool night_flg) noexcept { night_flg_ = night_flg; }
 	// その他
+	bool empty() const noexcept { return hp_before_.empty() && hp_.empty() && damage_.empty() && damage_night_.empty(); }
 	string Put() const;
 	// 勝利判定
 	WinReason JudgeWinReason() const noexcept;
