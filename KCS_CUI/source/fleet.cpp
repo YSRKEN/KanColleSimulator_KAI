@@ -362,10 +362,8 @@ int Fleet::AntiAirBonus() const {
 		for (auto &it_k : it_u) {
 			if (it_k.Status() == kStatusLost) continue;
 			double anti_air_bonus = it_k.SumWeapons([](const auto& it_w) {
-				return it_w.IsHAG() || it_w.Include(L"高射装置") ? 0.35 * it_w.GetAntiAir()
-					: it_w.Is(WeaponClass::SmallR | WeaponClass::LargeR) ? 0.4 * it_w.GetAntiAir()
-					: it_w.Is(WeaponClass::AAA) ? 0.6 * it_w.GetAntiAir()
-					: 0.2 * it_w.GetAntiAir();
+				auto scale = it_w.IsHAG() || it_w.Include(L"高射装置") ? 0.35 : it_w.Is(WeaponClass::SmallR | WeaponClass::LargeR) ? 0.4 : it_w.Is(WeaponClass::AAA) ? 0.6 : 0.2;
+				return it_w.GetAntiAir() * scale;
 			});
 			fleets_anti_air_bonus += int(anti_air_bonus);
 		}

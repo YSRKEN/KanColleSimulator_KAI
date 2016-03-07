@@ -482,7 +482,7 @@ double Kammusu::FitGunHitPlus() const noexcept {
 // (level_flgがtrueの場合、装備改修による威力向上も考慮する)
 int Kammusu::AllTorpedo(const bool &level_flg) const noexcept {
 	double torpedo_sum = torpedo_ + SumWeapons([=](const auto& it_w) {
-		return it_w.GetTorpedo() + level_flg && it_w.Is(WeaponClass::Torpedo | WeaponClass::AAG) ? 1.2 * sqrt(it_w.GetLevel()) : 0;
+		return it_w.GetTorpedo() + (level_flg && it_w.Is(WeaponClass::Torpedo | WeaponClass::AAG) ? 1.2 * sqrt(it_w.GetLevel()) : 0);
 	});
 	return int(torpedo_sum);
 }
