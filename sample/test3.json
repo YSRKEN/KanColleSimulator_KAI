@@ -1,0 +1,12 @@
+{
+    "version": 3,
+    "info": "hubuki(Lv1)",
+    "f1": {
+        "s1": {
+            "id": "9",
+            "lv": 1,
+            "luck": -1,
+            "items": {}
+        }
+    }
+}
