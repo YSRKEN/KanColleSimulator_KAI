@@ -193,7 +193,7 @@ int Kammusu::AacType() const noexcept {
 	//電探を持っていたらtrue
 	auto has_radar = [sum_radarW, sum_radarA]() -> bool { return (sum_radarW + sum_radarA >= 1); };
 	// まず、固有カットインを判定する
-	if (id_ == 421 || id_ == 330 || id_ == 422 || id_ == 346 || id_ == 423 || id_ == 357 ) {
+	if (AnyOf(421, 330, 422, 346, 423, 357)) {
 		/* 秋月型……ご存知防空駆逐艦。対空カットイン無しでも圧倒的な対空値により艦載機を殲滅する。
 		* 二次創作界隈ではまさma氏が有名であるが、秋月型がこれ以上増えると投稿時のタイトルが長くなりすぎることから
 		* 嬉しい悲鳴を上げていたとか。なお史実上では後9隻居るが、有名なのは涼月などだろう……  */
@@ -201,13 +201,13 @@ int Kammusu::AacType() const noexcept {
 		if (has_hag() && has_radar()) return 2;
 		if (sum_hag + sum_hagX >= 2) return 3;
 	}
-	if (id_ == 428) {
+	else if (AnyOf(428)) {
 		/* 摩耶改二……麻耶ではない。対空兵装により「洋上の対空要塞」(by 青島文化教材社)となったため、
 		* 重巡にしては驚異的な対空値を誇る。ついでに服装もかなりプリティーに進化した(妹の鳥海も同様) */
 		if (has_hag() && sum_aagX >= 1 && sum_radarA >= 1) return 10;
 		if (has_hag() && sum_aagX >= 1) return 11;
 	}
-	if (id_ == 141) {
+	else if (AnyOf(141)) {
 		/* 五十鈴改二…… 名前通りLv50からの改装である。防空巡洋艦になった史実から、射程が短となり、
 		* 防空力が大幅にアップした。しかし搭載数0で火力面で使いづらくなった上、対潜は装備対潜のウェイトが高いため
 		* 彼女を最適解に出来る状況は限られている。また、改二なのに金レアで固有カットインがゴミクズ「だった」ことから、
@@ -215,7 +215,7 @@ int Kammusu::AacType() const noexcept {
 		if (has_hag() && has_aag() && sum_radarA >= 1) return 14;
 		if (has_hag() && has_aag()) return 15;
 	}
-	if (id_ == 470) {
+	else if (AnyOf(470)) {
 		/* 霞改二乙…… Lv88という驚異的な練度を要求するだけあり、内蔵されたギミックは特殊である。
 		* まず霞改二でも積めた大発に加え、大型電探も装備可能になった(代償に艦隊司令部施設が積めなくなった)。
 		* また、対空値も上昇し、固有カットインも実装された。ポスト秋月型＋アルファとも言えるだろう。
@@ -223,7 +223,7 @@ int Kammusu::AacType() const noexcept {
 		if (has_hag() && has_aag() && sum_radarA >= 1) return 16;
 		if (has_hag() && has_aag()) return 17;
 	}
-	if (id_ == 418) {
+	else if (AnyOf(418)) {
 		/* 皐月改二…… うるう年の2/29に実装された、皐月改二における固有の対空カットイン。
 		 * この調子では改二が出るたびに新型カットインが出るのではないかと一部で危惧されている。*/
 		if (sum_aagX >= 1) return 18;
@@ -375,7 +375,7 @@ int Kammusu::AllHit() const noexcept {
 
 // フィット砲補正
 double Kammusu::FitGunHitPlus() const noexcept {
-	if (!Is(ShipClass::BB | ShipClass::BBV)) return 0.0;
+	if (!AnyOf(ShipClass::BB | ShipClass::BBV)) return 0.0;
 	// 通常命中率低下は赤疲労検証での減少率÷2ぐらいでちょうどいいのでは？
 	const double fit[] = { 0.0, 0.01365, 0.0315, 0.0261, 0.0319 };
 	const double unfit_small[] = { 0.0, -0.00845, -0.04, -0.0422, -0.04255 };
@@ -397,64 +397,15 @@ double Kammusu::FitGunHitPlus() const noexcept {
 			++sum_46X;
 	}
 	// 種類により減衰量を決定する
-	switch (id_) {
-	case 26:
-	case 27:
-	case 77:
-	case 87:
-		// 伊勢・扶桑型戦艦
-		return fit[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];
-	case 82:
-	case 88:
-	case 286:
-	case 287:
-		// 伊勢型・扶桑型航戦
-		return fit[sum_356] + fit[sum_38] + fit[sum_381] + unfit_large[sum_46] + unfit_small[sum_46X];
-	case 411:
-	case 412:
-		// 扶桑型航戦改二
-		return fit[sum_356] + fit[sum_38] + fit[sum_381] + fit[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];
-	case 78:
-	case 79:
-	case 85:
-	case 86:
-	case 209:
-	case 210:
-	case 211:
-	case 212:
-	case 149:
-	case 150:
-	case 151:
-	case 152:
-		// 金剛型改二
-		return fit[sum_356] + fit[sum_38] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];
-	case 171:
-	case 172:
-	case 173:
-	case 178:
-		// Bismarck型
-		return fit[sum_356] + fit[sum_38] - unfit_small[sum_381]  + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];
-	case 441:
-	case 442:
-	case 446:
-	case 447:
-		// イタリア艦
-		return fit[sum_356] + fit[sum_381] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];
-	case 80:
-	case 81:
-	case 275:
-	case 276:
-		// 長門型
-		return fit[sum_356] + fit[sum_381] + fit[sum_41] + unfit_small[sum_46] + unfit_small[sum_46X];
-	case 131:
-	case 136:
-	case 143:
-	case 148:
-		// 大和型
-		return fit[sum_41];
-	default:
-		return 0.0;
-	}
+	if (AnyOf(26, 27, 77, 87))                                         return                                                     fit[sum_41]         + unfit_large[sum_46] + unfit_large[sum_46X];		// 伊勢・扶桑型戦艦
+	if (AnyOf(82, 88, 286, 287))                                       return fit[sum_356] + fit[sum_38] + fit[sum_381]                               + unfit_large[sum_46] + unfit_small[sum_46X];		// 伊勢型・扶桑型航戦
+	if (AnyOf(411, 412))                                               return fit[sum_356] + fit[sum_38] + fit[sum_381]         + fit[sum_41]         + unfit_large[sum_46] + unfit_small[sum_46X];		// 扶桑型航戦改二
+	if (AnyOf(78, 79, 85, 86, 209, 210, 211, 212, 149, 150, 151, 152)) return fit[sum_356] + fit[sum_38]                        + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];		// 金剛型改二
+	if (AnyOf(171, 172, 173, 178))                                     return fit[sum_356] + fit[sum_38] - unfit_small[sum_381] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];		// Bismarck型
+	if (AnyOf(441, 442, 446, 447))                                     return fit[sum_356]               + fit[sum_381]         + unfit_small[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];		// イタリア艦
+	if (AnyOf(80, 81, 275, 276))                                       return fit[sum_356]               + fit[sum_381]         + fit[sum_41]         + unfit_small[sum_46] + unfit_small[sum_46X];		// 長門型
+	if (AnyOf(131, 136, 143, 148))                                     return                                                     fit[sum_41];															// 大和型
+	return 0.0;
 }
 
 // 総雷装を返す
@@ -468,7 +419,7 @@ int Kammusu::AllTorpedo(const bool &level_flg) const noexcept {
 
 // 軽巡軽量砲補正
 double Kammusu::FitGunAttackPlus() const noexcept {
-	if (Is(ShipClass::CL | ShipClass::CLT | ShipClass::CP)) {
+	if (AnyOf(ShipClass::CL | ShipClass::CLT | ShipClass::CP)) {
 		int light_gun_single = 0, light_gun_double = 0;
 		for (auto &it_w : weapons_) {
 			if (it_w.AnyOf(L"14cm単装砲"s, L"15.2cm単装砲"s))
@@ -750,22 +701,7 @@ bool Kammusu::HasAirAttack() const noexcept {
 
 // 潜水艦系ならtrue
 bool Kammusu::IsSubmarine() const noexcept {
-	return Is(ShipClass::SS | ShipClass::SSV);
-}
-
-// 名前に特定の文字が含まれていればtrue
-bool Kammusu::Include(const wstring &wstr) const noexcept {
-	return (name_.find(wstr) != wstring::npos);
-}
-
-bool Kammusu::Include(const wchar_t* wstr) const noexcept
-{
-	return (name_.find(wstr) != wstring::npos);
-}
-
-bool Kammusu::IncludeAnyOf(std::initializer_list<const wchar_t*> strings) const
-{
-	return std::any_of(strings.begin(), strings.end(), [this](const wchar_t* const s) { return this->Include(s); });
+	return AnyOf(ShipClass::SS | ShipClass::SSV);
 }
 
 // 対潜シナジーを持っていたらtrue
@@ -788,7 +724,7 @@ bool Kammusu::HasAntiSubSynergy() const noexcept {
 
 // 徹甲弾補正を食らう側ならtrue
 bool Kammusu::IsSpecialEffectAP() const noexcept {
-	return Is(ShipClass::CA | ShipClass::CAV | ShipClass::BB | ShipClass::BBV | ShipClass::CV | ShipClass::AF | ShipClass::ACV);
+	return AnyOf(ShipClass::CA | ShipClass::CAV | ShipClass::BB | ShipClass::BBV | ShipClass::CV | ShipClass::AF | ShipClass::ACV);
 }
 
 // 彩雲を保有していた場合はtrue
@@ -824,10 +760,10 @@ bool Kammusu::IsFireTorpedo(const TorpedoTurn &torpedo_turn) const noexcept {
 		}
 		else {
 			// elite以上の潜水艦なら開幕魚雷を撃てる(ただし潜水棲姫は除く。なんでや！)
-			if (IsSubmarine() && IncludeAnyOf({ L"elite", L"flagship" })) return true;
+			if (IsSubmarine() && AnyOf(L"潜水カ級elite"s, L"潜水ヨ級elite"s, L"潜水カ級flagship"s, L"潜水ヨ級flagship"s, L"潜水ソ級elite"s, L"潜水ソ級flagship"s)) return true;
 			// エリレ級と水母棲姫と駆逐水鬼(甲作戦最終形態,艦船ID=649)と
 			// 重巡棲姫(最終形態,艦船ID=660,662,664)は無条件で撃てる
-			if (id_ == 562 || name_ == L"水母棲姫" || id_ == 649 || id_ == 660 || id_ == 662 || id_ == 664) return true;
+			if (AnyOf(562, L"水母棲姫"s, 649, 660, 662, 664)) return true;
 		}
 		return false;
 		break;
@@ -837,7 +773,7 @@ bool Kammusu::IsFireTorpedo(const TorpedoTurn &torpedo_turn) const noexcept {
 		// 素雷装が0なら不可
 		if (torpedo_ == 0) return false;
 		// 秋津洲および未改造の千歳型は不可
-		if (Include(L"秋津洲") || id_ == 102 || id_ == 103) return false;
+		if (AnyOf(L"秋津洲"s, L"秋津洲改"s, 102, 103)) return false;
 		return true;
 		break;
 	default:
@@ -852,7 +788,7 @@ bool Kammusu::IsMoveGun() const noexcept {
 	// 潜水艦系も砲撃フェイズでは行動できない
 	if (IsSubmarine()) return false;
 	// 艦載機が切れた空母も砲撃フェイズでは行動できない
-	if (Is(ShipClass::CVL | ShipClass::CV | ShipClass::ACV))
+	if (AnyOf(ShipClass::CVL | ShipClass::CV | ShipClass::ACV))
 		return HasAirAttack();
 	return true;
 }
@@ -865,9 +801,9 @@ bool Kammusu::IsFireGun() const noexcept {
 	if (IsSubmarine()) return false;
 	// 艦載機が切れた空母も砲撃フェイズでは攻撃できない
 	// また、中破した空母系・大破した装甲空母も攻撃できない
-	if (Is(ShipClass::CVL | ShipClass::CV | ShipClass::AF))
+	if (AnyOf(ShipClass::CVL | ShipClass::CV | ShipClass::AF))
 		return (HasAirAttack() && Status() != kStatusMiddleDamage);
-	if (Is(ShipClass::ACV))
+	if (AnyOf(ShipClass::ACV))
 		return (HasAirAttack() && Status() != kStatusHeavyDamage);
 	return true;
 }
@@ -875,16 +811,16 @@ bool Kammusu::IsFireGun() const noexcept {
 // 昼戦で対潜可能な艦ならtrue
 bool Kammusu::IsAntiSubDay() const noexcept {
 		// 空母型対潜攻撃
-	if (Is(ShipClass::CVL | ShipClass::AF))
+	if (AnyOf(ShipClass::CVL | ShipClass::AF))
 		return IsAntiSubDayPlane();
 		// 航戦型対潜攻撃
-	if (Is(ShipClass::BBV | ShipClass::AV | ShipClass::CAV))
+	if (AnyOf(ShipClass::BBV | ShipClass::AV | ShipClass::CAV))
 		return IsAntiSubDayWater();
 		// 水雷型対潜攻撃
-	if (Is(ShipClass::CL | ShipClass::CLT | ShipClass::DD | ShipClass::CP))
+	if (AnyOf(ShipClass::CL | ShipClass::CLT | ShipClass::DD | ShipClass::CP))
 		return anti_sub_ > 0;
 		// 上記3種類が合わさった速吸改は頭おかしい(褒め言葉)
-	if (Is(ShipClass::AO))
+	if (AnyOf(ShipClass::AO))
 		return (IsAntiSubDayPlane() || IsAntiSubDayWater() || (anti_sub_ > 0));
 	return false;
 }
@@ -907,14 +843,14 @@ bool Kammusu::IsFireNight() const noexcept {
 	// 大破していたら攻撃不可
 	if (Status() >= kStatusHeavyDamage) return false;
 	// 空母系は一部を覗いて攻撃不可
-	if (Is(ShipClass::CV | ShipClass::CVL | ShipClass::ACV)) {
+	if (AnyOf(ShipClass::CV | ShipClass::CVL | ShipClass::ACV)) {
 		if (kammusu_flg_) {
-			if (name_ == L"Graf") return true;
+			if (AnyOf(L"Graf Zeppelin改"s, L"Graf Zeppelin"s)) return true;
 			return false;
 		}
 		else {
-			if (Include(L"flagship")) return true;
-			if (IncludeAnyOf({ L"ヲ", L"ヌ" })) return false;
+			if (AnyOf(L"空母ヲ級flagship"s, L"軽母ヌ級flagship"s, L"空母ヲ級改flagship"s)) return true;
+			if (AnyOf(L"軽母ヌ級"s, L"空母ヲ級"s, L"軽母ヌ級elite"s, L"空母ヲ級elite"s)) return false;
 			return true;
 		}
 	}
@@ -924,7 +860,7 @@ bool Kammusu::IsFireNight() const noexcept {
 
 // 夜戦で対潜可能な艦ならtrue
 bool Kammusu::IsAntiSubNight() const noexcept {
-	if (Is(ShipClass::CL | ShipClass::CLT | ShipClass::DD | ShipClass::CP | ShipClass::AO)) {
+	if (AnyOf(ShipClass::CL | ShipClass::CLT | ShipClass::DD | ShipClass::CP | ShipClass::AO)) {
 		return anti_sub_ > 0;
 	}
 	return false;

@@ -448,7 +448,7 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 		const bool has_bb = [] (const vector<Fleet>& fleet) -> bool {
 			for (auto &it_b : fleet) {
 				for (auto &it_k : it_b.FirstUnit()) {
-					if (it_k.Is(ShipClass::BB | ShipClass::BBV | ShipClass::AF))
+					if (it_k.AnyOf(ShipClass::BB | ShipClass::BBV | ShipClass::AF))
 						return true;
 				}
 			}
@@ -507,7 +507,7 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 			auto &target_kammusu = fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i];
 			auto fire_type = JudgeDayFireType(bi, friend_index, enemy_index);
 			// 攻撃の種類によって、基本攻撃力および倍率を算出する
-			auto base_attack = hunter_kammusu.DayAttack(fire_type, target_kammusu.Is(ShipClass::AF), fleet_[bi].GetFleetType(), friend_index.fleet_no);
+			auto base_attack = hunter_kammusu.DayAttack(fire_type, target_kammusu.AnyOf(ShipClass::AF), fleet_[bi].GetFleetType(), friend_index.fleet_no);
 			bool special_attack_flg = false;
 			bool double_flg = false;
 			auto multiple = 1.0;
@@ -587,7 +587,7 @@ void Simulator::NightPhase() {
 			auto fire_type = JudgeNightFireType(bi, enemy_index);
 			// 攻撃の種類によって、基本攻撃力および倍率を算出する
 			// 夜戦速吸は対潜を常に爆雷で行う
-			auto base_attack = hunter_kammusu.NightAttack(fire_type, target_kammusu.Is(ShipClass::AF));
+			auto base_attack = hunter_kammusu.NightAttack(fire_type, target_kammusu.AnyOf(ShipClass::AF));
 			bool special_attack_flg = false;
 			bool double_flg = false;
 			auto multiple = 1.0;
@@ -596,7 +596,7 @@ void Simulator::NightPhase() {
 				// 砲撃時にのみ適用される
 				if (fire_type != kNightFireGun) return;
 				// 発動可能な弾着の種類を判断する
-				auto special_attack = JudgeNightSpecialAttack(bi, friend_index, target_kammusu.Is(ShipClass::AF));
+				auto special_attack = JudgeNightSpecialAttack(bi, friend_index, target_kammusu.AnyOf(ShipClass::AF));
 				if (std::get<1>(special_attack) == 1.0) return;
 				// 弾着観測射撃による補正
 				double_flg = std::get<0>(special_attack);
@@ -685,7 +685,7 @@ int Simulator::CalcDamage(
 		&& battle_phase != kBattlePhaseNight) return 0;		//砲撃戦および夜戦以外ではそもそも対潜攻撃を行わない
 	// 三式弾・WG42による対地上施設特効
 	double damage = base_attack;
-	if (target_kammusu.Is(ShipClass::AF)) {
+	if (target_kammusu.AnyOf(ShipClass::AF)) {
 		bool has_aaa = false;
 		auto wg_count = 0;
 		for (auto &it_w : hunter_kammusu.GetWeapon()) {
@@ -849,7 +849,7 @@ void Simulator::ProtectOracle(const size_t defense_side, KammusuIndex &defense_i
 	// 旗艦ではない場合、かばいは発生しない
 	if (defense_index.fleet_i != 0) return;
 	// 陸上型をかばう艦などいない
-	if (fleet_[defense_side].GetUnit()[defense_index.fleet_no][0].Is(ShipClass::AF)) return;
+	if (fleet_[defense_side].GetUnit()[defense_index.fleet_no][0].AnyOf(ShipClass::AF)) return;
 	// 水上艦は水上艦、潜水艦は潜水艦しかかばえないのでリストを作成する
 	auto &attendants = fleet_[defense_side].GetUnit()[defense_index.fleet_no];
 	auto is_submarine = attendants[0].IsSubmarine();
@@ -1017,8 +1017,8 @@ DayFireType Simulator::JudgeDayFireType(const size_t turn_player, const KammusuI
 	if (fleet_[other_side].GetUnit()[defense_index.fleet_no][defense_index.fleet_i].IsSubmarine()) return kDayFireChage;
 	// 自身が空母系統なら空撃
 	auto &hunter_kammusu = fleet_[turn_player].GetUnit()[attack_index.fleet_no][attack_index.fleet_i];
-	if (hunter_kammusu.Is(ShipClass::CV | ShipClass::ACV | ShipClass::CVL)) return kDayFireAir;
-	if(hunter_kammusu.Is(ShipClass::AO) && hunter_kammusu.IsFireGunPlane()) return kDayFireAir;
+	if (hunter_kammusu.AnyOf(ShipClass::CV | ShipClass::ACV | ShipClass::CVL)) return kDayFireAir;
+	if(hunter_kammusu.AnyOf(ShipClass::AO) && hunter_kammusu.IsFireGunPlane()) return kDayFireAir;
 	// それ以外は全て砲撃
 	return kDayFireGun;
 }
