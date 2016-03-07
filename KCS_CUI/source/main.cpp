@@ -7,8 +7,10 @@
 #include "result.hpp"
 #include "simulator.hpp"
 #include "random.hpp"
+#include "mapdata.hpp"
 #include <cassert>
 #include <omp.h>//omp_get_thread_num()
+
 int main(int argc, char *argv[]) {
 	try {
 		// 現在の設定を取得する
@@ -53,9 +55,19 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		else if (ext == "map") {	//マップモード
-			MapData map_Data(config.GetInputFilename(kEnemySide), weapon_db, kammusu_db);
+			// ファイルから艦隊とマップを読み込む
 			Fleet my_fleet(config.GetInputFilename(kFriendSide), config.GetFormation(i), weapon_db, kammusu_db);
+			MapData map_Data(config.GetInputFilename(kEnemySide), weapon_db, kammusu_db);
+			my_fleet.Put();
+			map_Data.Put();
+			// Simulatorを構築し、並列演算を行う
+			auto seed = make_SharedRand().make_unique_rand_array<unsigned int>(config.CalcSeedArrSize());
+			#pragma omp parallel for num_threads(static_cast<int>(config.GetThreads()))
+			for (int n = 0; n < static_cast<int>(config.GetTimes()); ++n) {
 
+			}
+			const auto process_end_time = std::chrono::high_resolution_clock::now();
+			cout << "処理時間：" << std::chrono::duration_cast<std::chrono::milliseconds>(process_end_time - process_begin_time).count() << "[ms]\n" << endl;
 		}
 	}
 	catch (const KCS_except::successful_termination&) {
