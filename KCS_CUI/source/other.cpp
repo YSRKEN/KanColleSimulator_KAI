@@ -3,6 +3,7 @@
 #include "fleet.hpp"
 #include "result.hpp"
 #include "char_convert.hpp"
+#include <cctype>
 #include <algorithm>
 enum class CsvParseLevel : std::size_t { kLevel1 = 0, kLevel99 = 1 };
 namespace detail {
@@ -405,10 +406,6 @@ string GetExtension(const string &path) {
 	// 切り取る
 	auto ext = path.substr(dot_pos + 1, path.find_last_not_of(' ') - dot_pos);
 	// 拡張子を小文字化する
-	auto itr = ext.begin();
-	while (itr != ext.end()) {
-		*itr = tolower(*itr);
-		itr++;
-	}
+	for (auto& c : ext) c = std::tolower(c);
 	return ext;
 }
