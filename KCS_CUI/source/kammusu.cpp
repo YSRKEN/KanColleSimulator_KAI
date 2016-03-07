@@ -430,65 +430,24 @@ double Kammusu::FitGunHitPlus() const noexcept {
 			break;
 		}
 	}
-	// 種類により減衰量を決定する
-	switch (id_) {
-	case 26:
-	case 27:
-	case 77:
-	case 87:
-		// 伊勢・扶桑型戦艦
+	// 種類により減衰量を決定する	
+	for (const auto i : { 26, 27, 77, 87 }) if (i == id_) // 伊勢・扶桑型戦艦
 		return fit[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];
-	case 82:
-	case 88:
-	case 286:
-	case 287:
-		// 伊勢型・扶桑型航戦
+	for (const auto i : { 82, 88, 286, 287 }) if (i == id_) // 伊勢型・扶桑型航戦
 		return fit[sum_356] + fit[sum_38] + fit[sum_381] + unfit_large[sum_46] + unfit_small[sum_46X];
-	case 411:
-	case 412:
-		// 扶桑型航戦改二
+	for (const auto i : { 411, 412 }) if (i == id_) // 扶桑型航戦改二
 		return fit[sum_356] + fit[sum_38] + fit[sum_381] + fit[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];
-	case 78:
-	case 79:
-	case 85:
-	case 86:
-	case 209:
-	case 210:
-	case 211:
-	case 212:
-	case 149:
-	case 150:
-	case 151:
-	case 152:
-		// 金剛型改二
+	for (const auto i : { 78, 79, 85, 86, 209, 210, 211, 212, 149, 150, 151, 152 }) if (i == id_) // 金剛型改二
 		return fit[sum_356] + fit[sum_38] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];
-	case 171:
-	case 172:
-	case 173:
-	case 178:
-		// Bismarck型
-		return fit[sum_356] + fit[sum_38] - unfit_small[sum_381]  + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];
-	case 441:
-	case 442:
-	case 446:
-	case 447:
-		// イタリア艦
+	for (const auto i : { 171, 172, 173, 178 }) if (i == id_) // Bismarck型
+		return fit[sum_356] + fit[sum_38] - unfit_small[sum_381] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];
+	for (const auto i : { 441, 442, 446, 447 }) if (i == id_) // イタリア艦
 		return fit[sum_356] + fit[sum_381] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];
-	case 80:
-	case 81:
-	case 275:
-	case 276:
-		// 長門型
+	for (const auto i : { 80, 81, 275, 276 }) if (i == id_) // 長門型
 		return fit[sum_356] + fit[sum_381] + fit[sum_41] + unfit_small[sum_46] + unfit_small[sum_46X];
-	case 131:
-	case 136:
-	case 143:
-	case 148:
-		// 大和型
+	for (const auto i : { 131, 136, 143, 148 }) if (i == id_) // 大和型
 		return fit[sum_41];
-	default:
-		return 0.0;
-	}
+	return 0.0;
 }
 
 // 総雷装を返す
