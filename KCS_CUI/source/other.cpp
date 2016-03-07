@@ -400,25 +400,15 @@ void ResultStat::Put(const vector<Fleet> &fleet, const string &file_name, const 
 // 参考：http://qiita.com/selflash/items/d6bdd0fcb677f4f8ca24
 string GetExtension(const string &path) {
 	// ドットの位置を検出する
-	auto dot_pos = path.rfind('.');
+	auto dot_pos = path.find_last_of('.');
 	if (dot_pos == string::npos) return "";
 	// 切り取る
-	auto ext = path.substr(dot_pos + 1, path.size() - dot_pos);
+	auto ext = path.substr(dot_pos + 1, path.find_last_not_of(' ') - dot_pos);
 	// 拡張子を小文字化する
 	auto itr = ext.begin();
 	while (itr != ext.end()) {
 		*itr = tolower(*itr);
 		itr++;
-	}
-	// ファイル名の末尾に\0やスペースがあった際は削除する
-	itr = ext.end() - 1;
-	while (itr != ext.begin()) {
-		if (*itr == '\0' || *itr == ' '){
-			ext.erase(itr--);
-		}
-		else {
-			itr--;
-		}
 	}
 	return ext;
 }
