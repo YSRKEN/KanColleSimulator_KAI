@@ -31,7 +31,8 @@
 // (The 30th bit is set.)
 using std::uint32_t;
 namespace intrin {
-	constexpr uint32_t RDRAND_MASK = 0x40000000;
+	constexpr uint32_t RDRAND_MASK = 1U << 30U;
+	constexpr uint32_t RDSEED_MASK = 1U << 18U;
 
 	typedef struct { uint32_t EAX, EBX, ECX, EDX; } regs_t;
 	regs_t get_cpuid(unsigned int level) {
@@ -46,17 +47,25 @@ namespace intrin {
 	}
 	bool IsIntelCPU() {
 		const auto id = get_cpuid(0);
-		uint32_t vender[4] = { id.EAX, id.ECX, id.EBX , 0 };
-		return (0 == std::strcmp(reinterpret_cast<char*>(vender), "GenuineIntel"));
+		union {
+			uint32_t u32[4];
+			char u8[16];
+		} vender = { id.EBX, id.EDX, id.ECX , 0 };
+		return (0 == std::strcmp(vender.u8, "GenuineIntel"));
 	}
 	bool IsRDRANDsupport() {
 		if (!IsIntelCPU()) return false;
 		const auto reg = get_cpuid(1);
 		return (RDRAND_MASK == (reg.ECX & RDRAND_MASK));
 	}
+	bool IsRDSEEDsupport() {
+		if (!IsIntelCPU()) return false;
+		const auto reg = get_cpuid(7);//If RDSEED is supported, the bit 18 of the EBX register is set after calling CPUID standard function 07H.
+		return (RDSEED_MASK == (reg.EBX & RDSEED_MASK));
+	}
 }
 #endif//!defined(_MSC_VER) || !defined(__clang__)
-using seed_v_t = std::vector<std::uint_least32_t>;
+using seed_v_t = std::vector<unsigned int>;
 seed_v_t create_seed_v() {
 	const auto begin_time = std::chrono::high_resolution_clock::now();
 	std::random_device rnd;// ランダムデバイス
@@ -64,7 +73,7 @@ seed_v_t create_seed_v() {
 	std::generate(sed_v.begin(), sed_v.end(), std::ref(rnd));// ベクタの初期化
 #if !defined(_MSC_VER) || !defined(__clang__)
 	if (intrin::IsRDRANDsupport()) {//RDRAND命令の結果もベクターに追加
-		for (std::size_t i = 0; i < 4; i++) {
+		for (unsigned int i = 0; i < 4; i++) {
 			unsigned int rdrand_value = 0;
 #	if defined(_MSC_VER) || defined(__INTEL_COMPILER)
 			_rdrand32_step(&rdrand_value);
@@ -72,7 +81,20 @@ seed_v_t create_seed_v() {
 			__builtin_ia32_rdrand32_step(&rdrand_value);
 #	endif//defined(_MSC_VER) || defined(__INTEL_COMPILER)
 			if (0 != rdrand_value) {
-				sed_v.push_back(rdrand_value & i);
+				sed_v.push_back((rdrand_value < std::numeric_limits<decltype(rdrand_value)>::max() - i) ? rdrand_value + i : rdrand_value);
+			}
+		}
+	}
+	if (intrin::IsRDSEEDsupport()) {
+		for (unsigned int i = 0; i < 5; i++) {
+			unsigned int rdseed_value = 0;
+#	if defined(_MSC_VER) || defined(__INTEL_COMPILER)
+			_rdseed32_step(&rdseed_value);
+#	else//defined(_MSC_VER) || defined(__INTEL_COMPILER)
+			__builtin_ia32_rdseed32_step(&rdrand_value);
+#	endif//defined(_MSC_VER) || defined(__INTEL_COMPILER)
+			if (0 != rdseed_value) {
+				sed_v.push_back((rdseed_value < std::numeric_limits<decltype(rdseed_value)>::max() - i) ? rdseed_value + i : rdseed_value);
 			}
 		}
 	}
@@ -96,7 +118,7 @@ seed_v_t create_seed_v() {
 	auto heap = std::make_unique<char>();
 	const auto address = reinterpret_cast<std::uint_least64_t>(heap.get());
 	sed_v.push_back(static_cast<std::uint_least32_t>(address));
-	sed_v.push_back(static_cast<std::uint_least32_t>(address >> 32));
+	if(sizeof(void*) > 4)sed_v.push_back(static_cast<std::uint_least32_t>(address >> 32));
 	const auto end_time = std::chrono::high_resolution_clock::now();
 	sed_v.push_back(static_cast<std::uint_least32_t>((end_time - begin_time).count()));
 	return sed_v;
