@@ -2,6 +2,7 @@
 #include "fleet.hpp"
 #include "utf8bomskip.hpp"
 #include <limits>
+using namespace std::string_literals;
 namespace detail {
 	template<typename T>
 	struct to_i_limit_helper {
@@ -87,7 +88,7 @@ void Fleet::LoadJson(std::istream & file, const WeaponDB & weapon_db, const Kamm
 				auto& parts = temp_p.second.get<object>();
 				Weapon temp_w = weapon_db.Get(parts.at("id").to_str() | to_i());
 				// 改修・外部熟練度・内部熟練度の処理
-				if (temp_w.Is(WeaponClass::Air)) {
+				if (temp_w.AnyOf(WeaponClass::Air)) {
 					level = parts.at("rf").to_str() | to_i_limit(0, 7);
 					int level_detail = 0;
 					auto it = parts.find("rf_detail");
@@ -278,7 +279,7 @@ int Fleet::AntiAirScore() const noexcept {
 	for (auto &it_k : FirstUnit()) {
 		if (it_k.Status() == kStatusLost) continue;
 		anti_air_score += it_k.SumWeapons([](const auto& it_w) {
-			return it_w.Is(WeaponClass::AirFight) ? it_w.AntiAirScore(it_w.GetAir()) : 0;
+			return it_w.AnyOf(WeaponClass::AirFight) ? it_w.AntiAirScore(it_w.GetAir()) : 0;
 		});
 	}
 	return anti_air_score;
@@ -291,7 +292,7 @@ double Fleet::TrailerAircraftProb(const AirWarStatus &air_war_status) const {
 	for (auto &it_k : FirstUnit()) {
 		if (it_k.Status() == kStatusLost) continue;
 		trailer_aircraft_prob += it_k.SumWeapons([](const auto& it_w) {
-			return it_w.Is(WeaponClass::PS | WeaponClass::PSS | WeaponClass::DaiteiChan | WeaponClass::WS | WeaponClass::WSN) ? 0.04 * it_w.GetSearch() * sqrt(it_w.GetAir()) : 0;
+			return it_w.AnyOf(WeaponClass::PS | WeaponClass::PSS | WeaponClass::DaiteiChan | WeaponClass::WS | WeaponClass::WSN) ? 0.04 * it_w.GetSearch() * sqrt(it_w.GetAir()) : 0;
 		});
 	}
 	// 制空段階によって補正を掛ける(航空優勢以外は試験実装)
@@ -320,7 +321,7 @@ double Fleet::TrailerAircraftPlus(){
 	for (auto &it_k :FirstUnit() ) {
 		if (it_k.Status() == kStatusLost) continue;
 		for (auto &it_w : it_k.GetWeapon()) {
-			if (!it_w.Is(WeaponClass::AirTrailer)) continue;
+			if (!it_w.AnyOf(WeaponClass::AirTrailer)) continue;
 			if (0.07 * it_w.GetSearch() >= rand_.RandReal()) {
 				return all_attack_plus_list[it_w.GetHit()];
 			}
@@ -362,7 +363,7 @@ int Fleet::AntiAirBonus() const {
 		for (auto &it_k : it_u) {
 			if (it_k.Status() == kStatusLost) continue;
 			double anti_air_bonus = it_k.SumWeapons([](const auto& it_w) {
-				auto scale = it_w.IsHAG() || it_w.Include(L"高射装置") ? 0.35 : it_w.Is(WeaponClass::SmallR | WeaponClass::LargeR) ? 0.4 : it_w.Is(WeaponClass::AAA) ? 0.6 : 0.2;
+				auto scale = it_w.IsHAG() || it_w.AnyOf(L"91式高射装置"s, L"94式高射装置"s) ? 0.35 : it_w.AnyOf(WeaponClass::SmallR | WeaponClass::LargeR) ? 0.4 : it_w.AnyOf(WeaponClass::AAA) ? 0.6 : 0.2;
 				return it_w.GetAntiAir() * scale;
 			});
 			fleets_anti_air_bonus += int(anti_air_bonus);
@@ -426,8 +427,8 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const T
 		for (size_t i = 0; i < alived_list_size; ++i) {
 			auto &it_k = GetUnit()[alived_list[i].fleet_no][alived_list[i].fleet_i];
 			for (auto &it_w : it_k.GetWeapon()) {
-				if (it_w.GetWeaponClass() != WeaponClass::SL) continue;
-				if (it_w.Include(L"96式")) {
+				if (!it_w.AnyOf(WeaponClass::SL)) continue;
+				if (it_w.AnyOf(L"96式150cm探照灯"s)) {
 					if (rand_.RandBool(0.3 + 0.01 * it_w.GetLevel())) large_sl_index = i;
 				}
 				else {
