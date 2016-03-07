@@ -345,8 +345,8 @@ void Simulator::AirWarPhase() {
 	cout << "残機：" << endl;
 	for (size_t i = 0; i < kBattleSize; ++i) {
 		for (auto &it_k : fleet_[i].FirstUnit()) {
-			for (size_t wi = 0; wi < it_k.GetSlots(); ++wi) {
-				cout << it_k.GetAir()[wi] << " ";
+			for (const auto& it_w : it_k.GetWeapon()) {
+				cout << it_w.GetAir() << " ";
 			}
 			cout << endl;
 		}
