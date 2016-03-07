@@ -270,10 +270,7 @@ double Kammusu::AacProb(const int &aac_type) const noexcept {
 	| 摩耶改二 | 僚艦 | 106      | 22         | 11   | 2号砲★9、90mm高★10、集中機銃、観測機>> | 103/204 | 50.5% |                 |
 	 */
 	// とりあえず装備対空を計算する
-	int weapon_anti_air = 0;
-	for (auto &it_w : weapons_) {
-		weapon_anti_air += it_w.GetAntiAir();
-	}
+	int weapon_anti_air = SumWeapons(&Weapon::GetAntiAir);
 	//とりあえず種別によって場合分け
 	switch (aac_type) {
 	case 1:
@@ -350,11 +347,7 @@ Status Kammusu::Status() const noexcept {
 
 // 総回避を返す
 int Kammusu::AllEvade() const noexcept {
-	int evade_sum = evade_;
-	for (auto &it_w : weapons_) {
-		evade_sum += it_w.GetEvade();
-	}
-	return evade_sum;
+	return evade_ + SumWeapons(&Weapon::GetEvade);
 }
 
 // 疲労度を返す
@@ -377,11 +370,7 @@ Mood Kammusu::Mood() const noexcept {
 
 // 総命中を返す
 int Kammusu::AllHit() const noexcept {
-	int hit_sum = 0;
-	for (auto &it_w : weapons_) {
-		hit_sum += it_w.GetHit();
-	}
-	return hit_sum;
+	return SumWeapons(&Weapon::GetHit);
 }
 
 // フィット砲補正
@@ -492,20 +481,9 @@ double Kammusu::FitGunHitPlus() const noexcept {
 // 総雷装を返す
 // (level_flgがtrueの場合、装備改修による威力向上も考慮する)
 int Kammusu::AllTorpedo(const bool &level_flg) const noexcept {
-	double torpedo_sum = torpedo_;
-	for (auto &it_w : weapons_) {
-		torpedo_sum += it_w.GetTorpedo();
-		if (level_flg) {
-			switch (it_w.GetWeaponClass()) {
-			case WeaponClass::Torpedo:
-			case WeaponClass::AAG:
-				torpedo_sum += 1.2 * sqrt(it_w.GetLevel());
-				break;
-			default:
-				break;
-			}
-		}
-	}
+	double torpedo_sum = torpedo_ + SumWeapons([=](const auto& it_w) {
+		return it_w.GetTorpedo() + level_flg && it_w.Is(WeaponClass::Torpedo | WeaponClass::AAG) ? 1.2 * sqrt(it_w.GetLevel()) : 0;
+	});
 	return int(torpedo_sum);
 }
 
@@ -566,12 +544,9 @@ double Kammusu::SpecialEffectApPlus() const noexcept {
 
 // 熟練艦載機によるCL2率上昇
 double Kammusu::CL2ProbPlus() const noexcept {
-	double cl_prob_plus = 0.0;
-	for (auto &it_w : weapons_) {
-		if (it_w.Is(WeaponClass::AirBomb))
-			cl_prob_plus += 0.05 * it_w.GetLevel() / 7;
-	}
-	return cl_prob_plus;
+	return SumWeapons([](const auto& it_w) {
+		return it_w.Is(WeaponClass::AirBomb) ? 0.05 * it_w.GetLevel() / 7 : 0;
+	});
 }
 
 // 熟練艦載機によるダメージ補正
@@ -587,11 +562,7 @@ double Kammusu::CL2AttackPlus() const noexcept {
 
 // 総装甲を返す
 int Kammusu::AllDefense() const noexcept {
-	int defense_sum = defense_;
-	for (auto &it_w : weapons_) {
-		defense_sum += it_w.GetDefense();
-	}
-	return defense_sum;
+	return defense_ + SumWeapons(&Weapon::GetDefense);
 }
 
 // 射程を返す
@@ -728,21 +699,12 @@ int Kammusu::NightAttack(const NightFireType fire_type, const bool af_flg) const
 		}
 		break;
 	case kNightFireChage:	//爆雷攻撃
-		int base_sub = anti_sub_;
-		for (auto &it_w : weapons_) {
-			switch (it_w.GetWeaponClass()) {
-			case WeaponClass::DP:
-			case WeaponClass::Sonar:
-				base_attack += it_w.GetAntiSub() * 1.5;
-				base_attack += sqrt(it_w.GetLevel());
-				break;
-			default:
-				// 夜戦での対潜は、航空対潜ではありえないので除外
-				// 小口径主砲・水上偵察機・小型電探の対潜値は無視していい
-				break;
-			}
-		}
-		base_attack += sqrt(base_sub) * 2 + 13;
+		base_attack += SumWeapons([](const auto& it_w) {
+			// 夜戦での対潜は、航空対潜ではありえないので除外
+			// 小口径主砲・水上偵察機・小型電探の対潜値は無視していい
+			return it_w.Is(WeaponClass::DP | WeaponClass::Sonar) ? it_w.GetAntiSub() * 1.5 + sqrt(it_w.GetLevel()) : 0;
+		});
+		base_attack += sqrt(anti_sub_) * 2 + 13;
 		break;
 	}
 	return int(base_attack);

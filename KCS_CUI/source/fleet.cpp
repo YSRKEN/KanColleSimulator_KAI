@@ -277,10 +277,9 @@ int Fleet::AntiAirScore() const noexcept {
 	int anti_air_score = 0;
 	for (auto &it_k : FirstUnit()) {
 		if (it_k.Status() == kStatusLost) continue;
-		for (const auto& it_w : it_k.GetWeapon()) {
-			if (!it_w.Is(WeaponClass::AirFight)) continue;
-			anti_air_score += it_w.AntiAirScore(it_w.GetAir());
-		}
+		anti_air_score += it_k.SumWeapons([](const auto& it_w) {
+			return it_w.Is(WeaponClass::AirFight) ? it_w.AntiAirScore(it_w.GetAir()) : 0;
+		});
 	}
 	return anti_air_score;
 }
@@ -291,10 +290,9 @@ double Fleet::TrailerAircraftProb(const AirWarStatus &air_war_status) const {
 	double trailer_aircraft_prob = 0.0;
 	for (auto &it_k : FirstUnit()) {
 		if (it_k.Status() == kStatusLost) continue;
-		for (const auto& it_w : it_k.GetWeapon()) {
-			if (it_w.Is(WeaponClass::PS | WeaponClass::PSS | WeaponClass::DaiteiChan | WeaponClass::WS | WeaponClass::WSN))
-				trailer_aircraft_prob += 0.04 * it_w.GetSearch() * sqrt(it_w.GetAir());
-		}
+		trailer_aircraft_prob += it_k.SumWeapons([](const auto& it_w) {
+			return it_w.Is(WeaponClass::PS | WeaponClass::PSS | WeaponClass::DaiteiChan | WeaponClass::WS | WeaponClass::WSN) ? 0.04 * it_w.GetSearch() * sqrt(it_w.GetAir()) : 0;
+		});
 	}
 	// 制空段階によって補正を掛ける(航空優勢以外は試験実装)
 	switch (air_war_status) {
@@ -363,21 +361,12 @@ int Fleet::AntiAirBonus() const {
 	for (auto &it_u : unit_) {
 		for (auto &it_k : it_u) {
 			if (it_k.Status() == kStatusLost) continue;
-			double anti_air_bonus = 0.0;
-			for (auto &it_w : it_k.GetWeapon()) {
-				if (it_w.IsHAG() || it_w.Include(L"高射装置")) {
-					anti_air_bonus += 0.35 * it_w.GetAntiAir();
-				}
-				else if (it_w.Is(WeaponClass::SmallR | WeaponClass::LargeR)) {
-					anti_air_bonus += 0.4 * it_w.GetAntiAir();
-				}
-				else if (it_w.Is(WeaponClass::AAA)) {
-					anti_air_bonus += 0.6 * it_w.GetAntiAir();
-				}
-				else {
-					anti_air_bonus += 0.2 * it_w.GetAntiAir();
-				}
-			}
+			double anti_air_bonus = it_k.SumWeapons([](const auto& it_w) {
+				return it_w.IsHAG() || it_w.Include(L"高射装置") ? 0.35 * it_w.GetAntiAir()
+					: it_w.Is(WeaponClass::SmallR | WeaponClass::LargeR) ? 0.4 * it_w.GetAntiAir()
+					: it_w.Is(WeaponClass::AAA) ? 0.6 * it_w.GetAntiAir()
+					: 0.2 * it_w.GetAntiAir();
+			});
 			fleets_anti_air_bonus += int(anti_air_bonus);
 		}
 	}
