@@ -277,9 +277,9 @@ int Fleet::AntiAirScore() const noexcept {
 	int anti_air_score = 0;
 	for (auto &it_k : FirstUnit()) {
 		if (it_k.Status() == kStatusLost) continue;
-		for (size_t wi = 0; wi < it_k.GetSlots(); ++wi) {
-			if (!it_k.GetWeapon()[wi].Is(WeaponClass::AirFight)) continue;
-			anti_air_score += it_k.GetWeapon()[wi].AntiAirScore(it_k.GetAir()[wi]);
+		for (const auto& it_w : it_k.GetWeapon()) {
+			if (!it_w.Is(WeaponClass::AirFight)) continue;
+			anti_air_score += it_w.AntiAirScore(it_w.GetAir());
 		}
 	}
 	return anti_air_score;
@@ -291,10 +291,9 @@ double Fleet::TrailerAircraftProb(const AirWarStatus &air_war_status) const {
 	double trailer_aircraft_prob = 0.0;
 	for (auto &it_k : FirstUnit()) {
 		if (it_k.Status() == kStatusLost) continue;
-		for (size_t wi = 0; wi < it_k.GetSlots(); ++wi) {
-			auto it_w = it_k.GetWeapon()[wi];
+		for (const auto& it_w : it_k.GetWeapon()) {
 			if (it_w.Is(WeaponClass::PS | WeaponClass::PSS | WeaponClass::DaiteiChan | WeaponClass::WS | WeaponClass::WSN))
-				trailer_aircraft_prob += 0.04 * it_w.GetSearch() * sqrt(it_k.GetAir()[wi]);
+				trailer_aircraft_prob += 0.04 * it_w.GetSearch() * sqrt(it_w.GetAir());
 		}
 	}
 	// 制空段階によって補正を掛ける(航空優勢以外は試験実装)

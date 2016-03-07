@@ -81,7 +81,6 @@ class Kammusu {
 	SharedRand rand_;
 	// 変更するもの
 	int hp_;					//現耐久
-	vector<int> airs_;			//現搭載数
 	vector<Weapon> weapons_;	//現装備
 	int cond_;					//cond値
 	int ammo_;					//残弾薬割合
@@ -120,8 +119,6 @@ public:
 	bool IsKammusu() const noexcept;
 	int GetLevel() const noexcept;
 	int GetHP() const noexcept;
-	vector<int>& GetAir() noexcept;
-	const vector<int>& GetAir() const noexcept;
 	vector<Weapon>& GetWeapon() noexcept;
 	const vector<Weapon>& GetWeapon() const noexcept;
 	int GetAmmo() const noexcept;
