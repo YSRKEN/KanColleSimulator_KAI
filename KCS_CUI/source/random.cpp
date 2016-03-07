@@ -53,13 +53,21 @@ namespace intrin {
 		} vender = { id.EBX, id.EDX, id.ECX , 0 };
 		return (0 == std::strcmp(vender.u8, "GenuineIntel"));
 	}
+	bool IsAMDCPU() {
+		const auto id = get_cpuid(0);
+		union {
+			uint32_t u32[4];
+			char u8[16];
+		} vender = { id.EBX, id.EDX, id.ECX , 0 };
+		return (0 == std::strcmp(vender.u8, "AuthenticAMD"));
+	}
 	bool IsRDRANDsupport() {
-		if (!IsIntelCPU()) return false;
+		if (!IsIntelCPU() && !IsAMDCPU()) return false;
 		const auto reg = get_cpuid(1);
 		return (RDRAND_MASK == (reg.ECX & RDRAND_MASK));
 	}
 	bool IsRDSEEDsupport() {
-		if (!IsIntelCPU()) return false;
+		if (!IsIntelCPU() && !IsAMDCPU()) return false;
 		const auto reg = get_cpuid(7);//If RDSEED is supported, the bit 18 of the EBX register is set after calling CPUID standard function 07H.
 		return (RDSEED_MASK == (reg.EBX & RDSEED_MASK));
 	}
