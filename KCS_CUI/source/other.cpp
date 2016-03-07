@@ -64,7 +64,11 @@ namespace detail {
 }
 detail::ToHash_helper ToHash() noexcept { return{}; }
 // 装備DBのコンストラクタ
-WeaponDB::WeaponDB(const char* csv_name) {
+WeaponDB::WeaponDB(const char* csv_name) 
+	:hash_({
+		{}
+})
+{
 	// ファイルを開く
 	std::locale::global(std::locale("japanese"));
 	ifstream ifs(csv_name);
@@ -92,10 +96,10 @@ WeaponDB::WeaponDB(const char* csv_name) {
 		auto level_detail = 0;
 		auto air          = 0;
 		
-		hash_[id] = Weapon(
-			id, name, weapon_class, defense, attack, torpedo, bomb, anti_air,
-			anti_sub, hit, evade, search, range, level, level_detail, air
-		);
+		//hash_[id] = Weapon(
+		//	id, name, weapon_class, defense, attack, torpedo, bomb, anti_air,
+		//	anti_sub, hit, evade, search, range, level, level_detail, air
+		//);
 	}
 	// ダミーデータを代入する
 	hash_[-1] = Weapon();

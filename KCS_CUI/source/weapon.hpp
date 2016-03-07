@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <iostream>
 #include <type_traits>
+#include <sprout/string.hpp>
 // 種別
 enum class WeaponClass : std::uint64_t {
 	Gun        = 0x0000000000000001,	//主砲
@@ -48,7 +49,7 @@ inline auto& operator<<(std::basic_ostream<E, T>& os, const WeaponClass& wc) { r
 //装備クラス
 class Weapon {
 	int id_;					//装備ID
-	wstring name_;				//装備名
+	weapon_str_t name_;
 	WeaponClass weapon_class_;	//種別
 	int defense_;				//装甲
 	int attack_;				//火力
@@ -66,12 +67,16 @@ class Weapon {
 public:
 	// コンストラクタ
 	Weapon() noexcept;
+	//Weapon(
+	//	const int, wstring, const WeaponClass, const int, const int, const int, const int,
+	//	const int, const int, const int, const int, const int, const Range, const int, const int, const int) noexcept;
 	Weapon(
-		const int, wstring, const WeaponClass, const int, const int, const int, const int,
-		const int, const int, const int, const int, const int, const Range, const int, const int, const int) noexcept;
+		const int id, const weapon_str_t& name, const WeaponClass weapon_class, const int defense,
+		const int attack, const int torpedo, const int bomb, const int anti_air, const int anti_sub,
+		const int hit, const int evade, const int search, const Range range, const int level, const int level_detail, const int air) noexcept;
 	// getter
 	int GetID() const noexcept;
-	const std::wstring& GetName() const noexcept;
+	const weapon_str_t& GetName() const noexcept;
 	WeaponClass GetWeaponClass() const noexcept;
 	int GetDefense() const noexcept;
 	int GetAttack() const noexcept;
@@ -95,7 +100,7 @@ public:
 	// 指定の種別か判定する
 	bool Is(const WeaponClass& wc) const noexcept { return (static_cast<std::underlying_type_t<WeaponClass>>(weapon_class_) & static_cast<std::underlying_type_t<WeaponClass>>(wc)) != 0; }
 	bool IsHAG() const noexcept;					//高角砲ならtrue
-	bool Include(const wstring&) const noexcept;	//名前に特定の文字が含まれていればtrue
+	bool Include(const weapon_str_t&) const noexcept;	//名前に特定の文字が含まれていればtrue
 	friend std::ostream& operator<<(std::ostream& os, const Weapon& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Weapon& conf);
 };

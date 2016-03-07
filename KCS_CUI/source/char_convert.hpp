@@ -14,6 +14,7 @@ Distributed under the Boost Software License, Version 1.0.
 #endif //NOMINMAX
 #include <windows.h>
 #include <cstring>
+#include <sprout/string.hpp>
 namespace char_cvt {
 	inline std::wstring shift_jis_to_utf_16(const std::string& str)
 	{
@@ -41,11 +42,11 @@ namespace char_cvt {
 		re.shrink_to_fit();
 		return re;
 	}
-	inline std::string utf_16_to_shift_jis(const std::wstring& str) {
+	inline std::string utf_16_to_shift_jis_cstr(const wchar_t* str) {
 		static_assert(sizeof(wchar_t) == 2, "this functon is windows only");
-		const int len = ::WideCharToMultiByte(CP_ACP, 0, str.c_str(), -1, nullptr, 0, nullptr, nullptr);
+		const int len = ::WideCharToMultiByte(CP_ACP, 0, str, -1, nullptr, 0, nullptr, nullptr);
 		std::string re(len * 2, '\0');
-		if (!::WideCharToMultiByte(CP_ACP, 0, str.c_str(), -1, &re[0], len, nullptr, nullptr)) {
+		if (!::WideCharToMultiByte(CP_ACP, 0, str, -1, &re[0], len, nullptr, nullptr)) {
 			const auto ec = ::GetLastError();
 			switch (ec)
 			{
@@ -63,6 +64,13 @@ namespace char_cvt {
 		re.resize(real_len);
 		re.shrink_to_fit();
 		return re;
+	}
+	template<std::size_t N>
+	inline std::string utf_16_to_shift_jis(const sprout::wstring<N>& str) {
+		return utf_16_to_shift_jis_cstr(str.c_str());
+	}
+	inline std::string utf_16_to_shift_jis(const std::wstring& str) {
+		return utf_16_to_shift_jis_cstr(str.c_str());
 	}
 }
 #endif

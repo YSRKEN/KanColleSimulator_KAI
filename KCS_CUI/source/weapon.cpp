@@ -3,17 +3,24 @@
 #include "char_convert.hpp"
 // コンストラクタ
 Weapon::Weapon() noexcept : Weapon(-1, {}, WeaponClass::Other, 0, 0, 0, 0, 0, 0, 0, 0, 0, kRangeNone, 0, 0, 0) {}
+//Weapon::Weapon(
+//	const int id, wstring name, const WeaponClass weapon_class, const int defense,
+//	const int attack, const int torpedo, const int bomb, const int anti_air, const int anti_sub,
+//	const int hit, const int evade, const int search, const Range range, const int level, const int level_detail, const int air) noexcept :
+//	id_(id), name_(move(name)), weapon_class_(weapon_class), defense_(defense), attack_(attack),
+//	torpedo_(torpedo), bomb_(bomb), anti_air_(anti_air), anti_sub_(anti_sub), hit_(hit),
+//	evade_(evade), search_(search), range_(range), level_(level), level_detail_(level_detail), air_(air) {}
 Weapon::Weapon(
-	const int id, wstring name, const WeaponClass weapon_class, const int defense,
+	const int id, const weapon_str_t& name, const WeaponClass weapon_class, const int defense,
 	const int attack, const int torpedo, const int bomb, const int anti_air, const int anti_sub,
 	const int hit, const int evade, const int search, const Range range, const int level, const int level_detail, const int air) noexcept :
-	id_(id), name_(move(name)), weapon_class_(weapon_class), defense_(defense), attack_(attack),
-	torpedo_(torpedo), bomb_(bomb), anti_air_(anti_air), anti_sub_(anti_sub), hit_(hit),
-	evade_(evade), search_(search), range_(range), level_(level), level_detail_(level_detail), air_(air) {}
+id_(id), name_(name), weapon_class_(weapon_class), defense_(defense), attack_(attack),
+torpedo_(torpedo), bomb_(bomb), anti_air_(anti_air), anti_sub_(anti_sub), hit_(hit),
+evade_(evade), search_(search), range_(range), level_(level), level_detail_(level_detail), air_(air) {}
 
 // getter
 int Weapon::GetID() const noexcept { return id_; }
-const std::wstring & Weapon::GetName() const noexcept { return name_; }
+const weapon_str_t & Weapon::GetName() const noexcept { return name_; }
 WeaponClass Weapon::GetWeaponClass() const noexcept { return weapon_class_; }
 int Weapon::GetDefense() const noexcept { return defense_; }
 int Weapon::GetAttack() const noexcept { return attack_; }
@@ -56,8 +63,8 @@ bool Weapon::IsHAG() const noexcept {
 }
 
 // 名前に特定の文字が含まれていればtrue
-bool Weapon::Include(const wstring &wstr) const noexcept {
-	return (name_.find(wstr) != wstring::npos);
+bool Weapon::Include(const weapon_str_t &wstr) const noexcept {
+	return (name_.find(wstr) != weapon_str_t::npos);
 }
 
 std::ostream & operator<<(std::ostream & os, const Weapon & conf)
@@ -125,6 +132,47 @@ WeaponClass ToWC(const string str) {
 		if (str == item.name)
 			return item.value;
 	return WeaponClass::Other;
+}
+namespace detail {
+	struct ToWC_helper {};
+	template<std::size_t N>
+	WeaponClass operator| (const wchar_t (&str)[N], ToWC_helper) {
+		static constexpr std::pair<weapon_str_t, WeaponClass> cvt[] = {//sorted by first string
+			{ L"その他", WeaponClass::Other },
+			{ L"オートジャイロ", WeaponClass::AJ },
+			{ L"ソナー", WeaponClass::Sonar },
+			{ L"主砲", WeaponClass::Gun },
+			{ L"副砲", WeaponClass::SubGun },
+			{ L"大型電探", WeaponClass::LargeR },
+			{ L"大型飛行艇", WeaponClass::DaiteiChan },
+			{ L"対潜哨戒機", WeaponClass::ASPP },
+			{ L"対空強化弾", WeaponClass::AAA },
+			{ L"対空機銃", WeaponClass::AAG },
+			{ L"対艦強化弾", WeaponClass::AP },
+			{ L"小型電探", WeaponClass::SmallR },
+			{ L"応急修理要員", WeaponClass::DC },
+			{ L"戦闘糧食", WeaponClass::CR },
+			{ L"探照灯", WeaponClass::SL },
+			{ L"水上偵察機", WeaponClass::WS },
+			{ L"水上偵察機(夜偵)", WeaponClass::WSN },
+			{ L"水上爆撃機", WeaponClass::WB },
+			{ L"水上艦要員", WeaponClass::SSP },
+			{ L"洋上補給", WeaponClass::OS },
+			{ L"照明弾", WeaponClass::LB },
+			{ L"爆雷", WeaponClass::DP },
+			{ L"特殊潜航艇", WeaponClass::SpecialSS },
+			{ L"艦上偵察機", WeaponClass::PS },
+			{ L"艦上偵察機(彩雲)", WeaponClass::PSS },
+			{ L"艦上戦闘機", WeaponClass::PF },
+			{ L"艦上攻撃機", WeaponClass::PA },
+			{ L"艦上爆撃機", WeaponClass::PB },
+			{ L"艦上爆撃機(爆戦)", WeaponClass::PBF },
+			{ L"艦隊司令部施設", WeaponClass::HQ },
+			{ L"高射装置", WeaponClass::AAD },
+			{ L"魚雷", WeaponClass::Torpedo },
+		};
+
+	}
 }
 
 // 外部熟練度(Simple)を内部熟練度(Detail)に変換する
