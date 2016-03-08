@@ -291,6 +291,7 @@
     <ClCompile Include="source\fleet.cpp" />
     <ClCompile Include="source\kammusu.cpp" />
     <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\mapdata.cpp" />
     <ClCompile Include="source\other.cpp" />
     <ClCompile Include="source\random.cpp" />
     <ClCompile Include="source\result.cpp" />
@@ -305,6 +306,7 @@
     <ClInclude Include="source\exception.hpp" />
     <ClInclude Include="source\fleet.hpp" />
     <ClInclude Include="source\kammusu.hpp" />
+    <ClInclude Include="source\mapdata.hpp" />
     <ClInclude Include="source\other.hpp" />
     <ClInclude Include="source\picojson.h" />
     <ClInclude Include="source\random.hpp" />

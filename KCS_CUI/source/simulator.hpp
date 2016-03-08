@@ -15,6 +15,7 @@ enum BattlePosition{ kBattlePositionSame, kBattlePositionReverse, kBattlePositio
 
 // 戦闘モード(昼戦＋夜戦、昼戦のみ、開幕夜戦)
 enum SimulateMode { kSimulateModeDN, kSimulateModeD, kSimulateModeN };
+const wstring kSimulateModeStr[] = {L"昼戦＋夜戦", L"昼戦のみ", L"開幕夜戦"};
 
 // 雷撃戦の巡目(開幕および雷撃戦)
 enum TorpedoTurn : std::uint8_t { kTorpedoFirst, kTorpedoSecond };

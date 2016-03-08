@@ -136,10 +136,10 @@ Fleet::Fleet(std::istream & file, const Formation & formation, const WeaponDB & 
 }
 
 // setter
-
 void Fleet::SetRandGenerator(const SharedRand & rand) {
 	this->rand_ = rand;
 }
+void Fleet::SetFormation(const Formation formation) { formation_ = formation; }
 
 // getter
 Formation Fleet::GetFormation() const noexcept { return formation_; }
@@ -507,6 +507,11 @@ bool Fleet::HasAirPss() const noexcept {
 // 探照灯や照明弾をいずれかの艦が保有していた場合はtrue
 bool Fleet::HasLights() const noexcept {
 	return any_of(this->unit_, [](const Kammusu& it_k) -> bool { return it_k.HasLights(); });
+}
+
+// 大破以上の艦が存在していた場合はtrue
+bool Fleet::HasHeavyDamage() const noexcept {
+	return any_of(this->unit_, [](const Kammusu& it_k) -> bool { return it_k.Status() >= kStatusHeavyDamage; });
 }
 
 std::ostream & operator<<(std::ostream & os, const Fleet & conf)

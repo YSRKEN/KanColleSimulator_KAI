@@ -406,6 +406,6 @@ string GetExtension(const string &path) {
 	// 切り取る
 	auto ext = path.substr(dot_pos + 1, path.find_last_not_of(' ') - dot_pos);
 	// 拡張子を小文字化する
-	for (auto& c : ext) c = std::tolower(c);
+	for (auto& c : ext) c = static_cast<char>(std::tolower(c));
 	return ext;
 }
