@@ -508,6 +508,11 @@ bool Fleet::HasLights() const noexcept {
 	return any_of(this->unit_, [](const Kammusu& it_k) -> bool { return it_k.HasLights(); });
 }
 
+// 大破以上の艦が存在していた場合はtrue
+bool Fleet::HasHeavyDamage() const noexcept {
+	return any_of(this->unit_, [](const Kammusu& it_k) -> bool { return it_k.Status() >= kStatusHeavyDamage; });
+}
+
 std::ostream & operator<<(std::ostream & os, const Fleet & conf)
 {
 	os << "陣形：" << char_cvt::utf_16_to_shift_jis(kFormationStr[conf.formation_]) << "　司令部レベル：" << conf.level_ << "　形式：" << char_cvt::utf_16_to_shift_jis(kFleetTypeStr[int(conf.fleet_type_) - 1]) << endl;

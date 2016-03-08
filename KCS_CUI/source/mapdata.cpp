@@ -45,7 +45,7 @@ size_t MapData::GetSize() const noexcept { return fleet_.size(); }
 Fleet MapData::GetFleet(const size_t p) const noexcept {
 	return fleet_[p][0];	//‰¼’u‚«
 }
-
+SimulateMode MapData::GetSimulateMode(const size_t p) const noexcept { return simulate_mode_[p]; }
 
 //“à—e‚ð•\Ž¦‚·‚é
 void MapData::Put() {

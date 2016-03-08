@@ -1,17 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommandArguments>-i "sample\3-5.json" "sample\3-5 high.map" -f 0 0 -n 1 -t 1 -o output.json &gt; log.txt</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-i "sample\3-5.json" "sample\3-5 high.map" -f 0 0 -n 10000 -t 1 -o output.json &gt; log.txt</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>$(ProjectDir)..\</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LocalDebuggerCommandArguments>-i "sample\sample3.json" "sample\sample1.json" -f 0 0 -n 100000 -t 4 -o output.json &gt; log.txt</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-i "sample\3-5.json" "sample\3-5 high.map" -f 0 0 -n 100000 -t 4 -o output.json &gt; log.txt</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>$(ProjectDir)..\</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release(OpenMP)|Win32'">
-    <LocalDebuggerCommandArguments>-i "sample\sample3.json" "sample\sample1.json" -f 0 0 -n 100000 -t 4 -o output.json &gt; log.txt</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-i "sample\3-5.json" "sample\3-5 high.map" -f 0 0 -n 100000 -t 4 -o output.json &gt; log.txt</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>$(ProjectDir)..\</LocalDebuggerWorkingDirectory>
   </PropertyGroup>

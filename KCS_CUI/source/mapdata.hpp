@@ -11,6 +11,7 @@ public:
 	// getter
 	size_t GetSize() const noexcept;
 	Fleet GetFleet(const size_t) const noexcept;
+	SimulateMode GetSimulateMode(const size_t) const noexcept;
 	// ‚»‚Ì‘¼
 	void Put();	//“à—e‚ð•\Ž¦‚·‚é
 };
