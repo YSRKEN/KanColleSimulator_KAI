@@ -8,24 +8,26 @@ MapData::MapData(const string &file_name, const WeaponDB &weapon_db, const Kammu
 	ifstream fin(file_name);
 	FILE_THROW_WITH_MESSAGE_IF(!fin.is_open(), "マップデータが正常に読み込めませんでした.")
 	using picojson::object;
-	picojson::value v;
+	using picojson::array;
+	using picojson::value;
+	value v;
 	fin >> v;
 	// 読み込んだJSONデータを解析する
 	auto& o = v.get<object>();
-	for (auto &it : o) {
-		if (it.first == "version") continue;
-		point_name_.push_back(it.first);
-		auto &o2 = it.second.get<picojson::object>();
-		simulate_mode_.push_back(SimulateMode(stoi(o2.at("mode").to_str())) | limit(kSimulateModeDN, kSimulateModeN));
-		auto &o3 = o2.at("pattern").get<picojson::array>();
+	auto &o2 = o.at("position").get<array>();
+	for (auto &it : o2) {
+		auto &o3 = it.get<object>();
+		point_name_.push_back(o3.at("name").to_str());
+		simulate_mode_.push_back(SimulateMode(stoi(o3.at("mode").to_str())) | limit(kSimulateModeDN, kSimulateModeN));
+		auto &o4 = o3.at("pattern").get<array>();
 		vector<Fleet> pattern;
-		for (auto &it2 : o3) {
+		for (auto &it2 : o4) {
 			Fleet temp;
-			auto &o4 = it2.get<picojson::object>();
-			auto formation_ = Formation(stoi(o4.at("form").to_str())) | limit(kFormationTrail, kFormationAbreast);
+			auto &o5 = it2.get<object>();
+			auto formation_ = Formation(stoi(o5.at("form").to_str())) | limit(kFormationTrail, kFormationAbreast);
 			temp.SetFormation(formation_);
-			auto &o5 = o4.at("fleets").get<picojson::array>();
-			for (auto &it3 : o5) {
+			auto &o6 = o5.at("fleets").get<picojson::array>();
+			for (auto &it3 : o6) {
 				auto id = stoi(it3.to_str());
 				auto kammusu = kammusu_db.Get(id, 1).Reset(weapon_db);
 				temp.GetUnit().resize(1);
