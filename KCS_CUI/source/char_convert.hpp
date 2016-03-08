@@ -14,6 +14,8 @@ Distributed under the Boost Software License, Version 1.0.
 #endif //NOMINMAX
 #include <windows.h>
 #include <cstring>
+//sproutとのconflict防止で必要だったが、sproutのf0ba8fad5d86aa82c1e49ce7fa027ac05004609cで修正された。
+//ただ、こういうマクロが生き残ってほしくないのでundefする
 #undef lst1
 #undef lst2
 #include <sprout/string.hpp>
