@@ -1,5 +1,5 @@
-﻿#ifndef KCS_KAI_WEAPON_H_
-#define KCS_KAI_WEAPON_H_
+﻿#ifndef KCS_KAI_INC_WEAPON_HPP_
+#define KCS_KAI_INC_WEAPON_HPP_
 
 #include <cstdint>
 #include <iostream>
@@ -113,4 +113,4 @@ int ConvertStoD(const int&);
 // 内部熟練度を外部熟練度に変換する
 int ConvertDtoS(const int&);
 
-#endif KCS_KAI_WEAPON_H_
+#endif //KCS_KAI_INC_WEAPON_HPP_

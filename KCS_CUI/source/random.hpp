@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef KCS_KAI_INC_RANDOM_HPP_
+#define KCS_KAI_INC_RANDOM_HPP_
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
@@ -226,3 +227,4 @@ public:
 
 };
 SharedRand make_SharedRand();
+#endif //KCS_KAI_INC_RANDOM_HPP_
