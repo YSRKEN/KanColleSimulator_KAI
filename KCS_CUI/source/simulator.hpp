@@ -74,4 +74,4 @@ public:
 	tuple<Result, vector<Fleet>> Calc();
 };
 
-#endif KCS_KAI_SIMULATOR_H_
+#endif //KCS_KAI_SIMULATOR_H_

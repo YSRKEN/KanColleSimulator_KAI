@@ -56,12 +56,13 @@ int main(int argc, char *argv[]) {
 		}
 		else if (ext == "map") {	//マップモード
 			// ファイルから艦隊とマップを読み込む
-			Fleet my_fleet(config.GetInputFilename(kFriendSide), config.GetFormation(i), weapon_db, kammusu_db);
+			Fleet my_fleet(config.GetInputFilename(kFriendSide), config.GetFormation(kFriendSide), weapon_db, kammusu_db);
 			MapData map_Data(config.GetInputFilename(kEnemySide), weapon_db, kammusu_db);
 			my_fleet.Put();
 			map_Data.Put();
 			// Simulatorを構築し、並列演算を行う
 			auto seed = make_SharedRand().make_unique_rand_array<unsigned int>(config.CalcSeedArrSize());
+			const auto process_begin_time = std::chrono::high_resolution_clock::now();
 			#pragma omp parallel for num_threads(static_cast<int>(config.GetThreads()))
 			for (int n = 0; n < static_cast<int>(config.GetTimes()); ++n) {
 

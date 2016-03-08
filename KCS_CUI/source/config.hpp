@@ -38,4 +38,4 @@ public:
 std::ostream& operator<<(std::ostream& os, const Config& conf);
 std::wostream& operator<<(std::wostream& os, const Config& conf);
 
-#endif KCS_KAI_CONFIG_H_
+#endif //KCS_KAI_CONFIG_H_

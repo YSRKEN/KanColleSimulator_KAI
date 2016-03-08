@@ -211,4 +211,4 @@ namespace detail {
 }
 constexpr detail::ToSpeed_helper ToSpeed() { return{}; }
 
-#endif KCS_KAI_KAMMUSU_H_
+#endif //KCS_KAI_KAMMUSU_H_

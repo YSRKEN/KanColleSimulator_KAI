@@ -113,4 +113,4 @@ int ConvertStoD(const int&);
 // 内部熟練度を外部熟練度に変換する
 int ConvertDtoS(const int&);
 
-#endif KCS_KAI_WEAPON_H_
+#endif //KCS_KAI_WEAPON_H_

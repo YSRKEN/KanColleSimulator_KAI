@@ -45,4 +45,4 @@ public:
 	WinReason JudgeWinReason() const noexcept;
 };
 
-#endif KCS_KAI_RESULT_H_
+#endif //KCS_KAI_RESULT_H_
