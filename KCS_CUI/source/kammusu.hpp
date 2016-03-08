@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef KCS_KAI_INC_KAMMUSU_HPP_
+#define KCS_KAI_INC_KAMMUSU_HPP_
 
 #include "weapon.hpp"
 #include <iostream>
@@ -209,3 +210,5 @@ namespace detail {
 	}
 }
 constexpr detail::ToSpeed_helper ToSpeed() { return{}; }
+
+#endif //KCS_KAI_INC_KAMMUSU_HPP_

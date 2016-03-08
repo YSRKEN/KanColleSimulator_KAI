@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef KCS_KAI_INC_BASE_HPP_
+#define KCS_KAI_INC_BASE_HPP_
 
 #include <algorithm>
 #include <array>
@@ -96,3 +97,5 @@ inline detail::to_i_helper<size_t> to_sz() noexcept { return{}; }
 
 template<typename T>
 inline constexpr detail::limit_helper<T> limit(const T &val_min, const T &val_max) noexcept { return{ val_min, val_max }; }
+
+#endif //KCS_KAI_INC_BASE_HPP_

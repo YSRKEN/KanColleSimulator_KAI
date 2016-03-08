@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿#ifndef KCS_KAI_INC_WEAPON_HPP_
+#define KCS_KAI_INC_WEAPON_HPP_
+
 #include <cstdint>
 #include <iostream>
 #include <type_traits>
@@ -175,3 +177,4 @@ namespace detail {
 	}
 }
 constexpr detail::ToWC_helper ToWC() { return{}; }
+#endif //KCS_KAI_INC_WEAPON_HPP_
