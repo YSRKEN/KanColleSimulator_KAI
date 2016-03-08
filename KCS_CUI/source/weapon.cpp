@@ -1,32 +1,6 @@
 ﻿#include "base.hpp"
 #include "weapon.hpp"
 #include "char_convert.hpp"
-// コンストラクタ
-Weapon::Weapon() noexcept : Weapon(-1, {}, WeaponClass::Other, 0, 0, 0, 0, 0, 0, 0, 0, 0, kRangeNone, 0, 0, 0) {}
-Weapon::Weapon(
-	const int id, wstring name, const WeaponClass weapon_class, const int defense,
-	const int attack, const int torpedo, const int bomb, const int anti_air, const int anti_sub,
-	const int hit, const int evade, const int search, const Range range, const int level, const int level_detail, const int air) noexcept :
-	id_(id), name_(move(name)), weapon_class_(weapon_class), defense_(defense), attack_(attack),
-	torpedo_(torpedo), bomb_(bomb), anti_air_(anti_air), anti_sub_(anti_sub), hit_(hit),
-	evade_(evade), search_(search), range_(range), level_(level), level_detail_(level_detail), air_(air) {}
-
-// getter
-int Weapon::GetID() const noexcept { return id_; }
-const std::wstring & Weapon::GetName() const noexcept { return name_; }
-WeaponClass Weapon::GetWeaponClass() const noexcept { return weapon_class_; }
-int Weapon::GetDefense() const noexcept { return defense_; }
-int Weapon::GetAttack() const noexcept { return attack_; }
-int Weapon::GetTorpedo() const noexcept { return torpedo_; }
-int Weapon::GetBomb() const noexcept { return bomb_; }
-int Weapon::GetAntiAir() const noexcept { return anti_air_; }
-int Weapon::GetAntiSub() const noexcept { return anti_sub_; }
-int Weapon::GetHit() const noexcept { return hit_; }
-int Weapon::GetEvade() const noexcept { return evade_; }
-int Weapon::GetSearch() const noexcept { return search_; }
-Range Weapon::GetRange() const noexcept { return range_; }
-int Weapon::GetLevel() const noexcept { return level_; }
-int Weapon::GetAir() const noexcept { return air_; }
 // setter
 void Weapon::SetLevel(const int level) { level_ = level; }
 void Weapon::SetLevelDetail(const int level_detail) { level_detail_ = level_detail; }
@@ -37,27 +11,14 @@ void Weapon::Put() const {
 	cout << *this;
 }
 
-//制空値を計算する
-int Weapon::AntiAirScore(const int &airs) const noexcept {
-	static const double kBonusPF[] = { 0,0,2,5,9,14,14,22 }, kBonusWB[] = { 0,0,1,1,1,3,3,6 };
-	double anti_air_score = anti_air_ * sqrt(airs) + sqrt(1.0 * level_detail_ / 10);
-	if (weapon_class_ == WeaponClass::PF) {
-		anti_air_score += kBonusPF[level_];
-	}
-	else if (weapon_class_ == WeaponClass::WB) {
-		anti_air_score += kBonusWB[level_];
-	}
-	return int(anti_air_score);
-}
-
 // 高角砲ならtrue
 bool Weapon::IsHAG() const noexcept {
 	return Include(L"高角砲");
 }
 
 // 名前に特定の文字が含まれていればtrue
-bool Weapon::Include(const wstring &wstr) const noexcept {
-	return (name_.find(wstr) != wstring::npos);
+bool Weapon::Include(const weapon_str_t &wstr) const noexcept {
+	return (name_.find(wstr) != weapon_str_t::npos);
 }
 
 std::ostream & operator<<(std::ostream & os, const Weapon & conf)

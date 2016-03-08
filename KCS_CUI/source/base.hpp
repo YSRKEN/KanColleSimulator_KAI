@@ -19,6 +19,7 @@
 #include <type_traits>
 #include "exception.hpp"
 #include "arithmetic_convert.hpp"
+#include <sprout/string.hpp>
 #pragma warning( disable : 4592)
 
 using std::cout;
@@ -44,6 +45,8 @@ constexpr size_t kMaxUnitSize = 6;		//艦隊に含まれる最大艦数
 constexpr int kFriendSide = 0;
 constexpr size_t kEnemySide = 1;	//味方および敵陣営の番号付け
 
+constexpr size_t weapon_str_capacity = 40;
+using weapon_str_t = sprout::wstring<weapon_str_capacity>;
 enum class WeaponClass : std::uint64_t;
 
 struct KammusuIndex {

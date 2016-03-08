@@ -11,11 +11,12 @@
 #include <omp.h>//omp_get_thread_num()
 int main(int argc, char *argv[]) {
 	try {
+		std::locale::global(std::locale("japanese"));
 		// 現在の設定を取得する
 		Config config(argc, argv);
 		config.Put();
 		// データベースを読み込む
-		WeaponDB weapon_db("slotitems.csv");
+		WeaponDB weapon_db{};
 		KammusuDB kammusu_db("ships.csv");
 		// ファイル拡張子により、処理内容を分岐させる
 		auto ext = GetExtension(config.GetInputFilename(kEnemySide));
