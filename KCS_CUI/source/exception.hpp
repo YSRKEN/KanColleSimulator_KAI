@@ -1,4 +1,5 @@
-#pragma once
+#ifndef KCS_KAI_INC_EXCEPTION_HPP_
+#define KCS_KAI_INC_EXCEPTION_HPP_
 #include <iostream>
 #include <stdexcept>
 #include <cstdint>
@@ -63,3 +64,4 @@ namespace KCS_except {
 	};
 
 }
+#endif //KCS_KAI_INC_EXCEPTION_HPP_
