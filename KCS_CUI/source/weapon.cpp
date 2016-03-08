@@ -1,6 +1,7 @@
 ﻿#include "base.hpp"
 #include "weapon.hpp"
 #include "char_convert.hpp"
+using namespace std::string_literals;
 // コンストラクタ
 Weapon::Weapon() noexcept : Weapon(-1, {}, WeaponClass::Other, 0, 0, 0, 0, 0, 0, 0, 0, 0, kRangeNone, 0, 0, 0) {}
 Weapon::Weapon(
@@ -41,10 +42,10 @@ void Weapon::Put() const {
 int Weapon::AntiAirScore(const int &airs) const noexcept {
 	static const double kBonusPF[] = { 0,0,2,5,9,14,14,22 }, kBonusWB[] = { 0,0,1,1,1,3,3,6 };
 	double anti_air_score = anti_air_ * sqrt(airs) + sqrt(1.0 * level_detail_ / 10);
-	if (weapon_class_ == WeaponClass::PF) {
+	if (AnyOf(WeaponClass::PF)) {
 		anti_air_score += kBonusPF[level_];
 	}
-	else if (weapon_class_ == WeaponClass::WB) {
+	else if (AnyOf(WeaponClass::WB)) {
 		anti_air_score += kBonusWB[level_];
 	}
 	return int(anti_air_score);
@@ -52,12 +53,7 @@ int Weapon::AntiAirScore(const int &airs) const noexcept {
 
 // 高角砲ならtrue
 bool Weapon::IsHAG() const noexcept {
-	return Include(L"高角砲");
-}
-
-// 名前に特定の文字が含まれていればtrue
-bool Weapon::Include(const wstring &wstr) const noexcept {
-	return (name_.find(wstr) != wstring::npos);
+	return AnyOf(L"10cm連装高角砲"s, L"12.7cm連装高角砲"s, L"12.7cm単装高角砲"s, L"8cm高角砲"s, L"10cm連装高角砲(砲架)"s, L"12.7cm連装高角砲(後期型)"s, L"10cm連装高角砲+高射装置"s, L"12.7cm高角砲+高射装置"s, L"90mm単装高角砲"s, L"3inch単装高角砲"s);
 }
 
 std::ostream & operator<<(std::ostream & os, const Weapon & conf)
