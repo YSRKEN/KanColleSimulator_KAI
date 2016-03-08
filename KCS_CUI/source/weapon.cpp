@@ -11,19 +11,6 @@ void Weapon::Put() const {
 	cout << *this;
 }
 
-//制空値を計算する
-int Weapon::AntiAirScore(const int &airs) const noexcept {
-	static const double kBonusPF[] = { 0,0,2,5,9,14,14,22 }, kBonusWB[] = { 0,0,1,1,1,3,3,6 };
-	double anti_air_score = anti_air_ * sqrt(airs) + sqrt(1.0 * level_detail_ / 10);
-	if (weapon_class_ == WeaponClass::PF) {
-		anti_air_score += kBonusPF[level_];
-	}
-	else if (weapon_class_ == WeaponClass::WB) {
-		anti_air_score += kBonusWB[level_];
-	}
-	return int(anti_air_score);
-}
-
 // 高角砲ならtrue
 bool Weapon::IsHAG() const noexcept {
 	return Include(L"高角砲");

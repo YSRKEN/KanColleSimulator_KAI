@@ -6,6 +6,8 @@
 #include <type_traits>
 #include <sprout/string.hpp>
 #include <sprout/algorithm.hpp>
+#include <sprout/math.hpp>
+#include <array>
 // 種別
 enum class WeaponClass : std::uint64_t {
 	Gun        = 0x0000000000000001,	//主砲
@@ -48,7 +50,18 @@ enum class WeaponClass : std::uint64_t {
 constexpr inline auto operator|(const WeaponClass& l, const WeaponClass& r) { return static_cast<WeaponClass>(static_cast<std::underlying_type_t<WeaponClass>>(l) | static_cast<std::underlying_type_t<WeaponClass>>(r)); }
 template<class E, class T>
 inline auto& operator<<(std::basic_ostream<E, T>& os, const WeaponClass& wc) { return os << static_cast<std::underlying_type_t<WeaponClass>>(wc); }
-
+namespace detail {
+	constexpr inline double AntiAirScore_impl(
+		double anti_air_score_base, WeaponClass weapon_class, int level,
+		const std::array<double, 8>& kBonusPF, const std::array<double, 8>& kBonusWB
+	) noexcept {
+		return (weapon_class == WeaponClass::PF)
+			? anti_air_score_base + kBonusPF[level]
+			: (weapon_class == WeaponClass::WB)
+				? anti_air_score_base + kBonusWB[level]
+				: anti_air_score_base;
+	}
+}
 //装備クラス
 class Weapon {
 	int id_;					//装備ID
@@ -101,7 +114,13 @@ public:
 	void SetAir(const int air);
 	// その他
 	void Put() const;					//中身を表示する
-	int AntiAirScore(const int&) const noexcept;	//制空値を計算する
+	constexpr int AntiAirScore(const int airs) const noexcept {	//制空値を計算する
+		return static_cast<int>(detail::AntiAirScore_impl(
+			this->anti_air_ * sprout::sqrt(airs) + sprout::sqrt(1.0 * level_detail_ / 10),
+			this->weapon_class_, this->level_, 
+			{ { 0,0,2,5,9,14,14,22 } }, { { 0,0,1,1,1,3,3,6 } }
+		));
+	}
 	// 指定の種別か判定する
 	bool Is(const WeaponClass& wc) const noexcept { return (static_cast<std::underlying_type_t<WeaponClass>>(weapon_class_) & static_cast<std::underlying_type_t<WeaponClass>>(wc)) != 0; }
 	bool IsHAG() const noexcept;					//高角砲ならtrue
