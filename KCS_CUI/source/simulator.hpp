@@ -22,6 +22,15 @@ enum TorpedoTurn : std::uint8_t { kTorpedoFirst, kTorpedoSecond };
 // 砲撃戦の巡目(1巡目および2巡目)
 enum FireTurn { kFireFirst , kFireSecond };
 
+// 戦闘状態Tupleのインデックス
+enum { condition, magnification };
+
+// 戦闘艦娘Tupleのインデックス
+enum { is_alive=0, is_attackable=0 , selected };
+
+
+
+// 戦闘可能
 class Fleet;
 #include "result.hpp"
 #include "random.hpp"

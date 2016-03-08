@@ -70,7 +70,7 @@ tuple<Result, vector<Fleet>> Simulator::Calc() {
 		if (IsBattleTerminate()) goto SimulatorCalcExit;
 #ifdef _DEBUG
 		cout << "制空状態・自艦隊倍率・敵艦隊倍率：\n";
-		cout << std::get<0>(air_war_result_) << " " << std::get<1>(air_war_result_)[0] << " " << std::get<1>(air_war_result_)[1] << "\n" << endl;
+		cout << std::get<condition>(air_war_result_) << " " << std::get<magnification>(air_war_result_)[0] << " " << std::get<magnification>(air_war_result_)[1] << "\n" << endl;
 #endif
 
 		// 交戦形態の決定
@@ -247,8 +247,8 @@ void Simulator::AirWarPhase() {
 			for (auto& it_w : it_k.GetWeapon()) {
 				if (!it_w.AnyOf(WeaponClass::AirFight)) continue;
 				auto intercept_index = fleet_[i].RandomKammusu();
-				if (!std::get<0>(intercept_index)) continue;
-				Kammusu &intercept_kammusu = fleet_[i].FirstUnit()[std::get<1>(intercept_index)];	//迎撃艦
+				if (!std::get<is_alive>(intercept_index)) continue;
+				Kammusu &intercept_kammusu = fleet_[i].FirstUnit()[std::get<selected>(intercept_index)];	//迎撃艦
 				auto all_anti_air = intercept_kammusu.AllAntiAir();								//加重対空値
 				int killed_airs = 0;
 				//固定撃墜
@@ -300,12 +300,12 @@ void Simulator::AirWarPhase() {
 			if (hunter_kammusu.Status() == kStatusLost) continue;
 			// 敵に攻撃できない場合は次の艦娘にバトンタッチ
 			auto has_attacker = fleet_[other_side].RandomKammusuNonSS(false, kTargetTypeAll);
-			if (!std::get<0>(has_attacker)) continue;
+			if (!std::get<is_attackable>(has_attacker)) continue;
 			// そうでない場合は、各スロットに対して攻撃対象を選択する
 			for (const auto& it_w : hunter_kammusu.GetWeapon()) {
 				if (it_w.GetAir() == 0 || !it_w.AnyOf(WeaponClass::AirBomb)) continue;
 				// 爆撃する対象を決定する(各スロット毎に、ランダムに対象を選択しなければならない)
-				auto target = std::get<1>(fleet_[other_side].RandomKammusuNonSS(false, kTargetTypeAll));
+				auto target = std::get<selected>(fleet_[other_side].RandomKammusuNonSS(false, kTargetTypeAll));
 				// 基礎攻撃力を算出する
 				int base_attack;
 				switch (it_w.GetWeaponClass()) {
@@ -405,12 +405,12 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 			if (hunter_kammusu.Status() == kStatusLost) continue;
 			// 敵に攻撃できない場合は次の艦娘にバトンタッチ
 			auto target = fleet_[other_side].RandomKammusuNonSS(true, kTargetTypeSecond);
-			if(!std::get<0>(target)) continue;
+			if(!std::get<is_attackable>(target)) continue;
 			// 基礎攻撃力を算出する
 			int base_attack = hunter_kammusu.AllTorpedo(true);
 			if(fleet_[bi].FleetSize() == 1) base_attack += 5;
 			// 与えるダメージを計算する
-			KammusuIndex enemy_index = std::get<1>(target);
+			KammusuIndex enemy_index = std::get<selected>(target);
 			auto damage = CalcDamage((torpedo_turn == kTorpedoFirst ? kBattlePhaseFirstTorpedo : kBattlePhaseTorpedo), bi, KammusuIndex{ fleet_[bi].SecondIndex(), ui }, enemy_index, base_attack, false, 1.0);
 			result_.AddDamage(bi, fleet_[bi].SecondIndex(), ui, damage);
 			all_damage[other_side][enemy_index.fleet_i] += damage;
@@ -498,12 +498,12 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 			if (hunter_kammusu.IsAntiSubDay()) {
 				target = fleet_[other_side].RandomKammusuSS(fleet_index);
 			}
-			if (!std::get<0>(target)) {
+			if (!std::get<is_attackable>(target)) {
 				target = fleet_[other_side].RandomKammusuNonSS(hunter_kammusu.HasAirBomb(), TargetType(fleet_index));
 			}
-			if (!std::get<0>(target)) continue;
+			if (!std::get<is_attackable>(target)) continue;
 			// 攻撃対象の種類によって、攻撃の種類を選ぶ
-			auto &enemy_index = std::get<1>(target);
+			auto &enemy_index = std::get<selected>(target);
 			auto &target_kammusu = fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i];
 			auto fire_type = JudgeDayFireType(bi, friend_index, enemy_index);
 			// 攻撃の種類によって、基本攻撃力および倍率を算出する
@@ -518,15 +518,15 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 				// 索敵に成功していないとダメな上、大破状態でも使えない
 				if (!search_result_[bi] || hunter_kammusu.Status() >= kStatusHeavyDamage) return;
 				// 航空優勢以上でないと使えない
-				if (bi == kFriendSide && std::get<0>(air_war_result_) > kAirWarStatusGood) return;
-				if (bi == other_side  && std::get<0>(air_war_result_) < kAirWarStatusBad)  return;
+				if (bi == kFriendSide && std::get<condition>(air_war_result_) > kAirWarStatusGood) return;
+				if (bi == other_side  && std::get<condition>(air_war_result_) < kAirWarStatusBad)  return;
 				// 発動可能な弾着の種類を判断する
 				auto special_attack = JudgeDaySpecialAttack(bi, friend_index);
-				if (std::get<1>(special_attack) == 1.0) return;
+				if (std::get<condition>(special_attack) == 1.0) return;
 				// 弾着観測射撃による補正
-				double_flg = std::get<0>(special_attack);
+				double_flg = std::get<condition>(special_attack);
 				special_attack_flg = true;
-				multiple = std::get<1>(special_attack);
+				multiple = std::get<magnification>(special_attack);
 			}();
 			// 与えるダメージを計算し、処理を行う
 #ifdef _DEBUG
@@ -577,12 +577,12 @@ void Simulator::NightPhase() {
 			if (hunter_kammusu.IsAntiSubNight()) {
 				target = fleet_[other_side].RandomKammusuSS(1);
 			}
-			if (!std::get<0>(target)) {
+			if (!std::get<is_attackable>(target)) {
 				target = fleet_[other_side].RandomKammusuNonSS(hunter_kammusu.HasAirBomb(), kTargetTypeSecond, true);
 			}
-			if (!std::get<0>(target)) continue;
+			if (!std::get<is_attackable>(target)) continue;
 			// 攻撃対象の種類によって、攻撃の種類を選ぶ
-			auto &enemy_index = std::get<1>(target);
+			auto &enemy_index = std::get<selected>(target);
 			auto &target_kammusu = fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i];
 			auto fire_type = JudgeNightFireType(bi, enemy_index);
 			// 攻撃の種類によって、基本攻撃力および倍率を算出する
@@ -597,11 +597,11 @@ void Simulator::NightPhase() {
 				if (fire_type != kNightFireGun) return;
 				// 発動可能な弾着の種類を判断する
 				auto special_attack = JudgeNightSpecialAttack(bi, friend_index, target_kammusu.AnyOf(ShipClass::AF));
-				if (std::get<1>(special_attack) == 1.0) return;
+				if (std::get<condition>(special_attack) == 1.0) return;
 				// 弾着観測射撃による補正
-				double_flg = std::get<0>(special_attack);
+				double_flg = std::get<condition>(special_attack);
 				special_attack_flg = true;
-				multiple = std::get<1>(special_attack);
+				multiple = std::get<magnification>(special_attack);
 			}();
 			// 与えるダメージを計算し、処理を行う
 #ifdef _DEBUG
@@ -841,7 +841,7 @@ int Simulator::CalcDamage(
 int Simulator::CalcDamage(
 	const BattlePhase &battle_phase, const size_t turn_player, const KammusuIndex &friend_index, KammusuIndex &enemy_index,
 	const int &base_attack, const bool &is_special_attack, const double &multiple) {
-	return CalcDamage(battle_phase, turn_player, friend_index, enemy_index, base_attack, std::get<1>(air_war_result_), battle_position_, is_special_attack, multiple);
+	return CalcDamage(battle_phase, turn_player, friend_index, enemy_index, base_attack, std::get<magnification>(air_war_result_), battle_position_, is_special_attack, multiple);
 	}
 
 // 「かばい」を確率的に発生させる
@@ -1070,7 +1070,7 @@ tuple<bool, double> Simulator::JudgeDaySpecialAttack(const size_t turn_player, c
 		oracle += (double_flg ? 0.2 : 0.0);
 		oracle += 0.06 * fleet_[turn_player].SearchValue();
 		oracle += (attack_index.fleet_i == 0 ? 0.1 : 0.0);
-		oracle += (std::get<0>(air_war_result_) == kAirWarStatusBest ? 0.1 : 0.0);
+		oracle += (std::get<condition>(air_war_result_) == kAirWarStatusBest ? 0.1 : 0.0);
 		oracle = oracle | limit(0.0, 0.99);
 		if (rand.RandBool(oracle)) {
 			vector<int> roulette;
