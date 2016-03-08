@@ -64,13 +64,16 @@ int main(int argc, char *argv[]) {
 			auto seed = make_SharedRand().make_unique_rand_array<unsigned int>(config.CalcSeedArrSize());
 			const auto process_begin_time = std::chrono::high_resolution_clock::now();
 			vector<Result> result_db;
+			vector<size_t> point_count(map_Data.GetSize(), 0);
 			//#pragma omp parallel for num_threads(static_cast<int>(config.GetThreads()))
 			for (int n = 0; n < static_cast<int>(config.GetTimes()); ++n) {
+				map_Data.SetRand(seed[config.CalcSeedVNo(n)]);
 				// 自艦隊をセットする
 				vector<Fleet> fleet(kBattleSize);
 				fleet[kFriendSide] = my_fleet;
 				// マップを進ませる
 				for (size_t p = 0; p < map_Data.GetSize(); ++p) {
+					++point_count[p];
 					// 敵艦隊をセットする
 					fleet[kEnemySide] = map_Data.GetFleet(p);
 					// 敵艦隊の形態、および戦闘モードにより自艦隊の陣形を変更する
@@ -90,16 +93,27 @@ int main(int argc, char *argv[]) {
 					std::tie(result_, fleet_) = simulator.Calc();
 					// 結果を元の配列に書き戻す
 					fleet[kFriendSide] = fleet_[kFriendSide];
-					// 大破していたら撤退する
-					if (fleet[kFriendSide].HasHeavyDamage()) break;
-					// ボスマスなら結果を記録する
-					if(p == map_Data.GetSize() - 1) result_db.push_back(result_);
+					if (p != map_Data.GetSize() - 1) {
+						// 大破していたら撤退する
+						if (fleet[kFriendSide].HasHeavyDamage()) break;
+					}else{
+						// ボスマスなら結果を記録する
+						result_db.push_back(result_);
+					}
 				}
 			}
 			const auto process_end_time = std::chrono::high_resolution_clock::now();
 			cout << "処理時間：" << std::chrono::duration_cast<std::chrono::milliseconds>(process_end_time - process_begin_time).count() << "[ms]\n" << endl;
 			// 集計を行う
-			cout << "ボスマス到達率：" << (100.0 * result_db.size() / config.GetTimes()) << "％\n" << endl;
+			for (size_t p = 0; p < map_Data.GetSize(); ++p) {
+				wcout << map_Data.GetPointName(p) << L"マス到達率：" << (100.0 * point_count[p] / config.GetTimes()) << L"％" << endl;
+				if (p != map_Data.GetSize() - 1) {
+					cout << "道中撤退率：" << (100.0 * (point_count[p] - point_count[p + 1]) / point_count[p]) << "％\n" << endl;
+				}
+				else {
+					cout << "\nボスマスにおける統計：" << endl;
+				}
+			}
 			vector<Fleet> fleet(kBattleSize);
 			fleet[kFriendSide] = my_fleet;
 			fleet[kEnemySide] = map_Data.GetFleet(map_Data.GetSize() - 1);
