@@ -30,6 +30,7 @@ public:
 	Fleet(std::istream &file, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, const SharedRand& rand = {}, char_cvt::char_enc fileenc = char_cvt::char_enc::utf8);
 	// setter
 	void SetRandGenerator(const SharedRand& rand);
+	void SetFormation(const Formation);
 	// getter
 	Formation GetFormation() const noexcept;
 	vector<vector<Kammusu>>& GetUnit();

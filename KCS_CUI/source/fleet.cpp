@@ -135,10 +135,10 @@ Fleet::Fleet(std::istream & file, const Formation & formation, const WeaponDB & 
 }
 
 // setter
-
 void Fleet::SetRandGenerator(const SharedRand & rand) {
 	this->rand_ = rand;
 }
+void Fleet::SetFormation(const Formation formation) { formation_ = formation; }
 
 // getter
 Formation Fleet::GetFormation() const noexcept { return formation_; }
