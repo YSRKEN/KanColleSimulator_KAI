@@ -6,7 +6,8 @@
 #include <type_traits>
 #include <sprout/string.hpp>
 #include <sprout/algorithm.hpp>
-#include <sprout/math.hpp>
+#include <sprout/math.hpp>//Link error
+//#include <sprout/math/sqrt.hpp>
 #include <array>
 // 種別
 enum class WeaponClass : std::uint64_t {
@@ -189,12 +190,16 @@ namespace detail {
 	constexpr WeaponClass convert_or_default(iterator it, iterator end, weapon_str_t val, WeaponClass default_, Compare comp) {
 		return (it != end && comp(val, it->str)) ? it->wc : default_;
 	}
-	template<std::size_t N>
-	constexpr WeaponClass operator| (const wchar_t(&str)[N], ToWC_helper) {
+	template<typename Compare>
+	constexpr WeaponClass ToWC_operator_impl(weapon_str_t str, std::array<WeaponClass_cvt_t, 32> cvt, Compare comp) {
 		return convert_or_default(
-			sprout::lower_bound(ToWC_cvt::cvt.begin(), ToWC_cvt::cvt.end(), weapon_str_t(str), sprout::less<>()),
-			ToWC_cvt::cvt.end(), weapon_str_t(str), WeaponClass::Other, sprout::less<>()
+			sprout::lower_bound(cvt.begin(), cvt.end(), str, comp),
+			cvt.end(), str, WeaponClass::Other, comp
 		);
+	}
+	template<std::size_t N, std::enable_if_t<!(weapon_str_capacity< N), std::nullptr_t> = nullptr>
+	constexpr WeaponClass operator| (const wchar_t(&str)[N], ToWC_helper) {
+		return ToWC_operator_impl(weapon_str_t(str), ToWC_cvt::cvt, sprout::less<>());
 	}
 }
 constexpr detail::ToWC_helper ToWC() { return{}; }
