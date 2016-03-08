@@ -99,7 +99,7 @@ WinReason Result::JudgeWinReason() const noexcept {
 		if (result_per[kFriendSide] > result_per[kEnemySide] * 2.5) {
 			return WinReason::B;
 		}
-		else return (result_per[kFriendSide] >= result_per[kEnemySide] || result_per[kFriendSide] >= 0.5 ? WinReason::C : WinReason::D);
+		else return (result_per[kFriendSide] > result_per[kEnemySide] || result_per[kFriendSide] >= 0.5 ? WinReason::C : WinReason::D);
 	} else {
 		// 自艦隊に撃沈艦が存在する場合
 		// 　敵旗艦を沈めた場合
