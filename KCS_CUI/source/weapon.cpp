@@ -1,7 +1,6 @@
 ﻿#include "base.hpp"
 #include "weapon.hpp"
 #include "char_convert.hpp"
-#include <sprout/algorithm.hpp>
 // コンストラクタ
 Weapon::Weapon() noexcept : Weapon(-1, {}, WeaponClass::Other, 0, 0, 0, 0, 0, 0, 0, 0, 0, kRangeNone, 0, 0, 0) {}
 //Weapon::Weapon(
@@ -134,63 +133,6 @@ WeaponClass ToWC(const string str) {
 			return item.value;
 	return WeaponClass::Other;
 }
-namespace detail {
-	struct WeaponClass_cvt_t {
-		weapon_str_t str;
-		WeaponClass wc;
-	};
-	struct ToWC_helper {
-		static constexpr std::array<WeaponClass_cvt_t, 32> cvt = { {//sorted by first string
-			{ L"その他", WeaponClass::Other },
-			{ L"オートジャイロ", WeaponClass::AJ },
-			{ L"ソナー", WeaponClass::Sonar },
-			{ L"主砲", WeaponClass::Gun },
-			{ L"副砲", WeaponClass::SubGun },
-			{ L"大型電探", WeaponClass::LargeR },
-			{ L"大型飛行艇", WeaponClass::DaiteiChan },
-			{ L"対潜哨戒機", WeaponClass::ASPP },
-			{ L"対空強化弾", WeaponClass::AAA },
-			{ L"対空機銃", WeaponClass::AAG },
-			{ L"対艦強化弾", WeaponClass::AP },
-			{ L"小型電探", WeaponClass::SmallR },
-			{ L"応急修理要員", WeaponClass::DC },
-			{ L"戦闘糧食", WeaponClass::CR },
-			{ L"探照灯", WeaponClass::SL },
-			{ L"水上偵察機", WeaponClass::WS },
-			{ L"水上偵察機(夜偵)", WeaponClass::WSN },
-			{ L"水上爆撃機", WeaponClass::WB },
-			{ L"水上艦要員", WeaponClass::SSP },
-			{ L"洋上補給", WeaponClass::OS },
-			{ L"照明弾", WeaponClass::LB },
-			{ L"爆雷", WeaponClass::DP },
-			{ L"特殊潜航艇", WeaponClass::SpecialSS },
-			{ L"艦上偵察機", WeaponClass::PS },
-			{ L"艦上偵察機(彩雲)", WeaponClass::PSS },
-			{ L"艦上戦闘機", WeaponClass::PF },
-			{ L"艦上攻撃機", WeaponClass::PA },
-			{ L"艦上爆撃機", WeaponClass::PB },
-			{ L"艦上爆撃機(爆戦)", WeaponClass::PBF },
-			{ L"艦隊司令部施設", WeaponClass::HQ },
-			{ L"高射装置", WeaponClass::AAD },
-			{ L"魚雷", WeaponClass::Torpedo },
-		} };
-	};
-	constexpr bool operator<(const WeaponClass_cvt_t& l, const weapon_str_t& r) {
-		return l.str < r;
-	}
-	template<typename iterator, typename Compare>
-	constexpr WeaponClass convert_or_default(iterator it, iterator end, weapon_str_t val, WeaponClass default_, Compare comp) {
-		return (it != end && comp(val, it->str)) ? it->wc : default_;
-	}
-	template<std::size_t N>
-	constexpr WeaponClass operator| (const wchar_t (&str)[N], ToWC_helper) {
-		return convert_or_default(
-			sprout::lower_bound(ToWC_helper::cvt.begin(), ToWC_helper::cvt.end(), weapon_str_t(str), sprout::less<>()),
-			ToWC_helper::cvt.end(), weapon_str_t(str), WeaponClass::Other, sprout::less<>()
-		);
-	}
-}
-constexpr detail::ToWC_helper ToWC() { return{}; }
 
 // 外部熟練度(Simple)を内部熟練度(Detail)に変換する
 int ConvertStoD(const int &level) {
