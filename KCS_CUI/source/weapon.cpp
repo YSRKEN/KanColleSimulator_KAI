@@ -138,9 +138,6 @@ namespace detail {
 	struct WeaponClass_cvt_t {
 		weapon_str_t str;
 		WeaponClass wc;
-		constexpr bool operator<(const WeaponClass_cvt_t& r) {
-			return this->str < r.str;
-		}
 	};
 	struct ToWC_helper {
 		static constexpr std::array<WeaponClass_cvt_t, 32> cvt = { {//sorted by first string
@@ -178,9 +175,9 @@ namespace detail {
 			{ L"魚雷", WeaponClass::Torpedo },
 		} };
 	};
-	//constexpr bool operator<(const WeaponClass_cvt_t& l, const WeaponClass_cvt_t& r) {
-	//	return l.str < r.str;
-	//}
+	constexpr bool operator<(const WeaponClass_cvt_t& l, const weapon_str_t& r) {
+		return l.str < r;
+	}
 	template<typename iterator, typename Compare>
 	constexpr WeaponClass convert_or_default(iterator it, iterator end, weapon_str_t val, WeaponClass default_, Compare comp) {
 		return (it != end && comp(val, it->str)) ? it->wc : default_;
@@ -188,8 +185,8 @@ namespace detail {
 	template<std::size_t N>
 	constexpr WeaponClass operator| (const wchar_t (&str)[N], ToWC_helper) {
 		return convert_or_default(
-			sprout::lower_bound(sprout::begin(ToWC_helper::cvt), sprout::end(ToWC_helper::cvt), weapon_str_t(str), sprout::less<>()),
-			sprout::end(ToWC_helper::cvt), weapon_str_t(str), WeaponClass::Other, sprout::less<>()
+			sprout::lower_bound(ToWC_helper::cvt.begin(), ToWC_helper::cvt.end(), weapon_str_t(str), sprout::less<>()),
+			ToWC_helper::cvt.end(), weapon_str_t(str), WeaponClass::Other, sprout::less<>()
 		);
 	}
 }
