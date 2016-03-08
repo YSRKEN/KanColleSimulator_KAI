@@ -1,5 +1,5 @@
-﻿#ifndef KCS_KAI_SIMULATOR_H_
-#define KCS_KAI_SIMULATOR_H_
+﻿#ifndef KCS_KAI_INC_SIMULATOR_HPP_
+#define KCS_KAI_INC_SIMULATOR_HPP_
 
 #include <cstdint>
 #include "kammusu.hpp"
@@ -74,4 +74,4 @@ public:
 	tuple<Result, vector<Fleet>> Calc();
 };
 
-#endif KCS_KAI_SIMULATOR_H_
+#endif //KCS_KAI_INC_SIMULATOR_HPP_

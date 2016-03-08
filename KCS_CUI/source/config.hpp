@@ -1,5 +1,5 @@
-﻿#ifndef KCS_KAI_CONFIG_H_
-#define KCS_KAI_CONFIG_H_
+﻿#ifndef KCS_KAI_INC_CONFIG_HPP_
+#define KCS_KAI_INC_CONFIG_HPP_
 
 #include <iostream>
 #include <memory>
@@ -38,4 +38,4 @@ public:
 std::ostream& operator<<(std::ostream& os, const Config& conf);
 std::wostream& operator<<(std::wostream& os, const Config& conf);
 
-#endif KCS_KAI_CONFIG_H_
+#endif //KCS_KAI_INC_CONFIG_HPP_
