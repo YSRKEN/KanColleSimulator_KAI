@@ -64,8 +64,16 @@ int main(int argc, char *argv[]) {
 			auto seed = make_SharedRand().make_unique_rand_array<unsigned int>(config.CalcSeedArrSize());
 			const auto process_begin_time = std::chrono::high_resolution_clock::now();
 			#pragma omp parallel for num_threads(static_cast<int>(config.GetThreads()))
+			vector<Result> result_db(config.GetTimes());
 			for (int n = 0; n < static_cast<int>(config.GetTimes()); ++n) {
-
+				vector<Fleet> fleet(kBattleSize);
+				fleet[kFriendSide] = my_fleet;
+				for (size_t p = 0; p < map_Data.GetSize(); ++p) {
+					fleet[kEnemySide] = map_Data.GetFleet(p);
+					Simulator simulator(fleet, seed[config.CalcSeedVNo(n)], kSimulateModeDN);	//仮置き
+					vector<Fleet> fleet_;
+					std::tie(result_db[n], fleet_) = simulator.Calc();	//仮置き
+				}
 			}
 			const auto process_end_time = std::chrono::high_resolution_clock::now();
 			cout << "処理時間：" << std::chrono::duration_cast<std::chrono::milliseconds>(process_end_time - process_begin_time).count() << "[ms]\n" << endl;

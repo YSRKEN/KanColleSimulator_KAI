@@ -8,6 +8,9 @@ class MapData {
 public:
 	// コンストラクタ
 	MapData(const string &file_name, const WeaponDB &weapon_db, const KammusuDB &kammusu_db);
+	// getter
+	size_t GetSize() const noexcept;
+	Fleet GetFleet(const size_t) const noexcept;
 	// その他
 	void Put();	//内容を表示する
 };

@@ -40,6 +40,13 @@ MapData::MapData(const string &file_name, const WeaponDB &weapon_db, const Kammu
 	return;
 }
 
+// getter
+size_t MapData::GetSize() const noexcept { return fleet_.size(); }
+Fleet MapData::GetFleet(const size_t p) const noexcept {
+	return fleet_[p][0];	//‰¼’u‚«
+}
+
+
 //“à—e‚ð•\Ž¦‚·‚é
 void MapData::Put() {
 
