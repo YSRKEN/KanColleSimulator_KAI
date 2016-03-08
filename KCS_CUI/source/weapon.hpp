@@ -6,8 +6,8 @@
 #include <type_traits>
 #include <sprout/string.hpp>
 #include <sprout/algorithm.hpp>
-#include <sprout/math.hpp>//Link error
-//#include <sprout/math/sqrt.hpp>
+//#include <sprout/math.hpp>//Link error
+#include <sprout/math/sqrt.hpp>
 #include <array>
 // 種別
 enum class WeaponClass : std::uint64_t {
