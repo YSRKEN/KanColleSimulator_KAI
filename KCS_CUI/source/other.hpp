@@ -12,7 +12,7 @@ class WeaponDB {
 	unordered_map<int, Weapon> hash_;
 public:
 	// コンストラクタ
-	WeaponDB(const char* csv_name);
+	WeaponDB();
 	// ハッシュからデータを読みだす
 	Weapon Get(const int) const;
 	Weapon Get(const int id, std::nothrow_t) const noexcept;

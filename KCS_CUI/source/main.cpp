@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
 		Config config(argc, argv);
 		config.Put();
 		// データベースを読み込む
-		WeaponDB weapon_db("slotitems.csv");
+		WeaponDB weapon_db{};
 		KammusuDB kammusu_db("ships.csv");
 		// ファイル拡張子により、処理内容を分岐させる
 		auto ext = GetExtension(config.GetInputFilename(kEnemySide));

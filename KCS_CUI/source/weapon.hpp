@@ -69,30 +69,32 @@ class Weapon {
 	int air_;					//現搭載数
 public:
 	// コンストラクタ
-	Weapon() noexcept;
-	//Weapon(
-	//	const int, wstring, const WeaponClass, const int, const int, const int, const int,
-	//	const int, const int, const int, const int, const int, const Range, const int, const int, const int) noexcept;
-	Weapon(
+	constexpr Weapon() noexcept : Weapon(-1, {}, WeaponClass::Other, 0, 0, 0, 0, 0, 0, 0, 0, 0, kRangeNone, 0, 0, 0) {}
+	constexpr Weapon(
 		const int id, const weapon_str_t& name, const WeaponClass weapon_class, const int defense,
 		const int attack, const int torpedo, const int bomb, const int anti_air, const int anti_sub,
-		const int hit, const int evade, const int search, const Range range, const int level, const int level_detail, const int air) noexcept;
+		const int hit, const int evade, const int search, const Range range, const int level, const int level_detail, const int air
+	) noexcept 
+		: id_(id), name_(name), weapon_class_(weapon_class), defense_(defense), attack_(attack),
+		torpedo_(torpedo), bomb_(bomb), anti_air_(anti_air), anti_sub_(anti_sub), hit_(hit),
+		evade_(evade), search_(search), range_(range), level_(level), level_detail_(level_detail), air_(air)
+	{}
 	// getter
-	int GetID() const noexcept;
-	const weapon_str_t& GetName() const noexcept;
-	WeaponClass GetWeaponClass() const noexcept;
-	int GetDefense() const noexcept;
-	int GetAttack() const noexcept;
-	int GetTorpedo() const noexcept;
-	int GetBomb() const noexcept;
-	int GetAntiAir() const noexcept;
-	int GetAntiSub() const noexcept;
-	int GetHit() const noexcept;
-	int GetEvade() const noexcept;
-	int GetSearch() const noexcept;
-	Range GetRange() const noexcept;
-	int GetLevel() const noexcept;
-	int GetAir() const noexcept;
+	constexpr int GetID() const noexcept { return id_; }
+	constexpr weapon_str_t GetName() const noexcept { return name_; }
+	constexpr WeaponClass GetWeaponClass() const noexcept { return weapon_class_; }
+	constexpr int GetDefense() const noexcept { return defense_; }
+	constexpr int GetAttack() const noexcept { return attack_; }
+	constexpr int GetTorpedo() const noexcept { return torpedo_; }
+	constexpr int GetBomb() const noexcept { return bomb_; }
+	constexpr int GetAntiAir() const noexcept { return anti_air_; }
+	constexpr int GetAntiSub() const noexcept { return anti_sub_; }
+	constexpr int GetHit() const noexcept { return hit_; }
+	constexpr int GetEvade() const noexcept { return evade_; }
+	constexpr int GetSearch() const noexcept { return search_; }
+	constexpr Range GetRange() const noexcept { return range_; }
+	constexpr int GetLevel() const noexcept { return level_; }
+	constexpr int GetAir() const noexcept { return air_; }
 	// setter
 	void SetLevel(const int level);
 	void SetLevelDetail(const int level_detail);

@@ -64,7 +64,7 @@ namespace detail {
 }
 detail::ToHash_helper ToHash() noexcept { return{}; }
 // 装備DBのコンストラクタ
-WeaponDB::WeaponDB(const char* csv_name) 
+WeaponDB::WeaponDB() 
 	:hash_({
 		{ 1, Weapon{ 1, L"12cm単装砲", L"主砲" | ToWC(), 0, 1, 0, 0, 1, 0, 0, 0, 0, static_cast<Range>(1), 0, 0, 0 } },
 		{ 2, Weapon{ 2, L"12.7cm連装砲", L"主砲" | ToWC(), 0, 2, 0, 0, 2, 0, 0, 0, 0, static_cast<Range>(1), 0, 0, 0 } },
@@ -288,43 +288,10 @@ WeaponDB::WeaponDB(const char* csv_name)
 		{ 559, Weapon{ 559, L"深海FCS+CIC", L"ソナー" | ToWC(), 0, 0, 0, 0, 6, 20, 5, 3, 3, static_cast<Range>(0), 0, 0, 0 } },
 		{ 560, Weapon{ 560, L"深海探照灯", L"探照灯" | ToWC(), 0, 2, 0, 0, 0, 0, 0, 0, 2, static_cast<Range>(0), 0, 0, 0 } },
 		{ 563, Weapon{ 563, L"8inch長射程連装砲", L"主砲" | ToWC(), 0, 8, 0, 0, 1, 0, -1, 0, 0, static_cast<Range>(3), 0, 0, 0 } },
-		{ 564, Weapon{ 564, L"深海水上偵察観測機", L"水上偵察機" | ToWC(), 0, 0, 0, 0, 2, 2, 5, 0, 5, static_cast<Range>(0), 0, 0, 0 } }
+		{ 564, Weapon{ 564, L"深海水上偵察観測機", L"水上偵察機" | ToWC(), 0, 0, 0, 0, 2, 2, 5, 0, 5, static_cast<Range>(0), 0, 0, 0 } },
+		{ -1, Weapon{} }
 	})
-{
-	// ファイルを開く
-	ifstream ifs(csv_name);
-	FILE_THROW_WITH_MESSAGE_IF(!ifs.is_open(), string(csv_name) + "が正常に読み込めませんでした.")
-	// 1行づつ読み込んでいく
-	string temp_str;
-	getline(ifs, temp_str);
-	auto header = temp_str | Split(',') | ToHash();
-	while (getline(ifs, temp_str)) {
-		//auto list         = temp_str | Split(',');
-		//auto id           = list[header.at("装備ID")] | to_i();
-		//auto name         = char_cvt::shift_jis_to_utf_16(list[header.at("装備名")]);
-		//auto weapon_class = ToWC(list[header.at("種別")]);
-		//auto defense      = list[header.at("装甲")] | to_i();
-		//auto attack       = list[header.at("火力")] | to_i();
-		//auto torpedo      = list[header.at("雷撃")] | to_i();
-		//auto bomb         = list[header.at("爆装")] | to_i();
-		//auto anti_air     = list[header.at("対空")] | to_i();
-		//auto anti_sub     = list[header.at("対潜")] | to_i();
-		//auto hit          = list[header.at("命中")] | to_i();
-		//auto evade        = list[header.at("回避")] | to_i();
-		//auto search       = list[header.at("索敵")] | to_i();
-		//auto range        = static_cast<Range>(list[header.at("射程")] | to_i());
-		//auto level        = 0;
-		//auto level_detail = 0;
-		//auto air          = 0;
-		
-		//hash_[id] = Weapon(
-		//	id, name, weapon_class, defense, attack, torpedo, bomb, anti_air,
-		//	anti_sub, hit, evade, search, range, level, level_detail, air
-		//);
-	}
-	// ダミーデータを代入する
-	hash_[-1] = Weapon();
-}
+{}
 
 // 装備DBからデータを読みだす
 Weapon WeaponDB::Get(const int id) const {

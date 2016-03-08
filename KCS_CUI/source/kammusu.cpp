@@ -492,10 +492,10 @@ double Kammusu::FitGunAttackPlus() const noexcept {
 	if (Is(ShipClass::CL | ShipClass::CLT | ShipClass::CP)) {
 		int light_gun_single = 0, light_gun_double = 0;
 		for (auto &it_w : weapons_) {
-			auto &name = it_w.GetName();
+			const auto name = it_w.GetName();
 			if (name == L"14cm単装砲"
 				|| name == L"15.2cm単装砲") ++light_gun_single;
-			if (name == L"14cm連装砲"
+			else if (name == L"14cm連装砲"
 				|| name == L"15.2cm連装砲"
 				|| name == L"15.2cm連装砲改") ++light_gun_double;
 		}
