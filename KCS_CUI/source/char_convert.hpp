@@ -14,6 +14,8 @@ Distributed under the Boost Software License, Version 1.0.
 #endif //NOMINMAX
 #include <windows.h>
 #include <cstring>
+#undef lst1
+#undef lst2
 #include <sprout/string.hpp>
 namespace char_cvt {
 	inline std::wstring shift_jis_to_utf_16(const std::string& str)

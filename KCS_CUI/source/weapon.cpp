@@ -1,6 +1,7 @@
 ﻿#include "base.hpp"
 #include "weapon.hpp"
 #include "char_convert.hpp"
+#include <sprout/algorithm.hpp>
 // コンストラクタ
 Weapon::Weapon() noexcept : Weapon(-1, {}, WeaponClass::Other, 0, 0, 0, 0, 0, 0, 0, 0, 0, kRangeNone, 0, 0, 0) {}
 //Weapon::Weapon(
@@ -134,10 +135,15 @@ WeaponClass ToWC(const string str) {
 	return WeaponClass::Other;
 }
 namespace detail {
-	struct ToWC_helper {};
-	template<std::size_t N>
-	WeaponClass operator| (const wchar_t (&str)[N], ToWC_helper) {
-		static constexpr std::pair<weapon_str_t, WeaponClass> cvt[] = {//sorted by first string
+	struct WeaponClass_cvt_t {
+		weapon_str_t str;
+		WeaponClass wc;
+		constexpr bool operator<(const WeaponClass_cvt_t& r) {
+			return this->str < r.str;
+		}
+	};
+	struct ToWC_helper {
+		static constexpr std::array<WeaponClass_cvt_t, 32> cvt = { {//sorted by first string
 			{ L"その他", WeaponClass::Other },
 			{ L"オートジャイロ", WeaponClass::AJ },
 			{ L"ソナー", WeaponClass::Sonar },
@@ -170,10 +176,24 @@ namespace detail {
 			{ L"艦隊司令部施設", WeaponClass::HQ },
 			{ L"高射装置", WeaponClass::AAD },
 			{ L"魚雷", WeaponClass::Torpedo },
-		};
-
+		} };
+	};
+	//constexpr bool operator<(const WeaponClass_cvt_t& l, const WeaponClass_cvt_t& r) {
+	//	return l.str < r.str;
+	//}
+	template<typename iterator, typename Compare>
+	constexpr WeaponClass convert_or_default(iterator it, iterator end, weapon_str_t val, WeaponClass default_, Compare comp) {
+		return (it != end && comp(val, it->str)) ? it->wc : default_;
+	}
+	template<std::size_t N>
+	constexpr WeaponClass operator| (const wchar_t (&str)[N], ToWC_helper) {
+		return convert_or_default(
+			sprout::lower_bound(sprout::begin(ToWC_helper::cvt), sprout::end(ToWC_helper::cvt), weapon_str_t(str), sprout::less<>()),
+			sprout::end(ToWC_helper::cvt), weapon_str_t(str), WeaponClass::Other, sprout::less<>()
+		);
 	}
 }
+constexpr detail::ToWC_helper ToWC() { return{}; }
 
 // 外部熟練度(Simple)を内部熟練度(Detail)に変換する
 int ConvertStoD(const int &level) {
