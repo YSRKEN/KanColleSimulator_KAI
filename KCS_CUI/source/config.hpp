@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿#ifndef KCS_KAI_CONFIG_H_
+#define KCS_KAI_CONFIG_H_
+
 #include <iostream>
 #include <memory>
 [[noreturn]] void print_commandline_help() noexcept(false);
@@ -35,3 +37,5 @@ public:
 };
 std::ostream& operator<<(std::ostream& os, const Config& conf);
 std::wostream& operator<<(std::wostream& os, const Config& conf);
+
+#endif KCS_KAI_CONFIG_H_

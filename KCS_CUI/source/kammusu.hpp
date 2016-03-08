@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef KCS_KAI_KAMMUSU_H_
+#define KCS_KAI_KAMMUSU_H_
 
 #include "weapon.hpp"
 #include <iostream>
@@ -178,6 +179,8 @@ public:
 	bool IsFireNight() const noexcept;						//夜戦で攻撃可能な艦ならtrue
 	bool IsAntiSubNight() const noexcept;					//夜戦で対潜可能な艦ならtrue
 	bool HasLights() const noexcept;						//探照灯や照明弾を保有していた場合はtrue
+	template<class F>
+	auto SumWeapons(F f) const { return std::accumulate(std::cbegin(weapons_), std::cend(weapons_), std::result_of_t<F(const Weapon&)>{}, [&](const auto& sum, const auto& it_w) { return sum + std::invoke(f, it_w); }); }
 	friend std::ostream& operator<<(std::ostream& os, const Kammusu& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Kammusu& conf);
 };
@@ -207,3 +210,5 @@ namespace detail {
 	}
 }
 constexpr detail::ToSpeed_helper ToSpeed() { return{}; }
+
+#endif KCS_KAI_KAMMUSU_H_

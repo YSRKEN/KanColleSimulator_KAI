@@ -945,12 +945,9 @@ double Simulator::CalcHitProb(
 			hit_value += 0.02188 * sqrt(hunter_kammusu.GetLevel() - 1);
 			hit_value += T * int(0.001426 * hunter_kammusu.AllTorpedo(false) + 0.000836 * hunter_kammusu.GetTorpedo());
 			hit_value += 0.01009 * hunter_kammusu.AllHit();
-			auto &hunter_weapon = hunter_kammusu.GetWeapon();
-			for (auto &it_w : hunter_weapon) {
-				if (it_w.Is(WeaponClass::Torpedo)) {
-					hit_value += 0.02104 * sqrt(it_w.GetLevel());
-				}
-			}
+			hit_value += hunter_kammusu.SumWeapons([](const auto& it_w) {
+				return it_w.Is(WeaponClass::Torpedo) ? 0.02104 * sqrt(it_w.GetLevel()) : 0;
+			});
 			hit_value += 0.001482 * hunter_kammusu.GetLuck();
 			//回避側
 			double a;

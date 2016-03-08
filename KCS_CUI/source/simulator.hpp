@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿#ifndef KCS_KAI_SIMULATOR_H_
+#define KCS_KAI_SIMULATOR_H_
+
 #include <cstdint>
 #include "kammusu.hpp"
 #include <array>
@@ -71,3 +73,5 @@ public:
 	// 計算用メソッド
 	tuple<Result, vector<Fleet>> Calc();
 };
+
+#endif KCS_KAI_SIMULATOR_H_

@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿#ifndef KCS_KAI_WEAPON_H_
+#define KCS_KAI_WEAPON_H_
+
 #include <cstdint>
 #include <iostream>
 #include <type_traits>
@@ -110,3 +112,5 @@ int ConvertStoD(const int&);
 
 // 内部熟練度を外部熟練度に変換する
 int ConvertDtoS(const int&);
+
+#endif KCS_KAI_WEAPON_H_
