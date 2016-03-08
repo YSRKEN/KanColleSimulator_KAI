@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef KCS_KAI_OTHER_H_
+#define KCS_KAI_OTHER_H_
 
 #include "weapon.hpp"
 #include "kammusu.hpp"
@@ -56,3 +57,5 @@ vector<int> ToInt(const vector<string>&);
 
 // 文字列(ファイル名)から拡張子を取り出す
 string GetExtension(const string&);
+
+#endif KCS_KAI_OTHER_H_

@@ -243,37 +243,34 @@ int Kammusu::AacType() const noexcept {
 double Kammusu::AacProb(const int &aac_type) const noexcept {
 	// 色々とお察しください
 	/*
-	| 艦娘     | 位置 | 素対空値 | 装備対空値 | 種類 | 装備                                   | 結果    | ％    | 備考            |
-	|----------|------|----------|------------|------|----------------------------------------|---------|-------|-----------------|
-	| 秋月     | 僚艦 | 116      | 6          | 1    | 12.7高単、12.7高単、22号改四           | 72/100  | 72.0% |                 |
+	| 艦娘     | 位置 | 素対空値 | 装備対空値 | 種類 | 装備                                     | 結果    | ％    | 備考            |
+	|----------|------|----------|------------|------|------------------------------------------|---------|-------|-----------------|
+	| 秋月     | 僚艦 | 116      | 6          | 1    | 12.7高単、12.7高単、22号改四             | 72/100  | 72.0% |                 |
 	| 秋月     | 僚艦 | 116      | 24         | 1    | 秋月砲★9、秋月砲★9、13号改             | 164/206 | 79.6% | (16-991)        |
-	| 秋月     | 僚艦 | 116      | 17         | 3    | 10cm、10cm、94式                       | 121/202 | 59.9% |                 |
-	| 秋月     | 僚艦 | 116      | 23         | 3    | 秋月砲★9、秋月砲★9、94式★6             | 33/56   | 58.9% | (16-813)        |
-	| 榛名     | 旗艦 | 92       | 18         | 4    | ダズル、三式弾、14号、91式             | 33/50   | 66.0% | (16-691)        |
-	| 大淀     | 僚艦 | 74       | 28         | 5    | 秋月砲、秋月砲、14号、観測機           | 67/100  | 67.0% |                 |
-	| 大淀     | 僚艦 | 74       | 29         | 5    | 秋月砲、秋月砲、14号、94式             | 65/100  | 65.0% |                 |
-	| 大淀     | 僚艦 | 74       | 32         | 5    | 秋月砲、秋月砲、14号、14号             | 60/100  | 60.0% |                 |
-	| 榛名     | 旗艦 | 92       | 12         | 6    | ダズル、三式弾、22号、91式             | 23/50   | 46.0% |                 |
-	| 大淀     | 僚艦 | 74       | 29         | 7    | 浦風砲、浦風砲、14号、94式             | 48/100  | 48.0% |                 |
-	| 摩耶     | 僚艦 | 89       | 14         | 7    | 8cm、91式、14号                        | 89/200  | 44.5% |                 |
-	| 雪風     | 旗艦 | 59       | 14         | 8    | 秋月砲★9、13号改、魚雷                 | 144/279 | 51.6% | (17-10)         |
-	| 能代     | 僚艦 | 72       | 8          | 8    | 秋月砲★4、FuMO                         | 48/100  | 48.0% |                 |
-	| 時雨     | 旗艦 | 72       | 14         | 8    | 秋月砲★9、13号改、魚雷                 | 58/100  | 58.0% | (16-785)        |
-	| 時雨     | 旗艦 | 72       | 16         | 8    | 秋月砲、13号改、主砲                   | 26/50   | 52.0% |                 |
-	| 大淀     | 僚艦 | 74       | 25         | 8    | 秋月砲、10cm、14号、観測機             | 52/100  | 52.0% | (16-600)        |
-	| 陽炎     | 僚艦 | 49       | 17         | 9    | 10cm、10cm、94式                       | 103/300 | 34.3% | (16-702, 17-44) |
-	| 能代     | 僚艦 | 72       | 6          | 9    | 8cm、91式                              | 44/100  | 44.0% | (16-701)        |
-	| 能代     | 僚艦 | 72       | 8          | 9    | 8cm、94式★2                            | 49/100  | 49.0% | (16-660)        |
-	| 潮       | 僚艦 | 74       | 17         | 9    | 10cm、10cm、94式                       | 131/300 | 43.7% | (17-44)         |
-	| 摩耶     | 僚艦 | 89       | 8          | 9    | 8cm、91式                              | 83/200  | 41.5% |                 |
+	| 秋月     | 僚艦 | 116      | 17         | 3    | 10cm、10cm、94式                         | 121/202 | 59.9% |                 |
+	| 秋月     | 僚艦 | 116      | 23         | 3    | 秋月砲★9、秋月砲★9、94式★6            | 33/56   | 58.9% | (16-813)        |
+	| 榛名     | 旗艦 | 92       | 18         | 4    | ダズル、三式弾、14号、91式               | 33/50   | 66.0% | (16-691)        |
+	| 大淀     | 僚艦 | 74       | 28         | 5    | 秋月砲、秋月砲、14号、観測機             | 67/100  | 67.0% |                 |
+	| 大淀     | 僚艦 | 74       | 29         | 5    | 秋月砲、秋月砲、14号、94式               | 65/100  | 65.0% |                 |
+	| 大淀     | 僚艦 | 74       | 32         | 5    | 秋月砲、秋月砲、14号、14号               | 60/100  | 60.0% |                 |
+	| 榛名     | 旗艦 | 92       | 12         | 6    | ダズル、三式弾、22号、91式               | 23/50   | 46.0% |                 |
+	| 大淀     | 僚艦 | 74       | 29         | 7    | 浦風砲、浦風砲、14号、94式               | 48/100  | 48.0% |                 |
+	| 摩耶     | 僚艦 | 89       | 14         | 7    | 8cm、91式、14号                          | 89/200  | 44.5% |                 |
+	| 雪風     | 旗艦 | 59       | 14         | 8    | 秋月砲★9、13号改、魚雷                  | 144/279 | 51.6% | (17-10)         |
+	| 能代     | 僚艦 | 72       | 8          | 8    | 秋月砲★4、FuMO                          | 48/100  | 48.0% |                 |
+	| 時雨     | 旗艦 | 72       | 14         | 8    | 秋月砲★9、13号改、魚雷                  | 58/100  | 58.0% | (16-785)        |
+	| 時雨     | 旗艦 | 72       | 16         | 8    | 秋月砲、13号改、主砲                     | 26/50   | 52.0% |                 |
+	| 大淀     | 僚艦 | 74       | 25         | 8    | 秋月砲、10cm、14号、観測機               | 52/100  | 52.0% | (16-600)        |
+	| 陽炎     | 僚艦 | 49       | 17         | 9    | 10cm、10cm、94式                         | 103/300 | 34.3% | (16-702, 17-44) |
+	| 能代     | 僚艦 | 72       | 6          | 9    | 8cm、91式                                | 44/100  | 44.0% | (16-701)        |
+	| 能代     | 僚艦 | 72       | 8          | 9    | 8cm、94式★2                             | 49/100  | 49.0% | (16-660)        |
+	| 潮       | 僚艦 | 74       | 17         | 9    | 10cm、10cm、94式                         | 131/300 | 43.7% | (17-44)         |
+	| 摩耶     | 僚艦 | 89       | 8          | 9    | 8cm、91式                                | 83/200  | 41.5% |                 |
 	| 摩耶改二 | 僚艦 | 106      | 27         | 10   | 2号砲★9、90mm高★10、集中機銃、Fumo     | 108/206 | 52.4% | [22]            |
 	| 摩耶改二 | 僚艦 | 106      | 22         | 11   | 2号砲★9、90mm高★10、集中機銃、観測機>> | 103/204 | 50.5% |                 |
 	 */
 	// とりあえず装備対空を計算する
-	int weapon_anti_air = 0;
-	for (auto &it_w : weapons_) {
-		weapon_anti_air += it_w.GetAntiAir();
-	}
+	int weapon_anti_air = SumWeapons(&Weapon::GetAntiAir);
 	//とりあえず種別によって場合分け
 	switch (aac_type) {
 	case 1:
@@ -350,11 +347,7 @@ Status Kammusu::Status() const noexcept {
 
 // 総回避を返す
 int Kammusu::AllEvade() const noexcept {
-	int evade_sum = evade_;
-	for (auto &it_w : weapons_) {
-		evade_sum += it_w.GetEvade();
-	}
-	return evade_sum;
+	return evade_ + SumWeapons(&Weapon::GetEvade);
 }
 
 // 疲労度を返す
@@ -377,11 +370,7 @@ Mood Kammusu::Mood() const noexcept {
 
 // 総命中を返す
 int Kammusu::AllHit() const noexcept {
-	int hit_sum = 0;
-	for (auto &it_w : weapons_) {
-		hit_sum += it_w.GetHit();
-	}
-	return hit_sum;
+	return SumWeapons(&Weapon::GetHit);
 }
 
 // フィット砲補正
@@ -492,20 +481,9 @@ double Kammusu::FitGunHitPlus() const noexcept {
 // 総雷装を返す
 // (level_flgがtrueの場合、装備改修による威力向上も考慮する)
 int Kammusu::AllTorpedo(const bool &level_flg) const noexcept {
-	double torpedo_sum = torpedo_;
-	for (auto &it_w : weapons_) {
-		torpedo_sum += it_w.GetTorpedo();
-		if (level_flg) {
-			switch (it_w.GetWeaponClass()) {
-			case WeaponClass::Torpedo:
-			case WeaponClass::AAG:
-				torpedo_sum += 1.2 * sqrt(it_w.GetLevel());
-				break;
-			default:
-				break;
-			}
-		}
-	}
+	double torpedo_sum = torpedo_ + SumWeapons([=](const auto& it_w) {
+		return it_w.GetTorpedo() + (level_flg && it_w.Is(WeaponClass::Torpedo | WeaponClass::AAG) ? 1.2 * sqrt(it_w.GetLevel()) : 0);
+	});
 	return int(torpedo_sum);
 }
 
@@ -566,12 +544,9 @@ double Kammusu::SpecialEffectApPlus() const noexcept {
 
 // 熟練艦載機によるCL2率上昇
 double Kammusu::CL2ProbPlus() const noexcept {
-	double cl_prob_plus = 0.0;
-	for (auto &it_w : weapons_) {
-		if (it_w.Is(WeaponClass::AirBomb))
-			cl_prob_plus += 0.05 * it_w.GetLevel() / 7;
-	}
-	return cl_prob_plus;
+	return SumWeapons([](const auto& it_w) {
+		return it_w.Is(WeaponClass::AirBomb) ? 0.05 * it_w.GetLevel() / 7 : 0;
+	});
 }
 
 // 熟練艦載機によるダメージ補正
@@ -587,11 +562,7 @@ double Kammusu::CL2AttackPlus() const noexcept {
 
 // 総装甲を返す
 int Kammusu::AllDefense() const noexcept {
-	int defense_sum = defense_;
-	for (auto &it_w : weapons_) {
-		defense_sum += it_w.GetDefense();
-	}
-	return defense_sum;
+	return defense_ + SumWeapons(&Weapon::GetDefense);
 }
 
 // 射程を返す
@@ -728,21 +699,12 @@ int Kammusu::NightAttack(const NightFireType fire_type, const bool af_flg) const
 		}
 		break;
 	case kNightFireChage:	//爆雷攻撃
-		int base_sub = anti_sub_;
-		for (auto &it_w : weapons_) {
-			switch (it_w.GetWeaponClass()) {
-			case WeaponClass::DP:
-			case WeaponClass::Sonar:
-				base_attack += it_w.GetAntiSub() * 1.5;
-				base_attack += sqrt(it_w.GetLevel());
-				break;
-			default:
-				// 夜戦での対潜は、航空対潜ではありえないので除外
-				// 小口径主砲・水上偵察機・小型電探の対潜値は無視していい
-				break;
-			}
-		}
-		base_attack += sqrt(base_sub) * 2 + 13;
+		base_attack += SumWeapons([](const auto& it_w) {
+			// 夜戦での対潜は、航空対潜ではありえないので除外
+			// 小口径主砲・水上偵察機・小型電探の対潜値は無視していい
+			return it_w.Is(WeaponClass::DP | WeaponClass::Sonar) ? it_w.GetAntiSub() * 1.5 + sqrt(it_w.GetLevel()) : 0;
+		});
+		base_attack += sqrt(anti_sub_) * 2 + 13;
 		break;
 	}
 	return int(base_attack);

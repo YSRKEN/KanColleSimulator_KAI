@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef KCS_KAI_FLEET_H_
+#define KCS_KAI_FLEET_H_
 
 #include "picojson.h"
 #include "weapon.hpp"
@@ -67,3 +68,5 @@ public:
 };
 std::ostream& operator<<(std::ostream& os, const Fleet& conf);
 std::wostream& operator<<(std::wostream& os, const Fleet& conf);
+
+#endif KCS_KAI_FLEET_H_

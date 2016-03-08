@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef KCS_KAI_RESULT_H_
+#define KCS_KAI_RESULT_H_
 
 // 勝利判定
 enum class WinReason : std::uint_fast8_t {
@@ -43,3 +44,5 @@ public:
 	// 勝利判定
 	WinReason JudgeWinReason() const noexcept;
 };
+
+#endif KCS_KAI_RESULT_H_

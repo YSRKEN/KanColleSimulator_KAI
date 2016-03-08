@@ -23,11 +23,9 @@
 - --no-result-json-prettifyを指定すると、出力するJSONが整形されないようになる
 
 ## 使用例
-`KCS_CUI -i "sample\fleet sample1.json" "sample\fleet sample2.json" -f 0 1 -n 1`
+`KCS_CUI -i "sample\sample1.json" "sample\sample2.json" -f 0 0 -n 1`
 
-`KCS_CUI -i "sample\fleet 1-5.json" "sample\map 1-5 high.json" -f 0 0 -n 10000 -t 2 -o output.json`
-
-`KCS_CUI -i "sample\fleet 2016冬E3甲輸送.json" "sample\map 2016冬E3甲輸送.json" -f 3 4 -n 100000 -t 4 -o output.json`
+`KCS_CUI -i "sample\3-5.json" "sample\3-5 high.map" -f 0 0 -n 100000 -t 4 -o output.json`
 
 ## JSONデータの書式(艦隊編)
 - UTF-8で保存してください(どうせASCII文字しか無いと思いますが)
@@ -44,6 +42,13 @@
 (これが存在する場合は、rfの設定を上書きする)
 
 ## JSONデータの書式(マップ編)
+- UTF-8で保存してください(どうせASCII文字しか無いと思いますが)
+- 「"version": "map"」は決まり文句で、それと同じ階層で  
+マス名の連想配列→艦隊の配列→艦船(配列)・陣形・戦闘モードの連想配列となっています
+- 艦船の配列は艦船IDで、装備は初期装備です(ships.csvを参照)
+- formは陣形で、上記におけるformationと意味は同じです
+- modeは戦闘モードで、0が昼夜戦闘(通常ボスマスのみ)・1が昼戦のみ・2が開幕夜戦マスです
+- 艦隊の配列は、マスに踏み込むたびにランダムで選択するためのものです
 
 ## ソースコードの書式(C++編)
 - 変数はスネークケースだが、メンバ変数は末尾に`_`を付ける
@@ -70,23 +75,28 @@
 - 探照灯による誘引率
 
 ## 注意点
-- ダメコンおよび戦闘兵食・給油艦による補給には対応していません。
-- 護衛退避には対応していません。
-- 補強増設には対応していません。
-- 航空戦マス、および空襲戦マスには対応していません。
-- 支援艦隊には対応していません。
+- ダメコンおよび戦闘兵食・給油艦による補給には対応していません
+- したがって、マップモードでは大破した際必ず撤退します
+- 護衛退避には対応していません
+- 補強増設には対応していません
+- 航空戦マス、および空襲戦マスには対応していません
+- 支援艦隊には対応していません
 
 ## ライセンス
 MITライセンスとします。
 
 ## 開発者
-- YSR https://github.com/YSRKEN
-- yumetodo https://github.com/yumetodo
-- Cranberries https://github.com/LoliGothick
-- sayurin https://github.com/sayurin
+|名前       |GitHub                        |Twitter                      |
+|:----------|:-----------------------------|:----------------------------|
+|YSR        |https://github.com/YSRKEN     |https://twitter.com/YSRKEN   |
+|yumetodo   |https://github.com/yumetodo   |https://twitter.com/yumetodo |
+|Cranberries|https://github.com/LoliGothick|https://twitter.com/_EnumHack|
+|sayurin    |https://github.com/sayurin    |https://twitter.com/haxe     |
 
 ## バージョン履歴
-### Ver.1.0.2
+### Ver.1.1.1
+勝利判定が色々とおかしかったので修正。また、艦船データおよびサンプルデータを更新した。
+### Ver.1.1.0
 各種関数を高速化することでVer.1.0.1より倍は速くなったはず。また、艦船・装備データを更新した。
 ### Ver.1.0.1
 既に沈んだ相手に対して追い打ちをかけてしまうことがあったので修正。
