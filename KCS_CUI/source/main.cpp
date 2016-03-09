@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
 					// 敵艦隊をセットする
 					fleet[kEnemySide] = map_Data_[omp_get_thread_num()].GetFleet(p);
 					// 敵艦隊の形態、および戦闘モードにより自艦隊の陣形を変更する
-					if (fleet[kEnemySide].FirstUnit()[0].IsSubmarine()) {
+					if (fleet[kEnemySide].GetUnit().front().front().IsSubmarine()) {
 						fleet[kFriendSide].SetFormation(kFormationAbreast);
 					}
 					else if (map_Data_[omp_get_thread_num()].GetSimulateMode(p) == kSimulateModeN) {

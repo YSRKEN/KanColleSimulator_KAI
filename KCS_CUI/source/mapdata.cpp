@@ -63,7 +63,7 @@ void MapData::Put() {
 			wcout << L"　　";
 			for (size_t ui = 0; ui < it_f.UnitSize(0); ++ui) {
 				if (ui != 0) wcout << L",";
-				wcout << it_f.FirstUnit()[ui].GetName();
+				wcout << it_f.GetUnit().front()[ui].GetName();
 			}
 			wcout << L"　" << kFormationStr[it_f.GetFormation()] << endl;
 		}

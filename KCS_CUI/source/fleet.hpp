@@ -37,11 +37,6 @@ public:
 	const vector<vector<Kammusu>>& GetUnit() const noexcept;
 	FleetType GetFleetType() const noexcept;
 	// その他
-	vector<Kammusu>& FirstUnit();
-	const vector<Kammusu>& FirstUnit() const;
-	vector<Kammusu>& SecondUnit();
-	const vector<Kammusu>& SecondUnit() const;
-
 	size_t FleetSize() const noexcept;						//「艦隊数」(通常艦隊だと1、連合艦隊だと2)
 	size_t UnitSize(const size_t fi) const noexcept;	//「艦隊」における艦数
 	size_t FirstIndex() const noexcept;								//第一艦隊のインデックス
