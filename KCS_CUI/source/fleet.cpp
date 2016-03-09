@@ -143,8 +143,8 @@ void Fleet::SetFormation(const Formation formation) { formation_ = formation; }
 
 // getter
 Formation Fleet::GetFormation() const noexcept { return formation_; }
-vector<vector<Kammusu>>& Fleet::GetUnit() { return unit_; }
-const vector<vector<Kammusu>>& Fleet::GetUnit() const { return unit_; }
+vector<vector<Kammusu>>& Fleet::GetUnit() noexcept { return unit_; }
+const vector<vector<Kammusu>>& Fleet::GetUnit() const noexcept { return unit_; }
 FleetType Fleet::GetFleetType() const noexcept { return fleet_type_; }
 // その他
 vector<Kammusu>& Fleet::FirstUnit() { return unit_[0]; }

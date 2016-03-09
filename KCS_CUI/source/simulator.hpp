@@ -50,6 +50,8 @@ class Simulator {
 	void AirWarPhase();
 	void BattlePositionOracle() noexcept;
 	void TorpedoPhase(const TorpedoTurn&);
+	vector<vector<std::pair<KammusuIndex, Range>>> DetermineAttackOrder(FireTurn fire_turn, size_t fleet_index = 0) const;
+	std::tuple<bool, bool, double> CalcLandingObservationShootingCorrection(DayFireType fire_type, size_t bi, const Kammusu & hunter_kammusu, size_t other_side, KammusuIndex friend_index) const;
 	void FirePhase(const FireTurn&, const size_t &fleet_index = 0);
 	void NightPhase();
 	// 計算用メソッド(内部)

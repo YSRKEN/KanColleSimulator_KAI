@@ -33,8 +33,8 @@ public:
 	void SetFormation(const Formation);
 	// getter
 	Formation GetFormation() const noexcept;
-	vector<vector<Kammusu>>& GetUnit();
-	const vector<vector<Kammusu>>& GetUnit() const;
+	vector<vector<Kammusu>>& GetUnit() noexcept;
+	const vector<vector<Kammusu>>& GetUnit() const noexcept;
 	FleetType GetFleetType() const noexcept;
 	// その他
 	vector<Kammusu>& FirstUnit();
