@@ -96,6 +96,7 @@ MITライセンスとします。
 |yumetodo   |https://github.com/yumetodo   |https://twitter.com/yumetodo |
 |Cranberries|https://github.com/LoliGothick|https://twitter.com/_EnumHack|
 |sayurin    |https://github.com/sayurin    |https://twitter.com/haxe     |
+|taba       |https://github.com/taba256    |https://twitter.com/__taba__ |
 
 ## バージョン履歴
 ### Ver.1.2.0
