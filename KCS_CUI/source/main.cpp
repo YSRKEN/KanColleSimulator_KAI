@@ -65,42 +65,47 @@ int main(int argc, char *argv[]) {
 			const auto process_begin_time = std::chrono::high_resolution_clock::now();
 			vector<Result> result_db;
 			vector<size_t> point_count(map_Data.GetSize(), 0);
-			//#pragma omp parallel for num_threads(static_cast<int>(config.GetThreads()))
+			vector<vector<Result>> result_db_(config.GetThreads());
+			vector<MapData> map_Data_(config.GetThreads(), map_Data);
+			#pragma omp parallel for num_threads(static_cast<int>(config.GetThreads()))
 			for (int n = 0; n < static_cast<int>(config.GetTimes()); ++n) {
-				map_Data.SetRandGenerator(seed[config.CalcSeedVNo(n)]);
+				map_Data_[omp_get_thread_num()].SetRandGenerator(seed[config.CalcSeedVNo(n)]);
 				// 自艦隊をセットする
 				vector<Fleet> fleet(kBattleSize);
 				fleet[kFriendSide] = my_fleet;
 				// マップを進ませる
-				for (size_t p = 0; p < map_Data.GetSize(); ++p) {
+				for (size_t p = 0; p < map_Data_[omp_get_thread_num()].GetSize(); ++p) {
 					++point_count[p];
 					// 敵艦隊をセットする
-					fleet[kEnemySide] = map_Data.GetFleet(p);
+					fleet[kEnemySide] = map_Data_[omp_get_thread_num()].GetFleet(p);
 					// 敵艦隊の形態、および戦闘モードにより自艦隊の陣形を変更する
 					if (fleet[kEnemySide].FirstUnit()[0].IsSubmarine()) {
 						fleet[kFriendSide].SetFormation(kFormationAbreast);
 					}
-					else if (map_Data.GetSimulateMode(p) == kSimulateModeN) {
+					else if (map_Data_[omp_get_thread_num()].GetSimulateMode(p) == kSimulateModeN) {
 						fleet[kFriendSide].SetFormation(config.GetFormation(kFriendSide));
 					}
 					else {
 						fleet[kFriendSide].SetFormation(kFormationTrail);
 					}
 					// シミュレートを行う
-					Simulator simulator(fleet, seed[config.CalcSeedVNo(n)], map_Data.GetSimulateMode(p));
+					Simulator simulator(fleet, seed[config.CalcSeedVNo(n)], map_Data_[omp_get_thread_num()].GetSimulateMode(p));
 					vector<Fleet> fleet_;
 					Result result_;
 					std::tie(result_, fleet_) = simulator.Calc();
 					// 結果を元の配列に書き戻す
 					fleet[kFriendSide] = fleet_[kFriendSide];
-					if (p != map_Data.GetSize() - 1) {
+					if (p != map_Data_[omp_get_thread_num()].GetSize() - 1) {
 						// 大破していたら撤退する
 						if (fleet[kFriendSide].HasHeavyDamage()) break;
 					}else{
 						// ボスマスなら結果を記録する
-						result_db.push_back(result_);
+						result_db_[omp_get_thread_num()].push_back(result_);
 					}
 				}
+			}
+			for (auto &it : result_db_) {
+				std::copy(it.begin(), it.end(), std::back_inserter(result_db));
 			}
 			const auto process_end_time = std::chrono::high_resolution_clock::now();
 			cout << "処理時間：" << std::chrono::duration_cast<std::chrono::milliseconds>(process_end_time - process_begin_time).count() << "[ms]\n" << endl;
@@ -116,7 +121,7 @@ int main(int argc, char *argv[]) {
 			}
 			vector<Fleet> fleet(kBattleSize);
 			fleet[kFriendSide] = my_fleet;
-			fleet[kEnemySide] = map_Data.GetFleet(map_Data.GetSize() - 1);
+			fleet[kEnemySide] = map_Data.GetFleet(map_Data.GetSize() - 1, 0);
 			ResultStat result_stat(result_db, fleet[kFriendSide].GetUnit());
 			if (config.GetOutputFilename().empty()) {
 				// 標準出力モード
