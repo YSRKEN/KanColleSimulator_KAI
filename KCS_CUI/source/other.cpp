@@ -239,17 +239,17 @@ ResultStat::ResultStat(const vector<Result> &result_db, const vector<vector<Kamm
 	all_count_ = result_db.size();
 	reader_killed_count_ = 0;
 
-	for (size_t ti = 0; ti < all_count_; ++ti) {
-		++win_reason_count_[int(result_db[ti].JudgeWinReason())];
-		bool special_mvp_flg = result_db[ti].GetNightFlg() && (unit.size() > 1);
+	for (const auto& result : result_db) {
+		++win_reason_count_[int(result.JudgeWinReason())];
+		bool special_mvp_flg = result.GetNightFlg() && (unit.size() > 1);
 		for (size_t fi = 0; fi < unit.size(); ++fi) {
 			size_t mvp_index = 0;
 			int mvp_damage = -1;
 			for (size_t ui = 0; ui < kMaxUnitSize; ++ui) {
 				// 残り耐久・与ダメージ
 				for (size_t bi = 0; bi < kBattleSize; ++bi) {
-					auto hp = result_db[ti].GetHP(bi, fi, ui);
-					auto damage = result_db[ti].GetDamage(bi, fi, ui);
+					auto hp = result.GetHP(bi, fi, ui);
+					auto damage = result.GetDamage(bi, fi, ui);
 					hp_min_[bi][fi][ui] = std::min(hp_min_[bi][fi][ui], hp);
 					hp_max_[bi][fi][ui] = std::max(hp_max_[bi][fi][ui], hp);
 					damage_min_[bi][fi][ui] = std::min(damage_min_[bi][fi][ui], damage);
@@ -258,17 +258,17 @@ ResultStat::ResultStat(const vector<Result> &result_db, const vector<vector<Kamm
 					damage_ave_[bi][fi][ui] += damage;
 				}
 				// MVP・大破
-				auto damage = result_db[ti].GetDamage(0, fi, ui, special_mvp_flg);
+				auto damage = result.GetDamage(0, fi, ui, special_mvp_flg);
 				if (damage > mvp_damage) {
 					mvp_index = ui;
 					mvp_damage = damage;
 				}
-				if (result_db[ti].GetHP(0, fi, ui) * 4 <= unit[fi][ui].GetMaxHP()) ++heavy_damage_count_[fi][ui];
+				if (result.GetHP(0, fi, ui) * 4 <= unit[fi][ui].GetMaxHP()) ++heavy_damage_count_[fi][ui];
 			}
 			++mvp_count_[fi][mvp_index];
 		}
 		// 旗艦撃破
-		if (result_db[ti].GetHP(1, 0, 0) == 0) ++reader_killed_count_;
+		if (result.GetHP(1, 0, 0) == 0) ++reader_killed_count_;
 	}
 	// 平均
 	double all_count_inv = 1.0 / all_count_;
@@ -282,13 +282,13 @@ ResultStat::ResultStat(const vector<Result> &result_db, const vector<vector<Kamm
 	}
 	// 標本標準偏差
 	if (all_count_ > 1) {
-		for (size_t ti = 0; ti < all_count_; ++ti) {
+		for (const auto& result : result_db) {
 			for (size_t bi = 0; bi < kBattleSize; ++bi) {
 				for (size_t fi = 0; fi < kMaxFleetSize; ++fi) {
 					for (size_t ui = 0; ui < kMaxUnitSize; ++ui) {
-						double temp1 = hp_ave_[bi][fi][ui] - result_db[ti].GetHP(bi, fi, ui);
+						double temp1 = hp_ave_[bi][fi][ui] - result.GetHP(bi, fi, ui);
 						hp_sd_[bi][fi][ui] += temp1 * temp1;
-						double temp2 = damage_ave_[bi][fi][ui] - result_db[ti].GetDamage(bi, fi, ui);
+						double temp2 = damage_ave_[bi][fi][ui] - result.GetDamage(bi, fi, ui);
 						damage_sd_[bi][fi][ui] += temp2 * temp2;
 					}
 				}
