@@ -230,7 +230,7 @@ void Simulator::AirWarPhase() {
 		// 触接の開始率を計算する
 		auto trailer_aircraft_prob = fleet_[i].TrailerAircraftProb(air_war_status);
 		if (trailer_aircraft_prob < rand.RandReal()) continue;	//触接は確率的に開始される
-																// 触接の選択率を計算する
+		// 触接の選択率を計算する
 		all_attack_plus[i] = fleet_[i].TrailerAircraftPlus();
 	}
 
@@ -565,6 +565,22 @@ void Simulator::NightPhase() {
 	cout << "【夜戦フェイズ】" << endl << endl;
 #endif
 	result_.SetNightFlg(true);
+	// 夜偵が発動するかを確率的に判断する
+	bool wsn_flg = false;
+	auto aws = std::get<0>(air_war_result_);
+	//制空権確保・航空優勢・航空劣勢・開幕夜戦時に発動判定を行う
+	if (aws == kAirWarStatusBest || aws == kAirWarStatusGood || aws == kAirWarStatusBad || simulate_mode_ == kSimulateModeN) {
+		for (auto &it_k : fleet_[kFriendSide].SecondUnit()) {
+			for (auto &it_w : it_k.GetWeapon()) {
+				if (it_w.GetWeaponClass() != WeaponClass::WSN) continue;
+				double prob = ((sqrt(50 * it_k.GetLevel()) - 3) / 100) | limit(0.0, 0.99);
+				if (!rand.RandBool(prob)) continue;
+				wsn_flg = true;
+				break;
+			}
+			if (wsn_flg) break;
+		}
+	}
 	// 夜戦でのダメージは、Result#damage_だけでなくResult#damage_night_にも代入すること
 	for (size_t ui = 0; ui < kMaxUnitSize; ++ui) {
 		for (size_t bi = 0; bi < kBattleSize; ++bi) {
@@ -590,7 +606,7 @@ void Simulator::NightPhase() {
 			auto fire_type = JudgeNightFireType(bi, enemy_index);
 			// 攻撃の種類によって、基本攻撃力および倍率を算出する
 			// 夜戦速吸は対潜を常に爆雷で行う
-			auto base_attack = hunter_kammusu.NightAttack(fire_type, target_kammusu.AnyOf(ShipClass::AF));
+			auto base_attack = hunter_kammusu.NightAttack(fire_type, target_kammusu.AnyOf(ShipClass::AF)) + (wsn_flg ? 5 : 0);
 			bool special_attack_flg = false;
 			bool double_flg = false;
 			auto multiple = 1.0;
