@@ -11,7 +11,7 @@ public:
 	MapData(const string &file_name, const WeaponDB &weapon_db, const KammusuDB &kammusu_db);
 	// getter
 	size_t GetSize() const noexcept;
-	Fleet GetFleet(const size_t) const noexcept;
+	Fleet GetFleet(const size_t) noexcept;
 	SimulateMode GetSimulateMode(const size_t) const noexcept;
 	wstring GetPointName(const size_t) const noexcept;
 	// setter
