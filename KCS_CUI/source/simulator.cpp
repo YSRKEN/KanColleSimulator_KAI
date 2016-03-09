@@ -131,7 +131,7 @@ tuple<Result, vector<Fleet>> Simulator::Calc() {
 SimulatorCalcExit:
 	// 燃料・弾薬を減少させる
 	//連合艦隊かつ対潜マスなら弾薬消費無し
-	bool combined_ss_flg = fleet_[kFriendSide].GetFleetType() != FleetType::Normal && fleet_[kEnemySide].FirstUnit()[0].IsSubmarine();
+	bool combined_ss_flg = fleet_[kFriendSide].GetFleetType() != FleetType::Normal && fleet_[kEnemySide].GetUnit().front()[0].IsSubmarine();
 	//計算
 	for (auto &it_u : fleet_[kFriendSide].GetUnit()) {
 		for (auto &it_k : it_u) {
@@ -210,7 +210,7 @@ void Simulator::AirWarPhase() {
 		break;
 	}
 	for (size_t i = 0; i < kBattleSize; ++i) {
-		for (auto &it_k : fleet_[i].FirstUnit()) {
+		for (auto &it_k : fleet_[i].GetUnit().front()) {
 			if (it_k.Status() == kStatusLost) continue;
 			for (auto& it_w : it_k.GetWeapon()) {
 				if (!it_w.AnyOf(WeaponClass::AirFight)) continue;
@@ -245,13 +245,13 @@ void Simulator::AirWarPhase() {
 		//                       0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
 		const int aac_bonus_add1[] = { 0,7,6,4,6,4,4,3,4,2,8, 6, 3, 0, 4, 3, 4, 2, 2};
 		auto other_side = kBattleSize - i - 1;	//自分にとっての敵、敵にとっての自分
-		for (auto &it_k : fleet_[other_side].FirstUnit()) {
+		for (auto &it_k : fleet_[other_side].GetUnit().front()) {
 			if (it_k.Status() == kStatusLost) continue;
 			for (auto& it_w : it_k.GetWeapon()) {
 				if (!it_w.AnyOf(WeaponClass::AirFight)) continue;
 				auto intercept_index = fleet_[i].RandomKammusu();
 				if (!std::get<is_alive>(intercept_index)) continue;
-				Kammusu &intercept_kammusu = fleet_[i].FirstUnit()[std::get<selected>(intercept_index)];	//迎撃艦
+				Kammusu &intercept_kammusu = fleet_[i].GetUnit().front()[std::get<selected>(intercept_index)];	//迎撃艦
 				auto all_anti_air = intercept_kammusu.AllAntiAir();								//加重対空値
 				int killed_airs = 0;
 				//固定撃墜
@@ -296,7 +296,7 @@ void Simulator::AirWarPhase() {
 	vector<vector<vector<int>>> all_damage(kBattleSize, vector<vector<int>>(kMaxFleetSize, vector<int>(kMaxUnitSize, 0)));
 	for (size_t bi = 0; bi < kBattleSize; ++bi) {
 		auto other_side = kBattleSize - bi - 1;
-		auto &friend_unit = fleet_[bi].FirstUnit();
+		auto &friend_unit = fleet_[bi].GetUnit().front();
 		for (size_t ui = 0; ui < friend_unit.size(); ++ui) {
 			auto &hunter_kammusu = friend_unit[ui];
 			// 既に沈んでいる場合は攻撃できない
@@ -348,7 +348,7 @@ void Simulator::AirWarPhase() {
 #ifdef _DEBUG
 	cout << "残機：" << endl;
 	for (size_t i = 0; i < kBattleSize; ++i) {
-		for (auto &it_k : fleet_[i].FirstUnit()) {
+		for (auto &it_k : fleet_[i].GetUnit().front()) {
 			for (const auto& it_w : it_k.GetWeapon()) {
 				cout << it_w.GetAir() << " ";
 			}
@@ -399,7 +399,7 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 	vector<vector<int>> all_damage(kBattleSize, vector<int>(kMaxUnitSize, 0));
 	for (size_t bi = 0; bi < kBattleSize; ++bi) {
 		auto other_side = kBattleSize - bi - 1;
-		auto &friend_unit = fleet_[bi].SecondUnit();
+		auto &friend_unit = fleet_[bi].GetUnit().back();
 		for (size_t ui = 0; ui < friend_unit.size(); ++ui) {
 			auto &hunter_kammusu = friend_unit[ui];
 			// 魚雷が発射できるかどうかを判定する
@@ -421,7 +421,7 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 	}
 	// ダメージ処理
 	for (size_t bi = 0; bi < kBattleSize; ++bi) {
-		auto &friend_unit = fleet_[bi].SecondUnit();
+		auto &friend_unit = fleet_[bi].GetUnit().back();
 		for (size_t ui = 0; ui < friend_unit.size(); ++ui) {
 			friend_unit[ui].SetRandGenerator(this->rand);
 			friend_unit[ui].MinusHP(all_damage[bi][ui], stopper_[bi][fleet_[bi].SecondIndex()][ui]);
@@ -431,7 +431,7 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 #ifdef _DEBUG
 	cout << (torpedo_turn == kTorpedoFirst ? "開幕雷撃で" : "雷撃戦で") << "受けたダメージ：" << endl;
 	for (size_t bi = 0; bi < kBattleSize; ++bi) {
-		auto &friend_unit = fleet_[bi].SecondUnit();
+		auto &friend_unit = fleet_[bi].GetUnit().back();
 		for (size_t ui = 0; ui < friend_unit.size(); ++ui) {
 			cout << all_damage[bi][ui] << ",";
 		}
@@ -496,7 +496,7 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 	if (fire_turn == kFireSecond) {
 		const bool has_bb = [] (const vector<Fleet>& fleet) -> bool {
 			for (auto &it_b : fleet) {
-				for (auto &it_k : it_b.FirstUnit()) {
+				for (auto &it_k : it_b.GetUnit().front()) {
 					if (it_k.AnyOf(ShipClass::BB | ShipClass::BBV | ShipClass::AF))
 						return true;
 				}
@@ -576,7 +576,7 @@ void Simulator::NightPhase() {
 	auto aws = std::get<0>(air_war_result_);
 	//制空権確保・航空優勢・航空劣勢・開幕夜戦時に発動判定を行う
 	if (aws == kAirWarStatusBest || aws == kAirWarStatusGood || aws == kAirWarStatusBad || simulate_mode_ == kSimulateModeN) {
-		for (auto &it_k : fleet_[kFriendSide].SecondUnit()) {
+		for (auto &it_k : fleet_[kFriendSide].GetUnit().back()) {
 			for (auto &it_w : it_k.GetWeapon()) {
 				if (it_w.GetWeaponClass() != WeaponClass::WSN) continue;
 				double prob = ((sqrt(50 * it_k.GetLevel()) - 3) / 100) | limit(0.0, 0.99);
@@ -592,10 +592,10 @@ void Simulator::NightPhase() {
 		for (size_t bi = 0; bi < kBattleSize; ++bi) {
 			auto other_side = kBattleSize - bi - 1;
 			// 単純に範囲外なら飛ばす
-			if (fleet_[bi].SecondUnit().size() <= ui) continue;
+			if (fleet_[bi].GetUnit().back().size() <= ui) continue;
 			// 担当する艦娘が攻撃参加できない場合は飛ばす
 			auto friend_index = KammusuIndex{ fleet_[bi].SecondIndex(), ui };
-			auto &hunter_kammusu = fleet_[bi].SecondUnit()[ui];
+			auto &hunter_kammusu = fleet_[bi].GetUnit().back()[ui];
 			if (!hunter_kammusu.IsFireNight()) continue;
 			// 攻撃の種類を判断し、攻撃対象を選択する
 			tuple<bool, KammusuIndex> target(false, { 0, 0 });
