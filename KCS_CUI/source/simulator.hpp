@@ -58,10 +58,10 @@ class Simulator {
 	//与えるダメージ量を計算する
 	int CalcDamage(
 		const BattlePhase&, const size_t, const KammusuIndex&, KammusuIndex&, const int&,
-		const vector<double>&, const BattlePosition&, const bool&, const double&);
+		const vector<double>&, const BattlePosition&, const bool&, const double&) const;
 	int CalcDamage(const BattlePhase&, const size_t, const KammusuIndex&, KammusuIndex&, const int&, const bool&, const double&);
 	//「かばい」を確率的に発生させる
-	void ProtectOracle(const size_t, KammusuIndex&);
+	void ProtectOracle(const size_t, KammusuIndex&) const;
 	//命中率を計算する
 	double CalcHitProb(const Formation, const Formation, const Kammusu&, const Kammusu&, const BattlePhase, const size_t, const size_t) const noexcept;
 	// 戦闘終了を判断する
@@ -69,11 +69,11 @@ class Simulator {
 	// 昼戦での攻撃種別を判断する
 	DayFireType JudgeDayFireType(const size_t, const KammusuIndex&, const KammusuIndex&) const noexcept;
 	// 昼戦での特殊攻撃を判断する
-	tuple<bool, double> JudgeDaySpecialAttack(const size_t turn_player, const KammusuIndex &attack_index);
+	tuple<bool, double> JudgeDaySpecialAttack(const size_t turn_player, const KammusuIndex &attack_index) const;
 	// 夜戦での攻撃種別を判断する
 	NightFireType JudgeNightFireType(const size_t, const KammusuIndex&) const noexcept;
 	// 夜戦での特殊攻撃を判断する
-	tuple<bool, double> JudgeNightSpecialAttack(const size_t turn_player, const KammusuIndex &attack_index, const bool);
+	tuple<bool, double> JudgeNightSpecialAttack(const size_t turn_player, const KammusuIndex &attack_index, const bool) const;
 public:
 	// コンストラクタ
 	Simulator(){}

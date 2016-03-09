@@ -60,11 +60,11 @@ public:
 	friend std::wostream& operator<<(std::wostream& os, const Fleet& conf);
 
 	//ctorもしくはSetRandGenerator経由で乱数エンジンを渡している必要がある
-	double TrailerAircraftPlus();			//攻撃力補正を計算する
-	int AacType();							//発動する対空カットインの種類を判断する
-	tuple<bool, size_t> RandomKammusu();					//生存艦から艦娘をランダムに指定する
-	tuple<bool, KammusuIndex> RandomKammusuNonSS(const bool, const TargetType, const bool has_sl = false);	//水上の生存艦から艦娘をランダムに指定する
-	tuple<bool, KammusuIndex> RandomKammusuSS(const size_t);												//潜水の生存艦から艦娘をランダムに指定する
+	double TrailerAircraftPlus() const;			//攻撃力補正を計算する
+	int AacType() const;							//発動する対空カットインの種類を判断する
+	tuple<bool, size_t> RandomKammusu() const;					//生存艦から艦娘をランダムに指定する
+	tuple<bool, KammusuIndex> RandomKammusuNonSS(const bool, const TargetType, const bool has_sl = false) const;	//水上の生存艦から艦娘をランダムに指定する
+	tuple<bool, KammusuIndex> RandomKammusuSS(const size_t) const;												//潜水の生存艦から艦娘をランダムに指定する
 	bool HasLights() const noexcept;		//探照灯や照明弾をいずれかの艦が保有していた場合はtrue
 	bool HasHeavyDamage() const noexcept;	// 大破以上の艦が存在していた場合はtrue
 };

@@ -493,8 +493,8 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 			// 一覧の範囲外なら飛ばす
 			if (attack_list[bi].size() <= ui) continue;
 			// 担当する艦娘が攻撃参加できない場合は飛ばす
-			auto &friend_index = attack_list[bi][ui].first;
-			auto &hunter_kammusu = fleet_[bi].GetUnit()[friend_index.fleet_no][friend_index.fleet_i];
+			const auto &friend_index = attack_list[bi][ui].first;
+			const auto &hunter_kammusu = fleet_[bi].GetUnit()[friend_index.fleet_no][friend_index.fleet_i];
 			if (!hunter_kammusu.IsFireGun()) continue;
 			// 攻撃の種類を判断し、攻撃対象を選択する
 			tuple<bool, KammusuIndex> target(false, {0, 0});
@@ -507,13 +507,13 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 			if (!std::get<is_attackable>(target)) continue;
 			// 攻撃対象の種類によって、攻撃の種類を選ぶ
 			auto &enemy_index = std::get<selected>(target);
-			auto &target_kammusu = fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i];
+			const auto &target_kammusu = fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i];
 			auto fire_type = JudgeDayFireType(bi, friend_index, enemy_index);
 			// 攻撃の種類によって、基本攻撃力および倍率を算出する
-			auto base_attack = hunter_kammusu.DayAttack(fire_type, target_kammusu.AnyOf(ShipClass::AF), fleet_[bi].GetFleetType(), friend_index.fleet_no);
+			int base_attack = hunter_kammusu.DayAttack(fire_type, target_kammusu.AnyOf(ShipClass::AF), fleet_[bi].GetFleetType(), friend_index.fleet_no);
 			bool special_attack_flg = false;
 			bool double_flg = false;
-			auto multiple = 1.0;
+			double multiple = 1.0;
 			// 弾着観測射撃補正
 			[&] {
 				// 砲撃時にのみ適用される
@@ -688,7 +688,8 @@ AirWarStatus Simulator::JudgeAirWarStatus(const vector<int> &anti_air_score) {
 int Simulator::CalcDamage(
 	const BattlePhase &battle_phase, const size_t turn_player, const KammusuIndex &friend_index, KammusuIndex &enemy_index,
 	const int &base_attack, const vector<double> &all_attack_plus, const BattlePosition &battle_position,
-	const bool &is_special_attack, const double &multiple){
+	const bool &is_special_attack, const double &multiple
+) const {
 	auto other_side = kBattleSize - turn_player - 1;
 	// 旗艦相手への攻撃に限り、「かばい」が確率的に発生する
 	ProtectOracle(other_side, enemy_index);
@@ -864,13 +865,13 @@ int Simulator::CalcDamage(
 	}
 
 // 「かばい」を確率的に発生させる
-void Simulator::ProtectOracle(const size_t defense_side, KammusuIndex &defense_index) {
+void Simulator::ProtectOracle(const size_t defense_side, KammusuIndex &defense_index) const {
 	// 旗艦ではない場合、かばいは発生しない
 	if (defense_index.fleet_i != 0) return;
 	// 陸上型をかばう艦などいない
 	if (fleet_[defense_side].GetUnit()[defense_index.fleet_no][0].AnyOf(ShipClass::AF)) return;
 	// 水上艦は水上艦、潜水艦は潜水艦しかかばえないのでリストを作成する
-	auto &attendants = fleet_[defense_side].GetUnit()[defense_index.fleet_no];
+	const auto &attendants = fleet_[defense_side].GetUnit()[defense_index.fleet_no];
 	auto is_submarine = attendants[0].IsSubmarine();
 	std::array<size_t, kMaxUnitSize> block_list;
 	size_t block_list_size = 0;
@@ -1049,9 +1050,9 @@ DayFireType Simulator::JudgeDayFireType(const size_t turn_player, const KammusuI
 }
 
 // 昼戦での特殊攻撃を判断する
-tuple<bool, double> Simulator::JudgeDaySpecialAttack(const size_t turn_player, const KammusuIndex &attack_index) {
+tuple<bool, double> Simulator::JudgeDaySpecialAttack(const size_t turn_player, const KammusuIndex &attack_index) const {
 	// 主砲・副砲・徹甲弾・電探・偵察機の数を数える
-	auto &hunter_kammusu = fleet_[turn_player].GetUnit()[attack_index.fleet_no][attack_index.fleet_i];
+	const auto &hunter_kammusu = fleet_[turn_player].GetUnit()[attack_index.fleet_no][attack_index.fleet_i];
 	size_t sum_gun = 0, sum_subgun = 0, sum_ap = 0, sum_radar = 0, sum_ws = 0;
 	for (auto &it_w : hunter_kammusu.GetWeapon()) {
 		switch (it_w.GetWeaponClass()) {
@@ -1123,9 +1124,9 @@ NightFireType Simulator::JudgeNightFireType(const size_t turn_player, const Kamm
 }
 
 // 夜戦での特殊攻撃を判断する
-tuple<bool, double> Simulator::JudgeNightSpecialAttack(const size_t turn_player, const KammusuIndex &attack_index, const bool af_flg) {
+tuple<bool, double> Simulator::JudgeNightSpecialAttack(const size_t turn_player, const KammusuIndex &attack_index, const bool af_flg) const {
 	// 主砲・副砲・魚雷の数を数える
-	auto &hunter_kammusu = fleet_[turn_player].GetUnit()[attack_index.fleet_no][attack_index.fleet_i];
+	const auto &hunter_kammusu = fleet_[turn_player].GetUnit()[attack_index.fleet_no][attack_index.fleet_i];
 	size_t sum_gun = 0, sum_subgun = 0, sum_torpedo = 0;
 	for (auto &it_w : hunter_kammusu.GetWeapon()) {
 		switch (it_w.GetWeaponClass()) {

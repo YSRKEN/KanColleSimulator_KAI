@@ -11,11 +11,11 @@ public:
 	MapData(const string &file_name, const WeaponDB &weapon_db, const KammusuDB &kammusu_db);
 	// getter
 	size_t GetSize() const noexcept;
-	Fleet GetFleet(const size_t) noexcept;
+	Fleet GetFleet(const size_t) const noexcept;
 	SimulateMode GetSimulateMode(const size_t) const noexcept;
 	wstring GetPointName(const size_t) const noexcept;
 	// setter
-	void SetRand(const unsigned int seed);
+	void SetRandGenerator(const unsigned int seed);
 	// ‚»‚Ì‘¼
 	void Put();	//“à—e‚ð•\Ž¦‚·‚é
 };

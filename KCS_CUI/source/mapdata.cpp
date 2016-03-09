@@ -42,14 +42,14 @@ MapData::MapData(const string &file_name, const WeaponDB &weapon_db, const Kammu
 
 // getter
 size_t MapData::GetSize() const noexcept { return fleet_.size(); }
-Fleet MapData::GetFleet(const size_t p) noexcept {
+Fleet MapData::GetFleet(const size_t p) const noexcept {
 	return rand_.select_random_in_range(fleet_[p]);
 }
 SimulateMode MapData::GetSimulateMode(const size_t p) const noexcept { return simulate_mode_[p]; }
 wstring MapData::GetPointName(const size_t p) const noexcept { return point_name_[p]; }
 
 // setter
-void MapData::SetRand(const unsigned int seed) { rand_ = SharedRand(seed); }
+void MapData::SetRandGenerator(const unsigned int seed) { rand_ = SharedRand(seed); }
 
 //内容を表示する
 void MapData::Put() {

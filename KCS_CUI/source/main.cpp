@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
 			vector<size_t> point_count(map_Data.GetSize(), 0);
 			//#pragma omp parallel for num_threads(static_cast<int>(config.GetThreads()))
 			for (int n = 0; n < static_cast<int>(config.GetTimes()); ++n) {
-				map_Data.SetRand(seed[config.CalcSeedVNo(n)]);
+				map_Data.SetRandGenerator(seed[config.CalcSeedVNo(n)]);
 				// 自艦隊をセットする
 				vector<Fleet> fleet(kBattleSize);
 				fleet[kFriendSide] = my_fleet;

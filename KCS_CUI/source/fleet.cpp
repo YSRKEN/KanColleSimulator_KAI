@@ -316,9 +316,9 @@ double Fleet::TrailerAircraftProb(const AirWarStatus &air_war_status) const {
 }
 
 // 攻撃力補正を計算する
-double Fleet::TrailerAircraftPlus(){
+double Fleet::TrailerAircraftPlus() const {
 	const static double all_attack_plus_list[] = { 1.12, 1.12, 1.17, 1.20 };
-	for (auto &it_k :FirstUnit() ) {
+	for (const auto &it_k :FirstUnit() ) {
 		if (it_k.Status() == kStatusLost) continue;
 		for (auto &it_w : it_k.GetWeapon()) {
 			if (!it_w.AnyOf(WeaponClass::AirTrailer) || it_w.GetAir() == 0) continue;
@@ -331,9 +331,9 @@ double Fleet::TrailerAircraftPlus(){
 }
 
 // 発動する対空カットインの種類を判断する
-int Fleet::AacType() {
+int Fleet::AacType() const {
 	// まず、秋月型カットイン以外の判定を行う
-	for (auto &it_u : unit_) {
+	for (const auto &it_u : unit_) {
 		for (auto &it_k : it_u) {
 			if (it_k.Status() == kStatusLost) continue;
 			auto aac_type = it_k.AacType();
@@ -373,7 +373,7 @@ int Fleet::AntiAirBonus() const {
 }
 
 // 生存艦から艦娘をランダムに指定する(航空戦用)
-tuple<bool, size_t> Fleet::RandomKammusu() {
+tuple<bool, size_t> Fleet::RandomKammusu() const {
 	//生存艦をリストアップ
 	std::array<size_t, kMaxUnitSize> alived_list;
 	size_t alived_list_size = 0;
@@ -389,7 +389,7 @@ tuple<bool, size_t> Fleet::RandomKammusu() {
 
 // 生存する水上艦から艦娘をランダムに指定する
 // ただしhas_bombがtrueの際は陸上型棲姫を避けるようになる
-tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const TargetType target_type, const bool has_sl) {
+tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const TargetType target_type, const bool has_sl) const {
 	// 攻撃する艦隊の対象を選択する
 	std::array<size_t, kMaxFleetSize> list;
 	switch (target_type) {
@@ -408,7 +408,7 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const T
 	size_t alived_list_size = 0;
 	for (auto &fi : list) {
 		for (size_t ui = 0; ui < GetUnit()[fi].size(); ++ui) {
-			auto &it_k = GetUnit()[fi][ui];
+			const auto &it_k = GetUnit()[fi][ui];
 			if (it_k.Status() == kStatusLost) continue;
 			if (it_k.IsSubmarine()) continue;
 			if (has_bomb && it_k.AnyOf(ShipClass::AF)) continue;
@@ -425,8 +425,8 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const T
 		size_t large_sl_index = sz_max;
 		size_t small_sl_index = sz_max;
 		for (size_t i = 0; i < alived_list_size; ++i) {
-			auto &it_k = GetUnit()[alived_list[i].fleet_no][alived_list[i].fleet_i];
-			for (auto &it_w : it_k.GetWeapon()) {
+			const auto &it_k = GetUnit()[alived_list[i].fleet_no][alived_list[i].fleet_i];
+			for (const auto &it_w : it_k.GetWeapon()) {
 				if (!it_w.AnyOf(WeaponClass::SL)) continue;
 				if (it_w.AnyOf(L"96式150cm探照灯"s)) {
 					if (rand_.RandBool(0.3 + 0.01 * it_w.GetLevel())) large_sl_index = i;
@@ -449,7 +449,7 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const T
 }
 
 // 潜水の生存艦から艦娘をランダムに指定する
-tuple<bool, KammusuIndex> Fleet::RandomKammusuSS(const size_t fleet_index) {
+tuple<bool, KammusuIndex> Fleet::RandomKammusuSS(const size_t fleet_index) const {
 	// 攻撃する艦隊の対象を選択する
 	vector<size_t> list;
 	switch (fleet_index) {
@@ -464,7 +464,7 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuSS(const size_t fleet_index) {
 	vector<KammusuIndex> alived_list;
 	for (auto &fi : list) {
 		for (size_t ui = 0; ui < GetUnit()[fi].size(); ++ui) {
-			auto &it_k = GetUnit()[fi][ui];
+			const auto &it_k = GetUnit()[fi][ui];
 			if (it_k.Status() == kStatusLost) continue;
 			if (!it_k.IsSubmarine()) continue;
 			alived_list.push_back({ fi, ui });
