@@ -241,7 +241,7 @@ ResultStat::ResultStat(const vector<Result> &result_db, const vector<vector<Kamm
 
 	for (const auto& result : result_db) {
 		++win_reason_count_[int(result.JudgeWinReason())];
-		bool special_mvp_flg = result.GetNightFlg() && (unit.size() > 1);
+		const bool special_mvp_flg = result.GetNightFlg() && (unit.size() > 1);
 		for (size_t fi = 0; fi < unit.size(); ++fi) {
 			size_t mvp_index = 0;
 			int mvp_damage = -1;
@@ -271,15 +271,9 @@ ResultStat::ResultStat(const vector<Result> &result_db, const vector<vector<Kamm
 		if (result.GetHP(1, 0, 0) == 0) ++reader_killed_count_;
 	}
 	// 平均
-	double all_count_inv = 1.0 / all_count_;
-	for (size_t bi = 0; bi < kBattleSize; ++bi) {
-		for (size_t fi = 0; fi < kMaxFleetSize; ++fi) {
-			for (size_t ui = 0; ui < kMaxUnitSize; ++ui) {
-				hp_ave_[bi][fi][ui] *= all_count_inv;
-				damage_ave_[bi][fi][ui] *= all_count_inv;
-			}
-		}
-	}
+	const double all_count_inv = 1.0 / all_count_;
+	for (auto& hp_ave2d : this->hp_ave_) for (auto& hp_ave1d : hp_ave2d) for (auto& hp_ave : hp_ave1d) hp_ave *= all_count_inv;
+	for (auto& damage_ave2d : this->damage_ave_) for (auto& damage_ave1d : damage_ave2d) for (auto& damage_ave : damage_ave1d) damage_ave *= all_count_inv;
 	// 標本標準偏差
 	if (all_count_ > 1) {
 		for (const auto& result : result_db) {
@@ -294,15 +288,9 @@ ResultStat::ResultStat(const vector<Result> &result_db, const vector<vector<Kamm
 				}
 			}
 		}
-		double all_count_inv2 = 1.0 / (all_count_ - 1);
-		for (size_t bi = 0; bi < kBattleSize; ++bi) {
-			for (size_t fi = 0; fi < kMaxFleetSize; ++fi) {
-				for (size_t ui = 0; ui < kMaxUnitSize; ++ui) {
-					hp_sd_[bi][fi][ui] = sqrt(hp_sd_[bi][fi][ui] * all_count_inv2);
-					damage_sd_[bi][fi][ui] = sqrt(damage_sd_[bi][fi][ui] * all_count_inv2);
-				}
-			}
-		}
+		const double all_count_inv2 = 1.0 / (all_count_ - 1);
+		for (auto& hp_sd2d : this->hp_sd_) for (auto& hp_sd1d : hp_sd2d) for (auto& hp_sd : hp_sd1d) hp_sd = std::sqrt(hp_sd * all_count_inv2);
+		for (auto& damage_sd2d : this->damage_sd_) for (auto& damage_sd1d : damage_sd2d) for (auto& damage_sd : damage_sd1d) damage_sd = std::sqrt(damage_sd * all_count_inv2);
 	}
 }
 
