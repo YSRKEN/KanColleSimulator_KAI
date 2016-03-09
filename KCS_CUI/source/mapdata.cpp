@@ -45,6 +45,9 @@ size_t MapData::GetSize() const noexcept { return fleet_.size(); }
 Fleet MapData::GetFleet(const size_t p) const noexcept {
 	return rand_.select_random_in_range(fleet_[p]);
 }
+Fleet MapData::GetFleet(const size_t p, const size_t n) const noexcept {
+	return fleet_[p][n];
+}
 SimulateMode MapData::GetSimulateMode(const size_t p) const noexcept { return simulate_mode_[p]; }
 wstring MapData::GetPointName(const size_t p) const noexcept { return point_name_[p]; }
 

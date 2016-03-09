@@ -12,6 +12,7 @@ public:
 	// getter
 	size_t GetSize() const noexcept;
 	Fleet GetFleet(const size_t) const noexcept;
+	Fleet GetFleet(const size_t, const size_t) const noexcept;
 	SimulateMode GetSimulateMode(const size_t) const noexcept;
 	wstring GetPointName(const size_t) const noexcept;
 	// setter

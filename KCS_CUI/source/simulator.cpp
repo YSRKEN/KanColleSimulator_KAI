@@ -242,13 +242,14 @@ void Simulator::AirWarPhase() {
 		int aac_type = fleet_[i].AacType();
 		// 迎撃！
 		//加重対空値
-		//                       0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
+		//                             0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
 		const int aac_bonus_add1[] = { 0,7,6,4,6,4,4,3,4,2,8, 6, 3, 0, 4, 3, 4, 2, 2};
 		auto other_side = kBattleSize - i - 1;	//自分にとっての敵、敵にとっての自分
 		for (auto &it_k : fleet_[other_side].GetUnit().front()) {
 			if (it_k.Status() == kStatusLost) continue;
 			for (auto& it_w : it_k.GetWeapon()) {
-				if (!it_w.AnyOf(WeaponClass::AirFight)) continue;
+				if (!it_w.AnyOf(WeaponClass::AirFight)) continue;				//航空戦に参加しないものは落とされない
+				if (it_w.GetTorpedo() == 0 && it_w.GetBomb() == 0) continue;	//雷装も爆装もないものは落とされない
 				auto intercept_index = fleet_[i].RandomKammusu();
 				if (!std::get<is_alive>(intercept_index)) continue;
 				Kammusu &intercept_kammusu = fleet_[i].GetUnit().front()[std::get<selected>(intercept_index)];	//迎撃艦
@@ -263,13 +264,14 @@ void Simulator::AirWarPhase() {
 						killed_airs += int(1.0 * (all_anti_air + anti_air_bonus) / 10.6);
 					}
 					// 対空カットイン成功時における固定撃墜の追加ボーナス
-					/* 種類／対空 11  45  48  69.4 75  91  102 108 126 142
-						* 第9種(+2)      +1  +2    +2          +3          +4
-						* 第7種(+3)                       +3   +3  +4  +5  +5
-						* 第8種(+4)                +3 +3       +4
-						* 第4種(+6)                            +5
-						* 第1種(+7)  +0
-						*/
+					/* | 種類／対空 | 11 | 45 | 48 | 69.4 | 75 | 91 | 102 | 108 | 126 | 142 |
+					 * |------------|----|----|----|------|----|----|-----|-----|-----|-----|
+					 * | 第9種(+2)  |    | +1 | +2 | +2   |    |    | +3  |     |     | +4  |
+					 * | 第7種(+3)  |    |    |    |      |    | +3 | +3  | +4  | +5  | +5  |
+					 * | 第8種(+4)  |    |    |    | +3   | +3 |    | +4  |     |     |     |
+					 * | 第4種(+6)  |    |    |    |      |    |    | +5  |     |     |     |
+					 * | 第1種(+7)  | +0 |    |    |      |    |    |     |     |     |     |
+					 */
 					if (aac_type > 0) {
 						killed_airs += int(-1.1376 + 0.2341 * aac_bonus_add1[aac_type] + 0.0392 * all_anti_air + 0.5);
 					}
@@ -1058,6 +1060,7 @@ DayFireType Simulator::JudgeDayFireType(const size_t turn_player, const KammusuI
 // 昼戦での特殊攻撃を判断する
 tuple<bool, double> Simulator::JudgeDaySpecialAttack(const size_t turn_player, const KammusuIndex &attack_index) const {
 	// 主砲・副砲・徹甲弾・電探・偵察機の数を数える
+	// (水上戦闘機は偵察機に含めない)
 	const auto &hunter_kammusu = fleet_[turn_player].GetUnit()[attack_index.fleet_no][attack_index.fleet_i];
 	size_t sum_gun = 0, sum_subgun = 0, sum_ap = 0, sum_radar = 0, sum_ws = 0;
 	for (auto &it_w : hunter_kammusu.GetWeapon()) {
