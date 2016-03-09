@@ -25,7 +25,7 @@ class Fleet {
 	void LoadJson(std::istream &file, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, char_cvt::char_enc fileenc);
 public:
 	// コンストラクタ
-	Fleet() { formation_ = kFormationTrail; level_ = 120; fleet_type_ = FleetType::Normal; }
+	Fleet() : formation_(kFormationTrail), unit_(), level_(120), fleet_type_(FleetType::Normal), rand_() {}
 	Fleet(const string &file_name, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, const SharedRand& rand = {}, char_cvt::char_enc fileenc = char_cvt::char_enc::utf8);
 	Fleet(std::istream &file, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, const SharedRand& rand = {}, char_cvt::char_enc fileenc = char_cvt::char_enc::utf8);
 	// setter
