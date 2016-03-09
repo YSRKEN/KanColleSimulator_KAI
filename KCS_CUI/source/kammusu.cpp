@@ -657,8 +657,10 @@ void Kammusu::MinusHP(const int &damage, const bool &stopper_flg) {
 }
 
 //弾薬・燃料を減少させる
-void Kammusu::ConsumeMaterial() noexcept {
-	ammo_ = (ammo_ - 20) | limit(0, 100);
+void Kammusu::ConsumeMaterial(const bool night_flg, const bool combined_ss_flg) noexcept {
+	if (!combined_ss_flg) {
+		ammo_ = (ammo_ - (night_flg ? 30 : 20)) | limit(0, 100);
+	}
 	fuel_ = (fuel_ - 20) | limit(0, 100);
 }
 

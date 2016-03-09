@@ -157,7 +157,7 @@ public:
 	int DayAttack(const DayFireType, const bool, const FleetType, const size_t) const noexcept;	//昼戦火力を返す
 	int NightAttack(const NightFireType, const bool) const noexcept;	//夜戦火力を返す
 	void MinusHP(const int&, const bool&);			//ダメージを与える、ctorもしくはSetRandGenerator経由で乱数エンジンを渡している必要がある
-	void ConsumeMaterial() noexcept;				//弾薬・燃料を減少させる
+	void ConsumeMaterial(const bool, const bool) noexcept;	//弾薬・燃料を減少させる
 	bool HasAir() const noexcept;					//艦載機を保有していた場合はtrue
 	bool HasAirFight() const noexcept;				//航空戦に参加する艦載機を保有していた場合はtrue
 	bool HasAirTrailer() const noexcept;			//触接に参加する艦載機を保有していた場合はtrue

@@ -130,9 +130,12 @@ tuple<Result, vector<Fleet>> Simulator::Calc() {
 	// 終了処理
 SimulatorCalcExit:
 	// 燃料・弾薬を減少させる
+	//連合艦隊かつ対潜マスなら弾薬消費無し
+	bool combined_ss_flg = fleet_[kFriendSide].GetFleetType() != FleetType::Normal && fleet_[kEnemySide].FirstUnit()[0].IsSubmarine();
+	//計算
 	for (auto &it_u : fleet_[kFriendSide].GetUnit()) {
 		for (auto &it_k : it_u) {
-			it_k.ConsumeMaterial();
+			it_k.ConsumeMaterial(result_.GetNightFlg(), combined_ss_flg);
 		}
 	}
 
