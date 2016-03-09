@@ -37,11 +37,12 @@ enum class WeaponClass : std::uint64_t {
 	SSP        = 0x0000000010000000,	//水上艦要員
 	CR         = 0x0000000020000000,	//戦闘糧食
 	OS         = 0x0000000040000000,	//洋上補給
+	WF         = 0x0000000080000000,	//水上戦闘機
 	Other      = 0x8000000000000000,	//その他
-	AirFight = PF | PBF | PB | WB | PA,						//航空戦に参加する艦載機
-	AirTrailer = PA | PS | PSS | DaiteiChan | WS | WSN,		//触接に参加する艦載機
-	AirBomb = PBF | PB | WB | PA,							//開幕爆撃に参加する艦載機
-	Air = AirFight | AirTrailer,							//(熟練度が存在する)艦載機
+	AirFight = PF | PBF | PB | WB | PA | WF,					//航空戦に参加する艦載機
+	AirTrailer = PA | PS | PSS | DaiteiChan | WS | WSN | WF,	//触接に参加する艦載機
+	AirBomb = PBF | PB | WB | PA,								//開幕爆撃に参加する艦載機
+	Air = AirFight | AirTrailer,								//(熟練度が存在する)艦載機
 };
 constexpr inline auto operator|(const WeaponClass& l, const WeaponClass& r) { return static_cast<WeaponClass>(static_cast<std::underlying_type_t<WeaponClass>>(l) | static_cast<std::underlying_type_t<WeaponClass>>(r)); }
 template<class E, class T>

@@ -116,6 +116,7 @@ WeaponClass ToWC(const string str) {
 		{ "水上艦要員", WeaponClass::SSP },
 		{ "戦闘糧食", WeaponClass::CR },
 		{ "洋上補給", WeaponClass::OS },
+		{ "水上戦闘機", WeaponClass::WF},
 		{ "その他", WeaponClass::Other },
 	};
 	for (const auto& item : map)
