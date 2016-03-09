@@ -123,6 +123,7 @@ public:
 	vector<Weapon>& GetWeapon() noexcept;
 	const vector<Weapon>& GetWeapon() const noexcept;
 	int GetAmmo() const noexcept;
+	int GetFuel() const noexcept;
 	// setter
 	void SetMaxHP(const int max_hp) noexcept;
 	void SetLuck(const int luck) noexcept;

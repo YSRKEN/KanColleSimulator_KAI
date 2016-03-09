@@ -95,6 +95,7 @@ int Kammusu::GetHP() const noexcept { return hp_; }
 vector<Weapon>& Kammusu::GetWeapon() noexcept { return weapons_; }
 const vector<Weapon>& Kammusu::GetWeapon() const noexcept { return weapons_; }
 int Kammusu::GetAmmo() const noexcept { return ammo_; }
+int Kammusu::GetFuel() const noexcept { return fuel_; }
 // setter
 void Kammusu::SetMaxHP(const int max_hp) noexcept { max_hp_ = max_hp; }
 void Kammusu::SetLuck(const int luck) noexcept { luck_ = luck; }

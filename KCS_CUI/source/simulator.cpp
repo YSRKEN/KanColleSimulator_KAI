@@ -922,7 +922,10 @@ double Simulator::CalcHitProb(
 				break;
 			}
 			//引き算により命中率を決定する(上限あり)
-			hit_prob = std::min(hit_value - evade_value, 0.97);
+			hit_prob = hit_value - evade_value;
+			// 残燃料による回避補正
+			hit_prob *= 3.73127 - 3.53991 * std::min(target_kammusu.GetFuel(), 80) / 100;
+			hit_prob = std::min(hit_prob, 0.97);
 		}
 	break;
 	case kBattlePhaseFirstTorpedo:
@@ -978,7 +981,10 @@ double Simulator::CalcHitProb(
 				evade_value = evade_sum / (evade_sum + a);
 			}
 			//引き算により命中率を決定する(上限あり)
-			hit_prob = std::min(hit_value - evade_value, 0.9698);
+			hit_prob = hit_value - evade_value;
+			// 残燃料による回避補正
+			hit_prob *= 3.73127 - 3.53991 * std::min(target_kammusu.GetFuel(), 80) / 100;
+			hit_prob = std::min(hit_prob, 0.9698);
 		}
 	break;
 	}
