@@ -185,21 +185,6 @@ void Simulator::AirWarPhase() {
 	//制空状態を判断する
 	auto air_war_status = JudgeAirWarStatus(anti_air_score);
 
-	// 触接判定
-	vector<double> all_attack_plus(2, 1.0);
-	for (size_t i = 0; i < kBattleSize; ++i) {
-		// 触接発生条件
-		if (!search_result_[i]) continue;
-		if((i == kFriendSide && air_war_status == kAirWarStatusWorst)
-		|| (i == kEnemySide && air_war_status == kAirWarStatusBest)) continue;
-		if (!fleet_[i].HasAirTrailer()) continue;
-		// 触接の開始率を計算する
-		auto trailer_aircraft_prob = fleet_[i].TrailerAircraftProb(air_war_status);
-		if (trailer_aircraft_prob < rand.RandReal()) continue;	//触接は確率的に開始される
-		// 触接の選択率を計算する
-		all_attack_plus[i] = fleet_[i].TrailerAircraftPlus();
-	}
-
 	// 空中戦
 	double killed_airs_per[kBattleSize];
 	switch (air_war_status) {
@@ -232,6 +217,21 @@ void Simulator::AirWarPhase() {
 				it_w.SetAir(it_w.GetAir() - int(it_w.GetAir() * killed_airs_per[i]));
 			}
 		}
+	}
+
+	// 触接判定
+	vector<double> all_attack_plus(2, 1.0);
+	for (size_t i = 0; i < kBattleSize; ++i) {
+		// 触接発生条件
+		if (!search_result_[i]) continue;
+		if ((i == kFriendSide && air_war_status == kAirWarStatusWorst)
+			|| (i == kEnemySide && air_war_status == kAirWarStatusBest)) continue;
+		if (!fleet_[i].HasAirTrailer()) continue;
+		// 触接の開始率を計算する
+		auto trailer_aircraft_prob = fleet_[i].TrailerAircraftProb(air_war_status);
+		if (trailer_aircraft_prob < rand.RandReal()) continue;	//触接は確率的に開始される
+																// 触接の選択率を計算する
+		all_attack_plus[i] = fleet_[i].TrailerAircraftPlus();
 	}
 
 	// 対空砲火

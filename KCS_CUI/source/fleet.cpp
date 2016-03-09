@@ -321,7 +321,7 @@ double Fleet::TrailerAircraftPlus(){
 	for (auto &it_k :FirstUnit() ) {
 		if (it_k.Status() == kStatusLost) continue;
 		for (auto &it_w : it_k.GetWeapon()) {
-			if (!it_w.AnyOf(WeaponClass::AirTrailer)) continue;
+			if (!it_w.AnyOf(WeaponClass::AirTrailer) || it_w.GetAir() == 0) continue;
 			if (0.07 * it_w.GetSearch() >= rand_.RandReal()) {
 				return all_attack_plus_list[it_w.GetHit()];
 			}
