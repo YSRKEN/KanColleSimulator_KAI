@@ -95,6 +95,7 @@ int Kammusu::GetHP() const noexcept { return hp_; }
 vector<Weapon>& Kammusu::GetWeapon() noexcept { return weapons_; }
 const vector<Weapon>& Kammusu::GetWeapon() const noexcept { return weapons_; }
 int Kammusu::GetAmmo() const noexcept { return ammo_; }
+int Kammusu::GetFuel() const noexcept { return fuel_; }
 // setter
 void Kammusu::SetMaxHP(const int max_hp) noexcept { max_hp_ = max_hp; }
 void Kammusu::SetLuck(const int luck) noexcept { luck_ = luck; }
@@ -185,11 +186,11 @@ int Kammusu::AacType() const noexcept {
 	}
 	// 特定のパターンは先に関数化しておく
 	//高角砲を持っていたらtrue
-	auto has_hag = [sum_hag, sum_hagX]() -> bool { return (sum_hag + sum_hagX >= 1); };
+	auto has_high_angle_gun = [sum_hag, sum_hagX]() -> bool { return (sum_hag + sum_hagX >= 1); };
 	//対空機銃を持っていたらtrue
-	auto has_aag = [sum_aag, sum_aagX]() -> bool { return (sum_aag + sum_aagX >= 1); };
+	auto has_anti_aircraft_machine_gun = [sum_aag, sum_aagX]() -> bool { return (sum_aag + sum_aagX >= 1); };
 	//高射装置を持っていたらtrue
-	auto has_aad = [sum_hagX, sum_aad]() -> bool { return (sum_hagX + sum_aad >= 1); };
+	auto has_anti_aircraft_director = [sum_hagX, sum_aad]() -> bool { return (sum_hagX + sum_aad >= 1); };
 	//電探を持っていたらtrue
 	auto has_radar = [sum_radarW, sum_radarA]() -> bool { return (sum_radarW + sum_radarA >= 1); };
 	// まず、固有カットインを判定する
@@ -198,30 +199,30 @@ int Kammusu::AacType() const noexcept {
 		* 二次創作界隈ではまさma氏が有名であるが、秋月型がこれ以上増えると投稿時のタイトルが長くなりすぎることから
 		* 嬉しい悲鳴を上げていたとか。なお史実上では後9隻居るが、有名なのは涼月などだろう……  */
 		if (sum_hag + sum_hagX >= 2 && has_radar()) return 1;
-		if (has_hag() && has_radar()) return 2;
+		if (has_high_angle_gun() && has_radar()) return 2;
 		if (sum_hag + sum_hagX >= 2) return 3;
 	}
 	else if (AnyOf(428)) {
 		/* 摩耶改二……麻耶ではない。対空兵装により「洋上の対空要塞」(by 青島文化教材社)となったため、
 		* 重巡にしては驚異的な対空値を誇る。ついでに服装もかなりプリティーに進化した(妹の鳥海も同様) */
-		if (has_hag() && sum_aagX >= 1 && sum_radarA >= 1) return 10;
-		if (has_hag() && sum_aagX >= 1) return 11;
+		if (has_high_angle_gun() && sum_aagX >= 1 && sum_radarA >= 1) return 10;
+		if (has_high_angle_gun() && sum_aagX >= 1) return 11;
 	}
 	else if (AnyOf(141)) {
 		/* 五十鈴改二…… 名前通りLv50からの改装である。防空巡洋艦になった史実から、射程が短となり、
 		* 防空力が大幅にアップした。しかし搭載数0で火力面で使いづらくなった上、対潜は装備対潜のウェイトが高いため
 		* 彼女を最適解に出来る状況は限られている。また、改二なのに金レアで固有カットインがゴミクズ「だった」ことから、
 		* しばしば不遇改二の代表例として挙げられていた。逆に言えば、新人向けに便利とも言えるが…… */
-		if (has_hag() && has_aag() && sum_radarA >= 1) return 14;
-		if (has_hag() && has_aag()) return 15;
+		if (has_high_angle_gun() && has_anti_aircraft_machine_gun() && sum_radarA >= 1) return 14;
+		if (has_high_angle_gun() && has_anti_aircraft_machine_gun()) return 15;
 	}
 	else if (AnyOf(470)) {
 		/* 霞改二乙…… Lv88という驚異的な練度を要求するだけあり、内蔵されたギミックは特殊である。
 		* まず霞改二でも積めた大発に加え、大型電探も装備可能になった(代償に艦隊司令部施設が積めなくなった)。
 		* また、対空値も上昇し、固有カットインも実装された。ポスト秋月型＋アルファとも言えるだろう。
 		* なお紐が霞改二と違い赤色であるが、どちらにせよランドｓゲフンゲフン */
-		if (has_hag() && has_aag() && sum_radarA >= 1) return 16;
-		if (has_hag() && has_aag()) return 17;
+		if (has_high_angle_gun() && has_anti_aircraft_machine_gun() && sum_radarA >= 1) return 16;
+		if (has_high_angle_gun() && has_anti_aircraft_machine_gun()) return 17;
 	}
 	else if (AnyOf(418)) {
 		/* 皐月改二…… うるう年の2/29に実装された、皐月改二における固有の対空カットイン。
@@ -229,12 +230,12 @@ int Kammusu::AacType() const noexcept {
 		if (sum_aagX >= 1) return 18;
 	}
 	// 次に一般カットインを判定する
-	if (sum_gunL >= 1 && sum_three >= 1 && has_aad() && sum_radarA >= 1) return 4;
+	if (sum_gunL >= 1 && sum_three >= 1 && has_anti_aircraft_director() && sum_radarA >= 1) return 4;
 	if (sum_hagX >= 2 && sum_radarA >= 1) return 5;
-	if (sum_gunL >= 1 && sum_three >= 1 && has_aad()) return 6;
-	if (has_hag() && sum_aad >= 1 && sum_radarA >= 1) return 7;
+	if (sum_gunL >= 1 && sum_three >= 1 && has_anti_aircraft_director()) return 6;
+	if (has_high_angle_gun() && sum_aad >= 1 && sum_radarA >= 1) return 7;
 	if (sum_hagX >= 1 && sum_radarA >= 1) return 8;
-	if (has_hag() && sum_aad >= 1) return 9;
+	if (has_high_angle_gun() && sum_aad >= 1) return 9;
 	if (sum_aagX >= 1 && sum_aag >= 1 && sum_radarA >= 1) return 12;
 	return 0;
 }
@@ -657,8 +658,10 @@ void Kammusu::MinusHP(const int &damage, const bool &stopper_flg) {
 }
 
 //弾薬・燃料を減少させる
-void Kammusu::ConsumeMaterial() noexcept {
-	ammo_ = (ammo_ - 20) | limit(0, 100);
+void Kammusu::ConsumeMaterial(const bool night_flg, const bool combined_ss_flg) noexcept {
+	if (!combined_ss_flg) {
+		ammo_ = (ammo_ - (night_flg ? 30 : 20)) | limit(0, 100);
+	}
 	fuel_ = (fuel_ - 20) | limit(0, 100);
 }
 

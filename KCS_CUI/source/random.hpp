@@ -66,59 +66,59 @@ public:
 	bool operator!() const noexcept {
 		return this->is_generatable();
 	}
-	std::mt19937& get(std::nothrow_t) noexcept {
+	std::mt19937& get(std::nothrow_t) const noexcept {
 		return *this->generator_;
 	}
-	std::mt19937& get() {
+	std::mt19937& get() const {
 		MISSING_RAND_GENERATOR_THROW_WITH_MESSAGE_IF(!this->is_generatable(), "rand generator is not initialized.")
 		else {
 			return *this->generator_;
 		}
 	}
-	std::mt19937& operator*() {
+	std::mt19937& operator*() const {
 		return this->get();
 	}
 
 	//generater
-	double RandReal() {
+	double RandReal() const {
 		return this->defalut_dist_(this->get());
 	}
-	double operator()() {
+	double operator()() const {
 		return this->RandReal();
 	}
 	template<typename RandType>
-	RandType generate(const RandType min, const RandType max) {
+	RandType generate(const RandType min, const RandType max) const {
 		return distribution_t<RandType>(min, max)(this->get());
 	}
 	template<typename RandType>
-	RandType operator()(const RandType min, const RandType max) {
+	RandType operator()(const RandType min, const RandType max) const {
 		return this->generate(min, max);
 	}
 	//[a, b]の一様整数乱数を取り出す
-	int RandInt(const int min, const int max) {
+	int RandInt(const int min, const int max) const {
 		return this->generate(min, max);
 	}
 	//[0, n - 1]の一様整数乱数を取り出す
-	int RandInt(const int n) { 
+	int RandInt(const int n) const {
 		return this->RandInt(0, n -1); 
 	}
-	double RandReal(const double min, const double max) {
+	double RandReal(const double min, const double max) const {
 		return this->generate(min, max);
 	}
-	bool RandBool(double rate = 0.5) {
+	bool RandBool(double rate = 0.5) const {
 		return std::bernoulli_distribution(rate)(this->get());
 	}
-	template<typename T> const T& select_random_in_range(const std::vector<T>& v) {
+	template<typename T> const T& select_random_in_range(const std::vector<T>& v) const {
 		return v[this->generate<size_t>(0, v.size() - 1)];
 	}
-	template<typename T, size_t N> const T& select_random_in_range(const std::array<T, N>& v) {
+	template<typename T, size_t N> const T& select_random_in_range(const std::array<T, N>& v) const {
 		return v[this->generate<size_t>(0, v.size() - 1)];
 	}
-	template<typename T, size_t N> const T& select_random_in_range(const std::array<T, N>& v, size_t size) {
+	template<typename T, size_t N> const T& select_random_in_range(const std::array<T, N>& v, size_t size) const {
 		return v[this->generate<size_t>(0, size - 1)];
 	}
 private:
-	template<typename RandType> std::vector<RandType> make_unique_rand_array_unique(const std::size_t size, RandType rand_min, RandType rand_max) {
+	template<typename RandType> std::vector<RandType> make_unique_rand_array_unique(const std::size_t size, RandType rand_min, RandType rand_max) const {
 		if (rand_min > rand_max) std::swap(rand_min, rand_max);
 		const auto max_min_diff_tmp = detail::diff(rand_max, rand_min);
 		const auto max_min_diff = max_min_diff_tmp + 1;
@@ -147,7 +147,7 @@ private:
 		std::shuffle(tmp.begin(), tmp.end(), engine);
 		return tmp;
 	}
-	template<typename RandType> std::vector<RandType> make_unique_rand_array_select(const std::size_t size, RandType rand_min, RandType rand_max) {
+	template<typename RandType> std::vector<RandType> make_unique_rand_array_select(const std::size_t size, RandType rand_min, RandType rand_max) const {
 		if (rand_min > rand_max) std::swap(rand_min, rand_max);
 		const auto max_min_diff_tmp = detail::diff(rand_max, rand_min);
 		INVAID_ARGUMENT_THROW_WITH_MESSAGE_IF(max_min_diff_tmp == std::numeric_limits<decltype(max_min_diff_tmp)>::max(), "random generate range(" + std::to_string(rand_min) + "-->" + std::to_string(rand_max) + ") is too big!")
@@ -169,7 +169,7 @@ private:
 
 		return tmp;
 	}
-	template<typename RandType> std::vector<RandType> make_unique_rand_array_just_shuffle(const std::size_t size, RandType rand_min, RandType rand_max) {
+	template<typename RandType> std::vector<RandType> make_unique_rand_array_just_shuffle(const std::size_t size, RandType rand_min, RandType rand_max) const {
 		if (rand_min > rand_max) std::swap(rand_min, rand_max);
 		const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
 		INVAID_ARGUMENT_THROW_WITH_MESSAGE_IF(max_min_diff != size, "random generate range(" + std::to_string(rand_min) + "-->" + std::to_string(rand_max) + ")'s size is not same with size.")
@@ -183,7 +183,7 @@ private:
 	}
 public:
 	template<typename RandType, std::enable_if_t<std::is_integral<RandType>::value/*std::is_arithmetic<RandType>::value*/, std::nullptr_t> = nullptr>
-	std::vector<RandType> make_unique_rand_array(const std::size_t size, RandType rand_min = std::numeric_limits<RandType>::min(), RandType rand_max = std::numeric_limits<RandType>::max()) {
+	std::vector<RandType> make_unique_rand_array(const std::size_t size, RandType rand_min = std::numeric_limits<RandType>::min(), RandType rand_max = std::numeric_limits<RandType>::max()) const {
 		if (rand_min > rand_max) std::swap(rand_min, rand_max);
 		if (1 == size) return{ this->generate(rand_min, rand_max) };
 		const auto max_min_diff_tmp = detail::diff(rand_max, rand_min);
@@ -200,14 +200,14 @@ public:
 		}
 	}
 	template<typename ForwardIte, typename RandType, std::enable_if_t<std::is_arithmetic<RandType>::value, std::nullptr_t> = nullptr>
-	void generate(ForwardIte begin, ForwardIte end, RandType rand_min = std::numeric_limits<RandType>::min(), RandType rand_max = std::numeric_limits<RandType>::max()) {
+	void generate(ForwardIte begin, ForwardIte end, RandType rand_min = std::numeric_limits<RandType>::min(), RandType rand_max = std::numeric_limits<RandType>::max()) const {
 		if (rand_min > rand_max) std::swap(rand_min, rand_max);
 		auto& engine = this->get();
 		distribution_t<RandType> distribution(rand_min, rand_max);
 		std::generate(begin, end, [&distribution, &engine]() { return distribution(engine); });
 	}
 	template<typename RandType, std::enable_if_t<std::is_arithmetic<RandType>::value, std::nullptr_t> = nullptr>
-	std::vector<RandType> generate_n(const std::size_t size, RandType rand_min = std::numeric_limits<RandType>::min(), RandType rand_max = std::numeric_limits<RandType>::max()) {
+	std::vector<RandType> generate_n(const std::size_t size, RandType rand_min = std::numeric_limits<RandType>::min(), RandType rand_max = std::numeric_limits<RandType>::max()) const {
 		if (rand_min > rand_max) std::swap(rand_min, rand_max);
 		std::vector<RandType> re(size);
 		auto& engine = this->get();
@@ -216,7 +216,7 @@ public:
 		return re;
 	}
 	template<std::size_t N, typename RandType, std::enable_if_t<std::is_arithmetic<RandType>::value, std::nullptr_t> = nullptr>
-	std::array<RandType, N> generate_n(RandType rand_min = std::numeric_limits<RandType>::min(), RandType rand_max = std::numeric_limits<RandType>::max()) {
+	std::array<RandType, N> generate_n(RandType rand_min = std::numeric_limits<RandType>::min(), RandType rand_max = std::numeric_limits<RandType>::max()) const {
 		if (rand_min > rand_max) std::swap(rand_min, rand_max);
 		std::array<RandType, N> re;
 		auto& engine = this->get();

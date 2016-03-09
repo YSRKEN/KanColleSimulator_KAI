@@ -25,7 +25,7 @@ class Fleet {
 	void LoadJson(std::istream &file, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, char_cvt::char_enc fileenc);
 public:
 	// コンストラクタ
-	Fleet() { formation_ = kFormationTrail; level_ = 120; fleet_type_ = FleetType::Normal; }
+	Fleet() : formation_(kFormationTrail), unit_(), level_(120), fleet_type_(FleetType::Normal), rand_() {}
 	Fleet(const string &file_name, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, const SharedRand& rand = {}, char_cvt::char_enc fileenc = char_cvt::char_enc::utf8);
 	Fleet(std::istream &file, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, const SharedRand& rand = {}, char_cvt::char_enc fileenc = char_cvt::char_enc::utf8);
 	// setter
@@ -33,15 +33,10 @@ public:
 	void SetFormation(const Formation);
 	// getter
 	Formation GetFormation() const noexcept;
-	vector<vector<Kammusu>>& GetUnit();
-	const vector<vector<Kammusu>>& GetUnit() const;
+	vector<vector<Kammusu>>& GetUnit() noexcept;
+	const vector<vector<Kammusu>>& GetUnit() const noexcept;
 	FleetType GetFleetType() const noexcept;
 	// その他
-	vector<Kammusu>& FirstUnit();
-	const vector<Kammusu>& FirstUnit() const;
-	vector<Kammusu>& SecondUnit();
-	const vector<Kammusu>& SecondUnit() const;
-
 	size_t FleetSize() const noexcept;						//「艦隊数」(通常艦隊だと1、連合艦隊だと2)
 	size_t UnitSize(const size_t fi) const noexcept;	//「艦隊」における艦数
 	size_t FirstIndex() const noexcept;								//第一艦隊のインデックス
@@ -60,11 +55,11 @@ public:
 	friend std::wostream& operator<<(std::wostream& os, const Fleet& conf);
 
 	//ctorもしくはSetRandGenerator経由で乱数エンジンを渡している必要がある
-	double TrailerAircraftPlus();			//攻撃力補正を計算する
-	int AacType();							//発動する対空カットインの種類を判断する
-	tuple<bool, size_t> RandomKammusu();					//生存艦から艦娘をランダムに指定する
-	tuple<bool, KammusuIndex> RandomKammusuNonSS(const bool, const TargetType, const bool has_sl = false);	//水上の生存艦から艦娘をランダムに指定する
-	tuple<bool, KammusuIndex> RandomKammusuSS(const size_t);												//潜水の生存艦から艦娘をランダムに指定する
+	double TrailerAircraftPlus() const;			//攻撃力補正を計算する
+	int AacType() const;							//発動する対空カットインの種類を判断する
+	tuple<bool, size_t> RandomKammusu() const;					//生存艦から艦娘をランダムに指定する
+	tuple<bool, KammusuIndex> RandomKammusuNonSS(const bool, const TargetType, const bool has_sl = false) const;	//水上の生存艦から艦娘をランダムに指定する
+	tuple<bool, KammusuIndex> RandomKammusuSS(const size_t) const;												//潜水の生存艦から艦娘をランダムに指定する
 	bool HasLights() const noexcept;		//探照灯や照明弾をいずれかの艦が保有していた場合はtrue
 	bool HasHeavyDamage() const noexcept;	// 大破以上の艦が存在していた場合はtrue
 };

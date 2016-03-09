@@ -43,14 +43,16 @@ MapData::MapData(const string &file_name, const WeaponDB &weapon_db, const Kammu
 // getter
 size_t MapData::GetSize() const noexcept { return fleet_.size(); }
 Fleet MapData::GetFleet(const size_t p) const noexcept {
-	//return fleet_[p][rand_.RandInt(fleet_[p].size())];	このように書くとエラーが出る
-	return fleet_[p][0];
+	return rand_.select_random_in_range(fleet_[p]);
+}
+Fleet MapData::GetFleet(const size_t p, const size_t n) const noexcept {
+	return fleet_[p][n];
 }
 SimulateMode MapData::GetSimulateMode(const size_t p) const noexcept { return simulate_mode_[p]; }
 wstring MapData::GetPointName(const size_t p) const noexcept { return point_name_[p]; }
 
 // setter
-void MapData::SetRand(const unsigned int seed) { rand_ = SharedRand(seed); }
+void MapData::SetRandGenerator(const unsigned int seed) { rand_ = SharedRand(seed); }
 
 //内容を表示する
 void MapData::Put() {
@@ -61,7 +63,7 @@ void MapData::Put() {
 			wcout << L"　　";
 			for (size_t ui = 0; ui < it_f.UnitSize(0); ++ui) {
 				if (ui != 0) wcout << L",";
-				wcout << it_f.FirstUnit()[ui].GetName();
+				wcout << it_f.GetUnit().front()[ui].GetName();
 			}
 			wcout << L"　" << kFormationStr[it_f.GetFormation()] << endl;
 		}

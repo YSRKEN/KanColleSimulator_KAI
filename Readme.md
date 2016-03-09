@@ -96,6 +96,7 @@ MITライセンスとします。
 |yumetodo   |https://github.com/yumetodo   |https://twitter.com/yumetodo |
 |Cranberries|https://github.com/LoliGothick|https://twitter.com/_EnumHack|
 |sayurin    |https://github.com/sayurin    |https://twitter.com/haxe     |
+|taba       |https://github.com/taba256    |https://twitter.com/__taba__ |
 
 ## バージョン履歴
 ### Ver.1.2.0
@@ -126,10 +127,12 @@ https://github.com/kazuho/picojson
 - 艦これの仕様は通常wiki・検証wikiなどを参考にした  
 http://wikiwiki.jp/kancolle/  
 http://ja.kancolle.wikia.com/wiki/%E8%89%A6%E3%81%93%E3%82%8C_%E6%A4%9C%E8%A8%BCWiki  
-https://github.com/andanteyk/ElectronicObserver/blob/master/ElectronicObserver/Other/Information/kcmemo.md#%E8%89%A6%E3%81%93%E3%82%8C%E3%81%AE%E4%BB%95%E6%A7%98%E3%81%AB%E9%96%A2%E3%81%99%E3%82%8B%E9%9B%91%E5%A4%9A%E3%81%AA%E3%83%A1%E3%83%A2
-http://kancollecalc.web.fc2.com/damage_formula.html
-http://bs-arekore.at.webry.info/201502/article_4.html
-https://twitter.com/Xe_UCH/status/705281106011029505
-http://ch.nicovideo.jp/biikame/blomaga/ar850895
+https://github.com/andanteyk/ElectronicObserver/blob/master/ElectronicObserver/Other/Information/kcmemo.md#%E8%89%A6%E3%81%93%E3%82%8C%E3%81%AE%E4%BB%95%E6%A7%98%E3%81%AB%E9%96%A2%E3%81%99%E3%82%8B%E9%9B%91%E5%A4%9A%E3%81%AA%E3%83%A1%E3%83%A2  
+http://kancollecalc.web.fc2.com/damage_formula.html  
+http://bs-arekore.at.webry.info/201502/article_4.html  
+https://twitter.com/Xe_UCH/status/705281106011029505  
+http://ch.nicovideo.jp/biikame/blomaga/ar850895  
+https://docs.google.com/spreadsheets/d/1O91DpCaHbjCZV2jy1GlMyqjwyWULdjK5kwhYALPFJGE/edit  
+http://ch.nicovideo.jp/umya/blomaga/ar899278
 - おのれSourceTree……勝手に特定拡張子を自動で除外するとは……  
 http://tech.nitoyon.com/ja/blog/2013/04/05/sourcetree/
