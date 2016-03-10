@@ -66,6 +66,34 @@ namespace intrin {
 	}
 }
 #endif//!defined(_MSC_VER) || !defined(__clang__)
+namespace detail {
+	template<typename Pointer>
+	struct vector_push_back_pointer_helper {
+		Pointer value;
+	};
+	template<typename value_type, typename Pointer, bool pointer_is_larger>
+	struct vector_push_back_pointer_operator_impl {
+		void operator()(std::vector<value_type>& v, vector_push_back_pointer_helper<Pointer> info) {
+			v.push_back(reinterpret_cast<value_type>(info.value));
+		}
+	};
+	template<typename value_type, typename Pointer>
+	struct vector_push_back_pointer_operator_impl<value_type, Pointer, true> {
+		void operator()(std::vector<value_type>& v, vector_push_back_pointer_helper<Pointer> info) {
+			constexpr size_t size_time = sizeof(Pointer) / sizeof(value_type);
+			constexpr size_t rshft_num = sizeof(value_type) * CHAR_BIT;
+			for (size_t i = 0; i < size_time; ++i) {
+				v.push_back(static_cast<value_type>(reinterpret_cast<std::uintmax_t>(info.value) >> (rshft_num * i)));
+			}
+		}
+	};
+	template<typename value_type, typename Pointer, std::enable_if_t<std::is_pointer<Pointer>::value, std::nullptr_t> = nullptr>
+	void operator| (std::vector<value_type>& v, vector_push_back_pointer_helper<Pointer> info) {
+		vector_push_back_pointer_operator_impl<value_type, Pointer, (sizeof(value_type) < sizeof(Pointer))> ()(v, info);
+	}
+}
+template<typename Pointer>
+detail::vector_push_back_pointer_helper<Pointer> push_back(Pointer pointer) { return{ pointer }; }
 using seed_v_t = std::vector<unsigned int>;
 seed_v_t create_seed_v() {
 	const auto begin_time = std::chrono::high_resolution_clock::now();
@@ -110,9 +138,8 @@ seed_v_t create_seed_v() {
 	sed_v.push_back(static_cast<std::uint_least32_t>(time(nullptr)));//time関数の結果もベクターに追加
 	//ヒープ領域のアドレスもベクターに追加
 	auto heap = std::make_unique<char>();
-	const auto address = reinterpret_cast<std::uint_least64_t>(heap.get());
-	sed_v.push_back(static_cast<std::uint_least32_t>(address));
-	if(sizeof(void*) > 4)sed_v.push_back(static_cast<std::uint_least32_t>(address >> 32));
+	sed_v | push_back(heap.get());
+	sed_v | push_back(&heap);
 	const auto end_time = std::chrono::high_resolution_clock::now();
 	sed_v.push_back(static_cast<std::uint_least32_t>((end_time - begin_time).count()));
 	return sed_v;
