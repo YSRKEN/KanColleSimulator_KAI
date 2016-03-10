@@ -12,6 +12,7 @@
 #include <omp.h>//omp_get_thread_num()
 #include <thread>
 #include <future>
+#include <numeric>
 int main(int argc, char *argv[]) {
 	try {
 		// 現在の設定を取得する
@@ -70,14 +71,19 @@ int main(int argc, char *argv[]) {
 			});
 			MapData map_Data(config.GetInputFilename(kEnemySide), weapon_db, kammusu_db);
 			// Simulatorを構築し、並列演算を行う
-			vector<Result> result_db;
 			vector<size_t> point_count(map_Data.GetSize(), 0);
 			vector<MapData> map_Data_(config.GetThreads(), map_Data);
 			//同期待ちand出力
-			Fleet my_fleet = load_fleet.get();
+			const auto seed = t_make_seed_alocate_result_db.get();//close thread
+			std::thread t_alocate_result_db2([&result_db_, &config, &map_Data]() {
+				for (auto& r : result_db_) {
+					r.reserve(map_Data.GetSize() * config.GetTimes());
+				}
+			});
+			Fleet my_fleet = load_fleet.get();//close thread
 			my_fleet.Put();
 			map_Data.Put();
-			const auto seed = t_make_seed_alocate_result_db.get();
+			t_alocate_result_db2.join();//close thread
 			const auto process_begin_time = std::chrono::high_resolution_clock::now();
 			#pragma omp parallel for num_threads(static_cast<int>(config.GetThreads()))
 			for (int n = 0; n < static_cast<int>(config.GetTimes()); ++n) {
@@ -117,6 +123,8 @@ int main(int argc, char *argv[]) {
 					}
 				}
 			}
+			vector<Result> result_db;
+			result_db.reserve(std::accumulate(result_db_.begin(), result_db_.end(), size_t{}, [](const size_t& s, const vector<Result>& result) { return s + result.size(); }));
 			for (auto &it : result_db_) {
 				std::copy(it.begin(), it.end(), std::back_inserter(result_db));
 			}
