@@ -10,43 +10,9 @@
 #include <algorithm>
 using namespace std::string_literals;
 
-const std::wstring& to_wstring(const ShipClass& sc) {
-	struct {
-		const std::wstring name;
-		ShipClass value;
-	} map[] = {
-		{ L"魚雷艇"s, ShipClass::PT },
-		{ L"駆逐艦"s, ShipClass::DD },
-		{ L"軽巡洋艦"s, ShipClass::CL },
-		{ L"重雷装巡洋艦"s, ShipClass::CLT },
-		{ L"重巡洋艦"s, ShipClass::CA },
-		{ L"航空巡洋艦"s, ShipClass::CAV },
-		{ L"軽空母"s, ShipClass::CVL },
-		{ L"巡洋戦艦"s, ShipClass::CC },
-		{ L"戦艦"s, ShipClass::BB },
-		{ L"航空戦艦", ShipClass::BBV },
-		{ L"正規空母"s, ShipClass::CV },
-		{ L"陸上型"s, ShipClass::AF },
-		{ L"潜水艦", ShipClass::SS },
-		{ L"潜水空母"s, ShipClass::SSV },
-		{ L"輸送艦"s, ShipClass::LST },
-		{ L"水上機母艦"s, ShipClass::AV },
-		{ L"揚陸艦"s, ShipClass::LHA },
-		{ L"装甲空母"s,ShipClass::ACV },
-		{ L"工作艦"s, ShipClass::AR },
-		{ L"潜水母艦"s, ShipClass::AS },
-		{ L"練習巡洋艦"s, ShipClass::CP },
-		{ L"給油艦"s, ShipClass::AO },
-	};
-	for (const auto& item : map)
-		if (item.value == sc)
-			return item.name;
-	throw std::runtime_error("invalid ShipClass value.");
-}
-
 // コンストラクタ
 Kammusu::Kammusu() 
-	:	Kammusu(-1, L"なし", ShipClass::DD, 0, 0, 0, 0, 0, 0, kSpeedNone, kRangeNone,
+	:	Kammusu(-1, L"なし", SC("駆逐艦"), 0, 0, 0, 0, 0, 0, kSpeedNone, kRangeNone,
 		0, { 0, 0, 0, 0, 0 }, 0, 0, 0, { -1, -1, -1, -1, -1 }, true, 1) 
 {}
 
@@ -377,7 +343,7 @@ int Kammusu::AllHit() const noexcept {
 
 // フィット砲補正
 double Kammusu::FitGunHitPlus() const noexcept {
-	if (!AnyOf(ShipClass::BB | ShipClass::BBV)) return 0.0;
+	if (!AnyOf(SC("戦艦") | SC("航空戦艦"))) return 0.0;
 	// 通常命中率低下は赤疲労検証での減少率÷2ぐらいでちょうどいいのでは？
 	const double fit[] = { 0.0, 0.01365, 0.0315, 0.0261, 0.0319 };
 	const double unfit_small[] = { 0.0, -0.00845, -0.04, -0.0422, -0.04255 };
@@ -421,7 +387,7 @@ int Kammusu::AllTorpedo(const bool &level_flg) const noexcept {
 
 // 軽巡軽量砲補正
 double Kammusu::FitGunAttackPlus() const noexcept {
-	if (AnyOf(ShipClass::CL | ShipClass::CLT | ShipClass::CP)) {
+	if (AnyOf(SC("軽巡洋艦") | SC("重雷装巡洋艦") | SC("練習巡洋艦"))) {
 		int light_gun_single = 0, light_gun_double = 0;
 		for (auto &it_w : weapons_) {
 			if (it_w.AnyOf(L"14cm単装砲"s, L"15.2cm単装砲"s))
@@ -705,7 +671,7 @@ bool Kammusu::HasAirAttack() const noexcept {
 
 // 潜水艦系ならtrue
 bool Kammusu::IsSubmarine() const noexcept {
-	return AnyOf(ShipClass::SS | ShipClass::SSV);
+	return AnyOf(SC("潜水艦") | SC("潜水空母"));
 }
 
 // 対潜シナジーを持っていたらtrue
@@ -728,7 +694,7 @@ bool Kammusu::HasAntiSubSynergy() const noexcept {
 
 // 徹甲弾補正を食らう側ならtrue
 bool Kammusu::IsSpecialEffectAP() const noexcept {
-	return AnyOf(ShipClass::CA | ShipClass::CAV | ShipClass::BB | ShipClass::BBV | ShipClass::CV | ShipClass::AF | ShipClass::ACV);
+	return AnyOf(SC("重巡洋艦") | SC("航空巡洋艦") | SC("戦艦") | SC("航空戦艦") | SC("正規空母") | SC("陸上型") | SC("装甲空母"));
 }
 
 // 彩雲を保有していた場合はtrue
@@ -748,11 +714,11 @@ bool Kammusu::IsFireTorpedo(const TorpedoTurn &torpedo_turn) const noexcept {
 			// 甲標的を積んだ軽巡(事実上阿武隈改二のみ)・潜水系・雷巡・水母は飛ばせる
 			// (冷静に考えると、甲標的さえ載れば飛ばせるはず……)
 			/*switch (ship_class_) {
-			case ShipClass::CL:
-			case ShipClass::SS:
-			case ShipClass::SSV:
-			case ShipClass::CLT:
-			case ShipClass::AV:*/
+			case SC("軽巡洋艦"):
+			case SC("潜水艦"):
+			case SC("潜水空母"):
+			case SC("重雷装巡洋艦"):
+			case SC("水上機母艦"):*/
 				for (auto &it_w : weapons_) {
 					if (it_w.AnyOf(WC("特殊潜航艇"))) return true;
 				}
@@ -792,7 +758,7 @@ bool Kammusu::IsMoveGun() const noexcept {
 	// 潜水艦系も砲撃フェイズでは行動できない
 	if (IsSubmarine()) return false;
 	// 艦載機が切れた空母も砲撃フェイズでは行動できない
-	if (AnyOf(ShipClass::CVL | ShipClass::CV | ShipClass::ACV))
+	if (AnyOf(SC("軽空母") | SC("正規空母") | SC("装甲空母")))
 		return HasAirAttack();
 	return true;
 }
@@ -805,9 +771,9 @@ bool Kammusu::IsFireGun() const noexcept {
 	if (IsSubmarine()) return false;
 	// 艦載機が切れた空母も砲撃フェイズでは攻撃できない
 	// また、中破した空母系・大破した装甲空母も攻撃できない
-	if (AnyOf(ShipClass::CVL | ShipClass::CV | ShipClass::AF))
+	if (AnyOf(SC("軽空母") | SC("正規空母") | SC("陸上型")))
 		return (HasAirAttack() && Status() != kStatusMiddleDamage);
-	if (AnyOf(ShipClass::ACV))
+	if (AnyOf(SC("装甲空母")))
 		return (HasAirAttack() && Status() != kStatusHeavyDamage);
 	return true;
 }
@@ -815,16 +781,16 @@ bool Kammusu::IsFireGun() const noexcept {
 // 昼戦で対潜可能な艦ならtrue
 bool Kammusu::IsAntiSubDay() const noexcept {
 		// 空母型対潜攻撃
-	if (AnyOf(ShipClass::CVL | ShipClass::AF))
+	if (AnyOf(SC("軽空母") | SC("陸上型")))
 		return IsAntiSubDayPlane();
 		// 航戦型対潜攻撃
-	if (AnyOf(ShipClass::BBV | ShipClass::AV | ShipClass::CAV))
+	if (AnyOf(SC("航空戦艦") | SC("水上機母艦") | SC("航空巡洋艦")))
 		return IsAntiSubDayWater();
 		// 水雷型対潜攻撃
-	if (AnyOf(ShipClass::CL | ShipClass::CLT | ShipClass::DD | ShipClass::CP))
+	if (AnyOf(SC("軽巡洋艦") | SC("重雷装巡洋艦") | SC("駆逐艦") | SC("練習巡洋艦")))
 		return anti_sub_ > 0;
 		// 上記3種類が合わさった速吸改は頭おかしい(褒め言葉)
-	if (AnyOf(ShipClass::AO))
+	if (AnyOf(SC("給油艦")))
 		return (IsAntiSubDayPlane() || IsAntiSubDayWater() || (anti_sub_ > 0));
 	return false;
 }
@@ -847,7 +813,7 @@ bool Kammusu::IsFireNight() const noexcept {
 	// 大破していたら攻撃不可
 	if (Status() >= kStatusHeavyDamage) return false;
 	// 空母系は一部を覗いて攻撃不可
-	if (AnyOf(ShipClass::CV | ShipClass::CVL | ShipClass::ACV)) {
+	if (AnyOf(SC("正規空母") | SC("軽空母") | SC("装甲空母"))) {
 		if (kammusu_flg_) {
 			if (AnyOf(L"Graf Zeppelin改"s, L"Graf Zeppelin"s)) return true;
 			return false;
@@ -864,7 +830,7 @@ bool Kammusu::IsFireNight() const noexcept {
 
 // 夜戦で対潜可能な艦ならtrue
 bool Kammusu::IsAntiSubNight() const noexcept {
-	if (AnyOf(ShipClass::CL | ShipClass::CLT | ShipClass::DD | ShipClass::CP | ShipClass::AO)) {
+	if (AnyOf(SC("軽巡洋艦") | SC("重雷装巡洋艦") | SC("駆逐艦") | SC("練習巡洋艦") | SC("給油艦"))) {
 		return anti_sub_ > 0;
 	}
 	return false;

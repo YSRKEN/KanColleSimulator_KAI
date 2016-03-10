@@ -39,7 +39,43 @@ enum class ShipClass {
 	AO  = 0x00200000,	// 給油艦
 };
 constexpr inline auto operator|(const ShipClass& l, const ShipClass& r) { return static_cast<ShipClass>(static_cast<std::underlying_type_t<ShipClass>>(l) | static_cast<std::underlying_type_t<ShipClass>>(r)); }
-const std::wstring& to_wstring(const ShipClass& sc);
+
+namespace detail {
+	constexpr std::pair<cstring<wchar_t>, ShipClass> shipClassMap[] = {
+		{ L"魚雷艇", ShipClass::PT },
+		{ L"駆逐艦", ShipClass::DD },
+		{ L"軽巡洋艦", ShipClass::CL },
+		{ L"重雷装巡洋艦", ShipClass::CLT },
+		{ L"重巡洋艦", ShipClass::CA },
+		{ L"航空巡洋艦", ShipClass::CAV },
+		{ L"軽空母", ShipClass::CVL },
+		{ L"巡洋戦艦", ShipClass::CC },
+		{ L"戦艦", ShipClass::BB },
+		{ L"航空戦艦", ShipClass::BBV },
+		{ L"正規空母", ShipClass::CV },
+		{ L"陸上型", ShipClass::AF },
+		{ L"潜水艦", ShipClass::SS },
+		{ L"潜水空母", ShipClass::SSV },
+		{ L"輸送艦", ShipClass::LST },
+		{ L"水上機母艦", ShipClass::AV },
+		{ L"揚陸艦", ShipClass::LHA },
+		{ L"装甲空母",ShipClass::ACV },
+		{ L"工作艦", ShipClass::AR },
+		{ L"潜水母艦", ShipClass::AS },
+		{ L"練習巡洋艦", ShipClass::CP },
+		{ L"給油艦", ShipClass::AO },
+	};
+}
+// 文字列から艦種へ変換します。
+#define SC(STR) (std::integral_constant<ShipClass, Single(detail::shipClassMap, L##STR##_cs)>{}())
+
+inline std::wstring to_wstring(const ShipClass& sc) {
+	const auto itor = std::find_if(std::cbegin(detail::shipClassMap), std::cend(detail::shipClassMap), [sc](const auto& item) { return item.second == sc; });
+	if (itor == std::cend(detail::shipClassMap))
+		throw std::invalid_argument("bad ShipClass.");
+	return itor->first.c_str();
+}
+
 
 // 速力
 enum Speed { kSpeedNone, kSpeedLow, kSpeedHigh };
