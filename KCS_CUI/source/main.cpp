@@ -65,10 +65,12 @@ int main(int argc, char *argv[]) {
 			map_Data.Put();
 			// Simulatorを構築し、並列演算を行う
 			auto seed = make_SharedRand().make_unique_rand_array<unsigned int>(config.CalcSeedArrSize());
-			vector<Result> result_db;
 			vector<size_t> point_count(map_Data.GetSize(), 0);
 			vector<vector<Result>> result_db_(config.GetThreads());
 			vector<MapData> map_Data_(config.GetThreads(), map_Data);
+			for (auto& r : result_db_) {
+				r.reserve(map_Data.GetSize() * config.GetTimes());
+			}
 			const auto preprocess_end_time = std::chrono::high_resolution_clock::now();
 			cout << "preprocess:" << std::chrono::duration_cast<std::chrono::nanoseconds>(preprocess_end_time - preprocess_begin_time).count() << "[ns]\n" << endl;
 			const auto process_begin_time = std::chrono::high_resolution_clock::now();
@@ -110,6 +112,7 @@ int main(int argc, char *argv[]) {
 					}
 				}
 			}
+			vector<Result> result_db;
 			for (auto &it : result_db_) {
 				std::copy(it.begin(), it.end(), std::back_inserter(result_db));
 			}
