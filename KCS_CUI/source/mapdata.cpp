@@ -1,12 +1,14 @@
 ﻿#include "base.hpp"
 #include "fleet.hpp"
 #include "mapdata.hpp"
+#include "utf8bomskip.hpp"
 
 // コンストラクタ
-MapData::MapData(const string &file_name, const WeaponDB &weapon_db, const KammusuDB &kammusu_db) {
+MapData::MapData(const string &file_name, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, char_cvt::char_enc fileenc) {
 	// ファイルを読み込む
 	ifstream fin(file_name);
 	FILE_THROW_WITH_MESSAGE_IF(!fin.is_open(), "マップデータが正常に読み込めませんでした.")
+	if (char_cvt::char_enc::shift_jis != fileenc) skip_utf8_bom(fin, fileenc);
 	using picojson::object;
 	using picojson::array;
 	using picojson::value;
@@ -17,7 +19,7 @@ MapData::MapData(const string &file_name, const WeaponDB &weapon_db, const Kammu
 	auto &o2 = o.at("position").get<array>();
 	for (auto &it : o2) {
 		auto &o3 = it.get<object>();
-		point_name_.push_back(char_cvt::shift_jis_to_utf_16(o3.at("name").to_str()));
+		point_name_.push_back(char_cvt::string2wstring(o3.at("name").to_str(), fileenc));
 		simulate_mode_.push_back(SimulateMode(stoi(o3.at("mode").to_str())) | limit(kSimulateModeDN, kSimulateModeN));
 		auto &o4 = o3.at("pattern").get<array>();
 		vector<Fleet> pattern;
