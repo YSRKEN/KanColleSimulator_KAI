@@ -7,7 +7,11 @@
 using namespace std::string_literals;
 
 Simulator::Simulator(const vector<Fleet>& fleet, const unsigned int seed, const SimulateMode& simulate_mode)
-	: fleet_(fleet), result_(), rand(seed), simulate_mode_(simulate_mode), search_result_(),
+	: Simulator(fleet, SharedRand(seed), simulate_mode)
+{}
+
+Simulator::Simulator(const vector<Fleet>& fleet, SharedRand generator, const SimulateMode & simulate_mode)
+	: fleet_(fleet), result_(), rand(generator), simulate_mode_(simulate_mode), search_result_(),
 	stopper_(),
 	is_calculated()
 {

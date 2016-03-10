@@ -80,6 +80,7 @@ public:
 	// コンストラクタ
 	Simulator(){}
 	Simulator(const vector<Fleet> &fleet, const unsigned int seed, const SimulateMode& simulate_mode);
+	Simulator(const vector<Fleet> &fleet, SharedRand generator, const SimulateMode& simulate_mode);
 	SharedRand GetGenerator() noexcept;
 	void Flush_Calc_Result(const vector<Fleet>& fleet);
 	// 計算用メソッド

@@ -51,6 +51,8 @@ Fleet MapData::GetFleet(const size_t p, const size_t n) const noexcept {
 SimulateMode MapData::GetSimulateMode(const size_t p) const noexcept { return simulate_mode_[p]; }
 wstring MapData::GetPointName(const size_t p) const noexcept { return point_name_[p]; }
 
+SharedRand MapData::GetGenerator() noexcept { return this->rand_; }
+
 // setter
 void MapData::SetRandGenerator(const unsigned int seed) { rand_ = SharedRand(seed); }
 

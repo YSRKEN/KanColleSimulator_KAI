@@ -15,6 +15,7 @@ public:
 	Fleet GetFleet(const size_t, const size_t) const noexcept;
 	SimulateMode GetSimulateMode(const size_t) const noexcept;
 	wstring GetPointName(const size_t) const noexcept;
+	SharedRand GetGenerator() noexcept;
 	// setter
 	void SetRandGenerator(const unsigned int seed);
 	// ‚»‚Ì‘¼

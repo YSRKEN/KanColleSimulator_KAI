@@ -69,33 +69,34 @@ int main(int argc, char *argv[]) {
 			vector<MapData> map_Data_(config.GetThreads(), map_Data);
 			#pragma omp parallel for num_threads(static_cast<int>(config.GetThreads()))
 			for (int n = 0; n < static_cast<int>(config.GetTimes()); ++n) {
-				map_Data_[omp_get_thread_num()].SetRandGenerator(seed[config.CalcSeedVNo(n)]);
+				auto& map_data_this_thread = map_Data_[omp_get_thread_num()];
+				map_data_this_thread.SetRandGenerator(seed[config.CalcSeedVNo(n)]);
 				// 自艦隊をセットする
 				vector<Fleet> fleet(kBattleSize);
 				fleet[kFriendSide] = my_fleet;
 				// マップを進ませる
-				for (size_t p = 0; p < map_Data_[omp_get_thread_num()].GetSize(); ++p) {
+				for (size_t p = 0; p < map_data_this_thread.GetSize(); ++p) {
 					++point_count[p];
 					// 敵艦隊をセットする
-					fleet[kEnemySide] = map_Data_[omp_get_thread_num()].GetFleet(p);
+					fleet[kEnemySide] = map_data_this_thread.GetFleet(p);
 					// 敵艦隊の形態、および戦闘モードにより自艦隊の陣形を変更する
 					if (fleet[kEnemySide].GetUnit().front().front().IsSubmarine()) {
 						fleet[kFriendSide].SetFormation(kFormationAbreast);
 					}
-					else if (map_Data_[omp_get_thread_num()].GetSimulateMode(p) == kSimulateModeN) {
+					else if (map_data_this_thread.GetSimulateMode(p) == kSimulateModeN) {
 						fleet[kFriendSide].SetFormation(config.GetFormation(kFriendSide));
 					}
 					else {
 						fleet[kFriendSide].SetFormation(kFormationTrail);
 					}
 					// シミュレートを行う
-					Simulator simulator(fleet, seed[config.CalcSeedVNo(n)], map_Data_[omp_get_thread_num()].GetSimulateMode(p));
+					Simulator simulator(fleet, map_data_this_thread.GetGenerator(), map_data_this_thread.GetSimulateMode(p));
 					vector<Fleet> fleet_;
 					Result result_;
 					std::tie(result_, fleet_) = simulator.Calc();
 					// 結果を元の配列に書き戻す
 					fleet[kFriendSide] = fleet_[kFriendSide];
-					if (p != map_Data_[omp_get_thread_num()].GetSize() - 1) {
+					if (p != map_data_this_thread.GetSize() - 1) {
 						// 大破していたら撤退する
 						if (fleet[kFriendSide].HasHeavyDamage()) break;
 					}else{
