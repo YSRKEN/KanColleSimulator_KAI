@@ -43,7 +43,7 @@ MapData::MapData(const string &file_name, const WeaponDB &weapon_db, const Kammu
 
 // getter
 size_t MapData::GetSize() const noexcept { return fleet_.size(); }
-Fleet MapData::GetFleet(const size_t p) const noexcept {
+Fleet MapData::GetFleet(const size_t p) const {
 	return rand_.select_random_in_range(fleet_[p]);
 }
 Fleet MapData::GetFleet(const size_t p, const size_t n) const noexcept {
