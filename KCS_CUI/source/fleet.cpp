@@ -111,6 +111,7 @@ void Fleet::LoadJson(std::istream & file, const WeaponDB & weapon_db, const Kamm
 				if (wi >= temp_k.GetSlots()) break;
 			}
 			// リストに加える
+			temp_k.AacType_();	//事前に対空カットインの種類を判別しておく
 			unit_[fi].push_back(move(temp_k));
 		}
 		++fi;

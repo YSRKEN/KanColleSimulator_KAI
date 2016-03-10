@@ -27,10 +27,11 @@ MapData::MapData(const string &file_name, const WeaponDB &weapon_db, const Kammu
 			auto formation_ = Formation(stoi(o5.at("form").to_str())) | limit(kFormationTrail, kFormationAbreast);
 			temp.SetFormation(formation_);
 			auto &o6 = o5.at("fleets").get<picojson::array>();
+			temp.GetUnit().resize(1);
 			for (auto &it3 : o6) {
 				auto id = stoi(it3.to_str());
 				auto kammusu = kammusu_db.Get(id, 1).Reset(weapon_db);
-				temp.GetUnit().resize(1);
+				kammusu.AacType_();	//対空カットインの種類を判別しておく
 				temp.GetUnit()[0].push_back(kammusu);
 			}
 			pattern.push_back(temp);
