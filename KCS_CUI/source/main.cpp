@@ -1,4 +1,4 @@
-﻿/* KanColleSimulator Ver.1.2.1 */
+﻿/* KanColleSimulator Ver.1.3.0 */
 
 #include "base.hpp"
 #include "config.hpp"
