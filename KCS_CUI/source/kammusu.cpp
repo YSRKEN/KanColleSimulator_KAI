@@ -145,7 +145,7 @@ void Kammusu::AacType_() noexcept {
 	size_t sum_gunL = 0, sum_radarW = 0, sum_radarA = 0, sum_three = 0;
 	for (auto &it_w : weapons_) {
 		switch (it_w.GetWeaponClass()) {
-		case WeaponClass::Gun:
+		case WC("主砲"):
 			if (it_w.IsHAG()) {
 				if (it_w.AnyOf(L"10cm連装高角砲+高射装置"s, L"12.7cm高角砲+高射装置"s, L"90mm単装高角砲"s)) {
 					++sum_hagX;
@@ -158,10 +158,10 @@ void Kammusu::AacType_() noexcept {
 				++sum_gunL;
 			}
 			break;
-		case WeaponClass::AAD:
+		case WC("高射装置"):
 			++sum_aad;
 			break;
-		case WeaponClass::AAG:
+		case WC("対空機銃"):
 			if (it_w.AnyOf(L"25mm三連装機銃 集中配備"s)) {
 				++sum_aagX;
 			}
@@ -169,11 +169,11 @@ void Kammusu::AacType_() noexcept {
 				++sum_aag;
 			}
 			break;
-		case WeaponClass::AAA:
+		case WC("対空強化弾"):
 			++sum_three;
 			break;
-		case WeaponClass::SmallR:
-		case WeaponClass::LargeR:
+		case WC("小型電探"):
+		case WC("大型電探"):
 			if (it_w.AnyOf(L"13号対空電探"s, L"21号対空電探"s, L"14号対空電探"s, L"21号対空電探改"s, L"13号対空電探改"s, L"対空レーダ― Mark.I"s, L"対空レーダ― Mark.II"s, L"深海対空レーダ―"s)) {
 				++sum_radarA;
 			}
@@ -312,21 +312,21 @@ double Kammusu::AllAntiAir() const noexcept {
 			aaa = int(2.0 * sqrt(it_w.GetAntiAir()));
 		}
 		switch (it_w.GetWeaponClass()) {
-		case WeaponClass::AAG:
+		case WC("対空機銃"):
 			aaa *= 6.0;
 			break;
-		case WeaponClass::AAD:
+		case WC("高射装置"):
 			aaa *= 4.0;
 			break;
-		case WeaponClass::LargeR:
-		case WeaponClass::SmallR:
+		case WC("大型電探"):
+		case WC("小型電探"):
 			aaa *= 3.0;
 			break;
-		case WeaponClass::PF:
-		case WeaponClass::AAA:
+		case WC("艦上戦闘機"):
+		case WC("対空強化弾"):
 			aaa *= 0.0;
 			break;
-		case WeaponClass::Gun:
+		case WC("主砲"):
 			if (it_w.IsHAG()) aaa *= 4.0; else aaa *= 0.0;
 			break;
 		default:
@@ -414,7 +414,7 @@ double Kammusu::FitGunHitPlus() const noexcept {
 // (level_flgがtrueの場合、装備改修による威力向上も考慮する)
 int Kammusu::AllTorpedo(const bool &level_flg) const noexcept {
 	double torpedo_sum = torpedo_ + SumWeapons([=](const auto& it_w) {
-		return it_w.GetTorpedo() + (level_flg && it_w.AnyOf(WeaponClass::Torpedo | WeaponClass::AAG) ? 1.2 * sqrt(it_w.GetLevel()) : 0);
+		return it_w.GetTorpedo() + (level_flg && it_w.AnyOf(WC("魚雷") | WC("対空機銃")) ? 1.2 * sqrt(it_w.GetLevel()) : 0);
 	});
 	return int(torpedo_sum);
 }
@@ -439,17 +439,17 @@ double Kammusu::SpecialEffectApPlus() const noexcept {
 	bool has_gun = false, has_ap = false, has_subgun = false, has_radar = false;
 	for (auto &it_w : weapons_) {
 		switch (it_w.GetWeaponClass()) {
-		case WeaponClass::Gun:
+		case WC("主砲"):
 			has_gun = true;
 			break;
-		case WeaponClass::AP:
+		case WC("対艦強化弾"):
 			has_ap = true;
 			break;
-		case WeaponClass::SubGun:
+		case WC("副砲"):
 			has_subgun = true;
 			break;
-		case WeaponClass::SmallR:
-		case WeaponClass::LargeR:
+		case WC("小型電探"):
+		case WC("大型電探"):
 			has_radar = true;
 			break;
 		default:
@@ -513,16 +513,16 @@ int Kammusu::DayAttack(const DayFireType fire_type, const bool af_flg, const Fle
 		for (auto &it_w : weapons_) {
 			base_attack += it_w.GetAttack();
 			switch (it_w.GetWeaponClass()) {
-			case WeaponClass::Gun:
+			case WC("主砲"):
 				base_attack += (it_w.GetRange() >= kRangeLong ? 1.5 : 1.0) * sqrt(it_w.GetLevel());
 				break;
-			case WeaponClass::SubGun:
-			case WeaponClass::AAG:
-			case WeaponClass::AAD:
-			case WeaponClass::SL:
+			case WC("副砲"):
+			case WC("対空機銃"):
+			case WC("高射装置"):
+			case WC("探照灯"):
 				base_attack += sqrt(it_w.GetLevel());
-			case WeaponClass::Sonar:
-			case WeaponClass::DP:
+			case WC("ソナー"):
+			case WC("爆雷"):
 				base_attack += 0.75 * sqrt(it_w.GetLevel());
 			default:
 				break;
@@ -551,7 +551,7 @@ int Kammusu::DayAttack(const DayFireType fire_type, const bool af_flg, const Fle
 			for (auto &it_w : weapons_) {
 				all_torpedo += it_w.GetTorpedo();
 				all_bomb += it_w.GetBomb();
-				if (it_w.AnyOf(WeaponClass::SubGun)) gamma += sqrt(it_w.GetLevel());
+				if (it_w.AnyOf(WC("副砲"))) gamma += sqrt(it_w.GetLevel());
 			}
 			// 陸上型相手だと雷装値が無効になる
 			if (af_flg) all_torpedo = 0;
@@ -579,14 +579,14 @@ int Kammusu::DayAttack(const DayFireType fire_type, const bool af_flg, const Fle
 		bool air_flg = false;
 		for (auto &it_w : weapons_) {
 			switch (it_w.GetWeaponClass()) {
-			case WeaponClass::DP:
-			case WeaponClass::Sonar:
+			case WC("爆雷"):
+			case WC("ソナー"):
 				base_attack += it_w.GetAntiSub() * 1.5;
 				base_attack += sqrt(it_w.GetLevel());
 				break;
-			case WeaponClass::PA:
-			case WeaponClass::AJ:
-			case WeaponClass::ASPP:
+			case WC("艦上攻撃機"):
+			case WC("オートジャイロ"):
+			case WC("対潜哨戒機"):
 				base_attack += it_w.GetAntiSub() * 1.5;
 				air_flg = true;
 				break;
@@ -612,16 +612,16 @@ int Kammusu::NightAttack(const NightFireType fire_type, const bool af_flg) const
 			base_attack += it_w.GetAttack();
 			if (!af_flg) base_attack += it_w.GetTorpedo();
 			switch (it_w.GetWeaponClass()) {
-			case WeaponClass::Gun:
+			case WC("主砲"):
 				base_attack += (it_w.GetRange() >= kRangeLong ? 1.5 : 1.0) * sqrt(it_w.GetLevel());
 				break;
-			case WeaponClass::SubGun:
-			case WeaponClass::AAG:
-			case WeaponClass::AAD:
-			case WeaponClass::SL:
+			case WC("副砲"):
+			case WC("対空機銃"):
+			case WC("高射装置"):
+			case WC("探照灯"):
 				base_attack += sqrt(it_w.GetLevel());
-			case WeaponClass::Sonar:
-			case WeaponClass::DP:
+			case WC("ソナー"):
+			case WC("爆雷"):
 				base_attack += 0.75 * sqrt(it_w.GetLevel());
 			default:
 				break;
@@ -632,7 +632,7 @@ int Kammusu::NightAttack(const NightFireType fire_type, const bool af_flg) const
 		base_attack += SumWeapons([](const auto& it_w) {
 			// 夜戦での対潜は、航空対潜ではありえないので除外
 			// 小口径主砲・水上偵察機・小型電探の対潜値は無視していい
-			return it_w.AnyOf(WeaponClass::DP | WeaponClass::Sonar) ? it_w.GetAntiSub() * 1.5 + sqrt(it_w.GetLevel()) : 0;
+			return it_w.AnyOf(WC("爆雷") | WC("ソナー")) ? it_w.GetAntiSub() * 1.5 + sqrt(it_w.GetLevel()) : 0;
 		});
 		base_attack += sqrt(anti_sub_) * 2 + 13;
 		break;
@@ -695,7 +695,7 @@ bool Kammusu::HasAirTrailer() const noexcept {
 
 // 艦爆を保有していた場合はtrue
 bool Kammusu::HasAirBomb() const noexcept {
-	return HasWeaponClass(WeaponClass::PB | WeaponClass::PBF);
+	return HasWeaponClass(WC("艦上爆撃機") | WC("艦上爆撃機(爆戦)"));
 }
 
 // 昼戦に参加可能な場合はtrue
@@ -713,10 +713,10 @@ bool Kammusu::HasAntiSubSynergy() const noexcept {
 	bool has_dp = false, has_sonar = false;
 	for (auto &it_w : weapons_) {
 		switch (it_w.GetWeaponClass()) {
-		case WeaponClass::DP:
+		case WC("爆雷"):
 			has_dp = true;
 			break;
-		case WeaponClass::Sonar:
+		case WC("ソナー"):
 			has_sonar = true;
 			break;
 		default:
@@ -734,7 +734,7 @@ bool Kammusu::IsSpecialEffectAP() const noexcept {
 // 彩雲を保有していた場合はtrue
 bool Kammusu::HasAirPss() const noexcept {
 	for (auto &it_w : weapons_) {
-		if (it_w.AnyOf(WeaponClass::PSS)) return true;
+		if (it_w.AnyOf(WC("艦上偵察機(彩雲)"))) return true;
 	}
 	return false;
 }
@@ -754,7 +754,7 @@ bool Kammusu::IsFireTorpedo(const TorpedoTurn &torpedo_turn) const noexcept {
 			case ShipClass::CLT:
 			case ShipClass::AV:*/
 				for (auto &it_w : weapons_) {
-					if (it_w.AnyOf(WeaponClass::SpecialSS)) return true;
+					if (it_w.AnyOf(WC("特殊潜航艇"))) return true;
 				}
 			/*default:
 				break;
@@ -835,11 +835,11 @@ bool Kammusu::IsFireGunPlane() const noexcept {
 }
 
 bool Kammusu::IsAntiSubDayPlane() const noexcept {
-	return HasWeaponClass(WeaponClass::PBF | WeaponClass::PB | WeaponClass::PA);
+	return HasWeaponClass(WC("艦上爆撃機(爆戦)") | WC("艦上爆撃機") | WC("艦上攻撃機"));
 }
 
 bool Kammusu::IsAntiSubDayWater() const noexcept {
-	return HasWeaponClass(WeaponClass::WB | WeaponClass::ASPP | WeaponClass::AJ);
+	return HasWeaponClass(WC("水上爆撃機") | WC("対潜哨戒機") | WC("オートジャイロ"));
 }
 
 // 夜戦で攻撃可能な艦ならtrue
@@ -873,7 +873,7 @@ bool Kammusu::IsAntiSubNight() const noexcept {
 // 探照灯や照明弾を保有していた場合はtrue
 bool Kammusu::HasLights() const noexcept {
 	for (auto &it_w : weapons_) {
-		if (it_w.AnyOf(WeaponClass::SL | WeaponClass::LB)) return true;
+		if (it_w.AnyOf(WC("探照灯") | WC("照明弾"))) return true;
 	}
 	return false;
 }

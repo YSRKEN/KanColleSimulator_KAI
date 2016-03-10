@@ -236,29 +236,29 @@ double Fleet::SearchValue() const noexcept {
 			search_sum += sqrt(it_k.GetSearch()) * 1.6841056;
 			for (auto &it_w : it_k.GetWeapon()) {
 				switch (it_w.GetWeaponClass()) {
-				case WeaponClass::PB:	//艦爆
-				case WeaponClass::PBF:	//艦爆
+				case WC("艦上爆撃機"):	//艦爆
+				case WC("艦上爆撃機(爆戦)"):	//艦爆
 					search_sum += it_w.GetSearch() * 1.0376255;
 					break;
-				case WeaponClass::WB:	//水爆
+				case WC("水上爆撃機"):	//水爆
 					search_sum += it_w.GetSearch() * 1.7787282;
 					break;
-				case WeaponClass::PA:	//艦攻
+				case WC("艦上攻撃機"):	//艦攻
 					search_sum += it_w.GetSearch() * 1.3677954;
 					break;
-				case WeaponClass::PS:	//艦偵
+				case WC("艦上偵察機"):	//艦偵
 					search_sum += it_w.GetSearch() * 1.6592780;
 					break;
-				case WeaponClass::WS:	//水偵
+				case WC("水上偵察機"):	//水偵
 					search_sum += it_w.GetSearch() * 2.0000000;
 					break;
-				case WeaponClass::SmallR:	//小型電探
+				case WC("小型電探"):	//小型電探
 					search_sum += it_w.GetSearch() * 1.0045358;
 					break;
-				case WeaponClass::LargeR:	//大型電探
+				case WC("大型電探"):	//大型電探
 					search_sum += it_w.GetSearch() * 0.9906638;
 					break;
-				case WeaponClass::SL:	//探照灯
+				case WC("探照灯"):	//探照灯
 					search_sum += it_w.GetSearch() * 0.9067950;
 					break;
 				default:
@@ -289,7 +289,7 @@ double Fleet::TrailerAircraftProb(const AirWarStatus &air_war_status) const {
 	for (auto &it_k : this->GetUnit().front()) {
 		if (it_k.Status() == kStatusLost) continue;
 		trailer_aircraft_prob += it_k.SumWeapons([](const auto& it_w) {
-			return it_w.AnyOf(WeaponClass::PS | WeaponClass::PSS | WeaponClass::DaiteiChan | WeaponClass::WS | WeaponClass::WSN) ? 0.04 * it_w.GetSearch() * sqrt(it_w.GetAir()) : 0;
+			return it_w.AnyOf(WC("艦上偵察機") | WC("艦上偵察機(彩雲)") | WC("大型飛行艇") | WC("水上偵察機") | WC("水上偵察機(夜偵)")) ? 0.04 * it_w.GetSearch() * sqrt(it_w.GetAir()) : 0;
 		});
 	}
 	// 制空段階によって補正を掛ける(航空優勢以外は試験実装)
@@ -421,7 +421,7 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const T
 		for (size_t i = 0; i < alived_list_size; ++i) {
 			const auto &it_k = GetUnit()[alived_list[i].fleet_no][alived_list[i].fleet_i];
 			for (const auto &it_w : it_k.GetWeapon()) {
-				if (!it_w.AnyOf(WeaponClass::SL)) continue;
+				if (!it_w.AnyOf(WC("探照灯"))) continue;
 				if (it_w.AnyOf(L"96式150cm探照灯"s)) {
 					if (rand_.RandBool(0.3 + 0.01 * it_w.GetLevel())) large_sl_index = i;
 				}
