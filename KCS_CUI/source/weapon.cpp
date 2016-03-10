@@ -88,52 +88,6 @@ std::wostream & operator<<(std::wostream & os, const Weapon & conf)
 	return os;
 }
 
-// 文字列を種別に変換する
-WeaponClass ToWC(const string str) {
-	struct {
-		const char* name;
-		WeaponClass value;
-	} map[] = {
-		{ "主砲", WeaponClass::Gun },
-		{ "対艦強化弾", WeaponClass::AP },
-		{ "副砲", WeaponClass::SubGun },
-		{ "魚雷", WeaponClass::Torpedo },
-		{ "特殊潜航艇", WeaponClass::SpecialSS },
-		{ "艦上戦闘機", WeaponClass::PF },
-		{ "艦上爆撃機", WeaponClass::PB },
-		{ "艦上爆撃機(爆戦)", WeaponClass::PBF },
-		{ "水上爆撃機", WeaponClass::WB },
-		{ "艦上攻撃機", WeaponClass::PA },
-		{ "艦上偵察機", WeaponClass::PS },
-		{ "艦上偵察機(彩雲)", WeaponClass::PSS },
-		{ "大型飛行艇", WeaponClass::DaiteiChan },
-		{ "水上偵察機", WeaponClass::WS },
-		{ "水上偵察機(夜偵)", WeaponClass::WSN },
-		{ "対潜哨戒機", WeaponClass::ASPP },
-		{ "オートジャイロ", WeaponClass::AJ },
-		{ "小型電探", WeaponClass::SmallR },
-		{ "大型電探", WeaponClass::LargeR },
-		{ "対空機銃", WeaponClass::AAG },
-		{ "対空強化弾", WeaponClass::AAA },
-		{ "高射装置", WeaponClass::AAD },
-		{ "爆雷", WeaponClass::DP },
-		{ "ソナー", WeaponClass::Sonar },
-		{ "応急修理要員", WeaponClass::DC },
-		{ "探照灯", WeaponClass::SL },
-		{ "照明弾", WeaponClass::LB },
-		{ "艦隊司令部施設", WeaponClass::HQ },
-		{ "水上艦要員", WeaponClass::SSP },
-		{ "戦闘糧食", WeaponClass::CR },
-		{ "洋上補給", WeaponClass::OS },
-		{ "水上戦闘機", WeaponClass::WF},
-		{ "その他", WeaponClass::Other },
-	};
-	for (const auto& item : map)
-		if (str == item.name)
-			return item.value;
-	return WeaponClass::Other;
-}
-
 // 外部熟練度(Simple)を内部熟練度(Detail)に変換する
 int ConvertStoD(const int &level) {
 	return limit(level * 15 - 5, 0, 100);

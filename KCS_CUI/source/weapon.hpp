@@ -160,7 +160,7 @@ std::ostream& operator<<(std::ostream& os, const Weapon& conf);
 std::wostream& operator<<(std::wostream& os, const Weapon& conf);
 
 // 文字列を種別に変換する
-WeaponClass ToWC(const string);
+inline auto ToWC(const string& wc) noexcept { return FirstOrDefault(detail::weaponClassMap, cstring<char>{ wc.c_str(), wc.size() }, WC("その他")); }
 
 // 外部熟練度(Simple)を内部熟練度(Detail)に変換する
 int ConvertStoD(const int&);
