@@ -308,6 +308,7 @@
     <ClInclude Include="source\exception.hpp" />
     <ClInclude Include="source\fleet.hpp" />
     <ClInclude Include="source\kammusu.hpp" />
+    <ClInclude Include="source\lookup.hpp" />
     <ClInclude Include="source\mapdata.hpp" />
     <ClInclude Include="source\other.hpp" />
     <ClInclude Include="source\picojson.h" />
