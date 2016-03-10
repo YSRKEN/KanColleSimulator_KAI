@@ -15,6 +15,7 @@
 #include <numeric>
 int main(int argc, char *argv[]) {
 	try {
+		const auto preprocess_begin_time = std::chrono::high_resolution_clock::now();
 		// 現在の設定を取得する
 		Config config(argc, argv);
 		config.Put();
@@ -38,6 +39,8 @@ int main(int argc, char *argv[]) {
 			const auto seed = make_SharedRand().make_unique_rand_array<unsigned int>(config.CalcSeedArrSize());
 			vector<Result> result_db(config.GetTimes());
 			t_load_fleet.join();//読み込みを待つ
+			const auto preprocess_end_time = std::chrono::high_resolution_clock::now();
+			cout << "preprocess:" << std::chrono::duration_cast<std::chrono::nanoseconds>(preprocess_end_time - preprocess_begin_time).count() << "[ns]\n" << endl;
 			const auto process_begin_time = std::chrono::high_resolution_clock::now();
 			#pragma omp parallel for num_threads(static_cast<int>(config.GetThreads()))
 			for (int n = 0; n < static_cast<int>(config.GetTimes()); ++n) {
@@ -84,6 +87,8 @@ int main(int argc, char *argv[]) {
 			my_fleet.Put();
 			map_Data.Put();
 			t_alocate_result_db2.join();//close thread
+			const auto preprocess_end_time = std::chrono::high_resolution_clock::now();
+			cout << "preprocess:" << std::chrono::duration_cast<std::chrono::nanoseconds>(preprocess_end_time - preprocess_begin_time).count() << "[ns]\n" << endl;
 			const auto process_begin_time = std::chrono::high_resolution_clock::now();
 			#pragma omp parallel for num_threads(static_cast<int>(config.GetThreads()))
 			for (int n = 0; n < static_cast<int>(config.GetTimes()); ++n) {
