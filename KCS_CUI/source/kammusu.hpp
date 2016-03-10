@@ -86,6 +86,8 @@ class Kammusu {
 	int cond_;					//cond値
 	int ammo_;					//残弾薬割合
 	int fuel_;					//残燃料割合
+	// キャッシュ
+	int aac_type_;				//対空カットインの種類
 	// 内部用メンバ関数
 	bool IsAntiSubDayPlane() const noexcept;	//対潜判定(空母用)
 	bool IsAntiSubDayWater() const noexcept;	//対潜判定(航戦用)
@@ -140,6 +142,7 @@ public:
 	wstring GetNameLv() const;		//簡易的な名称を返す
 	Kammusu Reset();				//変更可な部分をリセットする
 	Kammusu Reset(const WeaponDB&);	//変更可な部分をリセットする(初期装備)
+	void AacType_() noexcept;						//対空カットインの種類を判別する
 	int AacType() const noexcept;					//対空カットインの種類を判別する
 	double AacProb(const int&) const noexcept;		//対空カットインの発動確率を計算する
 	double AllAntiAir() const noexcept;				//加重対空値を計算する

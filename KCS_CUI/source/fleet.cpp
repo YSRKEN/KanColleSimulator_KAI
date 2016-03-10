@@ -111,6 +111,7 @@ void Fleet::LoadJson(std::istream & file, const WeaponDB & weapon_db, const Kamm
 				if (wi >= temp_k.GetSlots()) break;
 			}
 			// リストに加える
+			temp_k.AacType_();	//事前に対空カットインの種類を判別しておく
 			unit_[fi].push_back(move(temp_k));
 		}
 		++fi;
@@ -358,10 +359,7 @@ int Fleet::AntiAirBonus() const {
 	for (auto &it_u : unit_) {
 		for (auto &it_k : it_u) {
 			if (it_k.Status() == kStatusLost) continue;
-			double anti_air_bonus = it_k.SumWeapons([](const auto& it_w) {
-				auto scale = it_w.IsHAG() || it_w.AnyOf(L"91式高射装置"s, L"94式高射装置"s) ? 0.35 : it_w.AnyOf(WeaponClass::SmallR | WeaponClass::LargeR) ? 0.4 : it_w.AnyOf(WeaponClass::AAA) ? 0.6 : 0.2;
-				return it_w.GetAntiAir() * scale;
-			});
+			double anti_air_bonus = it_k.SumWeapons([](const auto& it_w) {return it_w.AntiAirBonus(); });
 			fleets_anti_air_bonus += int(anti_air_bonus);
 		}
 	}

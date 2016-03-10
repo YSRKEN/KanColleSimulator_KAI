@@ -66,6 +66,8 @@ class Weapon {
 	int level_;					//装備改修度(0-10)、外部熟練度(0-7)
 	int level_detail_;			//内部熟練度(0-120)
 	int air_;					//現搭載数
+	// キャッシュ
+	double anti_air_bonus_;
 public:
 	// コンストラクタ
 	Weapon() noexcept;
@@ -95,6 +97,8 @@ public:
 	// その他
 	void Put() const;					//中身を表示する
 	int AntiAirScore(const int&) const noexcept;	//制空値を計算する
+	void AntiAirBonus_() noexcept;		//艦隊防空ボーナスを計算する
+	double Weapon::AntiAirBonus() const noexcept;
 	// 指定のIDか判別する。
 	bool AnyOf(const int test) const noexcept { return id_ == test; }
 	// 指定の種別か判定する。

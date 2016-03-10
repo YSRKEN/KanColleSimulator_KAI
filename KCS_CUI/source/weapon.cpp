@@ -10,7 +10,9 @@ Weapon::Weapon(
 	const int hit, const int evade, const int search, const Range range, const int level, const int level_detail, const int air) noexcept :
 	id_(id), name_(move(name)), weapon_class_(weapon_class), defense_(defense), attack_(attack),
 	torpedo_(torpedo), bomb_(bomb), anti_air_(anti_air), anti_sub_(anti_sub), hit_(hit),
-	evade_(evade), search_(search), range_(range), level_(level), level_detail_(level_detail), air_(air) {}
+	evade_(evade), search_(search), range_(range), level_(level), level_detail_(level_detail), air_(air) {
+	AntiAirBonus_();	//キャッシュする
+}
 
 // getter
 int Weapon::GetID() const noexcept { return id_; }
@@ -38,7 +40,7 @@ void Weapon::Put() const {
 	cout << *this;
 }
 
-//制空値を計算する
+// 制空値を計算する
 int Weapon::AntiAirScore(const int &airs) const noexcept {
 	static const double kBonusPF[] = { 0,0,2,5,9,14,14,22 }, kBonusWB[] = { 0,0,1,1,1,3,3,6 };
 	double anti_air_score = anti_air_ * sqrt(airs) + sqrt(1.0 * level_detail_ / 10);
@@ -50,6 +52,13 @@ int Weapon::AntiAirScore(const int &airs) const noexcept {
 	}
 	return int(anti_air_score);
 }
+
+// 艦隊防空ボーナスを計算する
+void Weapon::AntiAirBonus_() noexcept {
+	auto scale = (IsHAG() || AnyOf(L"91式高射装置"s, L"94式高射装置"s) ? 0.35 : AnyOf(WeaponClass::SmallR | WeaponClass::LargeR) ? 0.4 : AnyOf(WeaponClass::AAA) ? 0.6 : 0.2);
+	anti_air_bonus_ = scale * GetAntiAir();
+}
+double Weapon::AntiAirBonus() const noexcept { return anti_air_bonus_; }
 
 // 高角砲ならtrue
 bool Weapon::IsHAG() const noexcept {
