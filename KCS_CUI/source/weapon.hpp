@@ -98,7 +98,7 @@ public:
 	void Put() const;					//中身を表示する
 	int AntiAirScore(const int&) const noexcept;	//制空値を計算する
 	void AntiAirBonus_() noexcept;		//艦隊防空ボーナスを計算する
-	double Weapon::AntiAirBonus() const noexcept;
+	double AntiAirBonus() const noexcept;
 	// 指定のIDか判別する。
 	bool AnyOf(const int test) const noexcept { return id_ == test; }
 	// 指定の種別か判定する。
