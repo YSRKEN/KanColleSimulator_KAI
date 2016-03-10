@@ -26,12 +26,12 @@
     <LocalDebuggerWorkingDirectory>$(ProjectDir)..\</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommandArguments>-i "sample\3-5.json" "sample\3-5 high.map" -f 0 0 -n 10 -t 4 -o output.json &gt; log.txt</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-i "sample\3-5.json" "sample\3-5 high.map" -f 0 0 -n 100 -t 4 -o output.json &gt; log.txt</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>$(ProjectDir)../</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release(OpenMP)|x64'">
-    <LocalDebuggerCommandArguments>-i "sample\3-5.json" "sample\3-5 high.map" -f 0 0 -n 10 -t 4 -o output.json &gt; log.txt</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-i "sample\3-5.json" "sample\3-5 high.map" -f 0 0 -n 10000 -t 4 -o output.json &gt; log.txt</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>$(ProjectDir)../</LocalDebuggerWorkingDirectory>
   </PropertyGroup>

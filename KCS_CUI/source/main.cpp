@@ -10,7 +10,8 @@
 #include "mapdata.hpp"
 #include <cassert>
 #include <omp.h>//omp_get_thread_num()
-
+#include <thread>
+#include <future>
 int main(int argc, char *argv[]) {
 	try {
 		// 現在の設定を取得する
@@ -24,15 +25,18 @@ int main(int argc, char *argv[]) {
 		if (ext == "json") {	//通常モード
 			// ファイルから艦隊を読み込む
 			vector<Fleet> fleet;
-			fleet.reserve(kBattleSize);
-			assert(fleet.empty());
-			for (size_t i = 0; i < kBattleSize; ++i) {
-				fleet.emplace_back(config.GetInputFilename(i), config.GetFormation(i), weapon_db, kammusu_db);
-			}
-			for (const auto& f : fleet) f.Put();
+			std::thread t_load_fleet([&fleet, &config, &weapon_db, &kammusu_db]() {
+				fleet.reserve(kBattleSize);
+				assert(fleet.empty());
+				for (size_t i = 0; i < kBattleSize; ++i) {
+					fleet.emplace_back(config.GetInputFilename(i), config.GetFormation(i), weapon_db, kammusu_db);
+				}
+				for (const auto& f : fleet) f.Put();
+			});
 			// シミュレータを構築し、並列演算を行う
-			auto seed = make_SharedRand().make_unique_rand_array<unsigned int>(config.CalcSeedArrSize());
+			const auto seed = make_SharedRand().make_unique_rand_array<unsigned int>(config.CalcSeedArrSize());
 			vector<Result> result_db(config.GetTimes());
+			t_load_fleet.join();//読み込みを待つ
 			const auto process_begin_time = std::chrono::high_resolution_clock::now();
 			#pragma omp parallel for num_threads(static_cast<int>(config.GetThreads()))
 			for (int n = 0; n < static_cast<int>(config.GetTimes()); ++n) {
@@ -55,18 +59,26 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		else if (ext == "map") {	//マップモード
+			vector<vector<Result>> result_db_;
+			auto t_make_seed_alocate_result_db = std::async(std::launch::async, [&result_db_, &config]() {
+				result_db_.resize(config.GetThreads());
+				return make_SharedRand().make_unique_rand_array<unsigned int>(config.CalcSeedArrSize());
+			});
 			// ファイルから艦隊とマップを読み込む
-			Fleet my_fleet(config.GetInputFilename(kFriendSide), kFormationTrail, weapon_db, kammusu_db);
+			auto load_fleet = std::async(std::launch::async, [&config, &weapon_db, &kammusu_db]() {
+				return Fleet(config.GetInputFilename(kFriendSide), kFormationTrail, weapon_db, kammusu_db);
+			});
 			MapData map_Data(config.GetInputFilename(kEnemySide), weapon_db, kammusu_db);
-			my_fleet.Put();
-			map_Data.Put();
 			// Simulatorを構築し、並列演算を行う
-			auto seed = make_SharedRand().make_unique_rand_array<unsigned int>(config.CalcSeedArrSize());
-			const auto process_begin_time = std::chrono::high_resolution_clock::now();
 			vector<Result> result_db;
 			vector<size_t> point_count(map_Data.GetSize(), 0);
-			vector<vector<Result>> result_db_(config.GetThreads());
 			vector<MapData> map_Data_(config.GetThreads(), map_Data);
+			//同期待ちand出力
+			Fleet my_fleet = load_fleet.get();
+			my_fleet.Put();
+			map_Data.Put();
+			const auto seed = t_make_seed_alocate_result_db.get();
+			const auto process_begin_time = std::chrono::high_resolution_clock::now();
 			#pragma omp parallel for num_threads(static_cast<int>(config.GetThreads()))
 			for (int n = 0; n < static_cast<int>(config.GetTimes()); ++n) {
 				auto& map_data_this_thread = map_Data_[omp_get_thread_num()];
