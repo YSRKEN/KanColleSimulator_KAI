@@ -318,6 +318,10 @@
     <ClInclude Include="source\utf8bomskip.hpp" />
     <ClInclude Include="source\weapon.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="source\ships.csv" />
+    <None Include="source\slotitems.csv" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -102,4 +102,8 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="source\ships.csv" />
+    <None Include="source\slotitems.csv" />
+  </ItemGroup>
 </Project>
