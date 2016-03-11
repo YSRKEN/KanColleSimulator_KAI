@@ -7,6 +7,13 @@
 #include <utility>
 #include "cstring.hpp"
 #include "lookup.hpp"
+// 装備ID
+enum class WeaponId {
+#define WEAPON(PREFIX, ID, NAME, WEAPON_CLASS, DEFENSE, ATTACK, TORPEDO, BOMB, ANTI_AIR, ANTI_SUB, HIT, EVADE, SEARCH, RANGE, POSTFIX)	\
+	I ## D ## ID = ID,
+#include "slotitems.csv"
+#undef WEAPON
+};
 // 種別
 enum class WeaponClass : std::uint64_t {
 	Gun        = 0x0000000000000001,	//主砲
@@ -52,6 +59,12 @@ template<class E, class T>
 inline auto& operator<<(std::basic_ostream<E, T>& os, const WeaponClass& wc) { return os << static_cast<std::underlying_type_t<WeaponClass>>(wc); }
 
 namespace detail {
+	constexpr std::pair<cstring<wchar_t>, WeaponId> weaponIdMap[] = {
+#define WEAPON(PREFIX, ID, NAME, WEAPON_CLASS, DEFENSE, ATTACK, TORPEDO, BOMB, ANTI_AIR, ANTI_SUB, HIT, EVADE, SEARCH, RANGE, POSTFIX)	\
+		{ L#NAME, WeaponId::I##D##ID },
+#include "slotitems.csv"
+#undef WEAPON
+	};
 	constexpr std::pair<cstring<char>, WeaponClass> weaponClassMap[] = {
 		{ "主砲", WeaponClass::Gun },
 		{ "対艦強化弾", WeaponClass::AP },
@@ -88,6 +101,8 @@ namespace detail {
 		{ "その他", WeaponClass::Other },
 	};
 }
+// 文字列から装備IDへ変換します。
+#define WID(STR) (std::integral_constant<WeaponId, Single(detail::weaponIdMap, L##STR##_cs)>{}())
 // 文字列から装備種別へ変換します。
 #define WC(STR) (std::integral_constant<WeaponClass, Single(detail::weaponClassMap, STR##_cs)>{}())
 
