@@ -190,8 +190,7 @@ public:
 	void Put() const;						//中身を表示する
 	void ChangeCond(const int ) noexcept;	//cond値を変化させる
 	wstring GetNameLv() const;		//簡易的な名称を返す
-	Kammusu Reset();				//変更可な部分をリセットする
-	Kammusu Reset(const WeaponDB&);	//変更可な部分をリセットする(初期装備)
+	Kammusu Reset(bool load_first_weapons);			//変更可な部分をリセットする
 	void AacType_() noexcept;						//対空カットインの種類を判別する
 	int AacType() const noexcept;					//対空カットインの種類を判別する
 	double AacProb(const int&) const noexcept;		//対空カットインの発動確率を計算する

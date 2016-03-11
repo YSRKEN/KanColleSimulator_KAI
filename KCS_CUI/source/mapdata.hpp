@@ -9,7 +9,7 @@ class MapData {
 	SharedRand rand_;							//編成に使用する乱数生成器
 public:
 	// コンストラクタ
-	MapData(const string &file_name, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, char_cvt::char_enc fileenc = char_cvt::char_enc::utf8);
+	MapData(const string &file_name, const KammusuDB &kammusu_db, char_cvt::char_enc fileenc = char_cvt::char_enc::utf8);
 	// getter
 	size_t GetSize() const noexcept;
 	Fleet GetFleet(const size_t) const;

@@ -63,55 +63,7 @@ namespace detail {
 	}
 }
 detail::ToHash_helper ToHash() noexcept { return{}; }
-// 装備DBのコンストラクタ
-WeaponDB::WeaponDB(const char* csv_name) {
-	// ファイルを開く
-	ifstream ifs(csv_name);
-	FILE_THROW_WITH_MESSAGE_IF(!ifs.is_open(), string(csv_name) + "が正常に読み込めませんでした.")
-	// 1行づつ読み込んでいく
-	string temp_str;
-	getline(ifs, temp_str);
-	auto header = temp_str | Split(',') | ToHash();
-	while (getline(ifs, temp_str)) {
-		auto list         = temp_str | Split(',');
-		auto id           = list[header.at("装備ID")] | to_i();
-		auto name         = char_cvt::shift_jis_to_utf_16(list[header.at("装備名")]);
-		auto weapon_class = ToWC(list[header.at("種別")]);
-		auto defense      = list[header.at("装甲")] | to_i();
-		auto attack       = list[header.at("火力")] | to_i();
-		auto torpedo      = list[header.at("雷撃")] | to_i();
-		auto bomb         = list[header.at("爆装")] | to_i();
-		auto anti_air     = list[header.at("対空")] | to_i();
-		auto anti_sub     = list[header.at("対潜")] | to_i();
-		auto hit          = list[header.at("命中")] | to_i();
-		auto evade        = list[header.at("回避")] | to_i();
-		auto search       = list[header.at("索敵")] | to_i();
-		auto range        = static_cast<Range>(list[header.at("射程")] | to_i());
-		auto level        = 0;
-		auto level_detail = 0;
-		auto air          = 0;
-		
-		hash_[id] = Weapon(
-			id, name, weapon_class, defense, attack, torpedo, bomb, anti_air,
-			anti_sub, hit, evade, search, range, level, level_detail, air
-		);
-	}
-	// ダミーデータを代入する
-	hash_[-1] = Weapon();
-}
 
-// 装備DBからデータを読みだす
-Weapon WeaponDB::Get(const int id) const {
-	return hash_.at(id);
-}
-Weapon WeaponDB::Get(const int id, std::nothrow_t) const noexcept {
-	try {
-		return hash_.at(id);
-	}
-	catch (...) {
-		return{};
-	}
-}
 namespace detail{
 	template<CsvParseLevel KammusuLv>Kammusu::DependOnLv PaeseCsvToKammusu(const std::unordered_map<string, std::size_t>& header, const vector<string>& list){
 		const int max_hp   = list[header.at("耐久")] | Split('.')[KammusuLv] | to_i();

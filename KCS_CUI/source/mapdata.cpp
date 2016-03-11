@@ -4,7 +4,7 @@
 #include "utf8bomskip.hpp"
 
 // コンストラクタ
-MapData::MapData(const string &file_name, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, char_cvt::char_enc fileenc) {
+MapData::MapData(const string &file_name, const KammusuDB &kammusu_db, char_cvt::char_enc fileenc) {
 	// ファイルを読み込む
 	ifstream fin(file_name);
 	FILE_THROW_WITH_MESSAGE_IF(!fin.is_open(), "マップデータが正常に読み込めませんでした.")
@@ -32,7 +32,7 @@ MapData::MapData(const string &file_name, const WeaponDB &weapon_db, const Kammu
 			temp.GetUnit().resize(1);
 			for (auto &it3 : o6) {
 				auto id = stoi(it3.to_str());
-				auto kammusu = kammusu_db.Get(id, 1).Reset(weapon_db);
+				auto kammusu = kammusu_db.Get(id, 1).Reset(true);
 				kammusu.AacType_();	//対空カットインの種類を判別しておく
 				temp.GetUnit()[0].push_back(kammusu);
 			}

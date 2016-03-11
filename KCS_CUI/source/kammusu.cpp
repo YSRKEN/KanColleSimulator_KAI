@@ -26,7 +26,7 @@ Kammusu::Kammusu(
 	max_airs_(move(max_airs)), evade_(evade), anti_sub_(anti_sub), search_(search), first_weapons_(move(first_weapons)),
 	kammusu_flg_(kammusu_flg), level_(level) , rand_(rand)
 {
-	this->Reset();
+	this->Reset(false);
 }
 
 Kammusu::Kammusu(
@@ -83,22 +83,18 @@ wstring Kammusu::GetNameLv() const {
 	return name_ + L"(Lv" + std::to_wstring(level_) + L")";
 }
 
-// 変更可な部分をリセットする(装備なし)
-Kammusu Kammusu::Reset() {
+// 変更可な部分をリセットする
+Kammusu Kammusu::Reset(bool load_first_weapons) {
 	hp_ = max_hp_;
 	weapons_ = std::vector<Weapon>(slots_, Weapon());
 	cond_ = 49;
 	ammo_ = 100;
 	fuel_ = 100;
-	return *this;
-}
-// 変更可な部分をリセットする(初期装備)
-Kammusu Kammusu::Reset(const WeaponDB &weapon_db) {
-	this->Reset();
-	for (size_t i = 0; i < slots_; ++i) {
-		weapons_[i] = weapon_db.Get(first_weapons_[i], std::nothrow);
-		weapons_[i].SetAir(max_airs_[i]);
-	}
+	if(load_first_weapons)
+		for (size_t i = 0; i < slots_; ++i) {
+			weapons_[i] = Weapon::Get(first_weapons_[i]);
+			weapons_[i].SetAir(max_airs_[i]);
+		}
 	return *this;
 }
 

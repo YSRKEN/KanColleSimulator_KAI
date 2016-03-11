@@ -7,17 +7,6 @@
 class Fleet;
 class Result;
 
-// 装備DB
-class WeaponDB {
-	unordered_map<int, Weapon> hash_;
-public:
-	// コンストラクタ
-	WeaponDB(const char* csv_name);
-	// ハッシュからデータを読みだす
-	Weapon Get(const int) const;
-	Weapon Get(const int id, std::nothrow_t) const noexcept;
-};
-
 // 艦娘DB
 class KammusuDB {
 	unordered_map<int, Kammusu> hash_lv1_;
