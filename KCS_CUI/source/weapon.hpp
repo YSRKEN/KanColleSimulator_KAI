@@ -108,6 +108,7 @@ namespace detail {
 
 //装備クラス
 class Weapon {
+	static const std::unordered_map<int, const Weapon> db_;
 	int id_;					//装備ID
 	wstring name_;				//装備名
 	WeaponClass weapon_class_;	//種別
@@ -127,6 +128,7 @@ class Weapon {
 	// キャッシュ
 	double anti_air_bonus_;
 public:
+	static Weapon Get(int id) { return db_.at(id); }
 	// コンストラクタ
 	Weapon() noexcept;
 	Weapon(
