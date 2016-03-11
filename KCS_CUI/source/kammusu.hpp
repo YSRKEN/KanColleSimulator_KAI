@@ -9,7 +9,13 @@
 class WeaponDB;
 enum class FleetType : std::uint8_t;
 enum TorpedoTurn : std::uint8_t;
-
+//艦船ID
+enum class ShipId {
+#define SHIP(PREFIX, ID, NAME, SHIPCLASS, MAX_HP, DEFENSE, ATTACK, TORPEDO, ANTI_AIR, LUCK, SPEED, RANGE, SLOTS, MAX_AIRS, EVADE, ANTI_SUB, SEARCH, FIRST_WEAPONS, KAMMUSU_FLG, POSTFIX)	\
+	I ## D ## ID = ID,
+#include "ships.csv"
+#undef SHIP
+};
 // 艦種(厳密な綴りはShip Classificationsである)
 // ただし、浮遊要塞・護衛要塞・泊地棲鬼/姫・南方棲鬼は「重巡洋艦」、
 // 南方棲戦鬼は「航空巡洋艦」、装甲空母鬼/姫・戦艦レ級は「航空戦艦」、
@@ -41,6 +47,12 @@ enum class ShipClass {
 constexpr inline auto operator|(const ShipClass& l, const ShipClass& r) { return static_cast<ShipClass>(static_cast<std::underlying_type_t<ShipClass>>(l) | static_cast<std::underlying_type_t<ShipClass>>(r)); }
 
 namespace detail {
+	constexpr std::pair<cstring<wchar_t>, ShipId> shipIdMap[] = {
+#define SHIP(PREFIX, ID, NAME, SHIPCLASS, MAX_HP, DEFENSE, ATTACK, TORPEDO, ANTI_AIR, LUCK, SPEED, RANGE, SLOTS, MAX_AIRS, EVADE, ANTI_SUB, SEARCH, FIRST_WEAPONS, KAMMUSU_FLG, POSTFIX)	\
+		{ L#NAME, ShipId::I##D##ID },
+#include "ships.csv"
+#undef SHIP
+	};
 	constexpr std::pair<cstring<wchar_t>, ShipClass> shipClassMap[] = {
 		{ L"魚雷艇", ShipClass::PT },
 		{ L"駆逐艦", ShipClass::DD },
@@ -66,6 +78,8 @@ namespace detail {
 		{ L"給油艦", ShipClass::AO },
 	};
 }
+// 文字列から艦船IDへ変換します。
+#define SID(STR) (std::integral_constant<ShipId, Single(detail::shipIdMap, L##STR##_cs)>{}())
 // 文字列から艦種へ変換します。
 #define SC(STR) (std::integral_constant<ShipClass, Single(detail::shipClassMap, L##STR##_cs)>{}())
 
