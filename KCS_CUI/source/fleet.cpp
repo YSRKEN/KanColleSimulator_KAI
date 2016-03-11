@@ -422,7 +422,7 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const T
 			const auto &it_k = GetUnit()[alived_list[i].fleet_no][alived_list[i].fleet_i];
 			for (const auto &it_w : it_k.GetWeapon()) {
 				if (!it_w.AnyOf(WC("探照灯"))) continue;
-				if (it_w.AnyOf(L"96式150cm探照灯"s)) {
+				if (it_w.AnyOf(WID("96式150cm探照灯"))) {
 					if (rand_.RandBool(0.3 + 0.01 * it_w.GetLevel())) large_sl_index = i;
 				}
 				else {

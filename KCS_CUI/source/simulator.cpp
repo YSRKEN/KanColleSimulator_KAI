@@ -722,7 +722,7 @@ int Simulator::CalcDamage(
 		auto wg_count = 0;
 		for (auto &it_w : hunter_kammusu.GetWeapon()) {
 			if (it_w.AnyOf(WC("対空強化弾"))) has_aaa = true;
-			if (it_w.AnyOf(L"WG42"s)) ++wg_count;
+			if (it_w.AnyOf(WID("WG42 (Wurfgerat 42)"))) ++wg_count;
 		}
 		if (has_aaa) damage *= 2.5;
 		static const double wg_plus[] = { 0, 75, 109, 142, 162 };

@@ -113,7 +113,7 @@ void Kammusu::AacType_() noexcept {
 		switch (it_w.GetWeaponClass()) {
 		case WC("主砲"):
 			if (it_w.IsHAG()) {
-				if (it_w.AnyOf(L"10cm連装高角砲+高射装置"s, L"12.7cm高角砲+高射装置"s, L"90mm単装高角砲"s)) {
+				if (it_w.AnyOf(WID("10cm連装高角砲+高射装置"), WID("12.7cm高角砲+高射装置"), WID("90mm単装高角砲"))) {
 					++sum_hagX;
 				}
 				else {
@@ -128,7 +128,7 @@ void Kammusu::AacType_() noexcept {
 			++sum_aad;
 			break;
 		case WC("対空機銃"):
-			if (it_w.AnyOf(L"25mm三連装機銃 集中配備"s)) {
+			if (it_w.AnyOf(WID("25mm三連装機銃 集中配備"))) {
 				++sum_aagX;
 			}
 			else {
@@ -140,7 +140,7 @@ void Kammusu::AacType_() noexcept {
 			break;
 		case WC("小型電探"):
 		case WC("大型電探"):
-			if (it_w.AnyOf(L"13号対空電探"s, L"21号対空電探"s, L"14号対空電探"s, L"21号対空電探改"s, L"13号対空電探改"s, L"対空レーダ― Mark.I"s, L"対空レーダ― Mark.II"s, L"深海対空レーダ―"s)) {
+			if (it_w.AnyOf(WID("13号対空電探"), WID("21号対空電探"), WID("14号対空電探"), WID("21号対空電探改"), WID("13号対空電探改"), WID("対空レーダ― Mark.I"), WID("対空レーダ― Mark.II"), WID("深海対空レーダ―"))) {
 				++sum_radarA;
 			}
 			else {
@@ -351,17 +351,17 @@ double Kammusu::FitGunHitPlus() const noexcept {
 	// 数を数えておく
 	int sum_356 = 0, sum_38 = 0, sum_381 = 0, sum_41 = 0, sum_46 = 0, sum_46X = 0;
 	for (auto &it_w : weapons_) {
-		if (it_w.AnyOf(7, 103, 104))	// 35.6cm
+		if (it_w.AnyOf(WID("35.6cm連装砲"), WID("試製35.6cm三連装砲"), WID("35.6cm連装砲(ダズル迷彩)")))
 			++sum_356;
-		else if (it_w.AnyOf(76, 114))	// 38cm
+		else if (it_w.AnyOf(WID("38cm連装砲"), WID("38cm連装砲改")))
 			++sum_38;
-		else if (it_w.AnyOf(133, 137))	// 381mm
+		else if (it_w.AnyOf(WID("381mm/50 三連装砲"), WID("381mm/50 三連装砲改")))
 			++sum_381;
-		else if (it_w.AnyOf(8, 105))	// 41cm
+		else if (it_w.AnyOf(WID("41cm連装砲"), WID("試製41cm三連装砲")))
 			++sum_41;
-		else if (it_w.AnyOf(9))			// 46cm
+		else if (it_w.AnyOf(WID("46cm三連装砲")))
 			++sum_46;
-		else if (it_w.AnyOf(117))		// 試製46cm
+		else if (it_w.AnyOf(WID("試製46cm連装砲")))
 			++sum_46X;
 	}
 	// 種類により減衰量を決定する
@@ -390,9 +390,9 @@ double Kammusu::FitGunAttackPlus() const noexcept {
 	if (AnyOf(SC("軽巡洋艦") | SC("重雷装巡洋艦") | SC("練習巡洋艦"))) {
 		int light_gun_single = 0, light_gun_double = 0;
 		for (auto &it_w : weapons_) {
-			if (it_w.AnyOf(L"14cm単装砲"s, L"15.2cm単装砲"s))
+			if (it_w.AnyOf(WID("14cm単装砲"), WID("15.2cm単装砲")))
 				++light_gun_single;
-			else if (it_w.AnyOf(L"14cm連装砲"s, L"15.2cm連装砲"s, L"15.2cm連装砲改"s))
+			else if (it_w.AnyOf(WID("14cm連装砲"), WID("15.2cm連装砲"), WID("15.2cm連装砲改")))
 				++light_gun_double;
 		}
 		return sqrt(light_gun_single) + 2.0 * sqrt(light_gun_double);

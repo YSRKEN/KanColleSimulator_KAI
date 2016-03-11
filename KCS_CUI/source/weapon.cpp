@@ -55,15 +55,15 @@ int Weapon::AntiAirScore(const int &airs) const noexcept {
 
 // 艦隊防空ボーナスを計算する
 void Weapon::AntiAirBonus_() noexcept {
-	auto scale = (IsHAG() || AnyOf(L"91式高射装置"s, L"94式高射装置"s) ? 0.35 : AnyOf(WC("小型電探") | WC("大型電探")) ? 0.4 : AnyOf(WC("対空強化弾")) ? 0.6 : 0.2);
+	auto scale = (IsHAG() || AnyOf(WID("91式高射装置"), WID("94式高射装置")) ? 0.35 : AnyOf(WC("小型電探") | WC("大型電探")) ? 0.4 : AnyOf(WC("対空強化弾")) ? 0.6 : 0.2);
 	anti_air_bonus_ = scale * GetAntiAir();
 }
 double Weapon::AntiAirBonus() const noexcept { return anti_air_bonus_; }
 
 // 高角砲ならtrue
 bool Weapon::IsHAG() const noexcept {
-	return (name_.find(L"高角砲") != wstring::npos);
-//	return AnyOf(L"10cm連装高角砲"s, L"12.7cm連装高角砲"s, L"12.7cm単装高角砲"s, L"8cm高角砲"s, L"10cm連装高角砲(砲架)"s, L"12.7cm連装高角砲(後期型)"s, L"10cm連装高角砲+高射装置"s, L"12.7cm高角砲+高射装置"s, L"90mm単装高角砲"s, L"3inch単装高角砲"s);
+//	return (name_.find(L"高角砲") != wstring::npos);
+	return AnyOf(WID("10cm連装高角砲"), WID("12.7cm連装高角砲"), WID("12.7cm単装高角砲"), WID("8cm高角砲"), WID("10cm連装高角砲(砲架)"), WID("12.7cm連装高角砲(後期型)"), WID("10cm連装高角砲+高射装置"), WID("12.7cm高角砲+高射装置"), WID("90mm単装高角砲"), WID("3inch単装高角砲"));
 }
 
 std::ostream & operator<<(std::ostream & os, const Weapon & conf)
