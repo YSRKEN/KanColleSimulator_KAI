@@ -1,45 +1,69 @@
-#pragma once
-#include <cstddef>		// std::size_t
+ï»¿#pragma once
 #include <stdexcept>	// std::invalid_argument
-#include <type_traits>	// std::add_const_t
+#include <type_traits>	// std::add_const_t, std::add_lvalue_reference_t
 #include <utility>		// std::get, std::tuple_element_t
 
-/// <summary>ƒyƒA”z—ñ‚Ì’†‚©‚çƒL[‚ªŠÜ‚Ü‚ê‚Ä‚¢‚é‚©‚ğŒŸõ‚µ‚Ü‚·B</summary>
-/// <param name="pairs">ƒyƒA”z—ñBstd::pair”z—ñAstd::tuple”z—ñAstd::array”z—ñ‚Ì‚¢‚¸‚ê‚©‚ªg‚¦‚Ü‚·B</param>
-/// <param name="key">ŒŸõ‚·‚éƒL[Bstd::pair‚Ìê‡‚ÍfirstAstd::tuple‚âstd::array‚Ìê‡‚ÍÅ‰‚Ì—v‘f‚Æ”äŠr‚µ‚Ü‚·B</param>
-/// <param name="i">ŒŸõ‚ğŠJn‚·‚éƒCƒ“ƒfƒbƒNƒXBÈ—ª‚µ‚½ê‡‚Íæ“ª‚©‚çŒŸõ‚µ‚Ü‚·B</param>
-/// <returns>ƒL[‚ªŠÜ‚Ü‚ê‚Ä‚¢‚éê‡‚ÍtrueB</returns>
-/// <remarks>Œ^„˜_‚É‚æ‚èƒeƒ“ƒvƒŒ[ƒgˆø”‚Í‘S‚ÄÈ—ª‰Â”\‚Å‚·B</remarks>
-template<class T, std::size_t N, class Key = std::add_const_t<std::tuple_element_t<0, T>>>
-constexpr bool Contains(const T (&pairs)[N], Key& key, std::size_t i = 0) {
-	return i != N && (std::get<0>(pairs[i]) == key || Contains(pairs, key, i + 1));
+namespace detail {
+	const int block_size = 128;
+
+	template<class T, int N, class Key>
+	constexpr int IndexOfBlock(const T (&pairs)[N], const Key& key, int offset, int i = 0) noexcept {
+		return i == block_size || N <= offset + i ? -1
+			: std::get<0>(pairs[offset + i]) == key ? offset + i
+			: IndexOfBlock(pairs, key, offset, i + 1);
+	}
 }
 
-/// <summary>ƒyƒA”z—ñ‚Ì’†‚©‚çƒL[‚ğŒŸõ‚µÅ‰‚ÉŒ©‚Â‚¯‚½’l‚ğ•Ô‚µ‚Ü‚·BŒ©‚Â‚©‚ç‚È‚©‚Á‚½ê‡‚Íw’è‚³‚ê‚½ƒfƒtƒHƒ‹ƒg’l‚ğ•Ô‚µ‚Ü‚·B</summary>
-/// <param name="pairs">ƒyƒA”z—ñBstd::pair”z—ñAstd::tuple”z—ñAstd::array”z—ñ‚Ì‚¢‚¸‚ê‚©‚ªg‚¦‚Ü‚·B</param>
-/// <param name="key">ŒŸõ‚·‚éƒL[Bstd::pair‚Ìê‡‚ÍfirstAstd::tuple‚âstd::array‚Ìê‡‚ÍÅ‰‚Ì—v‘f‚Æ”äŠr‚µ‚Ü‚·B</param>
-/// <param name="defaultValue">Œ©‚Â‚©‚ç‚È‚©‚Á‚½ê‡‚É•Ô‚·ƒfƒtƒHƒ‹ƒg’lB</param>
-/// <param name="i">ŒŸõ‚ğŠJn‚·‚éƒCƒ“ƒfƒbƒNƒXBÈ—ª‚µ‚½ê‡‚Íæ“ª‚©‚çŒŸõ‚µ‚Ü‚·B</param>
-/// <returns>Å‰‚ÉŒ©‚Â‚¯‚½’lBstd::pair‚Ìê‡‚ÍsecondAstd::tuple‚âstd::array‚Ìê‡‚Í‚Q”Ô–Ú‚Ì—v‘f‚É‚È‚è‚Ü‚·BŒ©‚Â‚©‚ç‚È‚©‚Á‚½ê‡‚Íw’è‚³‚ê‚½ƒfƒtƒHƒ‹ƒg’lB</returns>
-/// <remarks>Œ^„˜_‚É‚æ‚èƒeƒ“ƒvƒŒ[ƒgˆø”‚Í‘S‚ÄÈ—ª‰Â”\‚Å‚·B</remarks>
-template<class T, std::size_t N, class Key = std::add_const_t<std::tuple_element_t<0, T>>, class Value = std::tuple_element_t<1, T>>
-constexpr Value FirstOrDefault(const T (&pairs)[N], Key& key, Value defaultValue, std::size_t i = 0) {
-	return i == N ? defaultValue
-		: std::get<0>(pairs[i]) == key ? std::get<1>(pairs[i])
-		: FirstOrDefault(pairs, key, defaultValue, i + 1);
+/// <summary>ãƒšã‚¢é…åˆ—ã®ä¸­ã‹ã‚‰ã‚­ãƒ¼ãŒå«ã¾ã‚Œã¦ã„ã‚‹ã‹ã‚’æ¤œç´¢ã—ã¾ã™ã€‚</summary>
+/// <param name="pairs">ãƒšã‚¢é…åˆ—ã€‚std::pairé…åˆ—ã€std::tupleé…åˆ—ã€std::arrayé…åˆ—ã®ã„ãšã‚Œã‹ãŒä½¿ãˆã¾ã™ã€‚</param>
+/// <param name="key">æ¤œç´¢ã™ã‚‹ã‚­ãƒ¼ã€‚std::pairã®å ´åˆã¯firstã€std::tupleã‚„std::arrayã®å ´åˆã¯æœ€åˆã®è¦ç´ ã¨æ¯”è¼ƒã—ã¾ã™ã€‚</param>
+/// <param name="offset">æ¤œç´¢ã‚’é–‹å§‹ã™ã‚‹ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã€‚çœç•¥ã—ãŸå ´åˆã¯å…ˆé ­ã‹ã‚‰æ¤œç´¢ã—ã¾ã™ã€‚</param>
+/// <returns>ã‚­ãƒ¼ãŒå«ã¾ã‚Œã¦ã„ã‚‹å ´åˆã¯trueã€‚</returns>
+/// <remarks>å‹æ¨è«–ã«ã‚ˆã‚Šãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆå¼•æ•°ã¯å…¨ã¦çœç•¥å¯èƒ½ã§ã™ã€‚</remarks>
+template<class T, int N, class Key = std::add_lvalue_reference_t<std::add_const_t<std::tuple_element_t<0, T>>>>
+constexpr bool Contains(const T (&pairs)[N], Key key, int offset = 0) noexcept {
+	return offset < N && (0 <= detail::IndexOfBlock(pairs, key, offset) || Contains(pairs, key, offset + detail::block_size));
 }
 
-/// <summary>ƒyƒA”z—ñ‚Ì’†‚©‚çƒL[‚ğŒŸõ‚µŒ©‚Â‚¯‚½’l‚ğ•Ô‚µ‚Ü‚·BŒ©‚Â‚©‚ç‚È‚©‚Á‚½ê‡‚â•¡”Œ©‚Â‚©‚Á‚½ê‡‚Í—áŠO‚ğ“Š‚°‚Ü‚·B</summary>
-/// <param name="pairs">ƒyƒA”z—ñBstd::pair”z—ñAstd::tuple”z—ñAstd::array”z—ñ‚Ì‚¢‚¸‚ê‚©‚ªg‚¦‚Ü‚·B</param>
-/// <param name="key">ŒŸõ‚·‚éƒL[Bstd::pair‚Ìê‡‚ÍfirstAstd::tuple‚âstd::array‚Ìê‡‚ÍÅ‰‚Ì—v‘f‚Æ”äŠr‚µ‚Ü‚·B</param>
-/// <param name="i">ŒŸõ‚ğŠJn‚·‚éƒCƒ“ƒfƒbƒNƒXBÈ—ª‚µ‚½ê‡‚Íæ“ª‚©‚çŒŸõ‚µ‚Ü‚·B</param>
-/// <returns>Œ©‚Â‚¯‚½’lBstd::pair‚Ìê‡‚ÍsecondAstd::tuple‚âstd::array‚Ìê‡‚Í‚Q”Ô–Ú‚Ì—v‘f‚É‚È‚è‚Ü‚·B</returns>
-/// <exception cref="std::invalid_argument">Œ©‚Â‚©‚ç‚È‚©‚Á‚½ê‡‚â•¡”Œ©‚Â‚©‚Á‚½ê‡‚É“Š‚°‚ç‚ê‚Ü‚·B</exception>
-/// <remarks>Œ^„˜_‚É‚æ‚èƒeƒ“ƒvƒŒ[ƒgˆø”‚Í‘S‚ÄÈ—ª‰Â”\‚Å‚·B</remarks>
-template<class T, std::size_t N, class Key = std::add_const_t<std::tuple_element_t<0, T>>, class Value = std::tuple_element_t<1, T>>
-constexpr Value Single(const T (&pairs)[N], Key& key, std::size_t i = 0) {
-	return i == N ? throw std::invalid_argument("not found.")
-		: std::get<0>(pairs[i]) != key ? Single(pairs, key, i + 1)
-		: Contains(pairs, key, i + 1) ? throw std::invalid_argument("duplicated key.")
-		: std::get<1>(pairs[i]);
+/// <summary>ãƒšã‚¢é…åˆ—ã®ä¸­ã‹ã‚‰ã‚­ãƒ¼ã‚’æ¤œç´¢ã—æœ€åˆã«è¦‹ã¤ã‘ãŸå€¤ã‚’è¿”ã—ã¾ã™ã€‚è¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸå ´åˆã¯ä¾‹å¤–ã‚’æŠ•ã’ã¾ã™ã€‚</summary>
+/// <param name="pairs">ãƒšã‚¢é…åˆ—ã€‚std::pairé…åˆ—ã€std::tupleé…åˆ—ã€std::arrayé…åˆ—ã®ã„ãšã‚Œã‹ãŒä½¿ãˆã¾ã™ã€‚</param>
+/// <param name="key">æ¤œç´¢ã™ã‚‹ã‚­ãƒ¼ã€‚std::pairã®å ´åˆã¯firstã€std::tupleã‚„std::arrayã®å ´åˆã¯æœ€åˆã®è¦ç´ ã¨æ¯”è¼ƒã—ã¾ã™ã€‚</param>
+/// <param name="offset">æ¤œç´¢ã‚’é–‹å§‹ã™ã‚‹ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã€‚çœç•¥ã—ãŸå ´åˆã¯å…ˆé ­ã‹ã‚‰æ¤œç´¢ã—ã¾ã™ã€‚</param>
+/// <returns>æœ€åˆã«è¦‹ã¤ã‘ãŸå€¤ã€‚std::pairã®å ´åˆã¯secondã€std::tupleã‚„std::arrayã®å ´åˆã¯ï¼’ç•ªç›®ã®è¦ç´ ã«ãªã‚Šã¾ã™ã€‚</returns>
+/// <exception cref="std::invalid_argument">è¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸå ´åˆã«æŠ•ã’ã‚‰ã‚Œã¾ã™ã€‚</exception>
+/// <remarks>å‹æ¨è«–ã«ã‚ˆã‚Šãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆå¼•æ•°ã¯å…¨ã¦çœç•¥å¯èƒ½ã§ã™ã€‚</remarks>
+template<class T, int N, class Key = std::add_lvalue_reference_t<std::add_const_t<std::tuple_element_t<0, T>>>, class Value = std::tuple_element_t<1, T>>
+constexpr Value First(const T (&pairs)[N], Key key, int offset = 0) {
+	return N <= offset ? throw std::invalid_argument("not found.")
+		: 0 <= detail::IndexOfBlock(pairs, key, offset) ? std::get<1>(pairs[detail::IndexOfBlock(pairs, key, offset)])
+		: First(pairs, key, offset + detail::block_size);
+}
+
+/// <summary>ãƒšã‚¢é…åˆ—ã®ä¸­ã‹ã‚‰ã‚­ãƒ¼ã‚’æ¤œç´¢ã—æœ€åˆã«è¦‹ã¤ã‘ãŸå€¤ã‚’è¿”ã—ã¾ã™ã€‚è¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸå ´åˆã¯æŒ‡å®šã•ã‚ŒãŸãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã‚’è¿”ã—ã¾ã™ã€‚</summary>
+/// <param name="pairs">ãƒšã‚¢é…åˆ—ã€‚std::pairé…åˆ—ã€std::tupleé…åˆ—ã€std::arrayé…åˆ—ã®ã„ãšã‚Œã‹ãŒä½¿ãˆã¾ã™ã€‚</param>
+/// <param name="key">æ¤œç´¢ã™ã‚‹ã‚­ãƒ¼ã€‚std::pairã®å ´åˆã¯firstã€std::tupleã‚„std::arrayã®å ´åˆã¯æœ€åˆã®è¦ç´ ã¨æ¯”è¼ƒã—ã¾ã™ã€‚</param>
+/// <param name="defaultValue">è¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸå ´åˆã«è¿”ã™ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã€‚</param>
+/// <param name="offset">æ¤œç´¢ã‚’é–‹å§‹ã™ã‚‹ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã€‚çœç•¥ã—ãŸå ´åˆã¯å…ˆé ­ã‹ã‚‰æ¤œç´¢ã—ã¾ã™ã€‚</param>
+/// <returns>æœ€åˆã«è¦‹ã¤ã‘ãŸå€¤ã€‚std::pairã®å ´åˆã¯secondã€std::tupleã‚„std::arrayã®å ´åˆã¯ï¼’ç•ªç›®ã®è¦ç´ ã«ãªã‚Šã¾ã™ã€‚è¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸå ´åˆã¯æŒ‡å®šã•ã‚ŒãŸãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã€‚</returns>
+/// <remarks>å‹æ¨è«–ã«ã‚ˆã‚Šãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆå¼•æ•°ã¯å…¨ã¦çœç•¥å¯èƒ½ã§ã™ã€‚</remarks>
+template<class T, int N, class Key = std::add_lvalue_reference_t<std::add_const_t<std::tuple_element_t<0, T>>>, class Value = std::tuple_element_t<1, T>>
+constexpr Value FirstOrDefault(const T (&pairs)[N], Key key, Value defaultValue, int offset = 0) noexcept {
+	return N <= offset ? defaultValue
+		: 0 <= detail::IndexOfBlock(pairs, key, offset) ? std::get<1>(pairs[detail::IndexOfBlock(pairs, key, offset)])
+		: FirstOrDefault(pairs, key, defaultValue, offset + detail::block_size);
+}
+
+/// <summary>ãƒšã‚¢é…åˆ—ã®ä¸­ã‹ã‚‰ã‚­ãƒ¼ã‚’æ¤œç´¢ã—è¦‹ã¤ã‘ãŸå€¤ã‚’è¿”ã—ã¾ã™ã€‚è¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸå ´åˆã‚„è¤‡æ•°è¦‹ã¤ã‹ã£ãŸå ´åˆã¯ä¾‹å¤–ã‚’æŠ•ã’ã¾ã™ã€‚</summary>
+/// <param name="pairs">ãƒšã‚¢é…åˆ—ã€‚std::pairé…åˆ—ã€std::tupleé…åˆ—ã€std::arrayé…åˆ—ã®ã„ãšã‚Œã‹ãŒä½¿ãˆã¾ã™ã€‚</param>
+/// <param name="key">æ¤œç´¢ã™ã‚‹ã‚­ãƒ¼ã€‚std::pairã®å ´åˆã¯firstã€std::tupleã‚„std::arrayã®å ´åˆã¯æœ€åˆã®è¦ç´ ã¨æ¯”è¼ƒã—ã¾ã™ã€‚</param>
+/// <param name="offset">æ¤œç´¢ã‚’é–‹å§‹ã™ã‚‹ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã€‚çœç•¥ã—ãŸå ´åˆã¯å…ˆé ­ã‹ã‚‰æ¤œç´¢ã—ã¾ã™ã€‚</param>
+/// <returns>è¦‹ã¤ã‘ãŸå€¤ã€‚std::pairã®å ´åˆã¯secondã€std::tupleã‚„std::arrayã®å ´åˆã¯ï¼’ç•ªç›®ã®è¦ç´ ã«ãªã‚Šã¾ã™ã€‚</returns>
+/// <exception cref="std::invalid_argument">è¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸå ´åˆã‚„è¤‡æ•°è¦‹ã¤ã‹ã£ãŸå ´åˆã«æŠ•ã’ã‚‰ã‚Œã¾ã™ã€‚</exception>
+/// <remarks>å‹æ¨è«–ã«ã‚ˆã‚Šãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆå¼•æ•°ã¯å…¨ã¦çœç•¥å¯èƒ½ã§ã™ã€‚</remarks>
+template<class T, int N, class Key = std::add_lvalue_reference_t<std::add_const_t<std::tuple_element_t<0, T>>>, class Value = std::tuple_element_t<1, T>>
+constexpr Value Single(const T (&pairs)[N], Key key, int offset = 0) {
+	return N <= offset ? throw std::invalid_argument("not found.")
+		: detail::IndexOfBlock(pairs, key, offset) < 0 ? Single(pairs, key, offset + detail::block_size)
+		: Contains(pairs, key, detail::IndexOfBlock(pairs, key, offset) + 1) ? throw std::invalid_argument("duplicated key.")
+		: std::get<1>(pairs[detail::IndexOfBlock(pairs, key, offset)]);
 }
