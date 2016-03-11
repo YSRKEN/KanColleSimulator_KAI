@@ -160,7 +160,7 @@ void Kammusu::AacType_() noexcept {
 	//電探を持っていたらtrue
 	auto has_radar = [sum_radarW, sum_radarA]() -> bool { return (sum_radarW + sum_radarA >= 1); };
 	// まず、固有カットインを判定する
-	if (AnyOf(421, 330, 422, 346, 423, 357)) {
+	if (AnyOf(SID("秋月"), SID("秋月改"), SID("照月"), SID("照月改"), SID("初月"), SID("初月改"))) {
 		/* 秋月型……ご存知防空駆逐艦。対空カットイン無しでも圧倒的な対空値により艦載機を殲滅する。
 		* 二次創作界隈ではまさma氏が有名であるが、秋月型がこれ以上増えると投稿時のタイトルが長くなりすぎることから
 		* 嬉しい悲鳴を上げていたとか。なお史実上では後9隻居るが、有名なのは涼月などだろう……  */
@@ -168,13 +168,13 @@ void Kammusu::AacType_() noexcept {
 		if (has_high_angle_gun() && has_radar()) aac_type_ = 2;
 		if (sum_hag + sum_hagX >= 2) aac_type_ = 3;
 	}
-	else if (AnyOf(428)) {
+	else if (AnyOf(SID("摩耶改二"))) {
 		/* 摩耶改二……麻耶ではない。対空兵装により「洋上の対空要塞」(by 青島文化教材社)となったため、
 		* 重巡にしては驚異的な対空値を誇る。ついでに服装もかなりプリティーに進化した(妹の鳥海も同様) */
 		if (has_high_angle_gun() && sum_aagX >= 1 && sum_radarA >= 1) aac_type_ = 10;
 		if (has_high_angle_gun() && sum_aagX >= 1) aac_type_ = 11;
 	}
-	else if (AnyOf(141)) {
+	else if (AnyOf(SID("五十鈴改二"))) {
 		/* 五十鈴改二…… 名前通りLv50からの改装である。防空巡洋艦になった史実から、射程が短となり、
 		* 防空力が大幅にアップした。しかし搭載数0で火力面で使いづらくなった上、対潜は装備対潜のウェイトが高いため
 		* 彼女を最適解に出来る状況は限られている。また、改二なのに金レアで固有カットインがゴミクズ「だった」ことから、
@@ -182,7 +182,7 @@ void Kammusu::AacType_() noexcept {
 		if (has_high_angle_gun() && has_anti_aircraft_machine_gun() && sum_radarA >= 1) aac_type_ = 14;
 		if (has_high_angle_gun() && has_anti_aircraft_machine_gun()) aac_type_ = 15;
 	}
-	else if (AnyOf(470)) {
+	else if (AnyOf(SID("霞改二乙"))) {
 		/* 霞改二乙…… Lv88という驚異的な練度を要求するだけあり、内蔵されたギミックは特殊である。
 		* まず霞改二でも積めた大発に加え、大型電探も装備可能になった(代償に艦隊司令部施設が積めなくなった)。
 		* また、対空値も上昇し、固有カットインも実装された。ポスト秋月型＋アルファとも言えるだろう。
@@ -190,7 +190,7 @@ void Kammusu::AacType_() noexcept {
 		if (has_high_angle_gun() && has_anti_aircraft_machine_gun() && sum_radarA >= 1) aac_type_ = 16;
 		if (has_high_angle_gun() && has_anti_aircraft_machine_gun()) aac_type_ = 17;
 	}
-	else if (AnyOf(418)) {
+	else if (AnyOf(SID("皐月改二"))) {
 		/* 皐月改二…… うるう年の2/29に実装された、皐月改二における固有の対空カットイン。
 		 * この調子では改二が出るたびに新型カットインが出るのではないかと一部で危惧されている。*/
 		if (sum_aagX >= 1) aac_type_ = 18;
@@ -365,14 +365,16 @@ double Kammusu::FitGunHitPlus() const noexcept {
 			++sum_46X;
 	}
 	// 種類により減衰量を決定する
-	if (AnyOf(26, 27, 77, 87))                                         return                                                     fit[sum_41]         + unfit_large[sum_46] + unfit_large[sum_46X];		// 伊勢・扶桑型戦艦
-	if (AnyOf(82, 88, 286, 287))                                       return fit[sum_356] + fit[sum_38] + fit[sum_381]                               + unfit_large[sum_46] + unfit_small[sum_46X];		// 伊勢型・扶桑型航戦
-	if (AnyOf(411, 412))                                               return fit[sum_356] + fit[sum_38] + fit[sum_381]         + fit[sum_41]         + unfit_large[sum_46] + unfit_small[sum_46X];		// 扶桑型航戦改二
-	if (AnyOf(78, 79, 85, 86, 209, 210, 211, 212, 149, 150, 151, 152)) return fit[sum_356] + fit[sum_38]                        + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];		// 金剛型改二
-	if (AnyOf(171, 172, 173, 178))                                     return fit[sum_356] + fit[sum_38] - unfit_small[sum_381] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];		// Bismarck型
-	if (AnyOf(441, 442, 446, 447))                                     return fit[sum_356]               + fit[sum_381]         + unfit_small[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];		// イタリア艦
-	if (AnyOf(80, 81, 275, 276))                                       return fit[sum_356]               + fit[sum_381]         + fit[sum_41]         + unfit_small[sum_46] + unfit_small[sum_46X];		// 長門型
-	if (AnyOf(131, 136, 143, 148))                                     return                                                     fit[sum_41];															// 大和型
+	if (AnyOf(SID("扶桑"), SID("山城"), SID("伊勢"), SID("日向")))                              return                                                     fit[sum_41]         + unfit_large[sum_46] + unfit_large[sum_46X];		// 伊勢・扶桑型戦艦
+	if (AnyOf(SID("伊勢改"), SID("日向改"), SID("扶桑改"), SID("山城改")))                       return fit[sum_356] + fit[sum_38] + fit[sum_381]                               + unfit_large[sum_46] + unfit_small[sum_46X];		// 伊勢型・扶桑型航戦
+	if (AnyOf(SID("扶桑改二"), SID("山城改二")))                                                return fit[sum_356] + fit[sum_38] + fit[sum_381]         + fit[sum_41]         + unfit_large[sum_46] + unfit_small[sum_46X];		// 扶桑型航戦改二
+	if (AnyOf(SID("金剛"), SID("榛名"), SID("霧島"), SID("比叡"),
+		SID("金剛改"), SID("比叡改"), SID("榛名改"), SID("霧島改"),
+		SID("金剛改二"), SID("比叡改二"), SID("榛名改二"), SID("霧島改二")))                     return fit[sum_356] + fit[sum_38]                        + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];		// 金剛型改二
+	if (AnyOf(SID("Bismarck"), SID("Bismarck改"), SID("Bismarck zwei"), SID("Bismarck drei"))) return fit[sum_356] + fit[sum_38] - unfit_small[sum_381] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];		// Bismarck型
+	if (AnyOf(SID("Littorio"), SID("Roma"), SID("Italia"), SID("Roma改")))                     return fit[sum_356]               + fit[sum_381]         + unfit_small[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];		// イタリア艦
+	if (AnyOf(SID("長門"), SID("陸奥"), SID("長門改"), SID("陸奥改")))                          return fit[sum_356]               + fit[sum_381]         + fit[sum_41]         + unfit_small[sum_46] + unfit_small[sum_46X];		// 長門型
+	if (AnyOf(SID("大和"), SID("大和改"), SID("武蔵"), SID("武蔵改")))                          return                                                     fit[sum_41];															// 大和型
 	return 0.0;
 }
 
@@ -730,10 +732,10 @@ bool Kammusu::IsFireTorpedo(const TorpedoTurn &torpedo_turn) const noexcept {
 		}
 		else {
 			// elite以上の潜水艦なら開幕魚雷を撃てる(ただし潜水棲姫は除く。なんでや！)
-			if (IsSubmarine() && AnyOf(L"潜水カ級elite"s, L"潜水ヨ級elite"s, L"潜水カ級flagship"s, L"潜水ヨ級flagship"s, L"潜水ソ級elite"s, L"潜水ソ級flagship"s)) return true;
+			if (IsSubmarine() && AnyOf(SID("潜水カ級elite"), SID("潜水ヨ級elite"), SID("潜水カ級flagship"), SID("潜水ヨ級flagship"), SID("潜水ソ級elite"), SID("潜水ソ級flagship"))) return true;
 			// エリレ級と水母棲姫と駆逐水鬼(甲作戦最終形態,艦船ID=649)と
 			// 重巡棲姫(最終形態,艦船ID=660,662,664)は無条件で撃てる
-			if (AnyOf(562, L"水母棲姫"s, 649, 660, 662, 664)) return true;
+			if (AnyOf(SID("戦艦レ級elite"), L"水母棲姫"s, ShipId::ID649, ShipId::ID660, ShipId::ID662, ShipId::ID664)) return true;
 		}
 		return false;
 		break;
@@ -743,7 +745,7 @@ bool Kammusu::IsFireTorpedo(const TorpedoTurn &torpedo_turn) const noexcept {
 		// 素雷装が0なら不可
 		if (torpedo_ == 0) return false;
 		// 秋津洲および未改造の千歳型は不可
-		if (AnyOf(L"秋津洲"s, L"秋津洲改"s, 102, 103)) return false;
+		if (AnyOf(SID("秋津洲"), SID("秋津洲改"), SID("千歳"), SID("千代田"))) return false;
 		return true;
 		break;
 	default:
@@ -815,12 +817,12 @@ bool Kammusu::IsFireNight() const noexcept {
 	// 空母系は一部を覗いて攻撃不可
 	if (AnyOf(SC("正規空母") | SC("軽空母") | SC("装甲空母"))) {
 		if (kammusu_flg_) {
-			if (AnyOf(L"Graf Zeppelin改"s, L"Graf Zeppelin"s)) return true;
+			if (AnyOf(SID("Graf Zeppelin改"), SID("Graf Zeppelin"))) return true;
 			return false;
 		}
 		else {
-			if (AnyOf(L"空母ヲ級flagship"s, L"軽母ヌ級flagship"s, L"空母ヲ級改flagship"s)) return true;
-			if (AnyOf(L"軽母ヌ級"s, L"空母ヲ級"s, L"軽母ヌ級elite"s, L"空母ヲ級elite"s)) return false;
+			if (AnyOf(L"空母ヲ級flagship"s, SID("軽母ヌ級flagship"), L"空母ヲ級改flagship"s)) return true;
+			if (AnyOf(SID("軽母ヌ級"), SID("空母ヲ級"), SID("軽母ヌ級elite"), SID("空母ヲ級elite"))) return false;
 			return true;
 		}
 	}

@@ -230,13 +230,13 @@ public:
 	bool IsAntiSubNight() const noexcept;					//夜戦で対潜可能な艦ならtrue
 	bool HasLights() const noexcept;						//探照灯や照明弾を保有していた場合はtrue
 	// 指定のIDか判別する。
-	bool AnyOf(const int test) const noexcept { return id_ == test; }
+	bool AnyOf(const ShipId test) const noexcept { return id_ == static_cast<int>(test); }
 	// 指定の種別か判定する。
 	bool AnyOf(const ShipClass& sc) const noexcept { return (static_cast<std::underlying_type_t<ShipClass>>(ship_class_) & static_cast<std::underlying_type_t<ShipClass>>(sc)) != 0; }
 	// 指定の名前か判定する。名前は完全一致で比較する。
 	template<class String, class = std::enable_if_t<std::is_same<String, std::wstring>::value>>		// 暗黙の型キャストにより非効率とならないようstd::wstringのみを受け付ける。
 	bool AnyOf(const String& test) const noexcept { return std::size(name_) == std::size(test) && name_ == test; }	// 長さが一致した場合に限り文字列比較を行う。
-	// 引数に指定された条件を満たすか判定する。引数はint型のID、ShipClass型の種別、std::wstring型の名前のいずれでも指定できる。名前は完全一致で比較する。
+	// 引数に指定された条件を満たすか判定する。引数はShipId型のID、ShipClass型の種別、std::wstring型の名前のいずれでも指定できる。名前は完全一致で比較する。
 	template<class Head, class... Rest>
 	bool AnyOf(Head head, Rest... rest) const noexcept { return AnyOf(head) || AnyOf(rest...); }
 	template<class F>
