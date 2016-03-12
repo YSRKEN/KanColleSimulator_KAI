@@ -109,6 +109,7 @@ enum NightFireType { kNightFireGun, kNightFireChage };
 
 // 艦娘クラス
 class Kammusu {
+	static const std::unordered_map<int, std::pair<const Kammusu, const Kammusu>> db_;
 	// 変更しないもの
 	int id_;						//艦船ID
 	wstring name_;					//艦名
@@ -143,6 +144,7 @@ class Kammusu {
 	bool IsAntiSubDayWater() const noexcept;	//対潜判定(航戦用)
 	bool HasWeaponClass(const WeaponClass& wc) const noexcept;	// 指定の艦載機を保有していた場合はtrue
 public:
+	static Kammusu Get(int id, int level);
 	struct DependOnLv;
 	// コンストラクタ
 	Kammusu();
