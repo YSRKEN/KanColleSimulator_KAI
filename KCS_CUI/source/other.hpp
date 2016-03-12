@@ -7,17 +7,6 @@
 class Fleet;
 class Result;
 
-// 艦娘DB
-class KammusuDB {
-	unordered_map<int, Kammusu> hash_lv1_;
-	unordered_map<int, Kammusu> hash_lv99_;
-public:
-	// コンストラクタ
-	KammusuDB(const char* csv_name);
-	// ハッシュからデータを読みだす
-	Kammusu Get(const int, const int) const;
-};
-
 // 集計結果保存用クラス
 class ResultStat {
 	vector<vector<vector<int>>> hp_min_, hp_max_, damage_min_, damage_max_;
@@ -33,16 +22,6 @@ public:
 	// 結果をファイルに出力する
 	void Put(const vector<Fleet>&, const string&, const bool&) const;
 };
-
-// 文字列をデリミタで区切り分割する
-//vector<string> Split(const string&, const char);
-
-// 文字列配列を数字配列に変換する
-vector<int> ToInt(const vector<string>&);
-
-//// 配列をハッシュに変換する
-//template<typename T>
-//unordered_map<T, size_t> ToHash(const vector<T>&);
 
 // 文字列(ファイル名)から拡張子を取り出す
 string GetExtension(const string&);
