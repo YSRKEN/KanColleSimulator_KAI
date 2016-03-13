@@ -44,6 +44,7 @@ public:
 	void Put() const;							//中身を表示する
 	void ChangeCond(const SimulateMode, const Result&) noexcept;	//cond値を変更する
 	double SearchValue() const noexcept;		//索敵値を計算する
+	double SearchValue_33() const noexcept;		//判定式(33)で索敵値を計算する
 	int AntiAirScore() const noexcept;			//制空値を計算する
 	double TrailerAircraftProb(const AirWarStatus&) const;	//触接開始率を計算する
 	bool HasAir() const noexcept;			//艦載機をいずれかの艦が保有していた場合はtrue
