@@ -65,46 +65,46 @@ namespace detail {
 #include "slotitems.csv"
 #undef WEAPON
 	};
-	constexpr std::pair<cstring<char>, WeaponClass> weaponClassMap[] = {
-		{ "主砲", WeaponClass::Gun },
-		{ "対艦強化弾", WeaponClass::AP },
-		{ "副砲", WeaponClass::SubGun },
-		{ "魚雷", WeaponClass::Torpedo },
-		{ "特殊潜航艇", WeaponClass::SpecialSS },
-		{ "艦上戦闘機", WeaponClass::PF },
-		{ "艦上爆撃機", WeaponClass::PB },
-		{ "艦上爆撃機(爆戦)", WeaponClass::PBF },
-		{ "水上爆撃機", WeaponClass::WB },
-		{ "艦上攻撃機", WeaponClass::PA },
-		{ "艦上偵察機", WeaponClass::PS },
-		{ "艦上偵察機(彩雲)", WeaponClass::PSS },
-		{ "大型飛行艇", WeaponClass::DaiteiChan },
-		{ "水上偵察機", WeaponClass::WS },
-		{ "水上偵察機(夜偵)", WeaponClass::WSN },
-		{ "対潜哨戒機", WeaponClass::ASPP },
-		{ "オートジャイロ", WeaponClass::AJ },
-		{ "小型電探", WeaponClass::SmallR },
-		{ "大型電探", WeaponClass::LargeR },
-		{ "対空機銃", WeaponClass::AAG },
-		{ "対空強化弾", WeaponClass::AAA },
-		{ "高射装置", WeaponClass::AAD },
-		{ "爆雷", WeaponClass::DP },
-		{ "ソナー", WeaponClass::Sonar },
-		{ "応急修理要員", WeaponClass::DC },
-		{ "探照灯", WeaponClass::SL },
-		{ "照明弾", WeaponClass::LB },
-		{ "艦隊司令部施設", WeaponClass::HQ },
-		{ "水上艦要員", WeaponClass::SSP },
-		{ "戦闘糧食", WeaponClass::CR },
-		{ "洋上補給", WeaponClass::OS },
-		{ "水上戦闘機", WeaponClass::WF },
-		{ "その他", WeaponClass::Other },
+	constexpr std::pair<cstring<wchar_t>, WeaponClass> weaponClassMap[] = {
+		{ L"主砲", WeaponClass::Gun },
+		{ L"対艦強化弾", WeaponClass::AP },
+		{ L"副砲", WeaponClass::SubGun },
+		{ L"魚雷", WeaponClass::Torpedo },
+		{ L"特殊潜航艇", WeaponClass::SpecialSS },
+		{ L"艦上戦闘機", WeaponClass::PF },
+		{ L"艦上爆撃機", WeaponClass::PB },
+		{ L"艦上爆撃機(爆戦)", WeaponClass::PBF },
+		{ L"水上爆撃機", WeaponClass::WB },
+		{ L"艦上攻撃機", WeaponClass::PA },
+		{ L"艦上偵察機", WeaponClass::PS },
+		{ L"艦上偵察機(彩雲)", WeaponClass::PSS },
+		{ L"大型飛行艇", WeaponClass::DaiteiChan },
+		{ L"水上偵察機", WeaponClass::WS },
+		{ L"水上偵察機(夜偵)", WeaponClass::WSN },
+		{ L"対潜哨戒機", WeaponClass::ASPP },
+		{ L"オートジャイロ", WeaponClass::AJ },
+		{ L"小型電探", WeaponClass::SmallR },
+		{ L"大型電探", WeaponClass::LargeR },
+		{ L"対空機銃", WeaponClass::AAG },
+		{ L"対空強化弾", WeaponClass::AAA },
+		{ L"高射装置", WeaponClass::AAD },
+		{ L"爆雷", WeaponClass::DP },
+		{ L"ソナー", WeaponClass::Sonar },
+		{ L"応急修理要員", WeaponClass::DC },
+		{ L"探照灯", WeaponClass::SL },
+		{ L"照明弾", WeaponClass::LB },
+		{ L"艦隊司令部施設", WeaponClass::HQ },
+		{ L"水上艦要員", WeaponClass::SSP },
+		{ L"戦闘糧食", WeaponClass::CR },
+		{ L"洋上補給", WeaponClass::OS },
+		{ L"水上戦闘機", WeaponClass::WF },
+		{ L"その他", WeaponClass::Other },
 	};
 }
 // 文字列から装備IDへ変換します。
 #define WID(STR) (std::integral_constant<WeaponId, Single(detail::weaponIdMap, L##STR##_cs)>{}())
 // 文字列から装備種別へ変換します。
-#define WC(STR) (std::integral_constant<WeaponClass, Single(detail::weaponClassMap, STR##_cs)>{}())
+#define WC(STR) (std::integral_constant<WeaponClass, Single(detail::weaponClassMap, L##STR##_cs)>{}())
 
 //装備クラス
 class Weapon {
@@ -172,9 +172,6 @@ public:
 };
 std::ostream& operator<<(std::ostream& os, const Weapon& conf);
 std::wostream& operator<<(std::wostream& os, const Weapon& conf);
-
-// 文字列を種別に変換する
-inline auto ToWC(const string& wc) noexcept { return FirstOrDefault(detail::weaponClassMap, cstring<char>{ wc.c_str(), wc.size() }, WC("その他")); }
 
 // 外部熟練度(Simple)を内部熟練度(Detail)に変換する
 int ConvertStoD(const int&);
