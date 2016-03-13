@@ -66,7 +66,6 @@ detail::ToHash_helper ToHash() noexcept { return{}; }
 // 装備DBのコンストラクタ
 WeaponDB::WeaponDB(const char* csv_name) {
 	// ファイルを開く
-	std::locale::global(std::locale("japanese"));
 	ifstream ifs(csv_name);
 	FILE_THROW_WITH_MESSAGE_IF(!ifs.is_open(), string(csv_name) + "が正常に読み込めませんでした.")
 	// 1行づつ読み込んでいく
@@ -129,7 +128,6 @@ namespace detail{
 // 艦娘DBのコンストラクタ
 KammusuDB::KammusuDB(const char* csv_name) {
 	// ファイルを開く
-	std::locale::global(std::locale("japanese"));
 	ifstream ifs(csv_name);
 	FILE_THROW_WITH_MESSAGE_IF(!ifs.is_open(), string(csv_name) + "が正常に読み込めませんでした.")
 	// 1行づつ読み込んでいく

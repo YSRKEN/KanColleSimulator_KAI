@@ -9,11 +9,13 @@
 #include "random.hpp"
 #include "mapdata.hpp"
 #include <cassert>
+#include <locale>
 #include <omp.h>//omp_get_thread_num()
 
 int main(int argc, char *argv[]) {
 	try {
 		const auto preprocess_begin_time = std::chrono::high_resolution_clock::now();
+		std::locale::global(std::locale("japanese"));
 		// 現在の設定を取得する
 		Config config(argc, argv);
 		config.Put();
