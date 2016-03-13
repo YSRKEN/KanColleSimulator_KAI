@@ -318,13 +318,13 @@ void Simulator::AirWarPhase() {
 				// 基礎攻撃力を算出する
 				int base_attack;
 				switch (it_w.GetWeaponClass()) {
-				case WeaponClass::PBF:
-				case WeaponClass::PB:
-				case WeaponClass::WB:
+				case WC("艦上爆撃機(爆戦)"):
+				case WC("艦上爆撃機"):
+				case WC("水上爆撃機"):
 					// 爆撃は等倍ダメージ
 					base_attack = int(it_w.GetBomb() * sqrt(it_w.GetAir()) + 25);
 					break;
-				case WeaponClass::PA:
+				case WC("艦上攻撃機"):
 					// 雷撃は150％か80％かがランダムで決まる
 					base_attack = int((rand.RandBool() ? 1.5 : 0.8) * (it_w.GetTorpedo() * sqrt(it_w.GetAir()) + 25));
 					break;
@@ -503,7 +503,7 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 		const bool has_bb = [] (const vector<Fleet>& fleet) -> bool {
 			for (auto &it_b : fleet) {
 				for (auto &it_k : it_b.GetUnit().front()) {
-					if (it_k.AnyOf(ShipClass::BB | ShipClass::BBV | ShipClass::AF))
+					if (it_k.AnyOf(SC("戦艦") | SC("航空戦艦") | SC("陸上型")))
 						return true;
 				}
 			}
@@ -538,7 +538,7 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 			const auto &target_kammusu = fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i];
 			auto fire_type = JudgeDayFireType(bi, friend_index, enemy_index);
 			// 攻撃の種類によって、基本攻撃力および倍率を算出する
-			int base_attack = hunter_kammusu.DayAttack(fire_type, target_kammusu.AnyOf(ShipClass::AF), fleet_[bi].GetFleetType(), friend_index.fleet_no);
+			int base_attack = hunter_kammusu.DayAttack(fire_type, target_kammusu.AnyOf(SC("陸上型")), fleet_[bi].GetFleetType(), friend_index.fleet_no);
 			bool special_attack_flg, double_flg;
 			double multiple;
 			// 弾着観測射撃補正
@@ -584,7 +584,7 @@ void Simulator::NightPhase() {
 	if (aws == kAirWarStatusBest || aws == kAirWarStatusGood || aws == kAirWarStatusBad || simulate_mode_ == kSimulateModeN) {
 		for (auto &it_k : fleet_[kFriendSide].GetUnit().back()) {
 			for (auto &it_w : it_k.GetWeapon()) {
-				if (it_w.GetWeaponClass() != WeaponClass::WSN) continue;
+				if (it_w.GetWeaponClass() != WC("水上偵察機(夜偵)")) continue;
 				double prob = ((sqrt(50 * it_k.GetLevel()) - 3) / 100) | limit(0.0, 0.99);
 				if (!rand.RandBool(prob)) continue;
 				wsn_flg = true;
@@ -618,7 +618,7 @@ void Simulator::NightPhase() {
 			auto fire_type = JudgeNightFireType(bi, enemy_index);
 			// 攻撃の種類によって、基本攻撃力および倍率を算出する
 			// 夜戦速吸は対潜を常に爆雷で行う
-			auto base_attack = hunter_kammusu.NightAttack(fire_type, target_kammusu.AnyOf(ShipClass::AF)) + (wsn_flg ? 5 : 0);
+			auto base_attack = hunter_kammusu.NightAttack(fire_type, target_kammusu.AnyOf(SC("陸上型"))) + (wsn_flg ? 5 : 0);
 			bool special_attack_flg = false;
 			bool double_flg = false;
 			auto multiple = 1.0;
@@ -627,7 +627,7 @@ void Simulator::NightPhase() {
 				// 砲撃時にのみ適用される
 				if (fire_type != kNightFireGun) return;
 				// 発動可能な弾着の種類を判断する
-				auto special_attack = JudgeNightSpecialAttack(bi, friend_index, target_kammusu.AnyOf(ShipClass::AF));
+				auto special_attack = JudgeNightSpecialAttack(bi, friend_index, target_kammusu.AnyOf(SC("陸上型")));
 				if (std::get<condition>(special_attack) == 1.0) return;
 				// 弾着観測射撃による補正
 				double_flg = std::get<condition>(special_attack);
@@ -717,12 +717,12 @@ int Simulator::CalcDamage(
 		&& battle_phase != kBattlePhaseNight) return 0;		//砲撃戦および夜戦以外ではそもそも対潜攻撃を行わない
 	// 三式弾・WG42による対地上施設特効
 	double damage = base_attack;
-	if (target_kammusu.AnyOf(ShipClass::AF)) {
+	if (target_kammusu.AnyOf(SC("陸上型"))) {
 		bool has_aaa = false;
 		auto wg_count = 0;
 		for (auto &it_w : hunter_kammusu.GetWeapon()) {
-			if (it_w.AnyOf(WeaponClass::AAA)) has_aaa = true;
-			if (it_w.AnyOf(L"WG42"s)) ++wg_count;
+			if (it_w.AnyOf(WC("対空強化弾"))) has_aaa = true;
+			if (it_w.AnyOf(WID("WG42 (Wurfgerat 42)"))) ++wg_count;
 		}
 		if (has_aaa) damage *= 2.5;
 		static const double wg_plus[] = { 0, 75, 109, 142, 162 };
@@ -881,7 +881,7 @@ void Simulator::ProtectOracle(const size_t defense_side, KammusuIndex &defense_i
 	// 旗艦ではない場合、かばいは発生しない
 	if (defense_index.fleet_i != 0) return;
 	// 陸上型をかばう艦などいない
-	if (fleet_[defense_side].GetUnit()[defense_index.fleet_no][0].AnyOf(ShipClass::AF)) return;
+	if (fleet_[defense_side].GetUnit()[defense_index.fleet_no][0].AnyOf(SC("陸上型"))) return;
 	// 水上艦は水上艦、潜水艦は潜水艦しかかばえないのでリストを作成する
 	const auto &attendants = fleet_[defense_side].GetUnit()[defense_index.fleet_no];
 	auto is_submarine = attendants[0].IsSubmarine();
@@ -982,7 +982,7 @@ double Simulator::CalcHitProb(
 			hit_value += T * int(0.001426 * hunter_kammusu.AllTorpedo(false) + 0.000836 * hunter_kammusu.GetTorpedo());
 			hit_value += 0.01009 * hunter_kammusu.AllHit();
 			hit_value += hunter_kammusu.SumWeapons([](const auto& it_w) {
-				return it_w.AnyOf(WeaponClass::Torpedo) ? 0.02104 * sqrt(it_w.GetLevel()) : 0;
+				return it_w.AnyOf(WC("魚雷")) ? 0.02104 * sqrt(it_w.GetLevel()) : 0;
 			});
 			hit_value += 0.001482 * hunter_kammusu.GetLuck();
 			//回避側
@@ -1055,8 +1055,8 @@ DayFireType Simulator::JudgeDayFireType(const size_t turn_player, const KammusuI
 	if (fleet_[other_side].GetUnit()[defense_index.fleet_no][defense_index.fleet_i].IsSubmarine()) return kDayFireChage;
 	// 自身が空母系統なら空撃
 	auto &hunter_kammusu = fleet_[turn_player].GetUnit()[attack_index.fleet_no][attack_index.fleet_i];
-	if (hunter_kammusu.AnyOf(ShipClass::CV | ShipClass::ACV | ShipClass::CVL)) return kDayFireAir;
-	if(hunter_kammusu.AnyOf(ShipClass::AO) && hunter_kammusu.IsFireGunPlane()) return kDayFireAir;
+	if (hunter_kammusu.AnyOf(SC("正規空母") | SC("装甲空母") | SC("軽空母"))) return kDayFireAir;
+	if(hunter_kammusu.AnyOf(SC("給油艦")) && hunter_kammusu.IsFireGunPlane()) return kDayFireAir;
 	// それ以外は全て砲撃
 	return kDayFireGun;
 }
@@ -1069,22 +1069,22 @@ tuple<bool, double> Simulator::JudgeDaySpecialAttack(const size_t turn_player, c
 	size_t sum_gun = 0, sum_subgun = 0, sum_ap = 0, sum_radar = 0, sum_ws = 0;
 	for (auto &it_w : hunter_kammusu.GetWeapon()) {
 		switch (it_w.GetWeaponClass()) {
-		case WeaponClass::Gun:
+		case WC("主砲"):
 			++sum_gun;
 			break;
-		case WeaponClass::SubGun:
+		case WC("副砲"):
 			++sum_subgun;
 			break;
-		case WeaponClass::AP:
+		case WC("対艦強化弾"):
 			++sum_ap;
 			break;
-		case WeaponClass::SmallR:
-		case WeaponClass::LargeR:
+		case WC("小型電探"):
+		case WC("大型電探"):
 			++sum_radar;
 			break;
-		case WeaponClass::WB:
-		case WeaponClass::WS:
-		case WeaponClass::WSN:
+		case WC("水上爆撃機"):
+		case WC("水上偵察機"):
+		case WC("水上偵察機(夜偵)"):
 			++sum_ws;
 		default:
 			break;
@@ -1144,13 +1144,13 @@ tuple<bool, double> Simulator::JudgeNightSpecialAttack(const size_t turn_player,
 	size_t sum_gun = 0, sum_subgun = 0, sum_torpedo = 0;
 	for (auto &it_w : hunter_kammusu.GetWeapon()) {
 		switch (it_w.GetWeaponClass()) {
-		case WeaponClass::Gun:
+		case WC("主砲"):
 			++sum_gun;
 			break;
-		case WeaponClass::SubGun:
+		case WC("副砲"):
 			++sum_subgun;
 			break;
-		case WeaponClass::Torpedo:
+		case WC("魚雷"):
 			// 恐ろしいことに、敵が地上型なら魚雷を持ってない扱いにされる！
 			if(!af_flg) ++sum_torpedo;
 			break;
@@ -1192,7 +1192,7 @@ tuple<bool, double> Simulator::JudgeNightSpecialAttack(const size_t turn_player,
 	// 熟練見張員補正
 	auto has_ssp = [&hunter_kammusu]() -> bool {
 		for (auto &it_w : hunter_kammusu.GetWeapon())
-			if (it_w.AnyOf(WeaponClass::SSP)) return true;
+			if (it_w.AnyOf(WC("水上艦要員"))) return true;
 		return false; };
 	// 運による発動率上昇は、運キャップによる上限がある
 	switch (attack_type) {

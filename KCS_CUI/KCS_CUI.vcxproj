@@ -304,9 +304,11 @@
     <ClInclude Include="source\base.hpp" />
     <ClInclude Include="source\char_convert.hpp" />
     <ClInclude Include="source\config.hpp" />
+    <ClInclude Include="source\cstring.hpp" />
     <ClInclude Include="source\exception.hpp" />
     <ClInclude Include="source\fleet.hpp" />
     <ClInclude Include="source\kammusu.hpp" />
+    <ClInclude Include="source\lookup.hpp" />
     <ClInclude Include="source\mapdata.hpp" />
     <ClInclude Include="source\other.hpp" />
     <ClInclude Include="source\picojson.h" />
@@ -315,6 +317,10 @@
     <ClInclude Include="source\simulator.hpp" />
     <ClInclude Include="source\utf8bomskip.hpp" />
     <ClInclude Include="source\weapon.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="source\ships.csv" />
+    <None Include="source\slotitems.csv" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

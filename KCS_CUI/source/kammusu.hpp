@@ -9,7 +9,13 @@
 class WeaponDB;
 enum class FleetType : std::uint8_t;
 enum TorpedoTurn : std::uint8_t;
-
+//艦船ID
+enum class ShipId {
+#define SHIP(PREFIX, ID, NAME, SHIPCLASS, MAX_HP, DEFENSE, ATTACK, TORPEDO, ANTI_AIR, LUCK, SPEED, RANGE, SLOTS, MAX_AIRS, EVADE, ANTI_SUB, SEARCH, FIRST_WEAPONS, KAMMUSU_FLG, POSTFIX)	\
+	I ## D ## ID = ID,
+#include "ships.csv"
+#undef SHIP
+};
 // 艦種(厳密な綴りはShip Classificationsである)
 // ただし、浮遊要塞・護衛要塞・泊地棲鬼/姫・南方棲鬼は「重巡洋艦」、
 // 南方棲戦鬼は「航空巡洋艦」、装甲空母鬼/姫・戦艦レ級は「航空戦艦」、
@@ -39,7 +45,51 @@ enum class ShipClass {
 	AO  = 0x00200000,	// 給油艦
 };
 constexpr inline auto operator|(const ShipClass& l, const ShipClass& r) { return static_cast<ShipClass>(static_cast<std::underlying_type_t<ShipClass>>(l) | static_cast<std::underlying_type_t<ShipClass>>(r)); }
-const std::wstring& to_wstring(const ShipClass& sc);
+
+namespace detail {
+	constexpr std::pair<cstring<wchar_t>, ShipId> shipIdMap[] = {
+#define SHIP(PREFIX, ID, NAME, SHIPCLASS, MAX_HP, DEFENSE, ATTACK, TORPEDO, ANTI_AIR, LUCK, SPEED, RANGE, SLOTS, MAX_AIRS, EVADE, ANTI_SUB, SEARCH, FIRST_WEAPONS, KAMMUSU_FLG, POSTFIX)	\
+		{ L#NAME, ShipId::I##D##ID },
+#include "ships.csv"
+#undef SHIP
+	};
+	constexpr std::pair<cstring<wchar_t>, ShipClass> shipClassMap[] = {
+		{ L"魚雷艇", ShipClass::PT },
+		{ L"駆逐艦", ShipClass::DD },
+		{ L"軽巡洋艦", ShipClass::CL },
+		{ L"重雷装巡洋艦", ShipClass::CLT },
+		{ L"重巡洋艦", ShipClass::CA },
+		{ L"航空巡洋艦", ShipClass::CAV },
+		{ L"軽空母", ShipClass::CVL },
+		{ L"巡洋戦艦", ShipClass::CC },
+		{ L"戦艦", ShipClass::BB },
+		{ L"航空戦艦", ShipClass::BBV },
+		{ L"正規空母", ShipClass::CV },
+		{ L"陸上型", ShipClass::AF },
+		{ L"潜水艦", ShipClass::SS },
+		{ L"潜水空母", ShipClass::SSV },
+		{ L"輸送艦", ShipClass::LST },
+		{ L"水上機母艦", ShipClass::AV },
+		{ L"揚陸艦", ShipClass::LHA },
+		{ L"装甲空母",ShipClass::ACV },
+		{ L"工作艦", ShipClass::AR },
+		{ L"潜水母艦", ShipClass::AS },
+		{ L"練習巡洋艦", ShipClass::CP },
+		{ L"給油艦", ShipClass::AO },
+	};
+}
+// 文字列から艦船IDへ変換します。
+#define SID(STR) (std::integral_constant<ShipId, Single(detail::shipIdMap, L##STR##_cs)>{}())
+// 文字列から艦種へ変換します。
+#define SC(STR) (std::integral_constant<ShipClass, Single(detail::shipClassMap, L##STR##_cs)>{}())
+
+inline std::wstring to_wstring(const ShipClass& sc) {
+	const auto itor = std::find_if(std::cbegin(detail::shipClassMap), std::cend(detail::shipClassMap), [sc](const auto& item) { return item.second == sc; });
+	if (itor == std::cend(detail::shipClassMap))
+		throw std::invalid_argument("bad ShipClass.");
+	return itor->first.c_str();
+}
+
 
 // 速力
 enum Speed { kSpeedNone, kSpeedLow, kSpeedHigh };
@@ -180,13 +230,13 @@ public:
 	bool IsAntiSubNight() const noexcept;					//夜戦で対潜可能な艦ならtrue
 	bool HasLights() const noexcept;						//探照灯や照明弾を保有していた場合はtrue
 	// 指定のIDか判別する。
-	bool AnyOf(const int test) const noexcept { return id_ == test; }
+	bool AnyOf(const ShipId test) const noexcept { return id_ == static_cast<int>(test); }
 	// 指定の種別か判定する。
 	bool AnyOf(const ShipClass& sc) const noexcept { return (static_cast<std::underlying_type_t<ShipClass>>(ship_class_) & static_cast<std::underlying_type_t<ShipClass>>(sc)) != 0; }
 	// 指定の名前か判定する。名前は完全一致で比較する。
 	template<class String, class = std::enable_if_t<std::is_same<String, std::wstring>::value>>		// 暗黙の型キャストにより非効率とならないようstd::wstringのみを受け付ける。
 	bool AnyOf(const String& test) const noexcept { return std::size(name_) == std::size(test) && name_ == test; }	// 長さが一致した場合に限り文字列比較を行う。
-	// 引数に指定された条件を満たすか判定する。引数はint型のID、ShipClass型の種別、std::wstring型の名前のいずれでも指定できる。名前は完全一致で比較する。
+	// 引数に指定された条件を満たすか判定する。引数はShipId型のID、ShipClass型の種別、std::wstring型の名前のいずれでも指定できる。名前は完全一致で比較する。
 	template<class Head, class... Rest>
 	bool AnyOf(Head head, Rest... rest) const noexcept { return AnyOf(head) || AnyOf(rest...); }
 	template<class F>

@@ -95,5 +95,15 @@
     <ClInclude Include="source\mapdata.hpp">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="source\cstring.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="source\lookup.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="source\ships.csv" />
+    <None Include="source\slotitems.csv" />
   </ItemGroup>
 </Project>
