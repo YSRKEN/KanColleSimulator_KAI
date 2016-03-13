@@ -49,7 +49,7 @@ constexpr inline auto operator|(const ShipClass& l, const ShipClass& r) { return
 namespace detail {
 	constexpr std::pair<cstring<wchar_t>, ShipId> shipIdMap[] = {
 #define SHIP(PREFIX, ID, NAME, SHIPCLASS, MAX_HP, DEFENSE, ATTACK, TORPEDO, ANTI_AIR, LUCK, SPEED, RANGE, SLOTS, MAX_AIRS, EVADE, ANTI_SUB, SEARCH, FIRST_WEAPONS, KAMMUSU_FLG, POSTFIX)	\
-		{ L#NAME, ShipId::I##D##ID },
+		{ L##NAME, ShipId::I##D##ID },
 #include "ships.csv"
 #undef SHIP
 	};

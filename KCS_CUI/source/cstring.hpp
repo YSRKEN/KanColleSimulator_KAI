@@ -21,7 +21,7 @@ public:
 	// 文字列が一致するか比較します。
 	constexpr bool equal(const cstring<Char>& r) const noexcept { return size() == r.size() && equal(r, 0); }
 private:
-	constexpr bool equal(const cstring<Char>& r, std::size_t i) const noexcept { return i == size() || (*this)[i] == r[i] && equal(r, i + 1); }
+	constexpr bool equal(const cstring<Char>& r, std::size_t i) const noexcept { return i == size() || ((*this)[i] == r[i] && equal(r, i + 1)); }
 };
 
 template<class Char>
