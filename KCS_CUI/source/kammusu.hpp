@@ -145,7 +145,6 @@ class Kammusu {
 	bool HasWeaponClass(const WeaponClass& wc) const noexcept;	// 指定の艦載機を保有していた場合はtrue
 public:
 	static Kammusu Get(int id, int level);
-	struct DependOnLv;
 	// コンストラクタ
 	Kammusu();
 	Kammusu(
@@ -153,11 +152,6 @@ public:
 		const int attack, const int torpedo, const int anti_air, const int luck, const Speed speed,
 		const Range range, const int slots, vector<int> max_airs, const int evade, const int anti_sub,
 		const int search, vector<int> first_weapons, const bool kammusu_flg, const int level, const SharedRand& rand = {}
-	);
-	Kammusu(
-		const DependOnLv info, const int id, wstring name, const ShipClass shipclass, 
-		const int luck, const Speed speed, const Range range, const int slots, vector<int> max_airs, 
-		vector<int> first_weapons, const bool kammusu_flg, const SharedRand& rand = {}
 	);
 	void SetRandGenerator(const SharedRand& rand);
 	// getter
@@ -247,29 +241,5 @@ public:
 };
 std::ostream& operator<<(std::ostream& os, const Kammusu& conf);
 std::wostream& operator<<(std::wostream& os, const Kammusu& conf);
-
-struct Kammusu::DependOnLv {
-	int max_hp;					//最大耐久
-	int defense;					//装甲
-	int attack;					//火力
-	int torpedo;					//雷撃
-	int anti_air;					//対空
-	int evade;						//回避
-	int anti_sub;					//対潜
-	int search;					//索敵
-	int level;						//レベル(練度)
-};
-namespace detail {
-	struct ToSpeed_helper {};
-	// 文字列を速力に変換する
-	inline Speed operator| (const string& str, ToSpeed_helper) {
-		switch (str | to_i()) {
-		case 10: return kSpeedHigh;
-		case 5:  return kSpeedLow;
-		default: return kSpeedNone;
-		}
-	}
-}
-constexpr detail::ToSpeed_helper ToSpeed() { return{}; }
 
 #endif //KCS_KAI_INC_KAMMUSU_HPP_

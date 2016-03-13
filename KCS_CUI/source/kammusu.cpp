@@ -110,17 +110,6 @@ Kammusu::Kammusu(
 	this->Reset(false);
 }
 
-Kammusu::Kammusu(
-	const DependOnLv info, const int id, wstring name, const ShipClass shipclass, 
-	const int luck, const Speed speed, const Range range, const int slots, vector<int> max_airs, 
-	vector<int> first_weapons, const bool kammusu_flg, const SharedRand& rand
-)
-	: Kammusu(
-		id, move(name), shipclass, info.max_hp, info.defense, info.attack, info.torpedo, info.anti_air, luck, speed, range, slots, 
-		move(max_airs), info.evade, info.anti_sub, info.search, move(first_weapons), kammusu_flg, info.level, rand
-	)
-{}
-
 void Kammusu::SetRandGenerator(const SharedRand & rand) {
 	this->rand_ = rand;
 }
