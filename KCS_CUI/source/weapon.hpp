@@ -61,7 +61,7 @@ inline auto& operator<<(std::basic_ostream<E, T>& os, const WeaponClass& wc) { r
 namespace detail {
 	constexpr std::pair<cstring<wchar_t>, WeaponId> weaponIdMap[] = {
 #define WEAPON(PREFIX, ID, NAME, WEAPON_CLASS, DEFENSE, ATTACK, TORPEDO, BOMB, ANTI_AIR, ANTI_SUB, HIT, EVADE, SEARCH, RANGE, POSTFIX)	\
-		{ L#NAME, WeaponId::I##D##ID },
+		{ L##NAME, WeaponId::I##D##ID },
 #include "slotitems.csv"
 #undef WEAPON
 	};
