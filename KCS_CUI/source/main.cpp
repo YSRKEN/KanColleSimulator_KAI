@@ -20,9 +20,6 @@ int main(int argc, char *argv[]) {
 		// 現在の設定を取得する
 		Config config(argc, argv);
 		config.Put();
-		// データベースを読み込む
-		WeaponDB weapon_db("slotitems.csv");
-		KammusuDB kammusu_db("ships.csv");
 		// ファイル拡張子により、処理内容を分岐させる
 		auto ext = GetExtension(config.GetInputFilename(kEnemySide));
 		if (ext == "json") {	//通常モード
@@ -31,7 +28,7 @@ int main(int argc, char *argv[]) {
 			fleet.reserve(kBattleSize);
 			assert(fleet.empty());
 			for (size_t i = 0; i < kBattleSize; ++i) {
-				fleet.emplace_back(config.GetInputFilename(i), config.GetFormation(i), weapon_db, kammusu_db);
+				fleet.emplace_back(config.GetInputFilename(i), config.GetFormation(i));
 			}
 			for (const auto& f : fleet) f.Put();
 			// シミュレータを構築し、並列演算を行う
@@ -62,8 +59,8 @@ int main(int argc, char *argv[]) {
 		}
 		else if (ext == "map") {	//マップモード
 			// ファイルから艦隊とマップを読み込む
-			Fleet my_fleet(config.GetInputFilename(kFriendSide), kFormationTrail, weapon_db, kammusu_db);
-			MapData map_Data(config.GetInputFilename(kEnemySide), weapon_db, kammusu_db);
+			Fleet my_fleet(config.GetInputFilename(kFriendSide), kFormationTrail);
+			MapData map_Data(config.GetInputFilename(kEnemySide));
 			my_fleet.Put();
 			map_Data.Put();
 			// Simulatorを構築し、並列演算を行う
