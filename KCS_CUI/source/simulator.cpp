@@ -64,7 +64,7 @@ tuple<Result, vector<Fleet>> Simulator::Calc() {
 #ifdef _DEBUG
 	cout << "索敵結果・索敵値・艦載機を持っているか：\n";
 	for (size_t i = 0; i < kBattleSize; ++i) {
-		cout << search_result_[i] << " " << fleet_[i].SearchValue() << " " << fleet_[i].HasAir() << endl;
+		cout << search_result_[i] << " " << fleet_[i].SearchValue() << "(33式:" << fleet_[i].SearchValue_33() << ") " << fleet_[i].HasAir() << endl;
 	}
 	cout << endl;
 #endif

@@ -270,6 +270,55 @@ double Fleet::SearchValue() const noexcept {
 	return floor(search_sum * 10.0 + 0.5) / 10.0;	//小数第2位を四捨五入
 }
 
+//判定式(33)で索敵値を計算する
+double Fleet::SearchValue_33() const noexcept
+{
+	double search_sum = 0.0;
+	int alive_count = 0;
+	//司令部レベルによる補正
+	search_sum -= ceil(level_ * 0.4);
+	//艦娘・装備による補正
+	for (auto &it_u : unit_) {
+		for (auto &it_k : it_u) {
+			if (it_k.Status() == kStatusLost) continue;
+			alive_count++;
+			search_sum += sqrt(it_k.GetSearch());
+			for (auto &it_w : it_k.GetWeapon()) {
+				switch (it_w.GetWeaponClass()) {
+				case WC("水上爆撃機"):	//水爆
+					search_sum += it_w.GetSearch() * 1.1;
+					break;
+				case WC("艦上攻撃機"):	//艦攻
+					search_sum += it_w.GetSearch() * 0.8;
+					break;
+				case WC("艦上偵察機"):	//艦偵
+				case WC("艦上偵察機(彩雲)"):	//彩雲
+					search_sum += it_w.GetSearch() * 1.0;
+					break;
+				case WC("水上偵察機"):	//水偵
+				case WC("水上偵察機(夜偵)"):	//夜偵
+					search_sum += it_w.GetSearch() * 1.2;
+					//熟練度が改修値と混同されるため、とりあえずコメントアウト
+					//JSONのフォーマット自体を変えないと解決しません
+					//search_sum += sqrt(it_w.GetLevel()) * 1.2;
+					break;
+				case WC("小型電探"):	//小型電探
+				case WC("大型電探"):	//大型電探
+					search_sum += it_w.GetSearch() * 0.6;
+					search_sum += sqrt(it_w.GetLevel()) * 1.25;
+					break;
+				default:	//その他装備は係数0.6、改修効果は乗らないとする
+					search_sum += it_w.GetSearch() * 0.6;
+					break;
+				}
+			}
+		}
+	}
+	//隻数による補正
+	search_sum += 2 * (6 - alive_count);
+	return floor(search_sum * 10.0 + 0.5) / 10.0;	//小数第2位を四捨五入
+}
+
 // 制空値を計算する
 int Fleet::AntiAirScore() const noexcept {
 	int anti_air_score = 0;
