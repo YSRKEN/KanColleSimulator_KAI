@@ -33,8 +33,9 @@ static std::vector<int> split(const std::wstring& str) {
 	return result;
 }
 
-static std::pair<const Kammusu, const Kammusu> parse(int id, const wchar_t* name_str, int shipclass_num, const wchar_t* max_hp_str, const wchar_t* defense_str, const wchar_t* attack_str,
-	const wchar_t* torpedo_str, const wchar_t* anti_air_str, const wchar_t* luck_str, int speed_num, int range_num, int slots, const wchar_t* max_airs_str, const wchar_t* evade_str,
+static std::pair<const Kammusu, const Kammusu> parse(int id, const wchar_t* name_str, int shipclass_num, const wchar_t* max_hp_str,
+	const wchar_t* defense_str, const wchar_t* attack_str, const wchar_t* torpedo_str, const wchar_t* anti_air_str,
+	const wchar_t* luck_str, int speed_num, int range_num, int slots, const wchar_t* max_airs_str, const wchar_t* evade_str,
 	const wchar_t* anti_sub_str, const wchar_t* search_str, const wchar_t* first_weapons_str, const wchar_t* kammusu_flg_str)
 {
 	using std::get;
@@ -62,9 +63,10 @@ static std::pair<const Kammusu, const Kammusu> parse(int id, const wchar_t* name
 
 const std::unordered_map<int, std::pair<const Kammusu, const Kammusu>> Kammusu::db_ = [] {
 	std::unordered_map<int, std::pair<const Kammusu, const Kammusu>> db;
-#define SHIP(PREFIX, ID, NAME, SHIPCLASS, MAX_HP, DEFENSE, ATTACK, TORPEDO, ANTI_AIR, LUCK, SPEED, RANGE, SLOTS, MAX_AIRS, EVADE, ANTI_SUB, SEARCH, FIRST_WEAPONS, KAMMUSU_FLG, POSTFIX)								\
-	if (std::wstring(L#MAX_HP L#DEFENSE L#ATTACK L#TORPEDO L#ANTI_AIR L#LUCK L#MAX_AIRS L#EVADE L#ANTI_SUB L#SEARCH L#FIRST_WEAPONS L#KAMMUSU_FLG).find(L"null") == std::wstring::npos)									\
-		db.emplace(ID, parse(ID, L#NAME, SHIPCLASS, L#MAX_HP, L#DEFENSE, L#ATTACK, L#TORPEDO, L#ANTI_AIR, L#LUCK, SPEED, RANGE, SLOTS, L#MAX_AIRS, L#EVADE, L#ANTI_SUB, L#SEARCH, L#FIRST_WEAPONS, L#KAMMUSU_FLG));
+#define SHIP(PREFIX, ID, NAME, SHIPCLASS, MAX_HP, DEFENSE, ATTACK, TORPEDO, ANTI_AIR, LUCK, SPEED, RANGE, SLOTS, MAX_AIRS, EVADE, ANTI_SUB, SEARCH, FIRST_WEAPONS, KAMMUSU_FLG, POSTFIX)	\
+	if (std::wstring(L ## #MAX_HP #DEFENSE #ATTACK #TORPEDO #ANTI_AIR #LUCK #MAX_AIRS #EVADE #ANTI_SUB #SEARCH #FIRST_WEAPONS #KAMMUSU_FLG).find(L"null") == std::wstring::npos)			\
+		db.emplace(ID, parse(ID, L##NAME, SHIPCLASS, L ## #MAX_HP, L ## #DEFENSE, L ## #ATTACK, L ## #TORPEDO, L ## #ANTI_AIR, L ## #LUCK,													\
+								SPEED, RANGE, SLOTS, L ## #MAX_AIRS, L ## #EVADE, L ## #ANTI_SUB, L ## #SEARCH, L ## #FIRST_WEAPONS, L ## #KAMMUSU_FLG));
 #include "ships.csv"
 #undef SHIP
 	return db;
