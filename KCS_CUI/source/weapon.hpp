@@ -52,7 +52,7 @@ enum class WeaponClass : std::uint64_t {
 	AirFight = PF | PBF | PB | WB | PA | WF,					//航空戦に参加する艦載機
 	AirTrailer = PA | PS | PSS | DaiteiChan | WS | WSN | WF,	//触接に参加する艦載機
 	AirBomb = PBF | PB | WB | PA,								//開幕爆撃に参加する艦載機
-	Air = AirFight | AirTrailer,								//(熟練度が存在する)艦載機
+	Air = (AirFight | AirTrailer) ^ (WS | WSN),					//(熟練度が存在する)艦載機
 };
 constexpr inline auto operator|(const WeaponClass& l, const WeaponClass& r) { return static_cast<WeaponClass>(static_cast<std::underlying_type_t<WeaponClass>>(l) | static_cast<std::underlying_type_t<WeaponClass>>(r)); }
 template<class E, class T>

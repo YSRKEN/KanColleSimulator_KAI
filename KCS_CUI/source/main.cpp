@@ -1,4 +1,4 @@
-﻿/* KanColleSimulator Ver.1.4.0 */
+﻿/* KanColleSimulator Ver.1.4.1 */
 
 #include "base.hpp"
 #include "config.hpp"
@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
 			auto seed = make_SharedRand().make_unique_rand_array<unsigned int>(config.CalcSeedArrSize());
 			vector<Result> result_db(config.GetTimes());
 			const auto preprocess_end_time = std::chrono::high_resolution_clock::now();
-			cout << "preprocess:" << std::chrono::duration_cast<std::chrono::nanoseconds>(preprocess_end_time - preprocess_begin_time).count() << "[ns]\n" << endl;
+			cout << "preprocess:" << std::chrono::duration_cast<std::chrono::milliseconds>(preprocess_end_time - preprocess_begin_time).count() << "[ms]\n" << endl;
 			const auto process_begin_time = std::chrono::high_resolution_clock::now();
 			#pragma omp parallel for num_threads(static_cast<int>(config.GetThreads()))
 			for (int n = 0; n < static_cast<int>(config.GetTimes()); ++n) {
@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
 				r.reserve(map_Data.GetSize() * config.GetTimes());
 			}
 			const auto preprocess_end_time = std::chrono::high_resolution_clock::now();
-			cout << "preprocess:" << std::chrono::duration_cast<std::chrono::nanoseconds>(preprocess_end_time - preprocess_begin_time).count() << "[ns]\n" << endl;
+			cout << "preprocess:" << std::chrono::duration_cast<std::chrono::milliseconds>(preprocess_end_time - preprocess_begin_time).count() << "[ms]\n" << endl;
 			const auto process_begin_time = std::chrono::high_resolution_clock::now();
 			#pragma omp parallel for num_threads(static_cast<int>(config.GetThreads()))
 			for (int n = 0; n < static_cast<int>(config.GetTimes()); ++n) {
