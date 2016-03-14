@@ -272,7 +272,7 @@ double Kammusu::AllAntiAir() const noexcept {
 	for (auto &it_w : weapons_) {
 		double aaa;
 		if (kammusu_flg_) {
-			aaa = it_w.GetAntiAir() + 0.7 * sqrt(it_w.GetLevel());
+			aaa = it_w.GetAntiAir() + 0.7 * (it_w.AnyOf(WeaponClass::Air) ? 0 : sqrt(it_w.GetLevel()));
 		}
 		else {
 			aaa = int(2.0 * sqrt(it_w.GetAntiAir()));
