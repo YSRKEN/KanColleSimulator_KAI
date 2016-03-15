@@ -1,0 +1,18 @@
+{
+	"version": "map",
+	"position":[
+	{
+		"name":"A",
+		"pattern":[{"fleets":[501], "form":0},
+		           {"fleets":[502], "form":0},
+		           {"fleets":[503], "form":0}],
+		"mode":1
+	},
+	{
+		"name":"C",
+		"pattern":[{"fleets":[505,501,501], "form":0},
+		           {"fleets":[505,502,502], "form":0},
+		           {"fleets":[505,503,502,502], "form":0}],
+		"mode":0
+	}]
+}
