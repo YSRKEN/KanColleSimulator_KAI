@@ -447,25 +447,18 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 #endif
 }
 
-vector<vector<std::pair<KammusuIndex, Range>>> Simulator::DetermineAttackOrder(FireTurn fire_turn, const size_t fleet_index) const
+vector<vector<std::pair<KammusuIndex, Range>>> Simulator::DetermineAttackOrder(FireTurn fire_turn, size_t fleet_index) const
 {
 	vector<vector<std::pair<KammusuIndex, Range>>> attack_list(kBattleSize);
 	for (size_t bi = 0; bi < kBattleSize; ++bi) {
 		auto &unit = this->fleet_[bi].GetUnit();
 		// 行動可能な艦娘一覧を作成する
-		if (bi == kFriendSide) {
-			auto &unit2 = unit[fleet_index];
-			for (size_t ui = 0; ui < unit2.size(); ++ui) {
-				if (!unit2[ui].IsMoveGun()) continue;
-				attack_list[bi].push_back({ { fleet_index, ui }, unit2[ui].MaxRange() });
-			}
-		}
-		else {
-			auto &unit2 = unit[0];
-			for (size_t ui = 0; ui < unit2.size(); ++ui) {
-				if (!unit2[ui].IsMoveGun()) continue;
-				attack_list[bi].push_back({ { 0, ui }, unit2[ui].MaxRange() });
-			}
+		if (bi == kFriendSide) fleet_index = 0;
+		auto &unit2 = unit[fleet_index];
+		attack_list[bi].reserve(unit2.size());//unit2.size()はたかが1桁程度の値だから気にせずallocateする
+		for (size_t ui = 0; ui < unit2.size(); ++ui) {
+			if (!unit2[ui].IsMoveGun()) continue;
+			attack_list[bi].push_back({ { fleet_index, ui }, unit2[ui].MaxRange() });
 		}
 		if (fire_turn == kFireFirst) {
 			// 一覧をシャッフルする

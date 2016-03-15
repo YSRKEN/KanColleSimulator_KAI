@@ -40,4 +40,9 @@
     <LocalDebuggerWorkingDirectory>$(ProjectDir)../</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='clang_Release|x64'">
+    <LocalDebuggerCommandArguments>-i "sample\3-5.json" "sample\3-5 high.map" -f 3 0 -n 100000 -t 4 -o output.json</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>$(ProjectDir)../</LocalDebuggerWorkingDirectory>
+  </PropertyGroup>
 </Project>
