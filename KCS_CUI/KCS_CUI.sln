@@ -1,11 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25029.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KCS_CUI", "KCS_CUI.vcxproj", "{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{177C5836-F544-4572-A1B0-E2E8006B36E4}"
+	ProjectSection(SolutionItems) = preProject
+		パフォーマンス1.psess = パフォーマンス1.psess
+	EndProjectSection
+EndProject
 Global
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		clang_Debug|x64 = clang_Debug|x64
 		clang_Debug|x86 = clang_Debug|x86
@@ -15,6 +23,8 @@ Global
 		Debug|x86 = Debug|x86
 		Release(OpenMP)|x64 = Release(OpenMP)|x64
 		Release(OpenMP)|x86 = Release(OpenMP)|x86
+		Release(OpenMP_AVX2)|x64 = Release(OpenMP_AVX2)|x64
+		Release(OpenMP_AVX2)|x86 = Release(OpenMP_AVX2)|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
@@ -35,6 +45,10 @@ Global
 		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.Release(OpenMP)|x64.Build.0 = Release(OpenMP)|x64
 		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.Release(OpenMP)|x86.ActiveCfg = Release(OpenMP)|Win32
 		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.Release(OpenMP)|x86.Build.0 = Release(OpenMP)|Win32
+		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.Release(OpenMP_AVX2)|x64.ActiveCfg = Release(OpenMP_AVX2)|x64
+		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.Release(OpenMP_AVX2)|x64.Build.0 = Release(OpenMP_AVX2)|x64
+		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.Release(OpenMP_AVX2)|x86.ActiveCfg = Release(OpenMP_AVX2)|Win32
+		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.Release(OpenMP_AVX2)|x86.Build.0 = Release(OpenMP_AVX2)|Win32
 		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.Release|x64.ActiveCfg = Release|x64
 		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.Release|x64.Build.0 = Release|x64
 		{ACD9BD4F-A8C2-4C3A-9BC5-CBBF96BA13ED}.Release|x86.ActiveCfg = Release|Win32

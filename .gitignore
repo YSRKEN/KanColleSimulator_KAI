@@ -201,5 +201,7 @@ output.json
 *.zip
 KCS_CUI/Release(OpenMP)/KCS_CUI.iobj
 KCS_CUI/Release(OpenMP)/KCS_CUI.ipdb
+KCS_CUI/Release(OpenMP_AVX2)/KCS_CUI.iobj
+KCS_CUI/Release(OpenMP_AVX2)/KCS_CUI.ipdb
 KCS_CUI/KCS_CUI.VC.db
 *.diagsession

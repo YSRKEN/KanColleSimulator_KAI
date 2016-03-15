@@ -15,6 +15,11 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>$(ProjectDir)..\</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release(OpenMP_AVX2)|Win32'">
+    <LocalDebuggerCommandArguments>-i "sample\3-5.json" "sample\3-5 high.map"  -f 0 0 -n 100000 -t 4 -o output.json &gt; log.txt</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>$(ProjectDir)..\</LocalDebuggerWorkingDirectory>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='clang_Debug|Win32'">
     <LocalDebuggerCommandArguments>-i "sample\sample3.json" "sample\sample1.json" -f 0 1 -n 1 &gt; log.txt</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
@@ -31,6 +36,11 @@
     <LocalDebuggerWorkingDirectory>$(ProjectDir)../</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release(OpenMP)|x64'">
+    <LocalDebuggerCommandArguments>-i "sample\3-5.json" "sample\3-5 high.map" -f 3 0 -n 100000 -t 4 -o output.json &gt; log.txt</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>$(ProjectDir)../</LocalDebuggerWorkingDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release(OpenMP_AVX2)|x64'">
     <LocalDebuggerCommandArguments>-i "sample\3-5.json" "sample\3-5 high.map" -f 3 0 -n 100000 -t 4 -o output.json &gt; log.txt</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>$(ProjectDir)../</LocalDebuggerWorkingDirectory>
