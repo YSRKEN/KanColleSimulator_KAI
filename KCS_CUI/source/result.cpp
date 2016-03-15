@@ -1,13 +1,6 @@
 ﻿#include "base.hpp"
 #include "result.hpp"
 #include <array>
-// コンストラクタ
-Result::Result() {
-	hp_before_.resize(kBattleSize, vector<vector<int>>(kMaxFleetSize, vector<int>(kMaxUnitSize)));
-	hp_.resize(kBattleSize, vector<vector<int>>(kMaxFleetSize, vector<int>(kMaxUnitSize)));
-	damage_.resize(kBattleSize, vector<vector<int>>(kMaxFleetSize, vector<int>(kMaxUnitSize, 0)));
-	damage_night_.resize(kBattleSize, vector<vector<int>>(kMaxFleetSize, vector<int>(kMaxUnitSize, 0)));
-}
 
 // getter
 int Result::GetHP(const size_t bi, const size_t fi, const size_t ui) const noexcept { return hp_[bi][fi][ui]; }

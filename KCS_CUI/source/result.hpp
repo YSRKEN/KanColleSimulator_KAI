@@ -17,14 +17,14 @@ const wstring kWinReasonStrL[] = { L"完全勝利SS", L"勝利S", L"勝利A", L"
 const string kWinReasonStrS[] = { "SS", "S", "A", "B", "C", "D", "E" };
 
 class Result {
-	vector<vector<vector<int>>> hp_before_;
-	vector<vector<vector<int>>> hp_;
-	vector<vector<vector<int>>> damage_;
-	vector<vector<vector<int>>> damage_night_;
+	std::array<std::array<std::array<int, kMaxUnitSize>, kMaxFleetSize>, kBattleSize> hp_before_ = {};
+	std::array<std::array<std::array<int, kMaxUnitSize>, kMaxFleetSize>, kBattleSize> hp_ = {};
+	std::array<std::array<std::array<int, kMaxUnitSize>, kMaxFleetSize>, kBattleSize> damage_ = {};
+	std::array<std::array<std::array<int, kMaxUnitSize>, kMaxFleetSize>, kBattleSize> damage_night_ = {};
 	bool night_flg_;
 public:
 	// コンストラクタ
-	Result();
+	Result() {}
 	// getter
 	int GetHP(const size_t bi, const size_t fi, const size_t ui) const noexcept;
 	int GetDamage(const size_t bi, const size_t fi, const size_t ui, const bool special_mvp_flg = false) const noexcept;
