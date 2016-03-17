@@ -10,7 +10,7 @@
 // based on XORSHIFT-ADD version 1.2 (MIT License)
 // http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/XSADD/index-jp.html
 // https://github.com/MersenneTwister-Lab/XSadd
-class XorShiftPlus {
+class XorShiftAdd {
 public:
 	typedef uint32_t result_type;
 	static constexpr result_type min() { return 0; }
@@ -40,7 +40,7 @@ private:
 		state[3] = t;
 	}
 public:
-	XorShiftPlus(result_type seed) noexcept : state{ seed, 0, 0, 0 } {
+	XorShiftAdd(result_type seed) noexcept : state{ seed, 0, 0, 0 } {
 		for (int i = 1; i < LOOP; i++)
 			state[i & 3] ^= i + UINT32_C(1812433253) * (state[(i - 1) & 3] ^ (state[(i - 1) & 3] >> 30));
 		period_certificate();
@@ -53,7 +53,7 @@ public:
 	}
 };
 
-XorShiftPlus& GetRandomEngine();
+XorShiftAdd& GetRandomEngine();
 
 inline double RandReal() {
 	static std::uniform_real_distribution<double> dist;
