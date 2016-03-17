@@ -20,11 +20,11 @@ Kammusu::Kammusu(
 	const int id, wstring name, const ShipClass shipclass, const int max_hp, const int defense,
 	const int attack, const int torpedo, const int anti_air, const int luck, const Speed speed,
 	const Range range, const int slots, vector<int> max_airs, const int evade, const int anti_sub,
-	const int search, vector<int> first_weapons, const bool kammusu_flg, const int level, const SharedRand& rand) :
+	const int search, vector<int> first_weapons, const bool kammusu_flg, const int level) :
 	id_(id), name_(move(name)), ship_class_(shipclass), max_hp_(max_hp), defense_(defense), attack_(attack),
 	torpedo_(torpedo), anti_air_(anti_air), luck_(luck), speed_(speed), range_(range), slots_(slots),
 	max_airs_(move(max_airs)), evade_(evade), anti_sub_(anti_sub), search_(search), first_weapons_(move(first_weapons)),
-	kammusu_flg_(kammusu_flg), level_(level) , rand_(rand)
+	kammusu_flg_(kammusu_flg), level_(level)
 {
 	this->Reset();
 }
@@ -32,17 +32,13 @@ Kammusu::Kammusu(
 Kammusu::Kammusu(
 	const DependOnLv info, const int id, wstring name, const ShipClass shipclass, 
 	const int luck, const Speed speed, const Range range, const int slots, vector<int> max_airs, 
-	vector<int> first_weapons, const bool kammusu_flg, const SharedRand& rand
+	vector<int> first_weapons, const bool kammusu_flg
 )
 	: Kammusu(
 		id, move(name), shipclass, info.max_hp, info.defense, info.attack, info.torpedo, info.anti_air, luck, speed, range, slots, 
-		move(max_airs), info.evade, info.anti_sub, info.search, move(first_weapons), kammusu_flg, info.level, rand
+		move(max_airs), info.evade, info.anti_sub, info.search, move(first_weapons), kammusu_flg, info.level
 	)
 {}
-
-void Kammusu::SetRandGenerator(const SharedRand & rand) {
-	this->rand_ = rand;
-}
 
 // getter
 int Kammusu::GetID() const noexcept { return id_; }
@@ -617,7 +613,7 @@ void Kammusu::MinusHP(const int &damage, const bool &stopper_flg) {
 	}
 	else if (stopper_flg) {
 		// そうでない場合、撃沈ストッパーが効いている状況下では割合ダメージに変換される
-		hp_ -= int(0.5 * hp_ + 0.3 * rand_.RandInt(hp_));
+		hp_ -= int(0.5 * hp_ + 0.3 * RandInt(hp_));
 		if (hp_ <= 0) hp_ = 1;
 	}
 	else {
