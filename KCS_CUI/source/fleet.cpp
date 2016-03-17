@@ -34,7 +34,7 @@ detail::picojson_object_get_with_limit_or_default<ResultType> GetWithLimitOrDefa
 	return{ key, min, max, Default };
 }
 
-void Fleet::LoadJson(std::istream & file, const WeaponDB & weapon_db, const KammusuDB & kammusu_db, char_cvt::char_enc fileenc)
+void Fleet::LoadJson(std::istream & file, char_cvt::char_enc fileenc)
 {
 	using picojson::object;
 	ENCODE_THROW_WITH_MESSAGE_IF(fileenc == char_cvt::char_enc::unknown, "unknown char enc type.")//文字コード自動判別なんてやらない
@@ -76,7 +76,7 @@ void Fleet::LoadJson(std::istream & file, const WeaponDB & weapon_db, const Kamm
 			auto& unit = temp_u.second.get<object>();
 			auto id = unit.at("id").to_str() | to_i();
 			auto level = unit.at("lv").to_str() | to_i_limit(1, 155);	//上限はいつか変わるかも？
-			Kammusu temp_k = kammusu_db.Get(id, level).Reset();
+			Kammusu temp_k = Kammusu::Get(id, level).Reset(false);
 			auto luck = unit.at("luck").to_str() | to_i_limit(0, 100);
 			temp_k.SetLuck(luck);
 			if (unit.count("cond")) {
@@ -86,7 +86,7 @@ void Fleet::LoadJson(std::istream & file, const WeaponDB & weapon_db, const Kamm
 			size_t wi = 0;
 			for (auto &temp_p : unit.at("items").get<object>()) {
 				auto& parts = temp_p.second.get<object>();
-				Weapon temp_w = weapon_db.Get(parts.at("id").to_str() | to_i());
+				Weapon temp_w = Weapon::Get(parts.at("id").to_str() | to_i());
 				// 改修・外部熟練度・内部熟練度の処理
 				if (temp_w.AnyOf(WeaponClass::Air)) {
 					level = parts.at("rf").to_str() | to_i_limit(0, 7);
@@ -118,7 +118,7 @@ void Fleet::LoadJson(std::istream & file, const WeaponDB & weapon_db, const Kamm
 	}
 }
 // コンストラクタ
-Fleet::Fleet(const string &file_name, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, const SharedRand& rand, char_cvt::char_enc fileenc)
+Fleet::Fleet(const string &file_name, const Formation &formation, const SharedRand& rand, char_cvt::char_enc fileenc)
 	: formation_(formation), rand_(rand)// 陣形はそのまま反映させる
 {
 	ENCODE_THROW_WITH_MESSAGE_IF(fileenc == char_cvt::char_enc::unknown, "unknown char enc type.")//文字コード自動判別なんてやらない
@@ -126,14 +126,14 @@ Fleet::Fleet(const string &file_name, const Formation &formation, const WeaponDB
 	ifstream fin(file_name);
 	FILE_THROW_WITH_MESSAGE_IF(!fin.is_open(), "艦隊データが正常に読み込めませんでした.")
 	if(char_cvt::char_enc::shift_jis != fileenc) skip_utf8_bom(fin, fileenc);
-	this->LoadJson(fin, weapon_db, kammusu_db, fileenc);
+	this->LoadJson(fin, fileenc);
 }
 
-Fleet::Fleet(std::istream & file, const Formation & formation, const WeaponDB & weapon_db, const KammusuDB & kammusu_db, const SharedRand& rand, char_cvt::char_enc fileenc)
+Fleet::Fleet(std::istream & file, const Formation & formation, const SharedRand& rand, char_cvt::char_enc fileenc)
 	: formation_(formation), rand_(rand)// 陣形はそのまま反映させる
 {
 	ENCODE_THROW_WITH_MESSAGE_IF(fileenc == char_cvt::char_enc::unknown, "unknown char enc type.")//文字コード自動判別なんてやらない
-	this->LoadJson(file, weapon_db, kammusu_db, fileenc);
+	this->LoadJson(file, fileenc);
 }
 
 // setter

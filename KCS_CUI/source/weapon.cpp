@@ -2,6 +2,20 @@
 #include "weapon.hpp"
 #include "char_convert.hpp"
 using namespace std::string_literals;
+
+constexpr WeaponClass ToWC(const cstring<wchar_t>& str) noexcept {
+	// CSVにはWeaponClassに定義されていないクラスが記載されているため、見つからなかった場合はOtherとしておく。
+	return FirstOrDefault(detail::weaponClassMap, str, WeaponClass::Other);
+}
+
+const std::unordered_map<int, const Weapon> Weapon::db_ = {
+#define WEAPON(PREFIX, ID, NAME, WEAPON_CLASS, DEFENSE, ATTACK, TORPEDO, BOMB, ANTI_AIR, ANTI_SUB, HIT, EVADE, SEARCH, RANGE, POSTFIX)	\
+	{ ID, { ID, L ## #NAME ## s, std::integral_constant<WeaponClass, ToWC(L ## #WEAPON_CLASS ## _cs)>{}(),								\
+			DEFENSE, ATTACK, TORPEDO, BOMB, ANTI_AIR, ANTI_SUB, HIT, EVADE, SEARCH, static_cast<Range>(RANGE), 0, 0, 0 } },
+#include "slotitems.csv"
+#undef WEAPON
+};
+
 // コンストラクタ
 Weapon::Weapon() noexcept : Weapon(-1, {}, WC("その他"), 0, 0, 0, 0, 0, 0, 0, 0, 0, kRangeNone, 0, 0, 0) {}
 Weapon::Weapon(
