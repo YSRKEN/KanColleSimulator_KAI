@@ -35,14 +35,13 @@ int main(int argc, char *argv[]) {
 			}
 			for (const auto& f : fleet) f.Put();
 			// シミュレータを構築し、並列演算を行う
-			auto seed = make_SharedRand().make_unique_rand_array<unsigned int>(config.CalcSeedArrSize());
 			vector<Result> result_db(config.GetTimes());
 			const auto preprocess_end_time = std::chrono::high_resolution_clock::now();
 			cout << "preprocess:" << std::chrono::duration_cast<std::chrono::nanoseconds>(preprocess_end_time - preprocess_begin_time).count() << "[ns]\n" << endl;
 			const auto process_begin_time = std::chrono::high_resolution_clock::now();
 			#pragma omp parallel for num_threads(static_cast<int>(config.GetThreads()))
 			for (int n = 0; n < static_cast<int>(config.GetTimes()); ++n) {
-				Simulator simulator(fleet, seed[config.CalcSeedVNo(n)], kSimulateModeDN);//戦闘のたびにSimulatorインスタンスを設定する
+				Simulator simulator(fleet, kSimulateModeDN);//戦闘のたびにSimulatorインスタンスを設定する
 				vector<Fleet> fleet_;
 				std::tie(result_db[n], fleet_) = simulator.Calc();
 			}
@@ -67,7 +66,6 @@ int main(int argc, char *argv[]) {
 			my_fleet.Put();
 			map_Data.Put();
 			// Simulatorを構築し、並列演算を行う
-			auto seed = make_SharedRand().make_unique_rand_array<unsigned int>(config.CalcSeedArrSize());
 			vector<size_t> point_count(map_Data.GetSize(), 0);
 			vector<vector<Result>> result_db_(config.GetThreads());
 			vector<MapData> map_Data_(config.GetThreads(), map_Data);
@@ -80,7 +78,6 @@ int main(int argc, char *argv[]) {
 			#pragma omp parallel for num_threads(static_cast<int>(config.GetThreads()))
 			for (int n = 0; n < static_cast<int>(config.GetTimes()); ++n) {
 				auto& map_data_this_thread = map_Data_[omp_get_thread_num()];
-				map_data_this_thread.SetRandGenerator(seed[config.CalcSeedVNo(n)]);
 				// 自艦隊をセットする
 				vector<Fleet> fleet(kBattleSize);
 				fleet[kFriendSide] = my_fleet;
@@ -100,7 +97,7 @@ int main(int argc, char *argv[]) {
 						fleet[kFriendSide].SetFormation(kFormationTrail);
 					}
 					// シミュレートを行う
-					Simulator simulator(fleet, map_data_this_thread.GetGenerator(), map_data_this_thread.GetSimulateMode(p));
+					Simulator simulator(fleet, map_data_this_thread.GetSimulateMode(p));
 					vector<Fleet> fleet_;
 					Result result_;
 					std::tie(result_, fleet_) = simulator.Calc();

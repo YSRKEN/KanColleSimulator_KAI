@@ -38,7 +38,6 @@ class Fleet;
 class Simulator {
 	vector<Fleet> fleet_;			//シミュレーションに使用する艦隊
 	Result result_;					//シミュレーション結果を保存するクラス
-	SharedRand rand;				//シミュレーションに使用する乱数生成器
 	SimulateMode simulate_mode_;	//シミュレーションにおける戦闘モード
 	bitset<kBattleSize> search_result_;	//索敵結果
 	tuple<AirWarStatus, vector<double>> air_war_result_;	//制空状態および触接倍率
@@ -79,9 +78,7 @@ class Simulator {
 public:
 	// コンストラクタ
 	Simulator(){}
-	Simulator(const vector<Fleet> &fleet, const unsigned int seed, const SimulateMode& simulate_mode);
-	Simulator(const vector<Fleet> &fleet, SharedRand generator, const SimulateMode& simulate_mode);
-	SharedRand GetGenerator() noexcept;
+	Simulator(const vector<Fleet> &fleet, const SimulateMode& simulate_mode);
 	void Flush_Calc_Result(const vector<Fleet>& fleet);
 	// 計算用メソッド
 	tuple<Result, vector<Fleet>> Calc();

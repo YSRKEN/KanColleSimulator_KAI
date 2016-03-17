@@ -46,18 +46,13 @@ MapData::MapData(const string &file_name, const WeaponDB &weapon_db, const Kammu
 // getter
 size_t MapData::GetSize() const noexcept { return fleet_.size(); }
 Fleet MapData::GetFleet(const size_t p) const {
-	return rand_.select_random_in_range(fleet_[p]);
+	return *select_random_in_range(std::begin(fleet_[p]), std::end(fleet_[p]));
 }
 Fleet MapData::GetFleet(const size_t p, const size_t n) const noexcept {
 	return fleet_[p][n];
 }
 SimulateMode MapData::GetSimulateMode(const size_t p) const noexcept { return simulate_mode_[p]; }
 wstring MapData::GetPointName(const size_t p) const noexcept { return point_name_[p]; }
-
-SharedRand MapData::GetGenerator() noexcept { return this->rand_; }
-
-// setter
-void MapData::SetRandGenerator(const unsigned int seed) { rand_ = SharedRand(seed); }
 
 //内容を表示する
 void MapData::Put() {

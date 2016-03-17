@@ -21,15 +21,13 @@ class Fleet {
 	vector<vector<Kammusu>> unit_;	//艦娘・深海棲艦
 	int level_;						//司令部レベル
 	FleetType fleet_type_;			//艦隊の形式
-	SharedRand rand_;
 	void LoadJson(std::istream &file, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, char_cvt::char_enc fileenc);
 public:
 	// コンストラクタ
-	Fleet() : formation_(kFormationTrail), unit_(), level_(120), fleet_type_(FleetType::Normal), rand_() {}
-	Fleet(const string &file_name, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, const SharedRand& rand = {}, char_cvt::char_enc fileenc = char_cvt::char_enc::utf8);
-	Fleet(std::istream &file, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, const SharedRand& rand = {}, char_cvt::char_enc fileenc = char_cvt::char_enc::utf8);
+	Fleet() : formation_(kFormationTrail), unit_(), level_(120), fleet_type_(FleetType::Normal) {}
+	Fleet(const string &file_name, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, char_cvt::char_enc fileenc = char_cvt::char_enc::utf8);
+	Fleet(std::istream &file, const Formation &formation, const WeaponDB &weapon_db, const KammusuDB &kammusu_db, char_cvt::char_enc fileenc = char_cvt::char_enc::utf8);
 	// setter
-	void SetRandGenerator(const SharedRand& rand);
 	void SetFormation(const Formation);
 	// getter
 	Formation GetFormation() const noexcept;

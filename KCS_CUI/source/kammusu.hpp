@@ -4,6 +4,7 @@
 #include "weapon.hpp"
 #include <iostream>
 #include <cstdint>
+#include <numeric>
 #include <type_traits>
 #include "random.hpp"
 class WeaponDB;
@@ -129,7 +130,6 @@ class Kammusu {
 	vector<int> first_weapons_;		//初期装備
 	bool kammusu_flg_;				//艦娘フラグ
 	int level_;						//レベル(練度)
-	SharedRand rand_;
 	// 変更するもの
 	int hp_;					//現耐久
 	vector<Weapon> weapons_;	//現装備
@@ -150,14 +150,13 @@ public:
 		const int id, wstring name, const ShipClass shipclass, const int max_hp, const int defense,
 		const int attack, const int torpedo, const int anti_air, const int luck, const Speed speed,
 		const Range range, const int slots, vector<int> max_airs, const int evade, const int anti_sub,
-		const int search, vector<int> first_weapons, const bool kammusu_flg, const int level, const SharedRand& rand = {}
+		const int search, vector<int> first_weapons, const bool kammusu_flg, const int level
 	);
 	Kammusu(
 		const DependOnLv info, const int id, wstring name, const ShipClass shipclass, 
 		const int luck, const Speed speed, const Range range, const int slots, vector<int> max_airs, 
-		vector<int> first_weapons, const bool kammusu_flg, const SharedRand& rand = {}
+		vector<int> first_weapons, const bool kammusu_flg
 	);
-	void SetRandGenerator(const SharedRand& rand);
 	// getter
 	int GetID() const noexcept;
 	wstring GetName() const;
