@@ -109,27 +109,26 @@ enum NightFireType { kNightFireGun, kNightFireChage };
 
 // 艦娘クラス
 class Kammusu {
-	static const std::unordered_map<int, std::pair<const Kammusu, const Kammusu>> db_;
 	// 変更しないもの
-	int id_;						//艦船ID
-	wstring name_;					//艦名
-	ShipClass ship_class_;			//艦種
-	int max_hp_;					//最大耐久
-	int defense_;					//装甲
-	int attack_;					//火力
-	int torpedo_;					//雷撃
-	int anti_air_;					//対空
-	int luck_;						//運
-	Speed speed_;					//速力
-	Range range_;					//射程
-	size_t slots_;					//スロット数
-	vector<int> max_airs_;			//最大搭載数
-	int evade_;						//回避
-	int anti_sub_;					//対潜
-	int search_;					//索敵
-	vector<int> first_weapons_;		//初期装備
-	bool kammusu_flg_;				//艦娘フラグ
-	int level_;						//レベル(練度)
+	int id_;														//艦船ID
+	std::reference_wrapper<const std::wstring> name_;				//艦名
+	ShipClass ship_class_;											//艦種
+	int max_hp_;													//最大耐久
+	int defense_;													//装甲
+	int attack_;													//火力
+	int torpedo_;													//雷撃
+	int anti_air_;													//対空
+	int luck_;														//運
+	Speed speed_;													//速力
+	Range range_;													//射程
+	size_t slots_;													//スロット数
+	std::reference_wrapper<const std::vector<int>> max_airs_;		//最大搭載数
+	int evade_;														//回避
+	int anti_sub_;													//対潜
+	int search_;													//索敵
+	std::reference_wrapper<const std::vector<int>> first_weapons_;	//初期装備
+	bool kammusu_flg_;												//艦娘フラグ
+	int level_;														//レベル(練度)
 	SharedRand rand_;
 	// 変更するもの
 	int hp_;					//現耐久
@@ -148,10 +147,10 @@ public:
 	// コンストラクタ
 	Kammusu();
 	Kammusu(
-		const int id, wstring name, const ShipClass shipclass, const int max_hp, const int defense,
+		const int id, const wstring& name, const ShipClass shipclass, const int max_hp, const int defense,
 		const int attack, const int torpedo, const int anti_air, const int luck, const Speed speed,
-		const Range range, const int slots, vector<int> max_airs, const int evade, const int anti_sub,
-		const int search, vector<int> first_weapons, const bool kammusu_flg, const int level, const SharedRand& rand = {}
+		const Range range, const size_t slots, const vector<int>& max_airs, const int evade, const int anti_sub,
+		const int search, const vector<int>& first_weapons, const bool kammusu_flg, const int level, const SharedRand& rand = {}
 	);
 	void SetRandGenerator(const SharedRand& rand);
 	// getter
@@ -173,12 +172,7 @@ public:
 	int GetAmmo() const noexcept;
 	int GetFuel() const noexcept;
 	// setter
-	void SetMaxHP(const int max_hp) noexcept;
 	void SetLuck(const int luck) noexcept;
-	void SetEvade(const int evade) noexcept;
-	void SetAntiSub(const int anti_sub) noexcept;
-	void SetSearch(const int search) noexcept;
-	void SetLevel(const int level) noexcept;
 	void SetHP(const int hp) noexcept;
 	void SetWeapon(const size_t index, const Weapon &weapon);
 	void SetCond(const int cond) noexcept;
@@ -230,7 +224,7 @@ public:
 	bool AnyOf(const ShipClass& sc) const noexcept { return (static_cast<std::underlying_type_t<ShipClass>>(ship_class_) & static_cast<std::underlying_type_t<ShipClass>>(sc)) != 0; }
 	// 指定の名前か判定する。名前は完全一致で比較する。
 	template<class String, class = std::enable_if_t<std::is_same<String, std::wstring>::value>>		// 暗黙の型キャストにより非効率とならないようstd::wstringのみを受け付ける。
-	bool AnyOf(const String& test) const noexcept { return std::size(name_) == std::size(test) && name_ == test; }	// 長さが一致した場合に限り文字列比較を行う。
+	bool AnyOf(const String& test) const noexcept { return std::size(GetName()) == std::size(test) && GetName() == test; }	// 長さが一致した場合に限り文字列比較を行う。
 	// 引数に指定された条件を満たすか判定する。引数はShipId型のID、ShipClass型の種別、std::wstring型の名前のいずれでも指定できる。名前は完全一致で比較する。
 	template<class Head, class... Rest>
 	bool AnyOf(Head head, Rest... rest) const noexcept { return AnyOf(head) || AnyOf(rest...); }

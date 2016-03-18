@@ -10,87 +10,126 @@
 #include <algorithm>
 using namespace std::string_literals;
 
-static std::pair<int, int> parse(const std::wstring& str) {
-	auto pos = str.find(L'.');
-	if (pos == std::wstring::npos) {
-		auto i = std::stoi(str);
-		return{ i, i };
+class MasterKammusu {
+	using pair = std::pair<int, int>;
+	using ints = std::vector<int>;
+
+	static const std::unordered_map<int, MasterKammusu> db_;
+
+	int id_;				//艦船ID
+	std::wstring name_;		//艦名
+	ShipClass ship_class_;	//艦種
+	pair max_hp_;			//最大耐久
+	pair defense_;			//装甲
+	pair attack_;			//火力
+	pair torpedo_;			//雷撃
+	pair anti_air_;			//対空
+	pair luck_;				//運
+	Speed speed_;			//速力
+	Range range_;			//射程
+	size_t slots_;			//スロット数
+	ints max_airs_;			//最大搭載数
+	pair evade_;			//回避
+	pair anti_sub_;			//対潜
+	pair search_;			//索敵
+	ints first_weapons_;	//初期装備
+	bool kammusu_flg_;		//艦娘フラグ
+
+	static pair parse(const std::wstring str) {
+		auto pos = str.find(L'.');
+		if (pos == std::wstring::npos) {
+			auto i = std::stoi(str);
+			return{ i, i };
+		}
+		if (pos == 0 || pos + 1 == str.size())
+			throw std::invalid_argument("empty element.");
+		if (str.find(L'.', pos + 1) != std::wstring::npos)
+			throw std::invalid_argument("multiple delimiters found.");
+		return{ std::stoi(str.substr(0, pos)), std::stoi(str.substr(pos + 1)) };
 	}
-	if (pos == 0 || pos + 1 == str.size())
-		throw std::invalid_argument("empty element.");
-	if (str.find(L'.', pos + 1) != std::wstring::npos)
-		throw std::invalid_argument("multiple delimiters found.");
-	return{ std::stoi(str.substr(0, pos)), std::stoi(str.substr(pos + 1)) };
-}
 
-static std::vector<int> split(const std::wstring& str) {
-	std::vector<int> result;
-	result.reserve(4);
-	std::wstringstream ss{ str };
-	std::wstring line;
-	while (std::getline(ss, line, L'.'))
-		result.push_back(std::stoi(line));
-	return result;
-}
+	static ints split(const std::wstring str) {
+		ints result;
+		result.reserve(6);
+		std::wstringstream ss{ str };
+		std::wstring line;
+		while (std::getline(ss, line, L'.'))
+			result.push_back(std::stoi(line));
+		return result;
+	}
 
-static std::pair<const Kammusu, const Kammusu> parse(int id, const wchar_t* name_str, int shipclass_num, const wchar_t* max_hp_str,
-	const wchar_t* defense_str, const wchar_t* attack_str, const wchar_t* torpedo_str, const wchar_t* anti_air_str,
-	const wchar_t* luck_str, int speed_num, int range_num, int slots, const wchar_t* max_airs_str, const wchar_t* evade_str,
-	const wchar_t* anti_sub_str, const wchar_t* search_str, const wchar_t* first_weapons_str, const wchar_t* kammusu_flg_str)
-{
-	using std::get;
-	std::wstring name{ name_str };
-	auto shipclass = static_cast<ShipClass>(1 << (shipclass_num - 1));
-	auto max_hp = parse(max_hp_str);
-	auto defense = parse(defense_str);
-	auto attack = parse(attack_str);
-	auto torpedo = parse(torpedo_str);
-	auto anti_air = parse(anti_air_str);
-	auto luck = get<0>(parse(luck_str));
-	auto speed = speed_num == 10 ? kSpeedHigh : speed_num == 5 ? kSpeedLow : kSpeedNone;
-	auto range = static_cast<Range>(range_num);
-	auto max_airs = split(max_airs_str);
-	auto evade = parse(evade_str);
-	auto anti_sub = parse(anti_sub_str);
-	auto search = parse(search_str);
-	auto first_weapons = split(first_weapons_str);
-	auto kammusu_flg = std::stoi(kammusu_flg_str) != 0;
-	return{	// TODO: Lv99の艦娘はなんでLv1をセットするんだろう？
-		{ id, name, shipclass, get<0>(max_hp), get<0>(defense), get<0>(attack), get<0>(torpedo), get<0>(anti_air), luck, speed, range, slots, max_airs, get<0>(evade), get<0>(anti_sub), get<0>(search), first_weapons, kammusu_flg, 0 },
-		{ id, name, shipclass, get<1>(max_hp), get<1>(defense), get<1>(attack), get<1>(torpedo), get<1>(anti_air), luck, speed, range, slots, max_airs, get<1>(evade), get<1>(anti_sub), get<1>(search), first_weapons, kammusu_flg, 1 }
-	};
-}
+public:
+	MasterKammusu(int id, const wchar_t* name_str, int shipclass_num, const wchar_t* max_hp_str, const wchar_t* defense_str, const wchar_t* attack_str, const wchar_t* torpedo_str,
+		const wchar_t* anti_air_str, const wchar_t* luck_str, int speed_num, int range_num, size_t slots, const wchar_t* max_airs_str, const wchar_t* evade_str,
+		const wchar_t* anti_sub_str, const wchar_t* search_str, const wchar_t* first_weapons_str, const wchar_t* kammusu_flg_str) :
+		id_{ id },
+		name_{ name_str },
+		ship_class_{ static_cast<ShipClass>(1 << (shipclass_num - 1)) },
+		max_hp_{ parse(max_hp_str) },
+		defense_{ parse(defense_str) },
+		attack_{ parse(attack_str) },
+		torpedo_{ parse(torpedo_str) },
+		anti_air_{ parse(anti_air_str) },
+		luck_{ parse(luck_str) },
+		speed_{ speed_num == 10 ? kSpeedHigh : speed_num == 5 ? kSpeedLow : kSpeedNone },
+		range_{ static_cast<Range>(range_num) },
+		slots_{ slots },
+		max_airs_{ split(max_airs_str) },
+		evade_{ parse(evade_str) },
+		anti_sub_{ parse(anti_sub_str) },
+		search_{ parse(search_str) },
+		first_weapons_{ split(first_weapons_str) },
+		kammusu_flg_{ std::stoi(kammusu_flg_str) != 0 } {
+	}
 
-const std::unordered_map<int, std::pair<const Kammusu, const Kammusu>> Kammusu::db_ = [] {
-	std::unordered_map<int, std::pair<const Kammusu, const Kammusu>> db;
+	Kammusu Get(int level) const {
+		auto max_hp = std::get<0>(max_hp_);
+		auto defense = std::get<1>(defense_);
+		auto attack = std::get<1>(attack_);
+		auto torpedo = std::get<1>(torpedo_);
+		auto anti_air = std::get<1>(anti_air_);
+		auto luck = std::get<0>(luck_);
+		auto evade = std::get<0>(evade_) + (std::get<1>(evade_) - std::get<0>(evade_)) * level / 99;
+		auto anti_sub = std::get<0>(anti_sub_) + (std::get<1>(anti_sub_) - std::get<0>(anti_sub_)) * level / 99;
+		auto search = std::get<0>(search_) + (std::get<1>(search_) - std::get<0>(search_)) * level / 99;
+		if (100 <= level) {
+			// ケッコンによる耐久上昇はややこしい
+			max_hp += max_hp < 10 ? 3 : max_hp < 30 ? 4 : max_hp < 40 ? 5 : max_hp < 50 ? 6 : max_hp < 70 ? 7 : max_hp < 90 ? 8 : 9;
+			max_hp = std::min(max_hp, std::get<1>(max_hp_));
+			// TODO: ケッコンによる運上昇は+3～+6までランダムなのでとりあえず+4とした
+			luck += 4;
+		}
+		return{ id_, name_, ship_class_, max_hp, defense, attack, torpedo, anti_air, luck, speed_, range_, slots_, max_airs_, evade, anti_sub, search, first_weapons_, kammusu_flg_, level };
+	}
+
+	static Kammusu Get(int id, int level) {
+		return db_.at(id).Get(level);
+	}
+};
+
+const std::unordered_map<int, MasterKammusu> MasterKammusu::db_ = [] {
+	std::unordered_map<int, MasterKammusu> db;
+#ifdef OPTIMIZE_AT_COMPILE_TIME
 #define SHIP(PREFIX, ID, NAME, SHIPCLASS, MAX_HP, DEFENSE, ATTACK, TORPEDO, ANTI_AIR, LUCK, SPEED, RANGE, SLOTS, MAX_AIRS, EVADE, ANTI_SUB, SEARCH, FIRST_WEAPONS, KAMMUSU_FLG, POSTFIX)	\
-	if (std::wstring(L ## #MAX_HP #DEFENSE #ATTACK #TORPEDO #ANTI_AIR #LUCK #MAX_AIRS #EVADE #ANTI_SUB #SEARCH #FIRST_WEAPONS #KAMMUSU_FLG).find(L"null") == std::wstring::npos)			\
-		db.emplace(ID, parse(ID, L##NAME, SHIPCLASS, L ## #MAX_HP, L ## #DEFENSE, L ## #ATTACK, L ## #TORPEDO, L ## #ANTI_AIR, L ## #LUCK,													\
-								SPEED, RANGE, SLOTS, L ## #MAX_AIRS, L ## #EVADE, L ## #ANTI_SUB, L ## #SEARCH, L ## #FIRST_WEAPONS, L ## #KAMMUSU_FLG));
+	if (std::integral_constant<bool, L ## #MAX_HP #DEFENSE #ATTACK #TORPEDO #ANTI_AIR #LUCK #MAX_AIRS #EVADE #ANTI_SUB #SEARCH #FIRST_WEAPONS #KAMMUSU_FLG ## _cs.find(L"null")				\
+		== cstring<wchar_t>::npos>{}())																																						\
+		db.emplace(std::piecewise_construct, std::forward_as_tuple(ID), std::forward_as_tuple(ID, L##NAME, SHIPCLASS, L ## #MAX_HP, L ## #DEFENSE, L ## #ATTACK, L ## #TORPEDO,				\
+			L ## #ANTI_AIR, L ## #LUCK, SPEED, RANGE, SLOTS, L ## #MAX_AIRS, L ## #EVADE, L ## #ANTI_SUB, L ## #SEARCH, L ## #FIRST_WEAPONS, L ## #KAMMUSU_FLG));
+#else
+#define SHIP(PREFIX, ID, NAME, SHIPCLASS, MAX_HP, DEFENSE, ATTACK, TORPEDO, ANTI_AIR, LUCK, SPEED, RANGE, SLOTS, MAX_AIRS, EVADE, ANTI_SUB, SEARCH, FIRST_WEAPONS, KAMMUSU_FLG, POSTFIX)	\
+	if (std::integral_constant<bool, L ## #MAX_HP #DEFENSE #ATTACK #TORPEDO #ANTI_AIR #LUCK #MAX_AIRS #EVADE #ANTI_SUB #SEARCH #FIRST_WEAPONS #KAMMUSU_FLG ## _cs.find(L"null")				\
+		== cstring<wchar_t>::npos>{}())																																						\
+		db.emplace(ID, MasterKammusu{ ID, L##NAME, SHIPCLASS, L ## #MAX_HP, L ## #DEFENSE, L ## #ATTACK, L ## #TORPEDO, L ## #ANTI_AIR, L ## #LUCK, SPEED, RANGE, SLOTS, L ## #MAX_AIRS,	\
+										L ## #EVADE, L ## #ANTI_SUB, L ## #SEARCH, L ## #FIRST_WEAPONS, L ## #KAMMUSU_FLG });
+#endif
 #include "ships.csv"
 #undef SHIP
 	return db;
 }();
 
+
 Kammusu Kammusu::Get(int id, int level) {
-	auto& pair = db_.at(id);
-	auto& lv1 = pair.first;
-	auto& lv99 = pair.second;
-	auto result = lv99;
-	result.SetEvade(lv1.GetEvade() + (lv99.GetEvade() - lv1.GetEvade()) * level / 99);
-	result.SetAntiSub(lv1.GetAntiSub() + (lv99.GetAntiSub() - lv1.GetAntiSub()) * level / 99);
-	result.SetSearch(lv1.GetSearch() + (lv99.GetSearch() - lv1.GetSearch()) * level / 99);
-	result.SetLevel(level);
-	auto max_hp = lv1.GetMaxHP();
-	if (100 <= level) {
-		// ケッコンによる耐久上昇はややこしい
-		max_hp += max_hp < 10 ? 3 : max_hp < 30 ? 4 : max_hp < 40 ? 5 : max_hp < 50 ? 6 : max_hp < 70 ? 7 : max_hp < 90 ? 8 : 9;
-		max_hp = std::min(max_hp, lv99.GetMaxHP());
-		// TODO: ケッコンによる運上昇は+3～+6までランダムなのでとりあえず+4とした
-		result.SetLuck(result.GetLuck() + 4);
-	}
-	result.SetMaxHP(max_hp);
-	return result;
+	return MasterKammusu::Get(id, level);
 }
 
 // コンストラクタ
@@ -100,13 +139,13 @@ Kammusu::Kammusu()
 {}
 
 Kammusu::Kammusu(
-	const int id, wstring name, const ShipClass shipclass, const int max_hp, const int defense,
+	const int id, const wstring& name, const ShipClass shipclass, const int max_hp, const int defense,
 	const int attack, const int torpedo, const int anti_air, const int luck, const Speed speed,
-	const Range range, const int slots, vector<int> max_airs, const int evade, const int anti_sub,
-	const int search, vector<int> first_weapons, const bool kammusu_flg, const int level, const SharedRand& rand) :
-	id_(id), name_(move(name)), ship_class_(shipclass), max_hp_(max_hp), defense_(defense), attack_(attack),
+	const Range range, const size_t slots, const vector<int>& max_airs, const int evade, const int anti_sub,
+	const int search, const vector<int>& first_weapons, const bool kammusu_flg, const int level, const SharedRand& rand) :
+	id_(id), name_(name), ship_class_(shipclass), max_hp_(max_hp), defense_(defense), attack_(attack),
 	torpedo_(torpedo), anti_air_(anti_air), luck_(luck), speed_(speed), range_(range), slots_(slots),
-	max_airs_(move(max_airs)), evade_(evade), anti_sub_(anti_sub), search_(search), first_weapons_(move(first_weapons)),
+	max_airs_(max_airs), evade_(evade), anti_sub_(anti_sub), search_(search), first_weapons_(first_weapons),
 	kammusu_flg_(kammusu_flg), level_(level) , rand_(rand)
 {
 	this->Reset(false);
@@ -135,14 +174,9 @@ const vector<Weapon>& Kammusu::GetWeapon() const noexcept { return weapons_; }
 int Kammusu::GetAmmo() const noexcept { return ammo_; }
 int Kammusu::GetFuel() const noexcept { return fuel_; }
 // setter
-void Kammusu::SetMaxHP(const int max_hp) noexcept { max_hp_ = max_hp; }
 void Kammusu::SetLuck(const int luck) noexcept { luck_ = luck; }
-void Kammusu::SetEvade(const int evade) noexcept { evade_ = evade; }
-void Kammusu::SetAntiSub(const int anti_sub) noexcept { anti_sub_ = anti_sub; }
-void Kammusu::SetSearch(const int search) noexcept { search_ = search; }
-void Kammusu::SetLevel(const int level) noexcept { level_ = level; }
 void Kammusu::SetHP(const int hp) noexcept { hp_ = hp; }
-void Kammusu::SetWeapon(const size_t index, const Weapon & weapon) { weapons_[index] = weapon; weapons_[index].SetAir(max_airs_[index]); }
+void Kammusu::SetWeapon(const size_t index, const Weapon & weapon) { weapons_[index] = weapon; weapons_[index].SetAir(max_airs_.get()[index]); }
 void Kammusu::SetCond(const int cond) noexcept { cond_ = cond; }
 
 // 中身を表示する
@@ -152,7 +186,7 @@ void Kammusu::Put() const {
 
 // 簡易的な名称を返す
 wstring Kammusu::GetNameLv() const {
-	return name_ + L"(Lv" + std::to_wstring(level_) + L")";
+	return GetName() + L"(Lv" + std::to_wstring(level_) + L")";
 }
 
 // 変更可な部分をリセットする
@@ -164,8 +198,8 @@ Kammusu Kammusu::Reset(bool load_first_weapons) {
 	fuel_ = 100;
 	if(load_first_weapons)
 		for (size_t i = 0; i < slots_; ++i) {
-			weapons_[i] = Weapon::Get(first_weapons_[i]);
-			weapons_[i].SetAir(max_airs_[i]);
+			weapons_[i] = Weapon::Get(first_weapons_.get()[i]);
+			weapons_[i].SetAir(max_airs_.get()[i]);
 		}
 	return *this;
 }
@@ -918,13 +952,13 @@ std::ostream & operator<<(std::ostream & os, const Kammusu & conf)
 {
 	os 
 		<< "艦船ID：" << conf.id_ << endl
-		<< "　艦名：" << char_cvt::utf_16_to_shift_jis(conf.name_) << "　艦種：" << char_cvt::utf_16_to_shift_jis(to_wstring(conf.ship_class_)) << endl
+		<< "　艦名：" << char_cvt::utf_16_to_shift_jis(conf.GetName()) << "　艦種：" << char_cvt::utf_16_to_shift_jis(to_wstring(conf.ship_class_)) << endl
 		<< "　最大耐久：" << conf.max_hp_ << "　装甲：" << conf.defense_ << "　火力：" << conf.attack_ << "　雷撃：" << conf.torpedo_ << endl
 		<< "　対空：" << conf.anti_air_ << "　運：" << conf.luck_ << "　速力：" << char_cvt::utf_16_to_shift_jis(kSpeedStr[conf.speed_]) << "　射程：" << char_cvt::utf_16_to_shift_jis(kRangeStr[conf.range_]) << endl
 		<< "　スロット数：" << conf.slots_ << "　最大搭載数：";
 	for (size_t i = 0; i < conf.slots_; ++i) {
 		if (i != 0) os << ",";
-		os << conf.max_airs_[i];
+		os << conf.max_airs_.get()[i];
 	}
 	os 
 		<< "　回避：" << conf.evade_ << "　対潜：" << conf.anti_sub_ << endl
@@ -944,13 +978,13 @@ std::wostream & operator<<(std::wostream & os, const Kammusu & conf)
 {
 	os
 		<< L"艦船ID：" << conf.id_ << endl
-		<< L"　艦名：" << conf.name_ << L"　艦種：" << to_wstring(conf.ship_class_) << endl
+		<< L"　艦名：" << conf.GetName() << L"　艦種：" << to_wstring(conf.ship_class_) << endl
 		<< L"　最大耐久：" << conf.max_hp_ << L"　装甲：" << conf.defense_ << L"　火力：" << conf.attack_ << L"　雷撃：" << conf.torpedo_ << endl
 		<< L"　対空：" << conf.anti_air_ << L"　運：" << conf.luck_ << L"　速力：" << kSpeedStr[conf.speed_] << L"　射程：" << kRangeStr[conf.range_] << endl
 		<< L"　スロット数：" << conf.slots_ << L"　最大搭載数：";
 	for (size_t i = 0; i < conf.slots_; ++i) {
 		if (i != 0) os << ",";
-		os << conf.max_airs_[i];
+		os << conf.max_airs_.get()[i];
 	}
 	os
 		<< L"　回避：" << conf.evade_ << L"　対潜：" << conf.anti_sub_ << endl
