@@ -1,6 +1,6 @@
 ﻿namespace KCS_GUI
 {
-	partial class Form1
+	partial class MainForm
 	{
 		/// <summary>
 		/// 必要なデザイナー変数です。
@@ -30,6 +30,11 @@
 		{
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabPage1 = new System.Windows.Forms.TabPage();
+			this.WeaponNameComboBox = new System.Windows.Forms.ComboBox();
+			this.DeleteWeaponButton = new System.Windows.Forms.Button();
+			this.AddWeaponButton = new System.Windows.Forms.Button();
+			this.DeleteKammusuButton = new System.Windows.Forms.Button();
+			this.AddKammusuButton = new System.Windows.Forms.Button();
 			this.label28 = new System.Windows.Forms.Label();
 			this.KammusuNameComboBox = new System.Windows.Forms.ComboBox();
 			this.WeaponDetailRfComboBox = new System.Windows.Forms.ComboBox();
@@ -39,7 +44,6 @@
 			this.label18 = new System.Windows.Forms.Label();
 			this.label17 = new System.Windows.Forms.Label();
 			this.label16 = new System.Windows.Forms.Label();
-			this.WeaponNameTextBox = new System.Windows.Forms.TextBox();
 			this.SearchPower33TextBox = new System.Windows.Forms.TextBox();
 			this.label15 = new System.Windows.Forms.Label();
 			this.SearchPower25TextBox = new System.Windows.Forms.TextBox();
@@ -69,13 +73,19 @@
 			this.KammusuSelectListBox = new System.Windows.Forms.ListBox();
 			this.FleetSelectComboBox = new System.Windows.Forms.ComboBox();
 			this.tabPage2 = new System.Windows.Forms.TabPage();
-			this.MapKammusuNameComboBoc = new System.Windows.Forms.ComboBox();
+			this.DeleteMapKammusuButton = new System.Windows.Forms.Button();
+			this.AddMapKammusuButton = new System.Windows.Forms.Button();
+			this.DeleteMapPatternButton = new System.Windows.Forms.Button();
+			this.AddMapPatternButton = new System.Windows.Forms.Button();
+			this.DeleteMapPositionButton = new System.Windows.Forms.Button();
+			this.AddMapPositionButton = new System.Windows.Forms.Button();
+			this.MapKammusuNameComboBox = new System.Windows.Forms.ComboBox();
 			this.MapKammusuListBox = new System.Windows.Forms.ListBox();
 			this.MapPatternAllAntiAirTextBox = new System.Windows.Forms.TextBox();
 			this.label27 = new System.Windows.Forms.Label();
 			this.MapPatternFormationComboBox = new System.Windows.Forms.ComboBox();
 			this.label24 = new System.Windows.Forms.Label();
-			this.MapKammusuTypeComboBoc = new System.Windows.Forms.ComboBox();
+			this.MapKammusuTypeComboBox = new System.Windows.Forms.ComboBox();
 			this.label25 = new System.Windows.Forms.Label();
 			this.label26 = new System.Windows.Forms.Label();
 			this.MapPositionBattleModeComboBox = new System.Windows.Forms.ComboBox();
@@ -117,16 +127,6 @@
 			this.ExitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.ヘルプHToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.VersionInfoMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.AddKammusuButton = new System.Windows.Forms.Button();
-			this.DeleteKammusuButton = new System.Windows.Forms.Button();
-			this.AddWeaponButton = new System.Windows.Forms.Button();
-			this.DeleteWeaponButton = new System.Windows.Forms.Button();
-			this.DeleteMapPositionButton = new System.Windows.Forms.Button();
-			this.AddMapPositionButton = new System.Windows.Forms.Button();
-			this.DeleteMapPatternButton = new System.Windows.Forms.Button();
-			this.AddMapPatternButton = new System.Windows.Forms.Button();
-			this.DeleteMapKammusuButton = new System.Windows.Forms.Button();
-			this.AddMapKammusuButton = new System.Windows.Forms.Button();
 			this.tabControl1.SuspendLayout();
 			this.tabPage1.SuspendLayout();
 			this.tabPage2.SuspendLayout();
@@ -147,6 +147,7 @@
 			// 
 			// tabPage1
 			// 
+			this.tabPage1.Controls.Add(this.WeaponNameComboBox);
 			this.tabPage1.Controls.Add(this.DeleteWeaponButton);
 			this.tabPage1.Controls.Add(this.AddWeaponButton);
 			this.tabPage1.Controls.Add(this.DeleteKammusuButton);
@@ -160,7 +161,6 @@
 			this.tabPage1.Controls.Add(this.label18);
 			this.tabPage1.Controls.Add(this.label17);
 			this.tabPage1.Controls.Add(this.label16);
-			this.tabPage1.Controls.Add(this.WeaponNameTextBox);
 			this.tabPage1.Controls.Add(this.SearchPower33TextBox);
 			this.tabPage1.Controls.Add(this.label15);
 			this.tabPage1.Controls.Add(this.SearchPower25TextBox);
@@ -196,6 +196,55 @@
 			this.tabPage1.TabIndex = 0;
 			this.tabPage1.Text = "艦隊エディタ";
 			this.tabPage1.UseVisualStyleBackColor = true;
+			// 
+			// WeaponNameComboBox
+			// 
+			this.WeaponNameComboBox.FormattingEnabled = true;
+			this.WeaponNameComboBox.Location = new System.Drawing.Point(188, 187);
+			this.WeaponNameComboBox.Name = "WeaponNameComboBox";
+			this.WeaponNameComboBox.Size = new System.Drawing.Size(120, 20);
+			this.WeaponNameComboBox.TabIndex = 43;
+			this.WeaponNameComboBox.Text = "12.7cm連装砲";
+			// 
+			// DeleteWeaponButton
+			// 
+			this.DeleteWeaponButton.Location = new System.Drawing.Point(239, 213);
+			this.DeleteWeaponButton.Name = "DeleteWeaponButton";
+			this.DeleteWeaponButton.Size = new System.Drawing.Size(40, 23);
+			this.DeleteWeaponButton.TabIndex = 42;
+			this.DeleteWeaponButton.Text = "削除";
+			this.DeleteWeaponButton.UseVisualStyleBackColor = true;
+			this.DeleteWeaponButton.Click += new System.EventHandler(this.DeleteWeaponButton_Click);
+			// 
+			// AddWeaponButton
+			// 
+			this.AddWeaponButton.Location = new System.Drawing.Point(193, 213);
+			this.AddWeaponButton.Name = "AddWeaponButton";
+			this.AddWeaponButton.Size = new System.Drawing.Size(40, 23);
+			this.AddWeaponButton.TabIndex = 41;
+			this.AddWeaponButton.Text = "追加";
+			this.AddWeaponButton.UseVisualStyleBackColor = true;
+			this.AddWeaponButton.Click += new System.EventHandler(this.AddWeaponButton_Click);
+			// 
+			// DeleteKammusuButton
+			// 
+			this.DeleteKammusuButton.Location = new System.Drawing.Point(239, 129);
+			this.DeleteKammusuButton.Name = "DeleteKammusuButton";
+			this.DeleteKammusuButton.Size = new System.Drawing.Size(40, 23);
+			this.DeleteKammusuButton.TabIndex = 40;
+			this.DeleteKammusuButton.Text = "削除";
+			this.DeleteKammusuButton.UseVisualStyleBackColor = true;
+			this.DeleteKammusuButton.Click += new System.EventHandler(this.DeleteKammusuButton_Click);
+			// 
+			// AddKammusuButton
+			// 
+			this.AddKammusuButton.Location = new System.Drawing.Point(193, 129);
+			this.AddKammusuButton.Name = "AddKammusuButton";
+			this.AddKammusuButton.Size = new System.Drawing.Size(40, 23);
+			this.AddKammusuButton.TabIndex = 39;
+			this.AddKammusuButton.Text = "追加";
+			this.AddKammusuButton.UseVisualStyleBackColor = true;
+			this.AddKammusuButton.Click += new System.EventHandler(this.AddKammusuButton_Click);
 			// 
 			// label28
 			// 
@@ -426,14 +475,6 @@
 			this.label16.TabIndex = 30;
 			this.label16.Text = "名称";
 			// 
-			// WeaponNameTextBox
-			// 
-			this.WeaponNameTextBox.Location = new System.Drawing.Point(188, 188);
-			this.WeaponNameTextBox.Name = "WeaponNameTextBox";
-			this.WeaponNameTextBox.Size = new System.Drawing.Size(120, 19);
-			this.WeaponNameTextBox.TabIndex = 29;
-			this.WeaponNameTextBox.Text = "12.7cm連装砲";
-			// 
 			// SearchPower33TextBox
 			// 
 			this.SearchPower33TextBox.Enabled = false;
@@ -536,6 +577,7 @@
 			this.WeaponTypeComboBox.Size = new System.Drawing.Size(120, 20);
 			this.WeaponTypeComboBox.TabIndex = 21;
 			this.WeaponTypeComboBox.Text = "主砲";
+			this.WeaponTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.WeaponTypeComboBox_SelectedIndexChanged);
 			// 
 			// label11
 			// 
@@ -637,6 +679,7 @@
 			this.KammusuTypeComboBox.Size = new System.Drawing.Size(100, 20);
 			this.KammusuTypeComboBox.TabIndex = 11;
 			this.KammusuTypeComboBox.Text = "駆逐艦";
+			this.KammusuTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.KammusuTypeComboBox_SelectedIndexChanged);
 			// 
 			// label7
 			// 
@@ -751,13 +794,13 @@
 			this.tabPage2.Controls.Add(this.AddMapPatternButton);
 			this.tabPage2.Controls.Add(this.DeleteMapPositionButton);
 			this.tabPage2.Controls.Add(this.AddMapPositionButton);
-			this.tabPage2.Controls.Add(this.MapKammusuNameComboBoc);
+			this.tabPage2.Controls.Add(this.MapKammusuNameComboBox);
 			this.tabPage2.Controls.Add(this.MapKammusuListBox);
 			this.tabPage2.Controls.Add(this.MapPatternAllAntiAirTextBox);
 			this.tabPage2.Controls.Add(this.label27);
 			this.tabPage2.Controls.Add(this.MapPatternFormationComboBox);
 			this.tabPage2.Controls.Add(this.label24);
-			this.tabPage2.Controls.Add(this.MapKammusuTypeComboBoc);
+			this.tabPage2.Controls.Add(this.MapKammusuTypeComboBox);
 			this.tabPage2.Controls.Add(this.label25);
 			this.tabPage2.Controls.Add(this.label26);
 			this.tabPage2.Controls.Add(this.MapPositionBattleModeComboBox);
@@ -776,14 +819,74 @@
 			this.tabPage2.Text = "マップエディタ";
 			this.tabPage2.UseVisualStyleBackColor = true;
 			// 
-			// MapKammusuNameComboBoc
+			// DeleteMapKammusuButton
 			// 
-			this.MapKammusuNameComboBoc.FormattingEnabled = true;
-			this.MapKammusuNameComboBoc.Location = new System.Drawing.Point(199, 199);
-			this.MapKammusuNameComboBoc.Name = "MapKammusuNameComboBoc";
-			this.MapKammusuNameComboBoc.Size = new System.Drawing.Size(100, 20);
-			this.MapKammusuNameComboBoc.TabIndex = 39;
-			this.MapKammusuNameComboBoc.Text = "駆逐イ級";
+			this.DeleteMapKammusuButton.Location = new System.Drawing.Point(212, 225);
+			this.DeleteMapKammusuButton.Name = "DeleteMapKammusuButton";
+			this.DeleteMapKammusuButton.Size = new System.Drawing.Size(40, 23);
+			this.DeleteMapKammusuButton.TabIndex = 46;
+			this.DeleteMapKammusuButton.Text = "削除";
+			this.DeleteMapKammusuButton.UseVisualStyleBackColor = true;
+			this.DeleteMapKammusuButton.Click += new System.EventHandler(this.DeleteMapKammusuButton_Click);
+			// 
+			// AddMapKammusuButton
+			// 
+			this.AddMapKammusuButton.Location = new System.Drawing.Point(166, 225);
+			this.AddMapKammusuButton.Name = "AddMapKammusuButton";
+			this.AddMapKammusuButton.Size = new System.Drawing.Size(40, 23);
+			this.AddMapKammusuButton.TabIndex = 45;
+			this.AddMapKammusuButton.Text = "追加";
+			this.AddMapKammusuButton.UseVisualStyleBackColor = true;
+			this.AddMapKammusuButton.Click += new System.EventHandler(this.AddMapKammusuButton_Click);
+			// 
+			// DeleteMapPatternButton
+			// 
+			this.DeleteMapPatternButton.Location = new System.Drawing.Point(210, 144);
+			this.DeleteMapPatternButton.Name = "DeleteMapPatternButton";
+			this.DeleteMapPatternButton.Size = new System.Drawing.Size(40, 23);
+			this.DeleteMapPatternButton.TabIndex = 44;
+			this.DeleteMapPatternButton.Text = "削除";
+			this.DeleteMapPatternButton.UseVisualStyleBackColor = true;
+			this.DeleteMapPatternButton.Click += new System.EventHandler(this.DeleteMapPatternButton_Click);
+			// 
+			// AddMapPatternButton
+			// 
+			this.AddMapPatternButton.Location = new System.Drawing.Point(164, 144);
+			this.AddMapPatternButton.Name = "AddMapPatternButton";
+			this.AddMapPatternButton.Size = new System.Drawing.Size(40, 23);
+			this.AddMapPatternButton.TabIndex = 43;
+			this.AddMapPatternButton.Text = "追加";
+			this.AddMapPatternButton.UseVisualStyleBackColor = true;
+			this.AddMapPatternButton.Click += new System.EventHandler(this.AddMapPatternButton_Click);
+			// 
+			// DeleteMapPositionButton
+			// 
+			this.DeleteMapPositionButton.Location = new System.Drawing.Point(210, 62);
+			this.DeleteMapPositionButton.Name = "DeleteMapPositionButton";
+			this.DeleteMapPositionButton.Size = new System.Drawing.Size(40, 23);
+			this.DeleteMapPositionButton.TabIndex = 42;
+			this.DeleteMapPositionButton.Text = "削除";
+			this.DeleteMapPositionButton.UseVisualStyleBackColor = true;
+			this.DeleteMapPositionButton.Click += new System.EventHandler(this.DeleteMapPositionButton_Click);
+			// 
+			// AddMapPositionButton
+			// 
+			this.AddMapPositionButton.Location = new System.Drawing.Point(164, 62);
+			this.AddMapPositionButton.Name = "AddMapPositionButton";
+			this.AddMapPositionButton.Size = new System.Drawing.Size(40, 23);
+			this.AddMapPositionButton.TabIndex = 41;
+			this.AddMapPositionButton.Text = "追加";
+			this.AddMapPositionButton.UseVisualStyleBackColor = true;
+			this.AddMapPositionButton.Click += new System.EventHandler(this.AddMapPositionButton_Click);
+			// 
+			// MapKammusuNameComboBox
+			// 
+			this.MapKammusuNameComboBox.FormattingEnabled = true;
+			this.MapKammusuNameComboBox.Location = new System.Drawing.Point(199, 199);
+			this.MapKammusuNameComboBox.Name = "MapKammusuNameComboBox";
+			this.MapKammusuNameComboBox.Size = new System.Drawing.Size(100, 20);
+			this.MapKammusuNameComboBox.TabIndex = 39;
+			this.MapKammusuNameComboBox.Text = "駆逐イ級";
 			// 
 			// MapKammusuListBox
 			// 
@@ -835,10 +938,10 @@
 			this.label24.TabIndex = 34;
 			this.label24.Text = "陣形";
 			// 
-			// MapKammusuTypeComboBoc
+			// MapKammusuTypeComboBox
 			// 
-			this.MapKammusuTypeComboBoc.FormattingEnabled = true;
-			this.MapKammusuTypeComboBoc.Items.AddRange(new object[] {
+			this.MapKammusuTypeComboBox.FormattingEnabled = true;
+			this.MapKammusuTypeComboBox.Items.AddRange(new object[] {
             "魚雷艇",
             "駆逐艦",
             "軽巡洋艦",
@@ -861,11 +964,12 @@
             "潜水母艦",
             "練習巡洋艦",
             "給油艦"});
-			this.MapKammusuTypeComboBoc.Location = new System.Drawing.Point(199, 173);
-			this.MapKammusuTypeComboBoc.Name = "MapKammusuTypeComboBoc";
-			this.MapKammusuTypeComboBoc.Size = new System.Drawing.Size(100, 20);
-			this.MapKammusuTypeComboBoc.TabIndex = 32;
-			this.MapKammusuTypeComboBoc.Text = "駆逐艦";
+			this.MapKammusuTypeComboBox.Location = new System.Drawing.Point(199, 173);
+			this.MapKammusuTypeComboBox.Name = "MapKammusuTypeComboBox";
+			this.MapKammusuTypeComboBox.Size = new System.Drawing.Size(100, 20);
+			this.MapKammusuTypeComboBox.TabIndex = 32;
+			this.MapKammusuTypeComboBox.Text = "駆逐艦";
+			this.MapKammusuTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.MapKammusuTypeComboBox_SelectedIndexChanged);
 			// 
 			// label25
 			// 
@@ -1278,107 +1382,7 @@
 			this.VersionInfoMenuItem.Text = "バージョン情報(&A)";
 			this.VersionInfoMenuItem.Click += new System.EventHandler(this.VersionInfoMenuItem_Click);
 			// 
-			// AddKammusuButton
-			// 
-			this.AddKammusuButton.Location = new System.Drawing.Point(193, 129);
-			this.AddKammusuButton.Name = "AddKammusuButton";
-			this.AddKammusuButton.Size = new System.Drawing.Size(40, 23);
-			this.AddKammusuButton.TabIndex = 39;
-			this.AddKammusuButton.Text = "追加";
-			this.AddKammusuButton.UseVisualStyleBackColor = true;
-			this.AddKammusuButton.Click += new System.EventHandler(this.AddKammusuButton_Click);
-			// 
-			// DeleteKammusuButton
-			// 
-			this.DeleteKammusuButton.Location = new System.Drawing.Point(239, 129);
-			this.DeleteKammusuButton.Name = "DeleteKammusuButton";
-			this.DeleteKammusuButton.Size = new System.Drawing.Size(40, 23);
-			this.DeleteKammusuButton.TabIndex = 40;
-			this.DeleteKammusuButton.Text = "削除";
-			this.DeleteKammusuButton.UseVisualStyleBackColor = true;
-			this.DeleteKammusuButton.Click += new System.EventHandler(this.DeleteKammusuButton_Click);
-			// 
-			// AddWeaponButton
-			// 
-			this.AddWeaponButton.Location = new System.Drawing.Point(193, 213);
-			this.AddWeaponButton.Name = "AddWeaponButton";
-			this.AddWeaponButton.Size = new System.Drawing.Size(40, 23);
-			this.AddWeaponButton.TabIndex = 41;
-			this.AddWeaponButton.Text = "追加";
-			this.AddWeaponButton.UseVisualStyleBackColor = true;
-			this.AddWeaponButton.Click += new System.EventHandler(this.AddWeaponButton_Click);
-			// 
-			// DeleteWeaponButton
-			// 
-			this.DeleteWeaponButton.Location = new System.Drawing.Point(239, 213);
-			this.DeleteWeaponButton.Name = "DeleteWeaponButton";
-			this.DeleteWeaponButton.Size = new System.Drawing.Size(40, 23);
-			this.DeleteWeaponButton.TabIndex = 42;
-			this.DeleteWeaponButton.Text = "削除";
-			this.DeleteWeaponButton.UseVisualStyleBackColor = true;
-			this.DeleteWeaponButton.Click += new System.EventHandler(this.DeleteWeaponButton_Click);
-			// 
-			// DeleteMapPositionButton
-			// 
-			this.DeleteMapPositionButton.Location = new System.Drawing.Point(210, 62);
-			this.DeleteMapPositionButton.Name = "DeleteMapPositionButton";
-			this.DeleteMapPositionButton.Size = new System.Drawing.Size(40, 23);
-			this.DeleteMapPositionButton.TabIndex = 42;
-			this.DeleteMapPositionButton.Text = "削除";
-			this.DeleteMapPositionButton.UseVisualStyleBackColor = true;
-			this.DeleteMapPositionButton.Click += new System.EventHandler(this.DeleteMapPositionButton_Click);
-			// 
-			// AddMapPositionButton
-			// 
-			this.AddMapPositionButton.Location = new System.Drawing.Point(164, 62);
-			this.AddMapPositionButton.Name = "AddMapPositionButton";
-			this.AddMapPositionButton.Size = new System.Drawing.Size(40, 23);
-			this.AddMapPositionButton.TabIndex = 41;
-			this.AddMapPositionButton.Text = "追加";
-			this.AddMapPositionButton.UseVisualStyleBackColor = true;
-			this.AddMapPositionButton.Click += new System.EventHandler(this.AddMapPositionButton_Click);
-			// 
-			// DeleteMapPatternButton
-			// 
-			this.DeleteMapPatternButton.Location = new System.Drawing.Point(210, 144);
-			this.DeleteMapPatternButton.Name = "DeleteMapPatternButton";
-			this.DeleteMapPatternButton.Size = new System.Drawing.Size(40, 23);
-			this.DeleteMapPatternButton.TabIndex = 44;
-			this.DeleteMapPatternButton.Text = "削除";
-			this.DeleteMapPatternButton.UseVisualStyleBackColor = true;
-			this.DeleteMapPatternButton.Click += new System.EventHandler(this.DeleteMapPatternButton_Click);
-			// 
-			// AddMapPatternButton
-			// 
-			this.AddMapPatternButton.Location = new System.Drawing.Point(164, 144);
-			this.AddMapPatternButton.Name = "AddMapPatternButton";
-			this.AddMapPatternButton.Size = new System.Drawing.Size(40, 23);
-			this.AddMapPatternButton.TabIndex = 43;
-			this.AddMapPatternButton.Text = "追加";
-			this.AddMapPatternButton.UseVisualStyleBackColor = true;
-			this.AddMapPatternButton.Click += new System.EventHandler(this.AddMapPatternButton_Click);
-			// 
-			// DeleteMapKammusuButton
-			// 
-			this.DeleteMapKammusuButton.Location = new System.Drawing.Point(212, 225);
-			this.DeleteMapKammusuButton.Name = "DeleteMapKammusuButton";
-			this.DeleteMapKammusuButton.Size = new System.Drawing.Size(40, 23);
-			this.DeleteMapKammusuButton.TabIndex = 46;
-			this.DeleteMapKammusuButton.Text = "削除";
-			this.DeleteMapKammusuButton.UseVisualStyleBackColor = true;
-			this.DeleteMapKammusuButton.Click += new System.EventHandler(this.DeleteMapKammusuButton_Click);
-			// 
-			// AddMapKammusuButton
-			// 
-			this.AddMapKammusuButton.Location = new System.Drawing.Point(166, 225);
-			this.AddMapKammusuButton.Name = "AddMapKammusuButton";
-			this.AddMapKammusuButton.Size = new System.Drawing.Size(40, 23);
-			this.AddMapKammusuButton.TabIndex = 45;
-			this.AddMapKammusuButton.Text = "追加";
-			this.AddMapKammusuButton.UseVisualStyleBackColor = true;
-			this.AddMapKammusuButton.Click += new System.EventHandler(this.AddMapKammusuButton_Click);
-			// 
-			// Form1
+			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -1386,7 +1390,7 @@
 			this.Controls.Add(this.tabControl1);
 			this.Controls.Add(this.menuStrip1);
 			this.MainMenuStrip = this.menuStrip1;
-			this.Name = "Form1";
+			this.Name = "MainForm";
 			this.Text = "KanColleSimulator";
 			this.tabControl1.ResumeLayout(false);
 			this.tabPage1.ResumeLayout(false);
@@ -1446,7 +1450,6 @@
 		private System.Windows.Forms.Label label15;
 		private System.Windows.Forms.TextBox SearchPower25TextBox;
 		private System.Windows.Forms.Label label16;
-		private System.Windows.Forms.TextBox WeaponNameTextBox;
 		private System.Windows.Forms.ComboBox WeaponDetailRfComboBox;
 		private System.Windows.Forms.ComboBox WeaponRfComboBox;
 		private System.Windows.Forms.ComboBox WeaponLevelComboBox;
@@ -1462,7 +1465,7 @@
 		private System.Windows.Forms.ComboBox MapPositionBattleModeComboBox;
 		private System.Windows.Forms.Label label23;
 		private System.Windows.Forms.Label label24;
-		private System.Windows.Forms.ComboBox MapKammusuTypeComboBoc;
+		private System.Windows.Forms.ComboBox MapKammusuTypeComboBox;
 		private System.Windows.Forms.Label label25;
 		private System.Windows.Forms.Label label26;
 		private System.Windows.Forms.ComboBox MapPatternFormationComboBox;
@@ -1470,7 +1473,7 @@
 		private System.Windows.Forms.Label label27;
 		private System.Windows.Forms.ListBox MapKammusuListBox;
 		private System.Windows.Forms.ComboBox KammusuNameComboBox;
-		private System.Windows.Forms.ComboBox MapKammusuNameComboBoc;
+		private System.Windows.Forms.ComboBox MapKammusuNameComboBox;
 		private System.Windows.Forms.Label label28;
 		private System.Windows.Forms.Label label29;
 		private System.Windows.Forms.Label label30;
@@ -1503,6 +1506,7 @@
 		private System.Windows.Forms.Button AddMapPatternButton;
 		private System.Windows.Forms.Button DeleteMapPositionButton;
 		private System.Windows.Forms.Button AddMapPositionButton;
+		private System.Windows.Forms.ComboBox WeaponNameComboBox;
 	}
 }
 
