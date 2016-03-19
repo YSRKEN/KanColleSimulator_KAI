@@ -22,6 +22,8 @@ namespace KCS_GUI
 		Dictionary<int, int> WeaponIDtoIndex;
 		//種別番号→インデックスのリスト変換
 		Dictionary<int, List<int>> WeaponTypeToIndexList;
+		//熟練度が存在する装備の種別番号一覧
+		List<int> RfWeaponTypeList;
 		//艦娘データ
 		DataTable KammusuData;
 		//艦船ID→インデックス
@@ -74,6 +76,17 @@ namespace KCS_GUI
 					{"洋上補給",30},
 					{"水上戦闘機",31},
 					{"その他",32}
+				};
+				RfWeaponTypeList = new List<int> {
+					WeaponTypeToNumber["艦上戦闘機"],
+					WeaponTypeToNumber["艦上爆撃機"],
+					WeaponTypeToNumber["艦上爆撃機(爆戦)"],
+					WeaponTypeToNumber["水上爆撃機"],
+					WeaponTypeToNumber["艦上攻撃機"],
+					WeaponTypeToNumber["艦上偵察機"],
+					WeaponTypeToNumber["艦上偵察機(彩雲)"],
+					WeaponTypeToNumber["大型飛行艇"],
+					WeaponTypeToNumber["水上戦闘機"]
 				};
 				ReadWeaponData();
 				ReadKammusuData();
@@ -242,6 +255,18 @@ namespace KCS_GUI
 				WeaponNameComboBox.Items.Add(dr[index]["装備名"].ToString());
 			}
 			WeaponNameComboBox.Refresh();
+			// 改修度および熟練度の選択を切り替える
+			if(RfWeaponTypeList.IndexOf(WeaponTypeComboBox.SelectedIndex) != -1) {
+				// 熟練度
+				WeaponLevelComboBox.Enabled = false;
+				WeaponRfComboBox.Enabled = true;
+				WeaponDetailRfComboBox.Enabled = true;
+			} else {
+				// 改修度
+				WeaponLevelComboBox.Enabled = true;
+				WeaponRfComboBox.Enabled = false;
+				WeaponDetailRfComboBox.Enabled = false;
+			}
 		}
 		// 艦娘データをGUIに反映
 		private void RedrawKammusuNameList() {
