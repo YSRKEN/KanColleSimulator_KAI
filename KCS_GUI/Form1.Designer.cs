@@ -595,6 +595,7 @@
 			this.WeaponSelectListBox.Name = "WeaponSelectListBox";
 			this.WeaponSelectListBox.Size = new System.Drawing.Size(80, 52);
 			this.WeaponSelectListBox.TabIndex = 19;
+			this.WeaponSelectListBox.SelectedIndexChanged += new System.EventHandler(this.WeaponSelectListBox_SelectedIndexChanged);
 			// 
 			// KammusuCondTextBox
 			// 

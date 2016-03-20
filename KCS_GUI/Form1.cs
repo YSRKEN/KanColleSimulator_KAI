@@ -196,7 +196,14 @@ namespace KCS_GUI
 			WeaponSelectListBox.Refresh();
 		}
 		private void DeleteWeaponButton_Click(object sender, EventArgs e) {
-
+			if(FleetSelectComboBox.SelectedIndex == -1
+			|| KammusuSelectListBox.SelectedIndex == -1
+			|| WeaponSelectListBox.SelectedIndex == -1)
+				return;
+			// FormFleetから装備データを削除する
+			FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].weapon.RemoveAt(WeaponSelectListBox.SelectedIndex);
+			WeaponSelectListBox.Items.RemoveAt(WeaponSelectListBox.SelectedIndex);
+			WeaponSelectListBox.Refresh();
 		}
 		private void FleetSelectComboBox_SelectedIndexChanged(object sender, EventArgs e) {
 			if(FleetSelectComboBox.SelectedIndex == -1)
@@ -226,12 +233,44 @@ namespace KCS_GUI
 			KammusuLevelTextBox.Text = kammusu.level.ToString();
 			KammusuLuckTextBox.Text = kammusu.luck.ToString();
 			KammusuCondTextBox.Text = kammusu.cond.ToString();
+			// 装備一覧を更新する
+			DataRow[] dr2 = WeaponData.Select();
+			WeaponSelectListBox.Items.Clear();
+			foreach(var weapon in kammusu.weapon) {
+				WeaponSelectListBox.Items.Add(dr2[WeaponIDtoIndex[weapon.id]]["装備名"].ToString());
+			}
+			WeaponSelectListBox.Refresh();
 		}
 		private void KammusuTypeComboBox_SelectedIndexChanged(object sender, EventArgs e) {
 			RedrawKammusuNameList();
 		}
 		private void WeaponTypeComboBox_SelectedIndexChanged(object sender, EventArgs e) {
 			RedrawWeaponNameList();
+		}
+		private void WeaponSelectListBox_SelectedIndexChanged(object sender, EventArgs e) {
+			if(FleetSelectComboBox.SelectedIndex == -1
+			|| KammusuSelectListBox.SelectedIndex == -1
+			|| WeaponSelectListBox.SelectedIndex == -1)
+				return;
+			// 表示する装備を切り替える
+			Kammusu kammusu = FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex];
+			Weapon weapon = kammusu.weapon[WeaponSelectListBox.SelectedIndex];
+			int showWeaponIndex = WeaponIDtoIndex[weapon.id];
+			DataRow[] dr = WeaponData.Select();
+			int showWeaponType = WeaponTypeToNumber["その他"];
+			if(WeaponTypeToNumber.ContainsKey(dr[showWeaponIndex]["種別"].ToString())) {
+				showWeaponType = WeaponTypeToNumber[dr[showWeaponIndex]["種別"].ToString()];
+			}
+			WeaponTypeComboBox.SelectedIndex = showWeaponType;
+			WeaponTypeComboBox.Refresh();
+			WeaponNameComboBox.Text = dr[showWeaponIndex]["装備名"].ToString();
+			RedrawWeaponNameList();
+			WeaponLevelComboBox.SelectedIndex = weapon.level;
+			WeaponLevelComboBox.Refresh();
+			WeaponRfComboBox.SelectedIndex = weapon.rf;
+			WeaponRfComboBox.Refresh();
+			WeaponDetailRfComboBox.SelectedIndex = weapon.detailRf;
+			WeaponDetailRfComboBox.Refresh();
 		}
 
 		// マップエディタタブ
