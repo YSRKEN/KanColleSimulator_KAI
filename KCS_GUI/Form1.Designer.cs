@@ -262,7 +262,6 @@
 			this.KammusuNameComboBox.Name = "KammusuNameComboBox";
 			this.KammusuNameComboBox.Size = new System.Drawing.Size(100, 20);
 			this.KammusuNameComboBox.TabIndex = 37;
-			this.KammusuNameComboBox.Text = "吹雪";
 			// 
 			// WeaponDetailRfComboBox
 			// 
@@ -678,7 +677,6 @@
 			this.KammusuTypeComboBox.Name = "KammusuTypeComboBox";
 			this.KammusuTypeComboBox.Size = new System.Drawing.Size(100, 20);
 			this.KammusuTypeComboBox.TabIndex = 11;
-			this.KammusuTypeComboBox.Text = "駆逐艦";
 			this.KammusuTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.KammusuTypeComboBox_SelectedIndexChanged);
 			// 
 			// label7
@@ -784,7 +782,6 @@
 			this.FleetSelectComboBox.Name = "FleetSelectComboBox";
 			this.FleetSelectComboBox.Size = new System.Drawing.Size(80, 20);
 			this.FleetSelectComboBox.TabIndex = 0;
-			this.FleetSelectComboBox.Text = "第1艦隊";
 			// 
 			// tabPage2
 			// 
@@ -1384,12 +1381,15 @@
 			// 
 			// MainForm
 			// 
+			this.AllowDrop = true;
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(484, 321);
 			this.Controls.Add(this.tabControl1);
 			this.Controls.Add(this.menuStrip1);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.MainMenuStrip = this.menuStrip1;
+			this.MaximizeBox = false;
 			this.Name = "MainForm";
 			this.Text = "KanColleSimulator";
 			this.tabControl1.ResumeLayout(false);

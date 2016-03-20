@@ -13,8 +13,14 @@ namespace KCS_GUI
 	public partial class MainForm : Form
 	{
 		/* メンバ変数 */
+		// 定数群
+		//ソフト名
 		const string SoftName = "KanColleSimulator";
+		//艦隊数の最大(2)
+		const int MaxFleetSize = 2;
+		//種別→種別番号変換
 		Dictionary<string, int> WeaponTypeToNumber;
+
 		// 装備・艦娘データ
 		//装備データ
 		DataTable WeaponData;
@@ -93,6 +99,8 @@ namespace KCS_GUI
 				RedrawWeaponNameList();
 				RedrawKammusuNameList();
 				RedrawMapKammusuNameList();
+				FormFleet = new Fleet();
+				FormMapData = new MapData();
 			}
 			catch (Exception ex)
 			{
@@ -130,7 +138,21 @@ namespace KCS_GUI
 
 		// 艦娘エディタタブ
 		private void AddKammusuButton_Click(object sender, EventArgs e) {
-
+			if(KammusuTypeComboBox.SelectedIndex == -1
+			|| KammusuNameComboBox.SelectedIndex == -1
+			|| FleetSelectComboBox.SelectedIndex == -1)
+				return;
+			DataRow[] dr = KammusuData.Select();
+			// 艦娘データを作成する
+			Kammusu setKammusu = new Kammusu();
+			int index = KammusuTypeToIndexList[KammusuTypeComboBox.SelectedIndex][KammusuNameComboBox.SelectedIndex];
+			setKammusu.id = int.Parse(dr[KammusuTypeToIndexList[KammusuTypeComboBox.SelectedIndex][KammusuNameComboBox.SelectedIndex]]["艦船ID"].ToString());
+			setKammusu.level = limit(int.Parse(KammusuLevelTextBox.Text), 1, 155);
+			setKammusu.luck = limit(int.Parse(KammusuLuckTextBox.Text), 0, 100);
+			setKammusu.cond = limit(int.Parse(KammusuCondTextBox.Text), 0, 100);
+			FormFleet.unit[FleetSelectComboBox.SelectedIndex].Add(setKammusu);
+			KammusuSelectListBox.Items.Add(dr[KammusuIDtoIndex[setKammusu.id]]["艦名"].ToString());
+			KammusuSelectListBox.Refresh();
 		}
 		private void DeleteKammusuButton_Click(object sender, EventArgs e) {
 
@@ -291,55 +313,83 @@ namespace KCS_GUI
 			}
 			MapKammusuNameComboBox.Refresh();
 		}
+		// 値を上下限で制限する
+		private int limit(int n, int min_n, int max_n) {
+			if(n < min_n)
+				return min_n;
+			if(n > max_n)
+				return max_n;
+			return n;
+		}
 		/* サブクラス */
 		// 装備
 		private class Weapon {
 			// 装備ID
-			int id;
+			public int id;
 			// 装備改修度
-			int level;
+			public int level;
 			// 外部熟練度
-			int rf;
+			public int rf;
 			// 内部熟練度
-			int detailRf;
+			public int detailRf;
 		}
 		// 艦娘
 		private class Kammusu {
 			// 艦船ID
-			int id;
+			public int id;
 			// レベル
-			int level;
+			public int level;
 			// 運
-			int luck;
+			public int luck;
 			// cond値
-			int cond;
+			public int cond;
 			// 装備
-			List<Weapon> weapon;
+			public List<Weapon> weapon;
+			// コンストラクタ
+			public Kammusu() {
+				weapon = new List<Weapon>();
+			}
 		}
 		// 艦隊
 		private class Fleet{
 			// 司令部レベル
-			int level;
+			public int level;
 			// 艦隊形式
-			int type;
+			public int type;
 			// 艦娘
-			List<List<Kammusu>> unit;
+			public List<List<Kammusu>> unit;
+			// コンストラクタ
+			public Fleet() {
+				unit = new List<List<Kammusu>>();
+				for(int i = 0; i < MaxFleetSize; ++i) {
+					unit.Add(new List<Kammusu>());
+				}
+			}
 		}
 		// マスデータ
 		private class Position {
 			// マスにおける戦闘モード
-			int mode;
+			public int mode;
 			// マスの名称
-			string name;
+			public string name;
 			// 各パターンにおける陣形
-			List<int> formation;
+			public List<int> formcation;
 			// 各パターン
-			List<Fleet> fleet;
+			public List<Fleet> fleet;
+			// コンストラクタ
+			public Position() {
+				formcation = new List<int>();
+				fleet = new List<Fleet>();
+			}
 		}
 		// マップデータ
 		private class MapData {
 			// マス
-			List<Position> position;
+			public List<Position> position;
+			// コンストラクタ
+			public MapData() {
+				position = new List<Position>();
+			}
 		}
 	}
 }
