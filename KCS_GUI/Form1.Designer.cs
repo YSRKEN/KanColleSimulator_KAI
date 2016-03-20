@@ -127,6 +127,8 @@
 			this.ExitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.ヘルプHToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.VersionInfoMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.ChangeKammusuButton = new System.Windows.Forms.Button();
+			this.ChangeWeaponButton = new System.Windows.Forms.Button();
 			this.tabControl1.SuspendLayout();
 			this.tabPage1.SuspendLayout();
 			this.tabPage2.SuspendLayout();
@@ -147,6 +149,8 @@
 			// 
 			// tabPage1
 			// 
+			this.tabPage1.Controls.Add(this.ChangeWeaponButton);
+			this.tabPage1.Controls.Add(this.ChangeKammusuButton);
 			this.tabPage1.Controls.Add(this.WeaponNameComboBox);
 			this.tabPage1.Controls.Add(this.DeleteWeaponButton);
 			this.tabPage1.Controls.Add(this.AddWeaponButton);
@@ -204,11 +208,10 @@
 			this.WeaponNameComboBox.Name = "WeaponNameComboBox";
 			this.WeaponNameComboBox.Size = new System.Drawing.Size(120, 20);
 			this.WeaponNameComboBox.TabIndex = 43;
-			this.WeaponNameComboBox.Text = "12.7cm連装砲";
 			// 
 			// DeleteWeaponButton
 			// 
-			this.DeleteWeaponButton.Location = new System.Drawing.Point(239, 213);
+			this.DeleteWeaponButton.Location = new System.Drawing.Point(243, 213);
 			this.DeleteWeaponButton.Name = "DeleteWeaponButton";
 			this.DeleteWeaponButton.Size = new System.Drawing.Size(40, 23);
 			this.DeleteWeaponButton.TabIndex = 42;
@@ -218,7 +221,7 @@
 			// 
 			// AddWeaponButton
 			// 
-			this.AddWeaponButton.Location = new System.Drawing.Point(193, 213);
+			this.AddWeaponButton.Location = new System.Drawing.Point(151, 213);
 			this.AddWeaponButton.Name = "AddWeaponButton";
 			this.AddWeaponButton.Size = new System.Drawing.Size(40, 23);
 			this.AddWeaponButton.TabIndex = 41;
@@ -228,7 +231,7 @@
 			// 
 			// DeleteKammusuButton
 			// 
-			this.DeleteKammusuButton.Location = new System.Drawing.Point(239, 129);
+			this.DeleteKammusuButton.Location = new System.Drawing.Point(243, 131);
 			this.DeleteKammusuButton.Name = "DeleteKammusuButton";
 			this.DeleteKammusuButton.Size = new System.Drawing.Size(40, 23);
 			this.DeleteKammusuButton.TabIndex = 40;
@@ -238,7 +241,7 @@
 			// 
 			// AddKammusuButton
 			// 
-			this.AddKammusuButton.Location = new System.Drawing.Point(193, 129);
+			this.AddKammusuButton.Location = new System.Drawing.Point(151, 131);
 			this.AddKammusuButton.Name = "AddKammusuButton";
 			this.AddKammusuButton.Size = new System.Drawing.Size(40, 23);
 			this.AddKammusuButton.TabIndex = 39;
@@ -577,7 +580,6 @@
 			this.WeaponTypeComboBox.Name = "WeaponTypeComboBox";
 			this.WeaponTypeComboBox.Size = new System.Drawing.Size(120, 20);
 			this.WeaponTypeComboBox.TabIndex = 21;
-			this.WeaponTypeComboBox.Text = "主砲";
 			this.WeaponTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.WeaponTypeComboBox_SelectedIndexChanged);
 			// 
 			// label11
@@ -613,7 +615,7 @@
 			this.KammusuLuckTextBox.Name = "KammusuLuckTextBox";
 			this.KammusuLuckTextBox.Size = new System.Drawing.Size(40, 19);
 			this.KammusuLuckTextBox.TabIndex = 17;
-			this.KammusuLuckTextBox.Text = "17";
+			this.KammusuLuckTextBox.Text = "-1";
 			// 
 			// KammusuLevelTextBox
 			// 
@@ -722,6 +724,7 @@
 			this.FleetTypeComboBox.Size = new System.Drawing.Size(80, 20);
 			this.FleetTypeComboBox.TabIndex = 7;
 			this.FleetTypeComboBox.Text = "通常艦隊";
+			this.FleetTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.FleetTypeComboBox_SelectedIndexChanged);
 			// 
 			// HQLevelTextBox
 			// 
@@ -730,6 +733,7 @@
 			this.HQLevelTextBox.Size = new System.Drawing.Size(40, 19);
 			this.HQLevelTextBox.TabIndex = 6;
 			this.HQLevelTextBox.Text = "120";
+			this.HQLevelTextBox.TextChanged += new System.EventHandler(this.HQLevelTextBox_TextChanged);
 			// 
 			// label4
 			// 
@@ -1384,6 +1388,26 @@
 			this.VersionInfoMenuItem.Text = "バージョン情報(&A)";
 			this.VersionInfoMenuItem.Click += new System.EventHandler(this.VersionInfoMenuItem_Click);
 			// 
+			// ChangeKammusuButton
+			// 
+			this.ChangeKammusuButton.Location = new System.Drawing.Point(197, 131);
+			this.ChangeKammusuButton.Name = "ChangeKammusuButton";
+			this.ChangeKammusuButton.Size = new System.Drawing.Size(40, 23);
+			this.ChangeKammusuButton.TabIndex = 44;
+			this.ChangeKammusuButton.Text = "変更";
+			this.ChangeKammusuButton.UseVisualStyleBackColor = true;
+			this.ChangeKammusuButton.Click += new System.EventHandler(this.ChangeKammusuButton_Click);
+			// 
+			// ChangeWeaponButton
+			// 
+			this.ChangeWeaponButton.Location = new System.Drawing.Point(197, 213);
+			this.ChangeWeaponButton.Name = "ChangeWeaponButton";
+			this.ChangeWeaponButton.Size = new System.Drawing.Size(40, 23);
+			this.ChangeWeaponButton.TabIndex = 45;
+			this.ChangeWeaponButton.Text = "変更";
+			this.ChangeWeaponButton.UseVisualStyleBackColor = true;
+			this.ChangeWeaponButton.Click += new System.EventHandler(this.ChangeWeaponButton_Click);
+			// 
 			// MainForm
 			// 
 			this.AllowDrop = true;
@@ -1512,6 +1536,8 @@
 		private System.Windows.Forms.Button DeleteMapPositionButton;
 		private System.Windows.Forms.Button AddMapPositionButton;
 		private System.Windows.Forms.ComboBox WeaponNameComboBox;
+		private System.Windows.Forms.Button ChangeWeaponButton;
+		private System.Windows.Forms.Button ChangeKammusuButton;
 	}
 }
 

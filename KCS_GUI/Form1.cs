@@ -163,6 +163,33 @@ namespace KCS_GUI
 			KammusuSelectListBox.Items.Add(dr[KammusuIDtoIndex[setKammusu.id]]["艦名"].ToString());
 			KammusuSelectListBox.Refresh();
 		}
+		private void ChangeKammusuButton_Click(object sender, EventArgs e) {
+			if(KammusuTypeComboBox.SelectedIndex == -1
+			|| KammusuNameComboBox.SelectedIndex == -1
+			|| FleetSelectComboBox.SelectedIndex == -1
+			|| KammusuSelectListBox.SelectedIndex == -1)
+				return;
+			DataRow[] dr = KammusuData.Select();
+			// 艦娘データを作成する
+			var setKammusu = new Kammusu();
+			int index = KammusuTypeToIndexList[KammusuTypeComboBox.SelectedIndex][KammusuNameComboBox.SelectedIndex];
+			setKammusu.id = int.Parse(dr[index]["艦船ID"].ToString());
+			setKammusu.level = limit(int.Parse(KammusuLevelTextBox.Text), 1, 155);
+			setKammusu.luck = int.Parse(KammusuLuckTextBox.Text);
+			if(setKammusu.luck < 0) {
+				// 運に負数を指定した場合は、艦娘のデフォルト値とする(デッキビルダーの仕様上、"-1"でOK)
+				setKammusu.luck = -1;
+			} else {
+				// そうでない場合は、最大でも100までに抑える
+				setKammusu.luck = limit(setKammusu.luck, 0, 100);
+			}
+			setKammusu.cond = limit(int.Parse(KammusuCondTextBox.Text), 0, 100);
+			setKammusu.maxSlots = int.Parse(dr[index]["スロット数"].ToString());
+			// 作成した艦娘データで上書きする
+			FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex] = setKammusu;
+			KammusuSelectListBox.Items[KammusuSelectListBox.SelectedIndex] = dr[KammusuIDtoIndex[setKammusu.id]]["艦名"].ToString();
+			KammusuSelectListBox.Refresh();
+		}
 		private void DeleteKammusuButton_Click(object sender, EventArgs e) {
 			if(FleetSelectComboBox.SelectedIndex == -1
 			|| KammusuSelectListBox.SelectedIndex == -1)
@@ -195,6 +222,27 @@ namespace KCS_GUI
 			WeaponSelectListBox.Items.Add(dr[WeaponIDtoIndex[setWeapon.id]]["装備名"].ToString());
 			WeaponSelectListBox.Refresh();
 		}
+		private void ChangeWeaponButton_Click(object sender, EventArgs e) {
+			if(FleetSelectComboBox.SelectedIndex == -1
+			|| KammusuSelectListBox.SelectedIndex == -1
+			|| WeaponTypeComboBox.SelectedIndex == -1
+			|| WeaponNameComboBox.SelectedIndex == -1
+			|| WeaponSelectListBox.SelectedIndex == -1)
+				return;
+			Kammusu selectedKammusu = FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex];
+			DataRow[] dr = WeaponData.Select();
+			// 装備データを作成する
+			var setWeapon = new Weapon();
+			int index = WeaponTypeToIndexList[WeaponTypeComboBox.SelectedIndex][WeaponNameComboBox.SelectedIndex];
+			setWeapon.id = int.Parse(dr[index]["装備ID"].ToString());
+			setWeapon.level = limit(WeaponLevelComboBox.SelectedIndex, 0, 10);
+			setWeapon.rf = limit(WeaponRfComboBox.SelectedIndex, 0, 7);
+			setWeapon.detailRf = limit(WeaponDetailRfComboBox.SelectedIndex, 0, 120);
+			// 作成した装備データで上書きする
+			selectedKammusu.weapon[WeaponSelectListBox.SelectedIndex] = setWeapon;
+			WeaponSelectListBox.Items[WeaponSelectListBox.SelectedIndex] = dr[WeaponIDtoIndex[setWeapon.id]]["装備名"].ToString();
+			WeaponSelectListBox.Refresh();
+		}
 		private void DeleteWeaponButton_Click(object sender, EventArgs e) {
 			if(FleetSelectComboBox.SelectedIndex == -1
 			|| KammusuSelectListBox.SelectedIndex == -1
@@ -204,6 +252,16 @@ namespace KCS_GUI
 			FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].weapon.RemoveAt(WeaponSelectListBox.SelectedIndex);
 			WeaponSelectListBox.Items.RemoveAt(WeaponSelectListBox.SelectedIndex);
 			WeaponSelectListBox.Refresh();
+		}
+		private void HQLevelTextBox_TextChanged(object sender, EventArgs e) {
+			// 司令部レベルが書き換わった際は反映する
+			FormFleet.level = limit(int.Parse(HQLevelTextBox.Text), 1, 120);
+		}
+		private void FleetTypeComboBox_SelectedIndexChanged(object sender, EventArgs e) {
+			if(FleetTypeComboBox.SelectedIndex == -1)
+				return;
+			// 艦隊形式が書き換わった際は反映する
+			FormFleet.type = FleetTypeComboBox.SelectedIndex;
 		}
 		private void FleetSelectComboBox_SelectedIndexChanged(object sender, EventArgs e) {
 			if(FleetSelectComboBox.SelectedIndex == -1)
@@ -493,6 +551,8 @@ namespace KCS_GUI
 			public List<List<Kammusu>> unit;
 			// コンストラクタ
 			public Fleet() {
+				level = 120;
+				type = 0;
 				unit = new List<List<Kammusu>>();
 				for(int i = 0; i < MaxFleetSize; ++i) {
 					unit.Add(new List<Kammusu>());
