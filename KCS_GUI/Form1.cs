@@ -272,6 +272,34 @@ namespace KCS_GUI
 			WeaponDetailRfComboBox.SelectedIndex = weapon.detailRf;
 			WeaponDetailRfComboBox.Refresh();
 		}
+		private void WeaponRfComboBox_SelectedIndexChanged(object sender, EventArgs e) {
+			// 外部熟練度を弄った場合、内部熟練度を自動補正する
+			int[] roughToDetail = new int[8]{0, 10, 25, 40, 55, 70, 85, 100};
+			WeaponDetailRfComboBox.SelectedIndex = roughToDetail[WeaponRfComboBox.SelectedIndex];
+			WeaponDetailRfComboBox.Refresh();
+		}
+		private void WeaponDetailRfComboBox_SelectedIndexChanged(object sender, EventArgs e) {
+			// 内部熟練度を弄った場合、外部熟練度を自動補正する
+			int detailRf = WeaponDetailRfComboBox.SelectedIndex, roughRf;
+			if(detailRf < 10)
+				roughRf = 0;
+			else if(detailRf < 25)
+				roughRf = 1;
+			else if(detailRf < 40)
+				roughRf = 2;
+			else if(detailRf < 55)
+				roughRf = 3;
+			else if(detailRf < 70)
+				roughRf = 4;
+			else if(detailRf < 85)
+				roughRf = 5;
+			else if(detailRf < 100)
+				roughRf = 6;
+			else
+				roughRf = 7;
+			WeaponRfComboBox.SelectedIndex = roughRf;
+			WeaponRfComboBox.Refresh();
+		}
 
 		// マップエディタタブ
 		private void AddMapPositionButton_Click(object sender, EventArgs e) {

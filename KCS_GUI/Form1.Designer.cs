@@ -394,6 +394,7 @@
 			this.WeaponDetailRfComboBox.Size = new System.Drawing.Size(50, 20);
 			this.WeaponDetailRfComboBox.TabIndex = 36;
 			this.WeaponDetailRfComboBox.Text = "0";
+			this.WeaponDetailRfComboBox.SelectedIndexChanged += new System.EventHandler(this.WeaponDetailRfComboBox_SelectedIndexChanged);
 			// 
 			// WeaponRfComboBox
 			// 
@@ -416,6 +417,7 @@
 			this.WeaponRfComboBox.Size = new System.Drawing.Size(50, 20);
 			this.WeaponRfComboBox.TabIndex = 35;
 			this.WeaponRfComboBox.Text = "0";
+			this.WeaponRfComboBox.SelectedIndexChanged += new System.EventHandler(this.WeaponRfComboBox_SelectedIndexChanged);
 			// 
 			// WeaponLevelComboBox
 			// 
