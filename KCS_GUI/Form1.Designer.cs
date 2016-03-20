@@ -771,6 +771,7 @@
 			this.KammusuSelectListBox.Name = "KammusuSelectListBox";
 			this.KammusuSelectListBox.Size = new System.Drawing.Size(80, 76);
 			this.KammusuSelectListBox.TabIndex = 1;
+			this.KammusuSelectListBox.SelectedIndexChanged += new System.EventHandler(this.KammusuSelectListBox_SelectedIndexChanged);
 			// 
 			// FleetSelectComboBox
 			// 
@@ -782,6 +783,7 @@
 			this.FleetSelectComboBox.Name = "FleetSelectComboBox";
 			this.FleetSelectComboBox.Size = new System.Drawing.Size(80, 20);
 			this.FleetSelectComboBox.TabIndex = 0;
+			this.FleetSelectComboBox.SelectedIndexChanged += new System.EventHandler(this.FleetSelectComboBox_SelectedIndexChanged);
 			// 
 			// tabPage2
 			// 

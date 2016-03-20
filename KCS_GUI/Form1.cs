@@ -144,24 +144,88 @@ namespace KCS_GUI
 				return;
 			DataRow[] dr = KammusuData.Select();
 			// 艦娘データを作成する
-			Kammusu setKammusu = new Kammusu();
+			var setKammusu = new Kammusu();
 			int index = KammusuTypeToIndexList[KammusuTypeComboBox.SelectedIndex][KammusuNameComboBox.SelectedIndex];
-			setKammusu.id = int.Parse(dr[KammusuTypeToIndexList[KammusuTypeComboBox.SelectedIndex][KammusuNameComboBox.SelectedIndex]]["艦船ID"].ToString());
+			setKammusu.id = int.Parse(dr[index]["艦船ID"].ToString());
 			setKammusu.level = limit(int.Parse(KammusuLevelTextBox.Text), 1, 155);
-			setKammusu.luck = limit(int.Parse(KammusuLuckTextBox.Text), 0, 100);
+			setKammusu.luck = int.Parse(KammusuLuckTextBox.Text);
+			if(setKammusu.luck < 0) {
+				// 運に負数を指定した場合は、艦娘のデフォルト値とする(デッキビルダーの仕様上、"-1"でOK)
+				setKammusu.luck = -1;
+			} else {
+				// そうでない場合は、最大でも100までに抑える
+				setKammusu.luck = limit(setKammusu.luck, 0, 100);
+			}
 			setKammusu.cond = limit(int.Parse(KammusuCondTextBox.Text), 0, 100);
+			setKammusu.maxSlots = int.Parse(dr[index]["スロット数"].ToString());
+			// 作成した艦娘データを追加する
 			FormFleet.unit[FleetSelectComboBox.SelectedIndex].Add(setKammusu);
 			KammusuSelectListBox.Items.Add(dr[KammusuIDtoIndex[setKammusu.id]]["艦名"].ToString());
 			KammusuSelectListBox.Refresh();
 		}
 		private void DeleteKammusuButton_Click(object sender, EventArgs e) {
-
+			if(FleetSelectComboBox.SelectedIndex == -1
+			|| KammusuSelectListBox.SelectedIndex == -1)
+				return;
+			// FormFleetから艦娘データを削除する
+			FormFleet.unit[FleetSelectComboBox.SelectedIndex].RemoveAt(KammusuSelectListBox.SelectedIndex);
+			KammusuSelectListBox.Items.RemoveAt(KammusuSelectListBox.SelectedIndex);
+			KammusuSelectListBox.Refresh();
 		}
 		private void AddWeaponButton_Click(object sender, EventArgs e) {
-
+			if(FleetSelectComboBox.SelectedIndex == -1
+			|| KammusuSelectListBox.SelectedIndex == -1
+			|| WeaponTypeComboBox.SelectedIndex == -1
+			|| WeaponNameComboBox.SelectedIndex == -1)
+				return;
+			// 4つ以上の装備は持てない
+			Kammusu selectedKammusu = FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex];
+			if(selectedKammusu.weapon.Count == selectedKammusu.maxSlots)
+				return;
+			DataRow[] dr = WeaponData.Select();
+			// 装備データを作成する
+			var setWeapon = new Weapon();
+			int index = WeaponTypeToIndexList[WeaponTypeComboBox.SelectedIndex][WeaponNameComboBox.SelectedIndex];
+			setWeapon.id = int.Parse(dr[index]["装備ID"].ToString());
+			setWeapon.level = limit(WeaponLevelComboBox.SelectedIndex, 0, 10);
+			setWeapon.rf = limit(WeaponRfComboBox.SelectedIndex, 0, 7);
+			setWeapon.detailRf = limit(WeaponDetailRfComboBox.SelectedIndex, 0, 120);
+			// 作成した装備データを追加する
+			selectedKammusu.weapon.Add(setWeapon);
+			WeaponSelectListBox.Items.Add(dr[WeaponIDtoIndex[setWeapon.id]]["装備名"].ToString());
+			WeaponSelectListBox.Refresh();
 		}
 		private void DeleteWeaponButton_Click(object sender, EventArgs e) {
 
+		}
+		private void FleetSelectComboBox_SelectedIndexChanged(object sender, EventArgs e) {
+			if(FleetSelectComboBox.SelectedIndex == -1)
+				return;
+			// 表示する艦隊を切り換える
+			KammusuSelectListBox.ClearSelected();
+			KammusuSelectListBox.Items.Clear();
+			DataRow[] dr = KammusuData.Select();
+			foreach(Kammusu kammusu in FormFleet.unit[FleetSelectComboBox.SelectedIndex]) {
+				KammusuSelectListBox.Items.Add(dr[KammusuIDtoIndex[kammusu.id]]["艦名"].ToString());
+			}
+			KammusuSelectListBox.Refresh();
+		}
+		private void KammusuSelectListBox_SelectedIndexChanged(object sender, EventArgs e) {
+			if(FleetSelectComboBox.SelectedIndex == -1
+			|| KammusuSelectListBox.SelectedIndex == -1)
+				return;
+			// 表示する艦娘を切り替える
+			Kammusu kammusu = FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex];
+			int showKammusuIndex = KammusuIDtoIndex[kammusu.id];
+			DataRow[] dr = KammusuData.Select();
+			int showKammusuType = int.Parse(dr[showKammusuIndex]["艦種"].ToString()) - 1;
+			KammusuTypeComboBox.SelectedIndex = showKammusuType;
+			KammusuTypeComboBox.Refresh();
+			KammusuNameComboBox.Text = dr[showKammusuIndex]["艦名"].ToString();
+			RedrawKammusuNameList();
+			KammusuLevelTextBox.Text = kammusu.level.ToString();
+			KammusuLuckTextBox.Text = kammusu.luck.ToString();
+			KammusuCondTextBox.Text = kammusu.cond.ToString();
 		}
 		private void KammusuTypeComboBox_SelectedIndexChanged(object sender, EventArgs e) {
 			RedrawKammusuNameList();
@@ -345,6 +409,8 @@ namespace KCS_GUI
 			public int cond;
 			// 装備
 			public List<Weapon> weapon;
+			// 最大スロット数
+			public int maxSlots;
 			// コンストラクタ
 			public Kammusu() {
 				weapon = new List<Weapon>();
