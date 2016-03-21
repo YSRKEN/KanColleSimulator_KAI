@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -16,8 +17,10 @@ namespace KCS_GUI
 		// 定数群
 		//ソフト名
 		const string SoftName = "KanColleSimulator";
-		//艦隊数の最大(2)
+		//艦隊数の最大
 		const int MaxFleetSize = 2;
+		//艦隊における艦船数の最大
+		const int MaxUnitSize = 6;
 		//種別→種別番号変換
 		Dictionary<string, int> WeaponTypeToNumber;
 
@@ -41,6 +44,10 @@ namespace KCS_GUI
 		Fleet FormFleet;
 		//マップタブ
 		MapData FormMapData;
+		//艦隊タブにおけるファイルパス
+		string FleetFilePath;
+		//マップタブにおけるファイルパス
+		string MapFilePath;
 
 		/* コンストラクタ */
 		public MainForm()
@@ -115,9 +122,104 @@ namespace KCS_GUI
 		{
 
 		}
-		private void OpenFileMenuItem_Click(object sender, EventArgs e)
-		{
+		private void OpenFileMenuItem_Click(object sender, EventArgs e){
+			// ファイルを開くダイアログを表示する
+			OpenFileDialog ofd = new OpenFileDialog();
+			ofd.Filter = "艦隊データ(*.json)|*.json|すべてのファイル(*.*)|*.*";
+			if(ofd.ShowDialog() != DialogResult.OK)
+				return;
+			FleetFilePath = ofd.FileName;
+			// ファイルを詠みこみ、JSONとして解釈する
+			System.IO.StreamReader sr = new System.IO.StreamReader(FleetFilePath, System.Text.Encoding.GetEncoding("utf-8"));
+			string jsonString = sr.ReadToEnd();
+			sr.Close();
+			JObject json = JObject.Parse(jsonString);
+			Fleet setFleet = new Fleet();
+			// 司令部レベルを読み込む
+			if(json["lv"] != null) {
+				setFleet.level = limit(int.Parse((string)json["lv"]), 1, 120);
+			} else {
+				setFleet.level = 120;
+			}
+			// 艦隊形式を読み込む
+			if(json["type"] != null) {
+				setFleet.type = limit(int.Parse((string)json["type"]), 0, 3);
+			} else {
+				setFleet.type = 0;
+			}
+			// 艦隊を読み込む
+			DataRow[] drWeapon = WeaponData.Select();
+			DataRow[] drKammusu = KammusuData.Select();
+			for(int fi = 1; fi <= MaxFleetSize; ++fi) {
+				if(json["f" + fi.ToString()] == null)
+					break;
+				var jsonFleet = (JObject)json["f" + fi.ToString()];
+				// 艦娘を読み込む
+				for(int si = 1; si <= MaxUnitSize; ++si) {
+					// JSONデータとしての判定
+					if(jsonFleet["s" + si.ToString()] == null)
+						break;
+					var jsonKammusu = (JObject)jsonFleet["s" + si.ToString()];
+					if(jsonKammusu["id"] == null
+					|| jsonKammusu["lv"] == null
+					|| jsonKammusu["luck"] == null
+					|| jsonKammusu["items"] == null)
+						return;
+					var setKammusu = new Kammusu();
+					// IDがデータベースに存在するか判定
+					setKammusu.id = limit(int.Parse((string)jsonKammusu["id"]), 1, 999);
+					if(!KammusuIDtoIndex.ContainsKey(setKammusu.id))
+						return;
+					// 追記
+					setKammusu.level = limit(int.Parse((string)jsonKammusu["lv"]), 1, 155);
+					setKammusu.luck = limit(int.Parse((string)jsonKammusu["luck"]), -1, 100);
+					var jsonItems = (JObject)jsonKammusu["items"];
+					var slotSize = int.Parse(drKammusu[KammusuIDtoIndex[setKammusu.id]]["スロット数"].ToString());
+					// 装備を読み込む
+					for(int wi = 1; wi <= slotSize; ++wi) {
+						// JSONデータとしての判定
+						if(jsonItems["i" + wi.ToString()] == null)
+							break;
+						var jsonWeapon = (JObject)jsonItems["i" + wi.ToString()];
+						if(jsonWeapon["id"] == null
+						|| jsonWeapon["rf"] == null)
+							return;
+						var setWeapon = new Weapon();
+						// IDがデータベースに存在するか判定
+						setWeapon.id = limit(int.Parse((string)jsonWeapon["id"]), 1, 999);
+						if(!WeaponIDtoIndex.ContainsKey(setWeapon.id))
+							return;
+						// 種別を判定することで、"rf"が装備改修度か艦載機熟練度かを判別する
+						int setWeaponType = WeaponTypeToNumber["その他"];
+						if(WeaponTypeToNumber.ContainsKey(drWeapon[WeaponIDtoIndex[setWeapon.id]]["種別"].ToString())) {
+							setWeaponType = WeaponTypeToNumber[drWeapon[WeaponIDtoIndex[setWeapon.id]]["種別"].ToString()];
+						}
+						if(RfWeaponTypeList.IndexOf(setWeaponType) != -1) {
+							setWeapon.level = 0;
+							setWeapon.rf = limit(int.Parse((string)jsonWeapon["rf"]), 0, 7);
+							if(jsonWeapon["rf_detail"] == null) {
+								setWeapon.detailRf = rfRoughToDetail(setWeapon.rf);
+							} else {
+								setWeapon.detailRf = limit(int.Parse((string)jsonWeapon["rf_detail"]), 0, 120);
+								setWeapon.rf = rfDetailToRough(setWeapon.detailRf);
+							}
+						} else {
+							setWeapon.level = limit(int.Parse((string)jsonWeapon["rf"]), 0, 10);
+							setWeapon.rf = 0;
+							setWeapon.detailRf = 0;
+						}
+						setKammusu.weapon.Add(setWeapon);
+					}
+					setFleet.unit[fi - 1].Add(setKammusu);
+				}
+			}
 
+			// 読み込んだデータを画面に反映する
+			FormFleet = setFleet;
+			HQLevelTextBox.Text = FormFleet.level.ToString();
+			FleetTypeComboBox.SelectedIndex = FormFleet.type;
+			FleetSelectComboBox_SelectedIndexChanged(sender, e);
+			return;
 		}
 		private void SaveSFileMenuItem_Click(object sender, EventArgs e)
 		{
@@ -143,6 +245,9 @@ namespace KCS_GUI
 			|| FleetSelectComboBox.SelectedIndex == -1)
 				return;
 			DataRow[] dr = KammusuData.Select();
+			// 1艦隊には6隻まで
+			if(FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count == MaxUnitSize)
+				return;
 			// 艦娘データを作成する
 			var setKammusu = new Kammusu();
 			int index = KammusuTypeToIndexList[KammusuTypeComboBox.SelectedIndex][KammusuNameComboBox.SelectedIndex];
@@ -332,30 +437,12 @@ namespace KCS_GUI
 		}
 		private void WeaponRfComboBox_SelectedIndexChanged(object sender, EventArgs e) {
 			// 外部熟練度を弄った場合、内部熟練度を自動補正する
-			int[] roughToDetail = new int[8]{0, 10, 25, 40, 55, 70, 85, 100};
-			WeaponDetailRfComboBox.SelectedIndex = roughToDetail[WeaponRfComboBox.SelectedIndex];
+			WeaponDetailRfComboBox.SelectedIndex = rfRoughToDetail(WeaponRfComboBox.SelectedIndex);
 			WeaponDetailRfComboBox.Refresh();
 		}
 		private void WeaponDetailRfComboBox_SelectedIndexChanged(object sender, EventArgs e) {
 			// 内部熟練度を弄った場合、外部熟練度を自動補正する
-			int detailRf = WeaponDetailRfComboBox.SelectedIndex, roughRf;
-			if(detailRf < 10)
-				roughRf = 0;
-			else if(detailRf < 25)
-				roughRf = 1;
-			else if(detailRf < 40)
-				roughRf = 2;
-			else if(detailRf < 55)
-				roughRf = 3;
-			else if(detailRf < 70)
-				roughRf = 4;
-			else if(detailRf < 85)
-				roughRf = 5;
-			else if(detailRf < 100)
-				roughRf = 6;
-			else
-				roughRf = 7;
-			WeaponRfComboBox.SelectedIndex = roughRf;
+			WeaponRfComboBox.SelectedIndex = rfDetailToRough(WeaponDetailRfComboBox.SelectedIndex);
 			WeaponRfComboBox.Refresh();
 		}
 
@@ -509,6 +596,32 @@ namespace KCS_GUI
 			if(n > max_n)
 				return max_n;
 			return n;
+		}
+		// 外部熟練度を内部熟練度に変換する
+		private int rfRoughToDetail(int rf) {
+			int[] roughToDetailList = new int[8] { 0, 10, 25, 40, 55, 70, 85, 100 };
+			return roughToDetailList[rf];
+		}
+		// 内部熟練度を外部熟練度に変換する
+		private int rfDetailToRough(int detailRf) {
+			int roughRf;
+			if(detailRf < 10)
+				roughRf = 0;
+			else if(detailRf < 25)
+				roughRf = 1;
+			else if(detailRf < 40)
+				roughRf = 2;
+			else if(detailRf < 55)
+				roughRf = 3;
+			else if(detailRf < 70)
+				roughRf = 4;
+			else if(detailRf < 85)
+				roughRf = 5;
+			else if(detailRf < 100)
+				roughRf = 6;
+			else
+				roughRf = 7;
+			return roughRf;
 		}
 		/* サブクラス */
 		// 装備
