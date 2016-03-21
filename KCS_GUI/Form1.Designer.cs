@@ -28,7 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.tabControl1 = new System.Windows.Forms.TabControl();
+			this.MainTabControl = new System.Windows.Forms.TabControl();
 			this.tabPage1 = new System.Windows.Forms.TabPage();
 			this.ChangeWeaponButton = new System.Windows.Forms.Button();
 			this.ChangeKammusuButton = new System.Windows.Forms.Button();
@@ -129,23 +129,23 @@
 			this.ExitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.ヘルプHToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.VersionInfoMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.tabControl1.SuspendLayout();
+			this.MainTabControl.SuspendLayout();
 			this.tabPage1.SuspendLayout();
 			this.tabPage2.SuspendLayout();
 			this.tabPage3.SuspendLayout();
 			this.menuStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// tabControl1
+			// MainTabControl
 			// 
-			this.tabControl1.Controls.Add(this.tabPage1);
-			this.tabControl1.Controls.Add(this.tabPage2);
-			this.tabControl1.Controls.Add(this.tabPage3);
-			this.tabControl1.Location = new System.Drawing.Point(12, 27);
-			this.tabControl1.Name = "tabControl1";
-			this.tabControl1.SelectedIndex = 0;
-			this.tabControl1.Size = new System.Drawing.Size(460, 282);
-			this.tabControl1.TabIndex = 0;
+			this.MainTabControl.Controls.Add(this.tabPage1);
+			this.MainTabControl.Controls.Add(this.tabPage2);
+			this.MainTabControl.Controls.Add(this.tabPage3);
+			this.MainTabControl.Location = new System.Drawing.Point(12, 27);
+			this.MainTabControl.Name = "MainTabControl";
+			this.MainTabControl.SelectedIndex = 0;
+			this.MainTabControl.Size = new System.Drawing.Size(460, 282);
+			this.MainTabControl.TabIndex = 0;
 			// 
 			// tabPage1
 			// 
@@ -1132,10 +1132,11 @@
 			// 
 			// ResultTextBox
 			// 
-			this.ResultTextBox.Enabled = false;
+			this.ResultTextBox.HideSelection = false;
 			this.ResultTextBox.Location = new System.Drawing.Point(8, 143);
 			this.ResultTextBox.Multiline = true;
 			this.ResultTextBox.Name = "ResultTextBox";
+			this.ResultTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
 			this.ResultTextBox.Size = new System.Drawing.Size(438, 107);
 			this.ResultTextBox.TabIndex = 50;
 			// 
@@ -1414,7 +1415,7 @@
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(484, 321);
-			this.Controls.Add(this.tabControl1);
+			this.Controls.Add(this.MainTabControl);
 			this.Controls.Add(this.menuStrip1);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.MainMenuStrip = this.menuStrip1;
@@ -1423,7 +1424,7 @@
 			this.Text = "KanColleSimulator";
 			this.DragDrop += new System.Windows.Forms.DragEventHandler(this.MainForm_DragDrop);
 			this.DragEnter += new System.Windows.Forms.DragEventHandler(this.MainForm_DragEnter);
-			this.tabControl1.ResumeLayout(false);
+			this.MainTabControl.ResumeLayout(false);
 			this.tabPage1.ResumeLayout(false);
 			this.tabPage1.PerformLayout();
 			this.tabPage2.ResumeLayout(false);
@@ -1439,7 +1440,7 @@
 
 		#endregion
 
-		private System.Windows.Forms.TabControl tabControl1;
+		private System.Windows.Forms.TabControl MainTabControl;
 		private System.Windows.Forms.TabPage tabPage1;
 		private System.Windows.Forms.TabPage tabPage2;
 		private System.Windows.Forms.TabPage tabPage3;

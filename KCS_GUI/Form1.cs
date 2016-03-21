@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -126,21 +127,23 @@ namespace KCS_GUI
 			FleetSelectComboBox_SelectedIndexChanged(sender, e);
 		}
 		private void OpenFileMenuItem_Click(object sender, EventArgs e){
-			// ファイルを開くダイアログを表示する
-			OpenFileDialog ofd = new OpenFileDialog();
-			ofd.Filter = "艦隊データ(*.json)|*.json|すべてのファイル(*.*)|*.*";
-			if(ofd.ShowDialog() != DialogResult.OK)
-				return;
-			FleetFilePath = ofd.FileName;
-			// ファイルを詠みこみ、JSONとして解釈する
-			Tuple<Fleet, bool> setFleet = ReadJsonFile(FleetFilePath);
-			if(!setFleet.Item2)
-				return;
-			// 読み込んだデータを画面に反映する
-			FormFleet = setFleet.Item1;
-			HQLevelTextBox.Text = FormFleet.level.ToString();
-			FleetTypeComboBox.SelectedIndex = FormFleet.type;
-			FleetSelectComboBox_SelectedIndexChanged(sender, e);
+			if(MainTabControl.SelectedIndex == 0) {
+				// ファイルを開くダイアログを表示する
+				OpenFileDialog ofd = new OpenFileDialog();
+				ofd.Filter = "艦隊データ(*.json)|*.json|すべてのファイル(*.*)|*.*";
+				if(ofd.ShowDialog() != DialogResult.OK)
+					return;
+				FleetFilePath = ofd.FileName;
+				// ファイルを詠みこみ、JSONとして解釈する
+				Tuple<Fleet, bool> setFleet = ReadJsonFile(FleetFilePath);
+				if(!setFleet.Item2)
+					return;
+				// 読み込んだデータを画面に反映する
+				FormFleet = setFleet.Item1;
+				HQLevelTextBox.Text = FormFleet.level.ToString();
+				FleetTypeComboBox.SelectedIndex = FormFleet.type;
+				FleetSelectComboBox_SelectedIndexChanged(sender, e);
+			}
 			return;
 		}
 		private void SaveSFileMenuItem_Click(object sender, EventArgs e){
@@ -402,15 +405,20 @@ namespace KCS_GUI
 			if(files.Length < 1)
 				return;
 			FleetFilePath = files[0];
-			// ファイルを詠みこみ、JSONとして解釈する
-			Tuple<Fleet, bool> setFleet = ReadJsonFile(FleetFilePath);
-			if(!setFleet.Item2)
-				return;
-			// 読み込んだデータを画面に反映する
-			FormFleet = setFleet.Item1;
-			HQLevelTextBox.Text = FormFleet.level.ToString();
-			FleetTypeComboBox.SelectedIndex = FormFleet.type;
-			FleetSelectComboBox_SelectedIndexChanged(sender, e);
+			if(MainTabControl.SelectedIndex == 0) {
+				// 拡張子で判別する
+				if(Path.GetExtension(FleetFilePath) != ".json")
+					return;
+				// ファイルを詠みこみ、JSONとして解釈する
+				Tuple<Fleet, bool> setFleet = ReadJsonFile(FleetFilePath);
+				if(!setFleet.Item2)
+					return;
+				// 読み込んだデータを画面に反映する
+				FormFleet = setFleet.Item1;
+				HQLevelTextBox.Text = FormFleet.level.ToString();
+				FleetTypeComboBox.SelectedIndex = FormFleet.type;
+				FleetSelectComboBox_SelectedIndexChanged(sender, e);
+			}
 		}
 		private void MainForm_DragEnter(object sender, DragEventArgs e) {
 			if(e.Data.GetDataPresent(DataFormats.FileDrop)) {
@@ -444,21 +452,61 @@ namespace KCS_GUI
 		}
 
 		// シミュレーションタブ
-		private void FriendBrowseButton_Click(object sender, EventArgs e)
-		{
-
+		private void FriendBrowseButton_Click(object sender, EventArgs e){
+			// ファイルを開くダイアログを表示する
+			OpenFileDialog ofd = new OpenFileDialog();
+			ofd.Filter = "艦隊データ(*.json)|*.json|すべてのファイル(*.*)|*.*";
+			if(ofd.ShowDialog() != DialogResult.OK)
+				return;
+			FriendPathTextBox.Text = ofd.FileName;
 		}
-		private void EnemyBrowseButton_Click(object sender, EventArgs e)
-		{
-
+		private void EnemyBrowseButton_Click(object sender, EventArgs e){
+			// ファイルを開くダイアログを表示する
+			OpenFileDialog ofd = new OpenFileDialog();
+			ofd.Filter = "艦隊データ(*.json)|*.json|マップエディタ(*.map)|*.map|すべてのファイル(*.*)|*.*";
+			if(ofd.ShowDialog() != DialogResult.OK)
+				return;
+			EnemyPathTextBox.Text = ofd.FileName;
 		}
-		private void OutputBrowseButton_Click(object sender, EventArgs e)
-		{
-
+		private void OutputBrowseButton_Click(object sender, EventArgs e){
+			// ファイルを開くダイアログを表示する
+			SaveFileDialog sfd = new SaveFileDialog();
+			sfd.Filter = "艦隊データ(*.json)|*.json";
+			if(sfd.ShowDialog() != DialogResult.OK)
+				return;
+			OutputPathTextBox.Text = sfd.FileName;
 		}
-		private void StartButton_Click(object sender, EventArgs e)
-		{
-
+		private void StartButton_Click(object sender, EventArgs e){
+			if(!System.IO.File.Exists(FriendPathTextBox.Text)
+			|| !System.IO.File.Exists(EnemyPathTextBox.Text))
+				return;
+			string commandLine = "";
+			commandLine += "-i \"" + FriendPathTextBox.Text + "\" \"" + EnemyPathTextBox.Text + "\"";
+			commandLine += " -f " + FriendFormationComboBox.SelectedIndex.ToString() + " " + EnemyFormationComboBox.SelectedIndex.ToString();
+			commandLine += " -n " + TimesComboBox.Text;
+			commandLine += " -t " + ThreadsComboBox.Text;
+			if(PutJSONCheckBox.Checked)
+				commandLine += " -o \"" + OutputPathTextBox.Text + "\"";
+			if(PrettifyJSONCheckBox.Checked) {
+				commandLine += " --result-json-prettify";
+			} else {
+				commandLine += " --no-result-json-prettify";
+			}
+			//外部exeファイルで実行し、標準出力を取り込む
+			this.Text = SoftName + "(計算中)";
+			ProcessStartInfo psInfo = new ProcessStartInfo();
+			psInfo.FileName = @System.IO.Directory.GetCurrentDirectory() + @"\KCS_CUI.exe"; //実行するファイル
+			System.Console.WriteLine(commandLine);
+			System.Console.WriteLine(psInfo.FileName);
+			psInfo.CreateNoWindow = true;           //コンソール・ウィンドウを開かない
+			psInfo.UseShellExecute = false;         //シェル機能を使用しない
+			psInfo.Arguments = commandLine;         //コマンドライン引数を設定
+			psInfo.RedirectStandardOutput = true;   //標準出力を取り込むようにする
+			Process p = Process.Start(psInfo);
+			string output = p.StandardOutput.ReadToEnd();
+			ResultTextBox.Text = output;
+			ResultTextBox.Focus();
+			this.Text = SoftName;
 		}
 
 		/* サブルーチン */
