@@ -131,93 +131,13 @@ namespace KCS_GUI
 			ofd.Filter = "艦隊データ(*.json)|*.json|すべてのファイル(*.*)|*.*";
 			if(ofd.ShowDialog() != DialogResult.OK)
 				return;
-			// ファイルを詠みこみ、JSONとして解釈する
-			System.IO.StreamReader sr = new System.IO.StreamReader(ofd.FileName, System.Text.Encoding.GetEncoding("utf-8"));
-			string jsonString = sr.ReadToEnd();
-			sr.Close();
-			JObject json = JObject.Parse(jsonString);
-			Fleet setFleet = new Fleet();
-			// 司令部レベルを読み込む
-			if(json["lv"] != null) {
-				setFleet.level = limit(int.Parse((string)json["lv"]), 1, 120);
-			} else {
-				setFleet.level = 120;
-			}
-			// 艦隊形式を読み込む
-			if(json["type"] != null) {
-				setFleet.type = limit(int.Parse((string)json["type"]), 0, 3);
-			} else {
-				setFleet.type = 0;
-			}
-			// 艦隊を読み込む
-			DataRow[] drWeapon = WeaponData.Select();
-			DataRow[] drKammusu = KammusuData.Select();
-			for(int fi = 1; fi <= MaxFleetSize; ++fi) {
-				if(json["f" + fi.ToString()] == null)
-					break;
-				var jsonFleet = (JObject)json["f" + fi.ToString()];
-				// 艦娘を読み込む
-				for(int si = 1; si <= MaxUnitSize; ++si) {
-					// JSONデータとしての判定
-					if(jsonFleet["s" + si.ToString()] == null)
-						break;
-					var jsonKammusu = (JObject)jsonFleet["s" + si.ToString()];
-					if(jsonKammusu["id"] == null
-					|| jsonKammusu["lv"] == null
-					|| jsonKammusu["luck"] == null
-					|| jsonKammusu["items"] == null)
-						return;
-					var setKammusu = new Kammusu();
-					// IDがデータベースに存在するか判定
-					setKammusu.id = limit(int.Parse((string)jsonKammusu["id"]), 1, 999);
-					if(!KammusuIDtoIndex.ContainsKey(setKammusu.id))
-						return;
-					// 追記
-					setKammusu.level = limit(int.Parse((string)jsonKammusu["lv"]), 1, 155);
-					setKammusu.luck = limit(int.Parse((string)jsonKammusu["luck"]), -1, 100);
-					var jsonItems = (JObject)jsonKammusu["items"];
-					var slotSize = int.Parse(drKammusu[KammusuIDtoIndex[setKammusu.id]]["スロット数"].ToString());
-					// 装備を読み込む
-					for(int wi = 1; wi <= slotSize; ++wi) {
-						// JSONデータとしての判定
-						if(jsonItems["i" + wi.ToString()] == null)
-							break;
-						var jsonWeapon = (JObject)jsonItems["i" + wi.ToString()];
-						if(jsonWeapon["id"] == null
-						|| jsonWeapon["rf"] == null)
-							return;
-						var setWeapon = new Weapon();
-						// IDがデータベースに存在するか判定
-						setWeapon.id = limit(int.Parse((string)jsonWeapon["id"]), 1, 999);
-						if(!WeaponIDtoIndex.ContainsKey(setWeapon.id))
-							return;
-						// 種別を判定することで、"rf"が装備改修度か艦載機熟練度かを判別する
-						int setWeaponType = WeaponTypeToNumber["その他"];
-						if(WeaponTypeToNumber.ContainsKey(drWeapon[WeaponIDtoIndex[setWeapon.id]]["種別"].ToString())) {
-							setWeaponType = WeaponTypeToNumber[drWeapon[WeaponIDtoIndex[setWeapon.id]]["種別"].ToString()];
-						}
-						if(RfWeaponTypeList.IndexOf(setWeaponType) != -1) {
-							setWeapon.level = 0;
-							setWeapon.rf = limit(int.Parse((string)jsonWeapon["rf"]), 0, 7);
-							if(jsonWeapon["rf_detail"] == null) {
-								setWeapon.detailRf = rfRoughToDetail(setWeapon.rf);
-							} else {
-								setWeapon.detailRf = limit(int.Parse((string)jsonWeapon["rf_detail"]), 0, 120);
-								setWeapon.rf = rfDetailToRough(setWeapon.detailRf);
-							}
-						} else {
-							setWeapon.level = limit(int.Parse((string)jsonWeapon["rf"]), 0, 10);
-							setWeapon.rf = 0;
-							setWeapon.detailRf = 0;
-						}
-						setKammusu.weapon.Add(setWeapon);
-					}
-					setFleet.unit[fi - 1].Add(setKammusu);
-				}
-			}
 			FleetFilePath = ofd.FileName;
+			// ファイルを詠みこみ、JSONとして解釈する
+			Tuple<Fleet, bool> setFleet = ReadJsonFile(FleetFilePath);
+			if(!setFleet.Item2)
+				return;
 			// 読み込んだデータを画面に反映する
-			FormFleet = setFleet;
+			FormFleet = setFleet.Item1;
 			HQLevelTextBox.Text = FormFleet.level.ToString();
 			FleetTypeComboBox.SelectedIndex = FormFleet.type;
 			FleetSelectComboBox_SelectedIndexChanged(sender, e);
@@ -476,6 +396,29 @@ namespace KCS_GUI
 			WeaponRfComboBox.SelectedIndex = rfDetailToRough(WeaponDetailRfComboBox.SelectedIndex);
 			WeaponRfComboBox.Refresh();
 		}
+		private void MainForm_DragDrop(object sender, DragEventArgs e) {
+			// ドラッグされたファイルを認識する
+			string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+			if(files.Length < 1)
+				return;
+			FleetFilePath = files[0];
+			// ファイルを詠みこみ、JSONとして解釈する
+			Tuple<Fleet, bool> setFleet = ReadJsonFile(FleetFilePath);
+			if(!setFleet.Item2)
+				return;
+			// 読み込んだデータを画面に反映する
+			FormFleet = setFleet.Item1;
+			HQLevelTextBox.Text = FormFleet.level.ToString();
+			FleetTypeComboBox.SelectedIndex = FormFleet.type;
+			FleetSelectComboBox_SelectedIndexChanged(sender, e);
+		}
+		private void MainForm_DragEnter(object sender, DragEventArgs e) {
+			if(e.Data.GetDataPresent(DataFormats.FileDrop)) {
+				e.Effect = DragDropEffects.All;
+			} else {
+				e.Effect = DragDropEffects.None;
+			}
+		}
 
 		// マップエディタタブ
 		private void AddMapPositionButton_Click(object sender, EventArgs e) {
@@ -653,6 +596,92 @@ namespace KCS_GUI
 			else
 				roughRf = 7;
 			return roughRf;
+		}
+		private Tuple<Fleet, bool> ReadJsonFile(string jsonFileName) {
+			Fleet setFleet = new Fleet();
+			System.IO.StreamReader sr = new System.IO.StreamReader(jsonFileName, System.Text.Encoding.GetEncoding("utf-8"));
+			string jsonString = sr.ReadToEnd();
+			sr.Close();
+			JObject json = JObject.Parse(jsonString);
+			// 司令部レベルを読み込む
+			if(json["lv"] != null) {
+				setFleet.level = limit(int.Parse((string)json["lv"]), 1, 120);
+			} else {
+				setFleet.level = 120;
+			}
+			// 艦隊形式を読み込む
+			if(json["type"] != null) {
+				setFleet.type = limit(int.Parse((string)json["type"]), 0, 3);
+			} else {
+				setFleet.type = 0;
+			}
+			// 艦隊を読み込む
+			DataRow[] drWeapon = WeaponData.Select();
+			DataRow[] drKammusu = KammusuData.Select();
+			for(int fi = 1; fi <= MaxFleetSize; ++fi) {
+				if(json["f" + fi.ToString()] == null)
+					break;
+				var jsonFleet = (JObject)json["f" + fi.ToString()];
+				// 艦娘を読み込む
+				for(int si = 1; si <= MaxUnitSize; ++si) {
+					// JSONデータとしての判定
+					if(jsonFleet["s" + si.ToString()] == null)
+						break;
+					var jsonKammusu = (JObject)jsonFleet["s" + si.ToString()];
+					if(jsonKammusu["id"] == null
+					|| jsonKammusu["lv"] == null
+					|| jsonKammusu["luck"] == null
+					|| jsonKammusu["items"] == null)
+						return new Tuple<Fleet, bool>(setFleet, false);
+					var setKammusu = new Kammusu();
+					// IDがデータベースに存在するか判定
+					setKammusu.id = limit(int.Parse((string)jsonKammusu["id"]), 1, 999);
+					if(!KammusuIDtoIndex.ContainsKey(setKammusu.id))
+						return new Tuple<Fleet, bool>(setFleet, false);
+					// 追記
+					setKammusu.level = limit(int.Parse((string)jsonKammusu["lv"]), 1, 155);
+					setKammusu.luck = limit(int.Parse((string)jsonKammusu["luck"]), -1, 100);
+					var jsonItems = (JObject)jsonKammusu["items"];
+					var slotSize = int.Parse(drKammusu[KammusuIDtoIndex[setKammusu.id]]["スロット数"].ToString());
+					// 装備を読み込む
+					for(int wi = 1; wi <= slotSize; ++wi) {
+						// JSONデータとしての判定
+						if(jsonItems["i" + wi.ToString()] == null)
+							break;
+						var jsonWeapon = (JObject)jsonItems["i" + wi.ToString()];
+						if(jsonWeapon["id"] == null
+						|| jsonWeapon["rf"] == null)
+							return new Tuple<Fleet, bool>(setFleet, false);
+						var setWeapon = new Weapon();
+						// IDがデータベースに存在するか判定
+						setWeapon.id = limit(int.Parse((string)jsonWeapon["id"]), 1, 999);
+						if(!WeaponIDtoIndex.ContainsKey(setWeapon.id))
+							return new Tuple<Fleet, bool>(setFleet, false);
+						// 種別を判定することで、"rf"が装備改修度か艦載機熟練度かを判別する
+						int setWeaponType = WeaponTypeToNumber["その他"];
+						if(WeaponTypeToNumber.ContainsKey(drWeapon[WeaponIDtoIndex[setWeapon.id]]["種別"].ToString())) {
+							setWeaponType = WeaponTypeToNumber[drWeapon[WeaponIDtoIndex[setWeapon.id]]["種別"].ToString()];
+						}
+						if(RfWeaponTypeList.IndexOf(setWeaponType) != -1) {
+							setWeapon.level = 0;
+							setWeapon.rf = limit(int.Parse((string)jsonWeapon["rf"]), 0, 7);
+							if(jsonWeapon["rf_detail"] == null) {
+								setWeapon.detailRf = rfRoughToDetail(setWeapon.rf);
+							} else {
+								setWeapon.detailRf = limit(int.Parse((string)jsonWeapon["rf_detail"]), 0, 120);
+								setWeapon.rf = rfDetailToRough(setWeapon.detailRf);
+							}
+						} else {
+							setWeapon.level = limit(int.Parse((string)jsonWeapon["rf"]), 0, 10);
+							setWeapon.rf = 0;
+							setWeapon.detailRf = 0;
+						}
+						setKammusu.weapon.Add(setWeapon);
+					}
+					setFleet.unit[fi - 1].Add(setKammusu);
+				}
+			}
+			return new Tuple<Fleet, bool>(setFleet, true);
 		}
 		/* サブクラス */
 		// 装備

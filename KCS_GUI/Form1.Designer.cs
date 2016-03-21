@@ -30,6 +30,8 @@
 		{
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabPage1 = new System.Windows.Forms.TabPage();
+			this.ChangeWeaponButton = new System.Windows.Forms.Button();
+			this.ChangeKammusuButton = new System.Windows.Forms.Button();
 			this.WeaponNameComboBox = new System.Windows.Forms.ComboBox();
 			this.DeleteWeaponButton = new System.Windows.Forms.Button();
 			this.AddWeaponButton = new System.Windows.Forms.Button();
@@ -127,8 +129,6 @@
 			this.ExitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.ヘルプHToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.VersionInfoMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.ChangeKammusuButton = new System.Windows.Forms.Button();
-			this.ChangeWeaponButton = new System.Windows.Forms.Button();
 			this.tabControl1.SuspendLayout();
 			this.tabPage1.SuspendLayout();
 			this.tabPage2.SuspendLayout();
@@ -200,6 +200,26 @@
 			this.tabPage1.TabIndex = 0;
 			this.tabPage1.Text = "艦隊エディタ";
 			this.tabPage1.UseVisualStyleBackColor = true;
+			// 
+			// ChangeWeaponButton
+			// 
+			this.ChangeWeaponButton.Location = new System.Drawing.Point(197, 213);
+			this.ChangeWeaponButton.Name = "ChangeWeaponButton";
+			this.ChangeWeaponButton.Size = new System.Drawing.Size(40, 23);
+			this.ChangeWeaponButton.TabIndex = 45;
+			this.ChangeWeaponButton.Text = "変更";
+			this.ChangeWeaponButton.UseVisualStyleBackColor = true;
+			this.ChangeWeaponButton.Click += new System.EventHandler(this.ChangeWeaponButton_Click);
+			// 
+			// ChangeKammusuButton
+			// 
+			this.ChangeKammusuButton.Location = new System.Drawing.Point(197, 131);
+			this.ChangeKammusuButton.Name = "ChangeKammusuButton";
+			this.ChangeKammusuButton.Size = new System.Drawing.Size(40, 23);
+			this.ChangeKammusuButton.TabIndex = 44;
+			this.ChangeKammusuButton.Text = "変更";
+			this.ChangeKammusuButton.UseVisualStyleBackColor = true;
+			this.ChangeKammusuButton.Click += new System.EventHandler(this.ChangeKammusuButton_Click);
 			// 
 			// WeaponNameComboBox
 			// 
@@ -1388,26 +1408,6 @@
 			this.VersionInfoMenuItem.Text = "バージョン情報(&A)";
 			this.VersionInfoMenuItem.Click += new System.EventHandler(this.VersionInfoMenuItem_Click);
 			// 
-			// ChangeKammusuButton
-			// 
-			this.ChangeKammusuButton.Location = new System.Drawing.Point(197, 131);
-			this.ChangeKammusuButton.Name = "ChangeKammusuButton";
-			this.ChangeKammusuButton.Size = new System.Drawing.Size(40, 23);
-			this.ChangeKammusuButton.TabIndex = 44;
-			this.ChangeKammusuButton.Text = "変更";
-			this.ChangeKammusuButton.UseVisualStyleBackColor = true;
-			this.ChangeKammusuButton.Click += new System.EventHandler(this.ChangeKammusuButton_Click);
-			// 
-			// ChangeWeaponButton
-			// 
-			this.ChangeWeaponButton.Location = new System.Drawing.Point(197, 213);
-			this.ChangeWeaponButton.Name = "ChangeWeaponButton";
-			this.ChangeWeaponButton.Size = new System.Drawing.Size(40, 23);
-			this.ChangeWeaponButton.TabIndex = 45;
-			this.ChangeWeaponButton.Text = "変更";
-			this.ChangeWeaponButton.UseVisualStyleBackColor = true;
-			this.ChangeWeaponButton.Click += new System.EventHandler(this.ChangeWeaponButton_Click);
-			// 
 			// MainForm
 			// 
 			this.AllowDrop = true;
@@ -1421,6 +1421,8 @@
 			this.MaximizeBox = false;
 			this.Name = "MainForm";
 			this.Text = "KanColleSimulator";
+			this.DragDrop += new System.Windows.Forms.DragEventHandler(this.MainForm_DragDrop);
+			this.DragEnter += new System.Windows.Forms.DragEventHandler(this.MainForm_DragEnter);
 			this.tabControl1.ResumeLayout(false);
 			this.tabPage1.ResumeLayout(false);
 			this.tabPage1.PerformLayout();
