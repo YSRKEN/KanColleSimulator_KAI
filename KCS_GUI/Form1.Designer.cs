@@ -129,6 +129,9 @@
 			this.ExitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.ヘルプHToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.VersionInfoMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.ChangeMapPositionButton = new System.Windows.Forms.Button();
+			this.ChangeMapPatternButton = new System.Windows.Forms.Button();
+			this.ChangeMapKammusuButton = new System.Windows.Forms.Button();
 			this.MainTabControl.SuspendLayout();
 			this.tabPage1.SuspendLayout();
 			this.tabPage2.SuspendLayout();
@@ -814,6 +817,9 @@
 			// 
 			// tabPage2
 			// 
+			this.tabPage2.Controls.Add(this.ChangeMapKammusuButton);
+			this.tabPage2.Controls.Add(this.ChangeMapPatternButton);
+			this.tabPage2.Controls.Add(this.ChangeMapPositionButton);
 			this.tabPage2.Controls.Add(this.DeleteMapKammusuButton);
 			this.tabPage2.Controls.Add(this.AddMapKammusuButton);
 			this.tabPage2.Controls.Add(this.DeleteMapPatternButton);
@@ -847,7 +853,7 @@
 			// 
 			// DeleteMapKammusuButton
 			// 
-			this.DeleteMapKammusuButton.Location = new System.Drawing.Point(212, 225);
+			this.DeleteMapKammusuButton.Location = new System.Drawing.Point(258, 225);
 			this.DeleteMapKammusuButton.Name = "DeleteMapKammusuButton";
 			this.DeleteMapKammusuButton.Size = new System.Drawing.Size(40, 23);
 			this.DeleteMapKammusuButton.TabIndex = 46;
@@ -867,7 +873,7 @@
 			// 
 			// DeleteMapPatternButton
 			// 
-			this.DeleteMapPatternButton.Location = new System.Drawing.Point(210, 144);
+			this.DeleteMapPatternButton.Location = new System.Drawing.Point(256, 144);
 			this.DeleteMapPatternButton.Name = "DeleteMapPatternButton";
 			this.DeleteMapPatternButton.Size = new System.Drawing.Size(40, 23);
 			this.DeleteMapPatternButton.TabIndex = 44;
@@ -887,7 +893,7 @@
 			// 
 			// DeleteMapPositionButton
 			// 
-			this.DeleteMapPositionButton.Location = new System.Drawing.Point(210, 62);
+			this.DeleteMapPositionButton.Location = new System.Drawing.Point(256, 62);
 			this.DeleteMapPositionButton.Name = "DeleteMapPositionButton";
 			this.DeleteMapPositionButton.Size = new System.Drawing.Size(40, 23);
 			this.DeleteMapPositionButton.TabIndex = 42;
@@ -922,6 +928,7 @@
 			this.MapKammusuListBox.Name = "MapKammusuListBox";
 			this.MapKammusuListBox.Size = new System.Drawing.Size(80, 76);
 			this.MapKammusuListBox.TabIndex = 38;
+			this.MapKammusuListBox.SelectedIndexChanged += new System.EventHandler(this.MapKammusuListBox_SelectedIndexChanged);
 			// 
 			// MapPatternAllAntiAirTextBox
 			// 
@@ -1071,6 +1078,7 @@
 			this.MapPatternListBox.Name = "MapPatternListBox";
 			this.MapPatternListBox.Size = new System.Drawing.Size(80, 76);
 			this.MapPatternListBox.TabIndex = 23;
+			this.MapPatternListBox.SelectedIndexChanged += new System.EventHandler(this.MapPatternListBox_SelectedIndexChanged);
 			// 
 			// label21
 			// 
@@ -1089,6 +1097,7 @@
 			this.MapPositionListBox.Name = "MapPositionListBox";
 			this.MapPositionListBox.Size = new System.Drawing.Size(80, 76);
 			this.MapPositionListBox.TabIndex = 21;
+			this.MapPositionListBox.SelectedIndexChanged += new System.EventHandler(this.MapPositionListBox_SelectedIndexChanged);
 			// 
 			// tabPage3
 			// 
@@ -1136,6 +1145,7 @@
 			this.ResultTextBox.Location = new System.Drawing.Point(8, 143);
 			this.ResultTextBox.Multiline = true;
 			this.ResultTextBox.Name = "ResultTextBox";
+			this.ResultTextBox.ReadOnly = true;
 			this.ResultTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
 			this.ResultTextBox.Size = new System.Drawing.Size(438, 107);
 			this.ResultTextBox.TabIndex = 50;
@@ -1409,6 +1419,36 @@
 			this.VersionInfoMenuItem.Text = "バージョン情報(&A)";
 			this.VersionInfoMenuItem.Click += new System.EventHandler(this.VersionInfoMenuItem_Click);
 			// 
+			// ChangeMapPositionButton
+			// 
+			this.ChangeMapPositionButton.Location = new System.Drawing.Point(210, 62);
+			this.ChangeMapPositionButton.Name = "ChangeMapPositionButton";
+			this.ChangeMapPositionButton.Size = new System.Drawing.Size(40, 23);
+			this.ChangeMapPositionButton.TabIndex = 47;
+			this.ChangeMapPositionButton.Text = "変更";
+			this.ChangeMapPositionButton.UseVisualStyleBackColor = true;
+			this.ChangeMapPositionButton.Click += new System.EventHandler(this.ChangeMapPositionButton_Click);
+			// 
+			// ChangeMapPatternButton
+			// 
+			this.ChangeMapPatternButton.Location = new System.Drawing.Point(210, 144);
+			this.ChangeMapPatternButton.Name = "ChangeMapPatternButton";
+			this.ChangeMapPatternButton.Size = new System.Drawing.Size(40, 23);
+			this.ChangeMapPatternButton.TabIndex = 48;
+			this.ChangeMapPatternButton.Text = "変更";
+			this.ChangeMapPatternButton.UseVisualStyleBackColor = true;
+			this.ChangeMapPatternButton.Click += new System.EventHandler(this.ChangeMapPatternButton_Click);
+			// 
+			// ChangeMapKammusuButton
+			// 
+			this.ChangeMapKammusuButton.Location = new System.Drawing.Point(212, 225);
+			this.ChangeMapKammusuButton.Name = "ChangeMapKammusuButton";
+			this.ChangeMapKammusuButton.Size = new System.Drawing.Size(40, 23);
+			this.ChangeMapKammusuButton.TabIndex = 49;
+			this.ChangeMapKammusuButton.Text = "変更";
+			this.ChangeMapKammusuButton.UseVisualStyleBackColor = true;
+			this.ChangeMapKammusuButton.Click += new System.EventHandler(this.ChangeMapKammusuButton_Click);
+			// 
 			// MainForm
 			// 
 			this.AllowDrop = true;
@@ -1541,6 +1581,9 @@
 		private System.Windows.Forms.ComboBox WeaponNameComboBox;
 		private System.Windows.Forms.Button ChangeWeaponButton;
 		private System.Windows.Forms.Button ChangeKammusuButton;
+		private System.Windows.Forms.Button ChangeMapPositionButton;
+		private System.Windows.Forms.Button ChangeMapPatternButton;
+		private System.Windows.Forms.Button ChangeMapKammusuButton;
 	}
 }
 

@@ -430,12 +430,37 @@ namespace KCS_GUI
 
 		// マップエディタタブ
 		private void AddMapPositionButton_Click(object sender, EventArgs e) {
-
+			if(MapPositionNameTextBox.Text == ""
+			|| MapPositionBattleModeComboBox.SelectedIndex == -1)
+				return;
+			var setPosition = new Position();
+			setPosition.name = MapPositionNameTextBox.Text;
+			setPosition.mode = MapPositionBattleModeComboBox.SelectedIndex;
+			FormMapData.position.Add(setPosition);
+			MapPositionListBox.Items.Add(setPosition.name);
+			MapPositionListBox.Refresh();
+		}
+		private void ChangeMapPositionButton_Click(object sender, EventArgs e) {
+			if(MapPositionNameTextBox.Text == ""
+			|| MapPositionBattleModeComboBox.SelectedIndex == -1
+			|| MapPositionListBox.SelectedIndex == -1)
+				return;
+			FormMapData.position[MapPositionListBox.SelectedIndex].name = MapPositionNameTextBox.Text;
+			FormMapData.position[MapPositionListBox.SelectedIndex].mode = MapPositionBattleModeComboBox.SelectedIndex;
+			MapPositionListBox.Items[MapPositionListBox.SelectedIndex] = MapPositionNameTextBox.Text;
+			MapPositionListBox.Refresh();
 		}
 		private void DeleteMapPositionButton_Click(object sender, EventArgs e) {
-
+			if(MapPositionListBox.SelectedIndex == -1)
+				return;
+			FormMapData.position.RemoveAt(MapPositionListBox.SelectedIndex);
+			MapPositionListBox.Items.RemoveAt(MapPositionListBox.SelectedIndex);
+			MapPositionListBox.Refresh();
 		}
 		private void AddMapPatternButton_Click(object sender, EventArgs e) {
+
+		}
+		private void ChangeMapPatternButton_Click(object sender, EventArgs e) {
 
 		}
 		private void DeleteMapPatternButton_Click(object sender, EventArgs e) {
@@ -444,11 +469,33 @@ namespace KCS_GUI
 		private void AddMapKammusuButton_Click(object sender, EventArgs e) {
 
 		}
+		private void ChangeMapKammusuButton_Click(object sender, EventArgs e) {
+
+		}
 		private void DeleteMapKammusuButton_Click(object sender, EventArgs e) {
 
 		}
 		private void MapKammusuTypeComboBox_SelectedIndexChanged(object sender, EventArgs e) {
 			RedrawMapKammusuNameList();
+		}
+		private void MapPositionListBox_SelectedIndexChanged(object sender, EventArgs e) {
+			if(MapPositionListBox.SelectedIndex == -1)
+				return;
+			var selectPosition = FormMapData.position[MapPositionListBox.SelectedIndex];
+			// 選択したマスについて、その名前と戦闘モードに関する情報
+			MapPositionNameTextBox.Text = selectPosition.name;
+			MapPositionBattleModeComboBox.SelectedIndex = selectPosition.mode;
+			MapPositionBattleModeComboBox.Refresh();
+			// 選択したマスについて、それに含まれるパターンに関する情報
+			MapPatternListBox.Items.Clear();
+			for(int pi = 0; pi < selectPosition.fleet.Count; ++pi) {
+				MapPatternListBox.Items.Add((pi + 1).ToString() + " : " + selectPosition.fleet[pi].unit[0].Count.ToString());
+			}
+			MapPatternListBox.Refresh();
+		}
+		private void MapPatternListBox_SelectedIndexChanged(object sender, EventArgs e) {
+		}
+		private void MapKammusuListBox_SelectedIndexChanged(object sender, EventArgs e) {
 		}
 
 		// シミュレーションタブ
@@ -839,12 +886,12 @@ namespace KCS_GUI
 			// マスの名称
 			public string name;
 			// 各パターンにおける陣形
-			public List<int> formcation;
+			public List<int> formation;
 			// 各パターン
 			public List<Fleet> fleet;
 			// コンストラクタ
 			public Position() {
-				formcation = new List<int>();
+				formation = new List<int>();
 				fleet = new List<Fleet>();
 			}
 		}
