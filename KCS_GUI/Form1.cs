@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,17 +23,17 @@ namespace KCS_GUI
 		//艦隊における艦船数の最大
 		const int MaxUnitSize = 6;
 		//種別→種別番号変換
-		Dictionary<string, int> WeaponTypeToNumber;
+		static Dictionary<string, int> WeaponTypeToNumber;
 
 		// 装備・艦娘データ
 		//装備データ
-		DataTable WeaponData;
+		static DataTable WeaponData;
 		//装備ID→インデックス変換
-		Dictionary<int, int> WeaponIDtoIndex;
+		static Dictionary<int, int> WeaponIDtoIndex;
 		//種別番号→インデックスのリスト変換
 		Dictionary<int, List<int>> WeaponTypeToIndexList;
 		//熟練度が存在する装備の種別番号一覧
-		List<int> RfWeaponTypeList;
+		static List<int> RfWeaponTypeList;
 		//艦娘データ
 		DataTable KammusuData;
 		//艦船ID→インデックス
@@ -118,9 +119,11 @@ namespace KCS_GUI
 
 		/* 各イベント毎の処理 */
 		// メニュー
-		private void NewFileMenuItem_Click(object sender, EventArgs e)
-		{
-
+		private void NewFileMenuItem_Click(object sender, EventArgs e){
+			FormFleet = new Fleet();
+			HQLevelTextBox.Text = FormFleet.level.ToString();
+			FleetTypeComboBox.SelectedIndex = FormFleet.type;
+			FleetSelectComboBox_SelectedIndexChanged(sender, e);
 		}
 		private void OpenFileMenuItem_Click(object sender, EventArgs e){
 			// ファイルを開くダイアログを表示する
@@ -128,9 +131,8 @@ namespace KCS_GUI
 			ofd.Filter = "艦隊データ(*.json)|*.json|すべてのファイル(*.*)|*.*";
 			if(ofd.ShowDialog() != DialogResult.OK)
 				return;
-			FleetFilePath = ofd.FileName;
 			// ファイルを詠みこみ、JSONとして解釈する
-			System.IO.StreamReader sr = new System.IO.StreamReader(FleetFilePath, System.Text.Encoding.GetEncoding("utf-8"));
+			System.IO.StreamReader sr = new System.IO.StreamReader(ofd.FileName, System.Text.Encoding.GetEncoding("utf-8"));
 			string jsonString = sr.ReadToEnd();
 			sr.Close();
 			JObject json = JObject.Parse(jsonString);
@@ -213,7 +215,7 @@ namespace KCS_GUI
 					setFleet.unit[fi - 1].Add(setKammusu);
 				}
 			}
-
+			FleetFilePath = ofd.FileName;
 			// 読み込んだデータを画面に反映する
 			FormFleet = setFleet;
 			HQLevelTextBox.Text = FormFleet.level.ToString();
@@ -221,21 +223,50 @@ namespace KCS_GUI
 			FleetSelectComboBox_SelectedIndexChanged(sender, e);
 			return;
 		}
-		private void SaveSFileMenuItem_Click(object sender, EventArgs e)
-		{
-
+		private void SaveSFileMenuItem_Click(object sender, EventArgs e){
+			if(FleetFilePath == "") {
+				SaveAFileMenuItem_Click(sender, e);
+				return;
+			}
+			if(FormFleet.unit[0].Count == 0) {
+				MessageBox.Show("艦娘を第1艦隊に1隻以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return;
+			}
+			// セーブデータを作成する
+			string saveData = FormFleet.ToJson();
+			// 作成したデータを保存する
+			var sw = new StreamWriter(FleetFilePath, false, Encoding.GetEncoding("utf-8"));
+			sw.Write(saveData);
+			sw.Close();
 		}
-		private void SaveAFileMenuItem_Click(object sender, EventArgs e)
-		{
-
+		private void SaveAFileMenuItem_Click(object sender, EventArgs e){
+			if(FormFleet.unit[0].Count == 0) {
+				MessageBox.Show("艦娘を第1艦隊に1隻以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return;
+			}
+			// セーブデータを作成する
+			string saveData = FormFleet.ToJson();
+			// 作成したデータを保存する
+			var sfd = new SaveFileDialog();
+			if(sfd.ShowDialog() != DialogResult.OK)
+				return;
+			FleetFilePath = sfd.FileName;
+			var sw = new StreamWriter(FleetFilePath, false, Encoding.GetEncoding("utf-8"));
+			sw.Write(saveData);
+			sw.Close();
 		}
 		private void ExitMenuItem_Click(object sender, EventArgs e)
 		{
 			this.Close();
 		}
-		private void VersionInfoMenuItem_Click(object sender, EventArgs e)
-		{
-
+		private void VersionInfoMenuItem_Click(object sender, EventArgs e){
+			/* バージョン情報表示 */
+			string verInfo = "";
+			verInfo += SoftName + "\n";
+			verInfo += "バージョン：1.5.0\n";
+			verInfo += "作成者：YSR\n";
+			verInfo += "最終更新日：2016/03/21";
+			MessageBox.Show(verInfo, SoftName);
 		}
 
 		// 艦娘エディタタブ
@@ -670,6 +701,58 @@ namespace KCS_GUI
 				for(int i = 0; i < MaxFleetSize; ++i) {
 					unit.Add(new List<Kammusu>());
 				}
+			}
+			// JSON書き出し
+			public string ToJson() {
+				JObject o = new JObject();
+				o["version"] = 3;
+				o["lv"] = level;
+				o["type"] = type;
+				// 書き出す艦隊数は艦隊形式によって制御する
+				int writeFleets;
+				if(type != 0) {
+					writeFleets = 2;
+				}else {
+					writeFleets = 1;
+				}
+				// 艦隊を順に書き出していく
+				DataRow[] drWeapon = WeaponData.Select();
+				for(int fi = 0; fi < writeFleets; ++fi) {
+					// 艦隊
+					JObject setFleet = new JObject();
+					for(int si = 0; si < unit[fi].Count; ++si) {
+						// 艦娘
+						JObject setKammusu = new JObject();
+						setKammusu["id"] = unit[fi][si].id;
+						setKammusu["lv"] = unit[fi][si].level;
+						setKammusu["luck"] = unit[fi][si].luck;
+						setKammusu["cond"] = unit[fi][si].cond;
+						//装備一覧
+						JObject setItems = new JObject();
+						for(int wi = 0; wi < unit[fi][si].weapon.Count; ++wi) {
+							// 装備
+							JObject setWeapon = new JObject();
+							setWeapon["id"] = unit[fi][si].weapon[wi].id;
+							//種別を判定することで、装備改修度か艦載機熟練度かを判別する
+							int setWeaponType = WeaponTypeToNumber["その他"];
+							if(WeaponTypeToNumber.ContainsKey(drWeapon[WeaponIDtoIndex[unit[fi][si].weapon[wi].id]]["種別"].ToString())) {
+								setWeaponType = WeaponTypeToNumber[drWeapon[WeaponIDtoIndex[unit[fi][si].weapon[wi].id]]["種別"].ToString()];
+							}
+							if(RfWeaponTypeList.IndexOf(setWeaponType) != -1) {
+								setWeapon["rf"] = unit[fi][si].weapon[wi].rf;
+								setWeapon["detail_rf"] = unit[fi][si].weapon[wi].detailRf;
+							}else {
+								setWeapon["rf"] = unit[fi][si].weapon[wi].level;
+							}
+							setItems["i" + (wi + 1).ToString()] = setWeapon;
+						}
+						setKammusu["items"] = setItems;
+						setFleet["s" + (si + 1).ToString()] = setKammusu;
+					}
+					o["f" + (fi + 1).ToString()] = setFleet;
+				}
+				// 最後にデシリアライズしておしまい
+				return o.ToString();
 			}
 		}
 		// マスデータ
