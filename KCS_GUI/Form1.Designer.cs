@@ -75,6 +75,9 @@
 			this.KammusuSelectListBox = new System.Windows.Forms.ListBox();
 			this.FleetSelectComboBox = new System.Windows.Forms.ComboBox();
 			this.tabPage2 = new System.Windows.Forms.TabPage();
+			this.ChangeMapKammusuButton = new System.Windows.Forms.Button();
+			this.ChangeMapPatternButton = new System.Windows.Forms.Button();
+			this.ChangeMapPositionButton = new System.Windows.Forms.Button();
 			this.DeleteMapKammusuButton = new System.Windows.Forms.Button();
 			this.AddMapKammusuButton = new System.Windows.Forms.Button();
 			this.DeleteMapPatternButton = new System.Windows.Forms.Button();
@@ -129,9 +132,6 @@
 			this.ExitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.ヘルプHToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.VersionInfoMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.ChangeMapPositionButton = new System.Windows.Forms.Button();
-			this.ChangeMapPatternButton = new System.Windows.Forms.Button();
-			this.ChangeMapKammusuButton = new System.Windows.Forms.Button();
 			this.MainTabControl.SuspendLayout();
 			this.tabPage1.SuspendLayout();
 			this.tabPage2.SuspendLayout();
@@ -851,6 +851,36 @@
 			this.tabPage2.Text = "マップエディタ";
 			this.tabPage2.UseVisualStyleBackColor = true;
 			// 
+			// ChangeMapKammusuButton
+			// 
+			this.ChangeMapKammusuButton.Location = new System.Drawing.Point(212, 225);
+			this.ChangeMapKammusuButton.Name = "ChangeMapKammusuButton";
+			this.ChangeMapKammusuButton.Size = new System.Drawing.Size(40, 23);
+			this.ChangeMapKammusuButton.TabIndex = 49;
+			this.ChangeMapKammusuButton.Text = "変更";
+			this.ChangeMapKammusuButton.UseVisualStyleBackColor = true;
+			this.ChangeMapKammusuButton.Click += new System.EventHandler(this.ChangeMapKammusuButton_Click);
+			// 
+			// ChangeMapPatternButton
+			// 
+			this.ChangeMapPatternButton.Location = new System.Drawing.Point(210, 144);
+			this.ChangeMapPatternButton.Name = "ChangeMapPatternButton";
+			this.ChangeMapPatternButton.Size = new System.Drawing.Size(40, 23);
+			this.ChangeMapPatternButton.TabIndex = 48;
+			this.ChangeMapPatternButton.Text = "変更";
+			this.ChangeMapPatternButton.UseVisualStyleBackColor = true;
+			this.ChangeMapPatternButton.Click += new System.EventHandler(this.ChangeMapPatternButton_Click);
+			// 
+			// ChangeMapPositionButton
+			// 
+			this.ChangeMapPositionButton.Location = new System.Drawing.Point(210, 62);
+			this.ChangeMapPositionButton.Name = "ChangeMapPositionButton";
+			this.ChangeMapPositionButton.Size = new System.Drawing.Size(40, 23);
+			this.ChangeMapPositionButton.TabIndex = 47;
+			this.ChangeMapPositionButton.Text = "変更";
+			this.ChangeMapPositionButton.UseVisualStyleBackColor = true;
+			this.ChangeMapPositionButton.Click += new System.EventHandler(this.ChangeMapPositionButton_Click);
+			// 
 			// DeleteMapKammusuButton
 			// 
 			this.DeleteMapKammusuButton.Location = new System.Drawing.Point(258, 225);
@@ -1325,17 +1355,23 @@
 			// 
 			// EnemyPathTextBox
 			// 
+			this.EnemyPathTextBox.AllowDrop = true;
 			this.EnemyPathTextBox.Location = new System.Drawing.Point(53, 37);
 			this.EnemyPathTextBox.Name = "EnemyPathTextBox";
 			this.EnemyPathTextBox.Size = new System.Drawing.Size(327, 19);
 			this.EnemyPathTextBox.TabIndex = 8;
+			this.EnemyPathTextBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.EnemyPathTextBox_DragDrop);
+			this.EnemyPathTextBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.EnemyPathTextBox_DragEnter);
 			// 
 			// FriendPathTextBox
 			// 
+			this.FriendPathTextBox.AllowDrop = true;
 			this.FriendPathTextBox.Location = new System.Drawing.Point(53, 10);
 			this.FriendPathTextBox.Name = "FriendPathTextBox";
 			this.FriendPathTextBox.Size = new System.Drawing.Size(327, 19);
 			this.FriendPathTextBox.TabIndex = 7;
+			this.FriendPathTextBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.FriendPathTextBox_DragDrop);
+			this.FriendPathTextBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.FriendPathTextBox_DragEnter);
 			// 
 			// label29
 			// 
@@ -1418,36 +1454,6 @@
 			this.VersionInfoMenuItem.Size = new System.Drawing.Size(158, 22);
 			this.VersionInfoMenuItem.Text = "バージョン情報(&A)";
 			this.VersionInfoMenuItem.Click += new System.EventHandler(this.VersionInfoMenuItem_Click);
-			// 
-			// ChangeMapPositionButton
-			// 
-			this.ChangeMapPositionButton.Location = new System.Drawing.Point(210, 62);
-			this.ChangeMapPositionButton.Name = "ChangeMapPositionButton";
-			this.ChangeMapPositionButton.Size = new System.Drawing.Size(40, 23);
-			this.ChangeMapPositionButton.TabIndex = 47;
-			this.ChangeMapPositionButton.Text = "変更";
-			this.ChangeMapPositionButton.UseVisualStyleBackColor = true;
-			this.ChangeMapPositionButton.Click += new System.EventHandler(this.ChangeMapPositionButton_Click);
-			// 
-			// ChangeMapPatternButton
-			// 
-			this.ChangeMapPatternButton.Location = new System.Drawing.Point(210, 144);
-			this.ChangeMapPatternButton.Name = "ChangeMapPatternButton";
-			this.ChangeMapPatternButton.Size = new System.Drawing.Size(40, 23);
-			this.ChangeMapPatternButton.TabIndex = 48;
-			this.ChangeMapPatternButton.Text = "変更";
-			this.ChangeMapPatternButton.UseVisualStyleBackColor = true;
-			this.ChangeMapPatternButton.Click += new System.EventHandler(this.ChangeMapPatternButton_Click);
-			// 
-			// ChangeMapKammusuButton
-			// 
-			this.ChangeMapKammusuButton.Location = new System.Drawing.Point(212, 225);
-			this.ChangeMapKammusuButton.Name = "ChangeMapKammusuButton";
-			this.ChangeMapKammusuButton.Size = new System.Drawing.Size(40, 23);
-			this.ChangeMapKammusuButton.TabIndex = 49;
-			this.ChangeMapKammusuButton.Text = "変更";
-			this.ChangeMapKammusuButton.UseVisualStyleBackColor = true;
-			this.ChangeMapKammusuButton.Click += new System.EventHandler(this.ChangeMapKammusuButton_Click);
 			// 
 			// MainForm
 			// 

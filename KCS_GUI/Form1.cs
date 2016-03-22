@@ -525,7 +525,8 @@ namespace KCS_GUI
 		}
 		private void StartButton_Click(object sender, EventArgs e){
 			if(!System.IO.File.Exists(FriendPathTextBox.Text)
-			|| !System.IO.File.Exists(EnemyPathTextBox.Text))
+			|| !System.IO.File.Exists(EnemyPathTextBox.Text)
+			|| (PutJSONCheckBox.Checked && OutputPathTextBox.Text == ""))
 				return;
 			string commandLine = "";
 			commandLine += "-i \"" + FriendPathTextBox.Text + "\" \"" + EnemyPathTextBox.Text + "\"";
@@ -554,6 +555,39 @@ namespace KCS_GUI
 			ResultTextBox.Text = output;
 			ResultTextBox.Focus();
 			this.Text = SoftName;
+		}
+		private void FriendPathTextBox_DragDrop(object sender, DragEventArgs e) {
+			// ドラッグされたファイルを認識する
+			string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+			if(files.Length < 1)
+				return;
+			if(Path.GetExtension(files[0]) != ".json")
+				return;
+			FriendPathTextBox.Text = files[0];
+		}
+		private void FriendPathTextBox_DragEnter(object sender, DragEventArgs e) {
+			if(e.Data.GetDataPresent(DataFormats.FileDrop)) {
+				e.Effect = DragDropEffects.All;
+			} else {
+				e.Effect = DragDropEffects.None;
+			}
+		}
+		private void EnemyPathTextBox_DragDrop(object sender, DragEventArgs e) {
+			// ドラッグされたファイルを認識する
+			string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+			if(files.Length < 1)
+				return;
+			if(Path.GetExtension(files[0]) != ".json"
+			&& Path.GetExtension(files[0]) != ".map")
+				return;
+			EnemyPathTextBox.Text = files[0];
+		}
+		private void EnemyPathTextBox_DragEnter(object sender, DragEventArgs e) {
+			if(e.Data.GetDataPresent(DataFormats.FileDrop)) {
+				e.Effect = DragDropEffects.All;
+			} else {
+				e.Effect = DragDropEffects.None;
+			}
 		}
 
 		/* サブルーチン */
