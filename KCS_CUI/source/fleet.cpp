@@ -251,6 +251,7 @@ double Fleet::SearchValue() const noexcept {
 					search_sum += it_w.GetSearch() * 1.6592780;
 					break;
 				case WC("水上偵察機"):	//水偵
+				case WC("水上偵察機(夜偵)"):	//水偵
 					search_sum += it_w.GetSearch() * 2.0000000;
 					break;
 				case WC("小型電探"):	//小型電探
