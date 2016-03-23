@@ -143,6 +143,24 @@ namespace KCS_GUI
 				HQLevelTextBox.Text = FormFleet.level.ToString();
 				FleetTypeComboBox.SelectedIndex = FormFleet.type;
 				FleetSelectComboBox_SelectedIndexChanged(sender, e);
+			} else if(MainTabControl.SelectedIndex == 1) {
+				// ファイルを開くダイアログを表示する
+				OpenFileDialog ofd = new OpenFileDialog();
+				ofd.Filter = "マップデータ(*.map)|*.map|すべてのファイル(*.*)|*.*";
+				if(ofd.ShowDialog() != DialogResult.OK)
+					return;
+				MapFilePath = ofd.FileName;
+				// ファイルを詠みこみ、マップデータのJSONとして解釈する
+				Tuple<MapData, bool> setMapData = ReadMapFile(MapFilePath);
+				if(!setMapData.Item2)
+					return;
+				// 読み込んだデータを画面に反映する
+				FormMapData = setMapData.Item1;
+				MapPositionListBox.Items.Clear();
+				foreach(var position in FormMapData.position) {
+					MapPositionListBox.Items.Add(position.name);
+				}
+				MapPositionListBox.Refresh();
 			}
 			return;
 		}
@@ -502,11 +520,11 @@ namespace KCS_GUI
 			// 艦娘データを作成
 			var setKammusu = new Kammusu();
 			DataRow[] drKammusu = KammusuData.Select();
-			DataRow[] drWeapon = WeaponData.Select();
 			int index = KammusuTypeToIndexList[MapKammusuTypeComboBox.SelectedIndex][MapKammusuNameComboBox.SelectedIndex];
 			setKammusu.id = int.Parse(drKammusu[index]["艦船ID"].ToString());
 			setKammusu.level = 1;
-			setKammusu.luck = int.Parse(drKammusu[index]["運"].ToString().Split('.')[0]);
+			setKammusu.luck = -1;
+			setKammusu.cond = 49;
 			var firstWeaponID = drKammusu[index]["初期装備"].ToString().Split('.');
 			foreach(string weaponID in firstWeaponID){
 				var weaponIdToInt = int.Parse(weaponID);
@@ -539,7 +557,7 @@ namespace KCS_GUI
 			int index = KammusuTypeToIndexList[MapKammusuTypeComboBox.SelectedIndex][MapKammusuNameComboBox.SelectedIndex];
 			setKammusu.id = int.Parse(drKammusu[index]["艦船ID"].ToString());
 			setKammusu.level = 1;
-			setKammusu.luck = int.Parse(drKammusu[index]["運"].ToString().Split('.')[0]);
+			setKammusu.luck = -1;
 			var firstWeaponID = drKammusu[index]["初期装備"].ToString().Split('.');
 			foreach(string weaponID in firstWeaponID) {
 				var weaponIdToInt = int.Parse(weaponID);
@@ -847,6 +865,7 @@ namespace KCS_GUI
 		}
 		private Tuple<Fleet, bool> ReadJsonFile(string jsonFileName) {
 			Fleet setFleet = new Fleet();
+			// テキストを読み込んでJSONにパースする
 			System.IO.StreamReader sr = new System.IO.StreamReader(jsonFileName, System.Text.Encoding.GetEncoding("utf-8"));
 			string jsonString = sr.ReadToEnd();
 			sr.Close();
@@ -930,6 +949,51 @@ namespace KCS_GUI
 				}
 			}
 			return new Tuple<Fleet, bool>(setFleet, true);
+		}
+		private Tuple<MapData, bool> ReadMapFile(string mapFileName) {
+			var setMapData = new MapData();
+			// テキストを読み込んでJSONにパースする
+			System.IO.StreamReader sr = new System.IO.StreamReader(mapFileName, System.Text.Encoding.GetEncoding("utf-8"));
+			string jsonString = sr.ReadToEnd();
+			sr.Close();
+			JObject json = JObject.Parse(jsonString);
+			// 順番に読み込んでいく
+			DataRow[] drKammusu = KammusuData.Select();
+			foreach(JObject jsonPosition in json["position"]){
+				// 各マス
+				var position = new Position();
+				position.name = (string)jsonPosition["name"];
+				position.mode = int.Parse((string)jsonPosition["mode"]);
+				foreach(JObject jsonPattern in jsonPosition["pattern"]) {
+					var fleet = new Fleet();
+					fleet.level = 120;
+					fleet.type = 0;
+					foreach(var jsonFleet in jsonPattern["fleets"]) {
+						var kammusu = new Kammusu();
+						kammusu.id = int.Parse((string)jsonFleet);
+						kammusu.level = 1;
+						kammusu.luck = -1;
+						var firstWeaponID = drKammusu[KammusuIDtoIndex[kammusu.id]]["初期装備"].ToString().Split('.');
+						foreach(string weaponID in firstWeaponID) {
+							var weaponIdToInt = int.Parse(weaponID);
+							if(weaponIdToInt <= 0)
+								break;
+							var setWeapon = new Weapon();
+							setWeapon.id = weaponIdToInt;
+							setWeapon.level = 0;
+							setWeapon.rf = 0;
+							setWeapon.detailRf = 0;
+							kammusu.weapon.Add(setWeapon);
+						}
+						kammusu.maxSlots = kammusu.weapon.Count();
+						fleet.unit[0].Add(kammusu);
+					}
+					position.fleet.Add(fleet);
+					position.formation.Add(int.Parse((string)jsonPattern["form"]));
+				}
+				setMapData.position.Add(position);
+			}
+			return new Tuple<MapData, bool>(setMapData, true);
 		}
 		/* サブクラス */
 		// 装備

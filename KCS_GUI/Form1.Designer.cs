@@ -853,7 +853,7 @@
 			// 
 			// ChangeMapKammusuButton
 			// 
-			this.ChangeMapKammusuButton.Location = new System.Drawing.Point(212, 225);
+			this.ChangeMapKammusuButton.Location = new System.Drawing.Point(252, 221);
 			this.ChangeMapKammusuButton.Name = "ChangeMapKammusuButton";
 			this.ChangeMapKammusuButton.Size = new System.Drawing.Size(40, 23);
 			this.ChangeMapKammusuButton.TabIndex = 49;
@@ -863,7 +863,7 @@
 			// 
 			// ChangeMapPatternButton
 			// 
-			this.ChangeMapPatternButton.Location = new System.Drawing.Point(210, 144);
+			this.ChangeMapPatternButton.Location = new System.Drawing.Point(250, 140);
 			this.ChangeMapPatternButton.Name = "ChangeMapPatternButton";
 			this.ChangeMapPatternButton.Size = new System.Drawing.Size(40, 23);
 			this.ChangeMapPatternButton.TabIndex = 48;
@@ -873,7 +873,7 @@
 			// 
 			// ChangeMapPositionButton
 			// 
-			this.ChangeMapPositionButton.Location = new System.Drawing.Point(210, 62);
+			this.ChangeMapPositionButton.Location = new System.Drawing.Point(250, 58);
 			this.ChangeMapPositionButton.Name = "ChangeMapPositionButton";
 			this.ChangeMapPositionButton.Size = new System.Drawing.Size(40, 23);
 			this.ChangeMapPositionButton.TabIndex = 47;
@@ -883,7 +883,7 @@
 			// 
 			// DeleteMapKammusuButton
 			// 
-			this.DeleteMapKammusuButton.Location = new System.Drawing.Point(258, 225);
+			this.DeleteMapKammusuButton.Location = new System.Drawing.Point(298, 221);
 			this.DeleteMapKammusuButton.Name = "DeleteMapKammusuButton";
 			this.DeleteMapKammusuButton.Size = new System.Drawing.Size(40, 23);
 			this.DeleteMapKammusuButton.TabIndex = 46;
@@ -893,7 +893,7 @@
 			// 
 			// AddMapKammusuButton
 			// 
-			this.AddMapKammusuButton.Location = new System.Drawing.Point(166, 225);
+			this.AddMapKammusuButton.Location = new System.Drawing.Point(206, 221);
 			this.AddMapKammusuButton.Name = "AddMapKammusuButton";
 			this.AddMapKammusuButton.Size = new System.Drawing.Size(40, 23);
 			this.AddMapKammusuButton.TabIndex = 45;
@@ -903,7 +903,7 @@
 			// 
 			// DeleteMapPatternButton
 			// 
-			this.DeleteMapPatternButton.Location = new System.Drawing.Point(256, 144);
+			this.DeleteMapPatternButton.Location = new System.Drawing.Point(296, 140);
 			this.DeleteMapPatternButton.Name = "DeleteMapPatternButton";
 			this.DeleteMapPatternButton.Size = new System.Drawing.Size(40, 23);
 			this.DeleteMapPatternButton.TabIndex = 44;
@@ -913,7 +913,7 @@
 			// 
 			// AddMapPatternButton
 			// 
-			this.AddMapPatternButton.Location = new System.Drawing.Point(164, 144);
+			this.AddMapPatternButton.Location = new System.Drawing.Point(204, 140);
 			this.AddMapPatternButton.Name = "AddMapPatternButton";
 			this.AddMapPatternButton.Size = new System.Drawing.Size(40, 23);
 			this.AddMapPatternButton.TabIndex = 43;
@@ -923,7 +923,7 @@
 			// 
 			// DeleteMapPositionButton
 			// 
-			this.DeleteMapPositionButton.Location = new System.Drawing.Point(256, 62);
+			this.DeleteMapPositionButton.Location = new System.Drawing.Point(296, 58);
 			this.DeleteMapPositionButton.Name = "DeleteMapPositionButton";
 			this.DeleteMapPositionButton.Size = new System.Drawing.Size(40, 23);
 			this.DeleteMapPositionButton.TabIndex = 42;
@@ -933,7 +933,7 @@
 			// 
 			// AddMapPositionButton
 			// 
-			this.AddMapPositionButton.Location = new System.Drawing.Point(164, 62);
+			this.AddMapPositionButton.Location = new System.Drawing.Point(204, 58);
 			this.AddMapPositionButton.Name = "AddMapPositionButton";
 			this.AddMapPositionButton.Size = new System.Drawing.Size(40, 23);
 			this.AddMapPositionButton.TabIndex = 41;
@@ -944,7 +944,7 @@
 			// MapKammusuNameComboBox
 			// 
 			this.MapKammusuNameComboBox.FormattingEnabled = true;
-			this.MapKammusuNameComboBox.Location = new System.Drawing.Point(199, 199);
+			this.MapKammusuNameComboBox.Location = new System.Drawing.Point(239, 195);
 			this.MapKammusuNameComboBox.Name = "MapKammusuNameComboBox";
 			this.MapKammusuNameComboBox.Size = new System.Drawing.Size(100, 20);
 			this.MapKammusuNameComboBox.TabIndex = 39;
@@ -956,14 +956,14 @@
 			this.MapKammusuListBox.ItemHeight = 12;
 			this.MapKammusuListBox.Location = new System.Drawing.Point(78, 173);
 			this.MapKammusuListBox.Name = "MapKammusuListBox";
-			this.MapKammusuListBox.Size = new System.Drawing.Size(80, 76);
+			this.MapKammusuListBox.Size = new System.Drawing.Size(120, 76);
 			this.MapKammusuListBox.TabIndex = 38;
 			this.MapKammusuListBox.SelectedIndexChanged += new System.EventHandler(this.MapKammusuListBox_SelectedIndexChanged);
 			// 
 			// MapPatternAllAntiAirTextBox
 			// 
 			this.MapPatternAllAntiAirTextBox.Enabled = false;
-			this.MapPatternAllAntiAirTextBox.Location = new System.Drawing.Point(223, 117);
+			this.MapPatternAllAntiAirTextBox.Location = new System.Drawing.Point(263, 113);
 			this.MapPatternAllAntiAirTextBox.Name = "MapPatternAllAntiAirTextBox";
 			this.MapPatternAllAntiAirTextBox.Size = new System.Drawing.Size(40, 19);
 			this.MapPatternAllAntiAirTextBox.TabIndex = 37;
@@ -971,7 +971,7 @@
 			// label27
 			// 
 			this.label27.AutoSize = true;
-			this.label27.Location = new System.Drawing.Point(164, 120);
+			this.label27.Location = new System.Drawing.Point(204, 116);
 			this.label27.Name = "label27";
 			this.label27.Size = new System.Drawing.Size(53, 12);
 			this.label27.TabIndex = 36;
@@ -986,7 +986,7 @@
             "輪形陣",
             "梯形陣",
             "単横陣"});
-			this.MapPatternFormationComboBox.Location = new System.Drawing.Point(199, 91);
+			this.MapPatternFormationComboBox.Location = new System.Drawing.Point(239, 87);
 			this.MapPatternFormationComboBox.Name = "MapPatternFormationComboBox";
 			this.MapPatternFormationComboBox.Size = new System.Drawing.Size(80, 20);
 			this.MapPatternFormationComboBox.TabIndex = 35;
@@ -995,7 +995,7 @@
 			// label24
 			// 
 			this.label24.AutoSize = true;
-			this.label24.Location = new System.Drawing.Point(164, 94);
+			this.label24.Location = new System.Drawing.Point(204, 90);
 			this.label24.Name = "label24";
 			this.label24.Size = new System.Drawing.Size(29, 12);
 			this.label24.TabIndex = 34;
@@ -1027,7 +1027,7 @@
             "潜水母艦",
             "練習巡洋艦",
             "給油艦"});
-			this.MapKammusuTypeComboBox.Location = new System.Drawing.Point(199, 173);
+			this.MapKammusuTypeComboBox.Location = new System.Drawing.Point(239, 169);
 			this.MapKammusuTypeComboBox.Name = "MapKammusuTypeComboBox";
 			this.MapKammusuTypeComboBox.Size = new System.Drawing.Size(100, 20);
 			this.MapKammusuTypeComboBox.TabIndex = 32;
@@ -1037,7 +1037,7 @@
 			// label25
 			// 
 			this.label25.AutoSize = true;
-			this.label25.Location = new System.Drawing.Point(164, 176);
+			this.label25.Location = new System.Drawing.Point(204, 172);
 			this.label25.Name = "label25";
 			this.label25.Size = new System.Drawing.Size(29, 12);
 			this.label25.TabIndex = 31;
@@ -1046,7 +1046,7 @@
 			// label26
 			// 
 			this.label26.AutoSize = true;
-			this.label26.Location = new System.Drawing.Point(164, 202);
+			this.label26.Location = new System.Drawing.Point(204, 198);
 			this.label26.Name = "label26";
 			this.label26.Size = new System.Drawing.Size(29, 12);
 			this.label26.TabIndex = 30;
@@ -1059,7 +1059,7 @@
             "昼夜戦",
             "昼戦のみ",
             "開幕夜戦"});
-			this.MapPositionBattleModeComboBox.Location = new System.Drawing.Point(227, 34);
+			this.MapPositionBattleModeComboBox.Location = new System.Drawing.Point(267, 30);
 			this.MapPositionBattleModeComboBox.Name = "MapPositionBattleModeComboBox";
 			this.MapPositionBattleModeComboBox.Size = new System.Drawing.Size(80, 20);
 			this.MapPositionBattleModeComboBox.TabIndex = 29;
@@ -1068,7 +1068,7 @@
 			// label23
 			// 
 			this.label23.AutoSize = true;
-			this.label23.Location = new System.Drawing.Point(164, 38);
+			this.label23.Location = new System.Drawing.Point(204, 34);
 			this.label23.Name = "label23";
 			this.label23.Size = new System.Drawing.Size(57, 12);
 			this.label23.TabIndex = 28;
@@ -1076,7 +1076,7 @@
 			// 
 			// MapPositionNameTextBox
 			// 
-			this.MapPositionNameTextBox.Location = new System.Drawing.Point(205, 9);
+			this.MapPositionNameTextBox.Location = new System.Drawing.Point(245, 5);
 			this.MapPositionNameTextBox.Name = "MapPositionNameTextBox";
 			this.MapPositionNameTextBox.Size = new System.Drawing.Size(40, 19);
 			this.MapPositionNameTextBox.TabIndex = 27;
@@ -1085,7 +1085,7 @@
 			// label22
 			// 
 			this.label22.AutoSize = true;
-			this.label22.Location = new System.Drawing.Point(164, 13);
+			this.label22.Location = new System.Drawing.Point(204, 9);
 			this.label22.Name = "label22";
 			this.label22.Size = new System.Drawing.Size(35, 12);
 			this.label22.TabIndex = 26;
@@ -1106,7 +1106,7 @@
 			this.MapPatternListBox.ItemHeight = 12;
 			this.MapPatternListBox.Location = new System.Drawing.Point(78, 91);
 			this.MapPatternListBox.Name = "MapPatternListBox";
-			this.MapPatternListBox.Size = new System.Drawing.Size(80, 76);
+			this.MapPatternListBox.Size = new System.Drawing.Size(120, 76);
 			this.MapPatternListBox.TabIndex = 23;
 			this.MapPatternListBox.SelectedIndexChanged += new System.EventHandler(this.MapPatternListBox_SelectedIndexChanged);
 			// 
@@ -1125,7 +1125,7 @@
 			this.MapPositionListBox.ItemHeight = 12;
 			this.MapPositionListBox.Location = new System.Drawing.Point(78, 9);
 			this.MapPositionListBox.Name = "MapPositionListBox";
-			this.MapPositionListBox.Size = new System.Drawing.Size(80, 76);
+			this.MapPositionListBox.Size = new System.Drawing.Size(120, 76);
 			this.MapPositionListBox.TabIndex = 21;
 			this.MapPositionListBox.SelectedIndexChanged += new System.EventHandler(this.MapPositionListBox_SelectedIndexChanged);
 			// 
