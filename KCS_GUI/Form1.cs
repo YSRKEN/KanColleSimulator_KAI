@@ -488,7 +488,7 @@ namespace KCS_GUI
 			selectPosition.formation.Add(MapPatternFormationComboBox.SelectedIndex);
 			// 画面上に反映
 			int selectPositionCount = selectPosition.fleet.Count;
-			MapPatternListBox.Items.Add(selectPositionCount.ToString() + " : " + selectPosition.fleet[selectPositionCount - 1].unit[0].Count.ToString());
+			MapPatternListBox.Items.Add(selectPositionCount.ToString() + " : " + selectPosition.fleet[selectPositionCount - 1].unit[0].Count.ToString() + "隻");
 			MapPatternListBox.Refresh();
 		}
 		private void ChangeMapPatternButton_Click(object sender, EventArgs e) {
@@ -517,6 +517,8 @@ namespace KCS_GUI
 			|| MapKammusuTypeComboBox.SelectedIndex == -1
 			|| MapKammusuNameComboBox.SelectedIndex == -1)
 				return;
+			if(FormMapData.position[MapPositionListBox.SelectedIndex].fleet[MapPatternListBox.SelectedIndex].unit[0].Count >= MaxUnitSize)
+				return;
 			// 艦娘データを作成
 			var setKammusu = new Kammusu();
 			DataRow[] drKammusu = KammusuData.Select();
@@ -538,10 +540,13 @@ namespace KCS_GUI
 				setKammusu.weapon.Add(setWeapon);
 			}
 			// 艦娘データを追加
-			var selectFleet = FormMapData.position[MapPositionListBox.SelectedIndex].fleet[MapPatternListBox.SelectedIndex];
+			var selectPosition = FormMapData.position[MapPositionListBox.SelectedIndex];
+			var selectFleet = selectPosition.fleet[MapPatternListBox.SelectedIndex];
+			int selectPositionCount = selectPosition.fleet.Count;
 			selectFleet.unit[0].Add(setKammusu);
 			MapKammusuListBox.Items.Add(drKammusu[KammusuIDtoIndex[setKammusu.id]]["艦名"].ToString());
 			MapKammusuListBox.Refresh();
+			MapPatternListBox.Items[MapPatternListBox.SelectedIndex] = selectPositionCount.ToString() + " : " + selectFleet.unit[0].Count.ToString() + "隻";
 		}
 		private void ChangeMapKammusuButton_Click(object sender, EventArgs e) {
 			if(MapPositionListBox.SelectedIndex == -1
@@ -583,6 +588,10 @@ namespace KCS_GUI
 				return;
 			FormMapData.position[MapPositionListBox.SelectedIndex].fleet[MapPatternListBox.SelectedIndex].unit[0].RemoveAt(MapKammusuListBox.SelectedIndex);
 			MapKammusuListBox.Items.RemoveAt(MapKammusuListBox.SelectedIndex);
+			var selectPosition = FormMapData.position[MapPositionListBox.SelectedIndex];
+			var selectFleet = selectPosition.fleet[MapPatternListBox.SelectedIndex];
+			int selectPositionCount = selectPosition.fleet.Count;
+			MapPatternListBox.Items[MapPatternListBox.SelectedIndex] = selectPositionCount.ToString() + " : " + selectFleet.unit[0].Count.ToString() + "隻";
 		}
 		private void MapKammusuTypeComboBox_SelectedIndexChanged(object sender, EventArgs e) {
 			RedrawMapKammusuNameList();
@@ -598,7 +607,7 @@ namespace KCS_GUI
 			// 選択したマスについて、それに含まれるパターンに関する情報
 			MapPatternListBox.Items.Clear();
 			for(int pi = 0; pi < selectPosition.fleet.Count; ++pi) {
-				MapPatternListBox.Items.Add((pi + 1).ToString() + " : " + selectPosition.fleet[pi].unit[0].Count.ToString());
+				MapPatternListBox.Items.Add((pi + 1).ToString() + " : " + selectPosition.fleet[pi].unit[0].Count.ToString() + "隻");
 			}
 			MapPatternListBox.Refresh();
 		}
