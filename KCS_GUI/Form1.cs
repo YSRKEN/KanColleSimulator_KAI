@@ -25,6 +25,9 @@ namespace KCS_GUI
 		const int MaxUnitSize = 6;
 		//種別→種別番号変換
 		static Dictionary<string, int> WeaponTypeToNumber;
+		//制空計算用(艦戦ボーナスと艦爆ボーナス)
+		static List<double> bonusPF = new List<double> { 0.0, 0.0, 2.0, 5.0, 9.0, 14.0, 14.0, 22.0 };
+		static List<double> bonusWB = new List<double> { 0.0, 0.0, 1.0, 1.0, 1.0, 3.0, 3.0, 6.0 };
 
 		// 装備・艦娘データ
 		//装備データ
@@ -36,9 +39,9 @@ namespace KCS_GUI
 		//熟練度が存在する装備の種別番号一覧
 		static List<int> RfWeaponTypeList;
 		//艦娘データ
-		DataTable KammusuData;
+		static DataTable KammusuData;
 		//艦船ID→インデックス
-		Dictionary<int, int> KammusuIDtoIndex;
+		static Dictionary<int, int> KammusuIDtoIndex;
 		//艦種番号→インデックスのリスト変換
 		Dictionary<int, List<int>> KammusuTypeToIndexList;
 		// 画面表示用データ
@@ -121,10 +124,18 @@ namespace KCS_GUI
 		/* 各イベント毎の処理 */
 		// メニュー
 		private void NewFileMenuItem_Click(object sender, EventArgs e){
-			FormFleet = new Fleet();
-			HQLevelTextBox.Text = FormFleet.level.ToString();
-			FleetTypeComboBox.SelectedIndex = FormFleet.type;
-			FleetSelectComboBox_SelectedIndexChanged(sender, e);
+			if(MainTabControl.SelectedIndex == 0) {
+				FormFleet = new Fleet();
+				HQLevelTextBox.Text = FormFleet.level.ToString();
+				FleetTypeComboBox.SelectedIndex = FormFleet.type;
+				FleetSelectComboBox_SelectedIndexChanged(sender, e);
+				RedrawAntiAirScore();
+			} else if(MainTabControl.SelectedIndex == 1) {
+				FormMapData = new MapData();
+				MapPositionListBox.Items.Clear();
+				MapPositionListBox.Refresh();
+				RedrawMapAntiAirScore();
+			}
 		}
 		private void OpenFileMenuItem_Click(object sender, EventArgs e){
 			if(MainTabControl.SelectedIndex == 0) {
@@ -143,6 +154,7 @@ namespace KCS_GUI
 				HQLevelTextBox.Text = FormFleet.level.ToString();
 				FleetTypeComboBox.SelectedIndex = FormFleet.type;
 				FleetSelectComboBox_SelectedIndexChanged(sender, e);
+				RedrawAntiAirScore();
 			} else if(MainTabControl.SelectedIndex == 1) {
 				// ファイルを開くダイアログを表示する
 				OpenFileDialog ofd = new OpenFileDialog();
@@ -161,6 +173,7 @@ namespace KCS_GUI
 					MapPositionListBox.Items.Add(position.name);
 				}
 				MapPositionListBox.Refresh();
+				RedrawMapAntiAirScore();
 			}
 			return;
 		}
@@ -295,6 +308,7 @@ namespace KCS_GUI
 			FormFleet.unit[FleetSelectComboBox.SelectedIndex].Add(setKammusu);
 			KammusuSelectListBox.Items.Add(dr[KammusuIDtoIndex[setKammusu.id]]["艦名"].ToString());
 			KammusuSelectListBox.Refresh();
+			RedrawAntiAirScore();
 		}
 		private void ChangeKammusuButton_Click(object sender, EventArgs e) {
 			if(KammusuTypeComboBox.SelectedIndex == -1
@@ -322,6 +336,7 @@ namespace KCS_GUI
 			FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex] = setKammusu;
 			KammusuSelectListBox.Items[KammusuSelectListBox.SelectedIndex] = dr[KammusuIDtoIndex[setKammusu.id]]["艦名"].ToString();
 			KammusuSelectListBox.Refresh();
+			RedrawAntiAirScore();
 		}
 		private void DeleteKammusuButton_Click(object sender, EventArgs e) {
 			if(FleetSelectComboBox.SelectedIndex == -1
@@ -331,6 +346,7 @@ namespace KCS_GUI
 			FormFleet.unit[FleetSelectComboBox.SelectedIndex].RemoveAt(KammusuSelectListBox.SelectedIndex);
 			KammusuSelectListBox.Items.RemoveAt(KammusuSelectListBox.SelectedIndex);
 			KammusuSelectListBox.Refresh();
+			RedrawAntiAirScore();
 		}
 		private void AddWeaponButton_Click(object sender, EventArgs e) {
 			if(FleetSelectComboBox.SelectedIndex == -1
@@ -354,6 +370,7 @@ namespace KCS_GUI
 			selectedKammusu.weapon.Add(setWeapon);
 			WeaponSelectListBox.Items.Add(dr[WeaponIDtoIndex[setWeapon.id]]["装備名"].ToString());
 			WeaponSelectListBox.Refresh();
+			RedrawAntiAirScore();
 		}
 		private void ChangeWeaponButton_Click(object sender, EventArgs e) {
 			if(FleetSelectComboBox.SelectedIndex == -1
@@ -375,6 +392,7 @@ namespace KCS_GUI
 			selectedKammusu.weapon[WeaponSelectListBox.SelectedIndex] = setWeapon;
 			WeaponSelectListBox.Items[WeaponSelectListBox.SelectedIndex] = dr[WeaponIDtoIndex[setWeapon.id]]["装備名"].ToString();
 			WeaponSelectListBox.Refresh();
+			RedrawAntiAirScore();
 		}
 		private void DeleteWeaponButton_Click(object sender, EventArgs e) {
 			if(FleetSelectComboBox.SelectedIndex == -1
@@ -385,6 +403,7 @@ namespace KCS_GUI
 			FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].weapon.RemoveAt(WeaponSelectListBox.SelectedIndex);
 			WeaponSelectListBox.Items.RemoveAt(WeaponSelectListBox.SelectedIndex);
 			WeaponSelectListBox.Refresh();
+			RedrawAntiAirScore();
 		}
 		private void HQLevelTextBox_TextChanged(object sender, EventArgs e) {
 			// 司令部レベルが書き換わった際は反映する
@@ -467,19 +486,21 @@ namespace KCS_GUI
 			// 外部熟練度を弄った場合、内部熟練度を自動補正する
 			WeaponDetailRfComboBox.SelectedIndex = rfRoughToDetail(WeaponRfComboBox.SelectedIndex);
 			WeaponDetailRfComboBox.Refresh();
+			RedrawAntiAirScore();
 		}
 		private void WeaponDetailRfComboBox_SelectedIndexChanged(object sender, EventArgs e) {
 			// 内部熟練度を弄った場合、外部熟練度を自動補正する
 			WeaponRfComboBox.SelectedIndex = rfDetailToRough(WeaponDetailRfComboBox.SelectedIndex);
 			WeaponRfComboBox.Refresh();
+			RedrawAntiAirScore();
 		}
 		private void MainForm_DragDrop(object sender, DragEventArgs e) {
-			// ドラッグされたファイルを認識する
-			string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
-			if(files.Length < 1)
-				return;
-			FleetFilePath = files[0];
 			if(MainTabControl.SelectedIndex == 0) {
+				// ドラッグされたファイルを認識する
+				string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+				if(files.Length < 1)
+					return;
+				FleetFilePath = files[0];
 				// 拡張子で判別する
 				if(Path.GetExtension(FleetFilePath) != ".json")
 					return;
@@ -492,6 +513,28 @@ namespace KCS_GUI
 				HQLevelTextBox.Text = FormFleet.level.ToString();
 				FleetTypeComboBox.SelectedIndex = FormFleet.type;
 				FleetSelectComboBox_SelectedIndexChanged(sender, e);
+				RedrawAntiAirScore();
+			} else if(MainTabControl.SelectedIndex == 1) {
+				// ドラッグされたファイルを認識する
+				string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+				if(files.Length < 1)
+					return;
+				MapFilePath = files[0];
+				// 拡張子で判別する
+				if(Path.GetExtension(MapFilePath) != ".map")
+					return;
+				// ファイルを詠みこみ、JSONとして解釈する
+				Tuple<MapData, bool> setMapData = ReadMapFile(MapFilePath);
+				if(!setMapData.Item2)
+					return;
+				// 読み込んだデータを画面に反映する
+				FormMapData = setMapData.Item1;
+				MapPositionListBox.Items.Clear();
+				foreach(var position in FormMapData.position) {
+					MapPositionListBox.Items.Add(position.name);
+				}
+				MapPositionListBox.Refresh();
+				RedrawMapAntiAirScore();
 			}
 		}
 		private void MainForm_DragEnter(object sender, DragEventArgs e) {
@@ -603,6 +646,7 @@ namespace KCS_GUI
 			MapKammusuListBox.Items.Add(drKammusu[KammusuIDtoIndex[setKammusu.id]]["艦名"].ToString());
 			MapKammusuListBox.Refresh();
 			MapPatternListBox.Items[MapPatternListBox.SelectedIndex] = selectPositionCount.ToString() + " : " + selectFleet.unit[0].Count.ToString() + "隻";
+			RedrawMapAntiAirScore();
 		}
 		private void ChangeMapKammusuButton_Click(object sender, EventArgs e) {
 			if(MapPositionListBox.SelectedIndex == -1
@@ -636,6 +680,7 @@ namespace KCS_GUI
 			selectFleet.unit[0][MapKammusuListBox.SelectedIndex] = setKammusu;
 			MapKammusuListBox.Items[MapKammusuListBox.SelectedIndex] = drKammusu[KammusuIDtoIndex[setKammusu.id]]["艦名"].ToString();
 			MapKammusuListBox.Refresh();
+			RedrawMapAntiAirScore();
 		}
 		private void DeleteMapKammusuButton_Click(object sender, EventArgs e) {
 			if(MapPositionListBox.SelectedIndex == -1
@@ -648,6 +693,7 @@ namespace KCS_GUI
 			var selectFleet = selectPosition.fleet[MapPatternListBox.SelectedIndex];
 			int selectPositionCount = selectPosition.fleet.Count;
 			MapPatternListBox.Items[MapPatternListBox.SelectedIndex] = selectPositionCount.ToString() + " : " + selectFleet.unit[0].Count.ToString() + "隻";
+			RedrawMapAntiAirScore();
 		}
 		private void MapKammusuTypeComboBox_SelectedIndexChanged(object sender, EventArgs e) {
 			RedrawMapKammusuNameList();
@@ -683,6 +729,7 @@ namespace KCS_GUI
 				MapKammusuListBox.Items.Add(dr[KammusuIDtoIndex[kammusu.id]]["艦名"].ToString());
 			}
 			MapKammusuListBox.Refresh();
+			RedrawMapAntiAirScore();
 		}
 		private void MapKammusuListBox_SelectedIndexChanged(object sender, EventArgs e) {
 			if(MapPositionListBox.SelectedIndex == -1
@@ -1060,6 +1107,19 @@ namespace KCS_GUI
 			}
 			return new Tuple<MapData, bool>(setMapData, true);
 		}
+		// 制空値を計算して表示する(艦隊エディタ)
+		private void RedrawAntiAirScore() {
+			int antiAirScore = FormFleet.CalcAntiAirScore();
+			AllAntiAirTextBox.Text = antiAirScore.ToString();
+		}
+		// 制空値を計算して表示する(マップエディタ)
+		private void RedrawMapAntiAirScore() {
+			if(MapPositionListBox.SelectedIndex == -1
+			|| MapPatternListBox.SelectedIndex == -1)
+				return;
+			int antiAirScore = FormMapData.position[MapPositionListBox.SelectedIndex].fleet[MapPatternListBox.SelectedIndex].CalcAntiAirScore();
+			MapPatternAllAntiAirTextBox.Text = antiAirScore.ToString();
+		}
 		/* サブクラス */
 		// 装備
 		private class Weapon {
@@ -1159,6 +1219,41 @@ namespace KCS_GUI
 				}
 				// 最後にデシリアライズしておしまい
 				return o.ToString();
+			}
+			// 制空値計算
+			public int CalcAntiAirScore() {
+				int antiAirScore = 0;
+				DataRow[] drWeapon = WeaponData.Select();
+				DataRow[] drKammusu = KammusuData.Select();
+				foreach(var kammusu in unit[0]) {
+					var slots = drKammusu[KammusuIDtoIndex[kammusu.id]]["搭載数"].ToString().Split('-');
+					for(int wi = 0; wi < kammusu.weapon.Count; ++wi) {
+						var weapon = kammusu.weapon[wi];
+						// まず装備の種類を読み取り、制空計算に使えるかを判別する
+						var weaponInfo = drWeapon[WeaponIDtoIndex[weapon.id]];
+						var type = weaponInfo["種別"].ToString();
+						if(type != "艦上戦闘機"
+						&& type != "艦上爆撃機(爆戦)"
+						&& type != "艦上爆撃機"
+						&& type != "水上爆撃機"
+						&& type != "艦上攻撃機"
+						&& type != "水上戦闘機")
+							continue;
+						// 対空値・搭載数・内部熟練度で決まる制空値を代入する
+						var antiAir = int.Parse(weaponInfo["対空"].ToString());
+						var slot = int.Parse(slots[wi]);
+						double antiAirScoreWeapon = antiAir * Math.Sqrt(slot) + Math.Sqrt(0.1 * weapon.detailRf);
+						// 一部の種別には特別な補正を掛ける
+						if(type == "艦上戦闘機") {
+							antiAirScoreWeapon += bonusPF[weapon.rf];
+						} else if(type == "水上爆撃機") {
+							antiAirScoreWeapon += bonusWB[weapon.rf];
+						}
+						// 小数点以下を切り捨てたものを加算する
+						antiAirScore += (int)(antiAirScoreWeapon);
+					}
+				}
+				return antiAirScore;
 			}
 		}
 		// マスデータ
