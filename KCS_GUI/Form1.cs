@@ -130,6 +130,7 @@ namespace KCS_GUI
 				FleetTypeComboBox.SelectedIndex = FormFleet.type;
 				FleetSelectComboBox_SelectedIndexChanged(sender, e);
 				RedrawAntiAirScore();
+				RedrawSearchPower();
 			} else if(MainTabControl.SelectedIndex == 1) {
 				FormMapData = new MapData();
 				MapPositionListBox.Items.Clear();
@@ -155,6 +156,7 @@ namespace KCS_GUI
 				FleetTypeComboBox.SelectedIndex = FormFleet.type;
 				FleetSelectComboBox_SelectedIndexChanged(sender, e);
 				RedrawAntiAirScore();
+				RedrawSearchPower();
 			} else if(MainTabControl.SelectedIndex == 1) {
 				// ファイルを開くダイアログを表示する
 				OpenFileDialog ofd = new OpenFileDialog();
@@ -309,6 +311,7 @@ namespace KCS_GUI
 			KammusuSelectListBox.Items.Add(dr[KammusuIDtoIndex[setKammusu.id]]["艦名"].ToString());
 			KammusuSelectListBox.Refresh();
 			RedrawAntiAirScore();
+			RedrawSearchPower();
 		}
 		private void ChangeKammusuButton_Click(object sender, EventArgs e) {
 			if(KammusuTypeComboBox.SelectedIndex == -1
@@ -337,6 +340,7 @@ namespace KCS_GUI
 			KammusuSelectListBox.Items[KammusuSelectListBox.SelectedIndex] = dr[KammusuIDtoIndex[setKammusu.id]]["艦名"].ToString();
 			KammusuSelectListBox.Refresh();
 			RedrawAntiAirScore();
+			RedrawSearchPower();
 		}
 		private void DeleteKammusuButton_Click(object sender, EventArgs e) {
 			if(FleetSelectComboBox.SelectedIndex == -1
@@ -347,6 +351,7 @@ namespace KCS_GUI
 			KammusuSelectListBox.Items.RemoveAt(KammusuSelectListBox.SelectedIndex);
 			KammusuSelectListBox.Refresh();
 			RedrawAntiAirScore();
+			RedrawSearchPower();
 		}
 		private void AddWeaponButton_Click(object sender, EventArgs e) {
 			if(FleetSelectComboBox.SelectedIndex == -1
@@ -371,6 +376,7 @@ namespace KCS_GUI
 			WeaponSelectListBox.Items.Add(dr[WeaponIDtoIndex[setWeapon.id]]["装備名"].ToString());
 			WeaponSelectListBox.Refresh();
 			RedrawAntiAirScore();
+			RedrawSearchPower();
 		}
 		private void ChangeWeaponButton_Click(object sender, EventArgs e) {
 			if(FleetSelectComboBox.SelectedIndex == -1
@@ -393,6 +399,7 @@ namespace KCS_GUI
 			WeaponSelectListBox.Items[WeaponSelectListBox.SelectedIndex] = dr[WeaponIDtoIndex[setWeapon.id]]["装備名"].ToString();
 			WeaponSelectListBox.Refresh();
 			RedrawAntiAirScore();
+			RedrawSearchPower();
 		}
 		private void DeleteWeaponButton_Click(object sender, EventArgs e) {
 			if(FleetSelectComboBox.SelectedIndex == -1
@@ -404,10 +411,12 @@ namespace KCS_GUI
 			WeaponSelectListBox.Items.RemoveAt(WeaponSelectListBox.SelectedIndex);
 			WeaponSelectListBox.Refresh();
 			RedrawAntiAirScore();
+			RedrawSearchPower();
 		}
 		private void HQLevelTextBox_TextChanged(object sender, EventArgs e) {
 			// 司令部レベルが書き換わった際は反映する
 			FormFleet.level = limit(int.Parse(HQLevelTextBox.Text), 1, 120);
+			RedrawSearchPower();
 		}
 		private void FleetTypeComboBox_SelectedIndexChanged(object sender, EventArgs e) {
 			if(FleetTypeComboBox.SelectedIndex == -1)
@@ -487,12 +496,14 @@ namespace KCS_GUI
 			WeaponDetailRfComboBox.SelectedIndex = rfRoughToDetail(WeaponRfComboBox.SelectedIndex);
 			WeaponDetailRfComboBox.Refresh();
 			RedrawAntiAirScore();
+			RedrawSearchPower();
 		}
 		private void WeaponDetailRfComboBox_SelectedIndexChanged(object sender, EventArgs e) {
 			// 内部熟練度を弄った場合、外部熟練度を自動補正する
 			WeaponRfComboBox.SelectedIndex = rfDetailToRough(WeaponDetailRfComboBox.SelectedIndex);
 			WeaponRfComboBox.Refresh();
 			RedrawAntiAirScore();
+			RedrawSearchPower();
 		}
 		private void MainForm_DragDrop(object sender, DragEventArgs e) {
 			if(MainTabControl.SelectedIndex == 0) {
@@ -514,6 +525,7 @@ namespace KCS_GUI
 				FleetTypeComboBox.SelectedIndex = FormFleet.type;
 				FleetSelectComboBox_SelectedIndexChanged(sender, e);
 				RedrawAntiAirScore();
+				RedrawSearchPower();
 			} else if(MainTabControl.SelectedIndex == 1) {
 				// ドラッグされたファイルを認識する
 				string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
@@ -626,7 +638,7 @@ namespace KCS_GUI
 			setKammusu.level = 1;
 			setKammusu.luck = -1;
 			setKammusu.cond = 49;
-			var firstWeaponID = drKammusu[index]["初期装備"].ToString().Split('.');
+			var firstWeaponID = drKammusu[index]["初期装備"].ToString().Split('-');
 			foreach(string weaponID in firstWeaponID){
 				var weaponIdToInt = int.Parse(weaponID);
 				if(weaponIdToInt <= 0)
@@ -663,7 +675,7 @@ namespace KCS_GUI
 			setKammusu.id = int.Parse(drKammusu[index]["艦船ID"].ToString());
 			setKammusu.level = 1;
 			setKammusu.luck = -1;
-			var firstWeaponID = drKammusu[index]["初期装備"].ToString().Split('.');
+			var firstWeaponID = drKammusu[index]["初期装備"].ToString().Split('-');
 			foreach(string weaponID in firstWeaponID) {
 				var weaponIdToInt = int.Parse(weaponID);
 				if(weaponIdToInt <= 0)
@@ -1089,7 +1101,7 @@ namespace KCS_GUI
 						kammusu.id = int.Parse((string)jsonFleet);
 						kammusu.level = 1;
 						kammusu.luck = -1;
-						var firstWeaponID = drKammusu[KammusuIDtoIndex[kammusu.id]]["初期装備"].ToString().Split('.');
+						var firstWeaponID = drKammusu[KammusuIDtoIndex[kammusu.id]]["初期装備"].ToString().Split('-');
 						foreach(string weaponID in firstWeaponID) {
 							var weaponIdToInt = int.Parse(weaponID);
 							if(weaponIdToInt <= 0)
@@ -1115,6 +1127,13 @@ namespace KCS_GUI
 		private void RedrawAntiAirScore() {
 			int antiAirScore = FormFleet.CalcAntiAirScore();
 			AllAntiAirTextBox.Text = antiAirScore.ToString();
+		}
+		// 索敵値を計算して表示する(艦隊エディタ)
+		private void RedrawSearchPower() {
+			double searchPower25A = FormFleet.CalcSearchPower25A();
+			double searchPower33 = FormFleet.CalcSearchPower33();
+			SearchPower25TextBox.Text = searchPower25A.ToString();
+			SearchPower33TextBox.Text = searchPower33.ToString();
 		}
 		// 制空値を計算して表示する(マップエディタ)
 		private void RedrawMapAntiAirScore() {
@@ -1258,6 +1277,116 @@ namespace KCS_GUI
 					}
 				}
 				return antiAirScore;
+			}
+			// 索敵値計算
+			public double CalcSearchPower25A() {
+				double searchPower = 0.0;
+				// 司令部レベル補正
+				int roundUp5Level = ((level - 1) / 5 + 1) * 5;
+				searchPower += -0.6142467 * roundUp5Level;
+				// 艦娘・装備による補正
+				DataRow[] drWeapon = WeaponData.Select();
+				DataRow[] drKammusu = KammusuData.Select();
+				foreach(var kammusu in unit[0]) {
+					// 艦娘の索敵値は練度依存
+					var searchValueSet = drKammusu[KammusuIDtoIndex[kammusu.id]]["索敵"].ToString().Split('-');
+					var searchValueK = int.Parse(searchValueSet[1]);
+					searchPower += Math.Sqrt(searchValueK) * 1.6841056;
+					foreach(var weapon in kammusu.weapon) {
+						// 装備の索敵値は種別によって係数が異なる
+						var searchValueW = int.Parse(drWeapon[WeaponIDtoIndex[weapon.id]]["索敵"].ToString());
+						switch(drWeapon[WeaponIDtoIndex[weapon.id]]["種別"].ToString()) {
+						case "艦上爆撃機":
+							searchPower += 1.0376255 * searchValueW;
+							break;
+						case "艦上爆撃機(爆戦)":
+							searchPower += 1.0376255 * searchValueW;
+							break;
+						case "水上爆撃機":
+							searchPower += 1.7787282 * searchValueW;
+							break;
+						case "艦上攻撃機":
+							searchPower += 1.3677954 * searchValueW;
+							break;
+						case "艦上偵察機":
+							searchPower += 1.6592780 * searchValueW;
+							break;
+						case "艦上偵察機(彩雲)":
+							searchPower += 1.6592780 * searchValueW;
+							break;
+						case "水上偵察機":
+							searchPower += 2.0000000 * searchValueW;
+							break;
+						case "水上偵察機(夜偵)":
+							searchPower += 2.0000000 * searchValueW;
+							break;
+						case "小型電探":
+							searchPower += 1.0045358 * searchValueW;
+							break;
+						case "大型電探":
+							searchPower += 0.9906638 * searchValueW;
+							break;
+						case "探照灯":
+							searchPower += 0.9067950 * searchValueW;
+							break;
+						default:
+							break;
+						}
+					}
+				}
+				// 小数第2位を四捨五入
+				return 0.1 * Math.Round(10.0 * searchPower);
+			}
+			public double CalcSearchPower33() {
+				double searchPower = 0.0;
+				// 司令部レベル補正
+				searchPower -= Math.Ceiling(0.4 * level);
+				// 艦娘・装備による補正
+				DataRow[] drWeapon = WeaponData.Select();
+				DataRow[] drKammusu = KammusuData.Select();
+				foreach(var kammusu in unit[0]) {
+					// 艦娘の索敵値は練度依存
+					var searchValueSet = drKammusu[KammusuIDtoIndex[kammusu.id]]["索敵"].ToString().Split('-');
+					var searchValueK = int.Parse(searchValueSet[1]);
+					searchPower += Math.Sqrt(searchValueK);
+					foreach(var weapon in kammusu.weapon) {
+						// 装備の索敵値は種別によって係数が異なる
+						var searchValueW = int.Parse(drWeapon[WeaponIDtoIndex[weapon.id]]["索敵"].ToString());
+						switch(drWeapon[WeaponIDtoIndex[weapon.id]]["種別"].ToString()) {
+						case "水上爆撃機":
+							searchPower += 1.1 * searchValueW;
+							break;
+						case "艦上攻撃機":
+							searchPower += 0.8 * searchValueW;
+							break;
+						case "艦上偵察機":
+							searchPower += 1.0 * searchValueW;
+							break;
+						case "艦上偵察機(彩雲)":
+							searchPower += 1.0 * searchValueW;
+							break;
+						case "水上偵察機":
+							searchPower += 1.2 * searchValueW + 1.2 * Math.Sqrt(weapon.level);
+							break;
+						case "水上偵察機(夜偵)":
+							searchPower += 1.2 * searchValueW + 1.2 * Math.Sqrt(weapon.level);
+							break;
+						case "小型電探":
+							searchPower += 0.6 * searchValueW + 1.25 * Math.Sqrt(weapon.level);
+							break;
+						case "大型電探":
+							searchPower += 0.6 * searchValueW + 1.25 * Math.Sqrt(weapon.level);
+							break;
+						default:
+							searchPower += 0.6 * searchValueW;
+							break;
+						}
+					}
+				}
+				// 隻数による補正
+				searchPower += 2.0 * (6.0 - unit[0].Count);
+				// 小数第2位を四捨五入
+				return 0.1 * Math.Round(10.0 * searchPower);
 			}
 		}
 		// マスデータ
