@@ -458,22 +458,113 @@ namespace KCS_GUI
 			MapPositionListBox.Refresh();
 		}
 		private void AddMapPatternButton_Click(object sender, EventArgs e) {
-
+			if(MapPositionListBox.SelectedIndex == -1
+			|| MapPatternFormationComboBox.SelectedIndex == -1)
+				return;
+			// 艦隊を追加
+			var selectPosition = FormMapData.position[MapPositionListBox.SelectedIndex];
+			var setFleet = new Fleet();
+			setFleet.level = 120;
+			setFleet.type = 0;
+			selectPosition.fleet.Add(setFleet);
+			selectPosition.formation.Add(MapPatternFormationComboBox.SelectedIndex);
+			// 画面上に反映
+			int selectPositionCount = selectPosition.fleet.Count;
+			MapPatternListBox.Items.Add(selectPositionCount.ToString() + " : " + selectPosition.fleet[selectPositionCount - 1].unit[0].Count.ToString());
+			MapPatternListBox.Refresh();
 		}
 		private void ChangeMapPatternButton_Click(object sender, EventArgs e) {
-
+			if(MapPositionListBox.SelectedIndex == -1
+			|| MapPatternFormationComboBox.SelectedIndex == -1
+			|| MapPatternListBox.SelectedIndex == -1)
+				return;
+			FormMapData.position[MapPositionListBox.SelectedIndex].formation[MapPatternListBox.SelectedIndex] = MapPatternFormationComboBox.SelectedIndex;
 		}
 		private void DeleteMapPatternButton_Click(object sender, EventArgs e) {
-
+			if(MapPositionListBox.SelectedIndex == -1
+			|| MapPatternListBox.SelectedIndex == -1)
+				return;
+			var selectPosition = FormMapData.position[MapPositionListBox.SelectedIndex];
+			selectPosition.fleet.RemoveAt(MapPatternListBox.SelectedIndex);
+			selectPosition.formation.RemoveAt(MapPatternListBox.SelectedIndex);
+			MapPatternListBox.Items.Clear();
+			for(int fi = 0; fi < selectPosition.fleet.Count; ++fi) {
+				MapPatternListBox.Items.Add((fi + 1).ToString() + " : " + selectPosition.fleet[fi].unit[0].Count.ToString());
+			}
+			MapPatternListBox.Refresh();
 		}
 		private void AddMapKammusuButton_Click(object sender, EventArgs e) {
-
+			if(MapPositionListBox.SelectedIndex == -1
+			|| MapPatternListBox.SelectedIndex == -1
+			|| MapKammusuTypeComboBox.SelectedIndex == -1
+			|| MapKammusuNameComboBox.SelectedIndex == -1)
+				return;
+			// 艦娘データを作成
+			var setKammusu = new Kammusu();
+			DataRow[] drKammusu = KammusuData.Select();
+			DataRow[] drWeapon = WeaponData.Select();
+			int index = KammusuTypeToIndexList[MapKammusuTypeComboBox.SelectedIndex][MapKammusuNameComboBox.SelectedIndex];
+			setKammusu.id = int.Parse(drKammusu[index]["艦船ID"].ToString());
+			setKammusu.level = 1;
+			setKammusu.luck = int.Parse(drKammusu[index]["運"].ToString().Split('.')[0]);
+			var firstWeaponID = drKammusu[index]["初期装備"].ToString().Split('.');
+			foreach(string weaponID in firstWeaponID){
+				var weaponIdToInt = int.Parse(weaponID);
+				if(weaponIdToInt <= 0)
+					break;
+				var setWeapon = new Weapon();
+				setWeapon.id = weaponIdToInt;
+				setWeapon.level = 0;
+				setWeapon.rf = 0;
+				setWeapon.detailRf = 0;
+				setKammusu.weapon.Add(setWeapon);
+			}
+			// 艦娘データを追加
+			var selectFleet = FormMapData.position[MapPositionListBox.SelectedIndex].fleet[MapPatternListBox.SelectedIndex];
+			selectFleet.unit[0].Add(setKammusu);
+			MapKammusuListBox.Items.Add(drKammusu[KammusuIDtoIndex[setKammusu.id]]["艦名"].ToString());
+			MapKammusuListBox.Refresh();
 		}
 		private void ChangeMapKammusuButton_Click(object sender, EventArgs e) {
-
+			if(MapPositionListBox.SelectedIndex == -1
+			|| MapPatternListBox.SelectedIndex == -1
+			|| MapKammusuTypeComboBox.SelectedIndex == -1
+			|| MapKammusuNameComboBox.SelectedIndex == -1
+			|| MapKammusuListBox.SelectedIndex == -1)
+				return;
+			// 艦娘データを作成
+			var setKammusu = new Kammusu();
+			DataRow[] drKammusu = KammusuData.Select();
+			DataRow[] drWeapon = WeaponData.Select();
+			int index = KammusuTypeToIndexList[MapKammusuTypeComboBox.SelectedIndex][MapKammusuNameComboBox.SelectedIndex];
+			setKammusu.id = int.Parse(drKammusu[index]["艦船ID"].ToString());
+			setKammusu.level = 1;
+			setKammusu.luck = int.Parse(drKammusu[index]["運"].ToString().Split('.')[0]);
+			var firstWeaponID = drKammusu[index]["初期装備"].ToString().Split('.');
+			foreach(string weaponID in firstWeaponID) {
+				var weaponIdToInt = int.Parse(weaponID);
+				if(weaponIdToInt <= 0)
+					break;
+				var setWeapon = new Weapon();
+				setWeapon.id = weaponIdToInt;
+				setWeapon.level = 0;
+				setWeapon.rf = 0;
+				setWeapon.detailRf = 0;
+				setKammusu.weapon.Add(setWeapon);
+			}
+			// 艦娘データを追加
+			var selectFleet = FormMapData.position[MapPositionListBox.SelectedIndex].fleet[MapPatternListBox.SelectedIndex];
+			selectFleet.unit[0][MapKammusuListBox.SelectedIndex] = setKammusu;
+			MapKammusuListBox.Items[MapKammusuListBox.SelectedIndex] = drKammusu[KammusuIDtoIndex[setKammusu.id]]["艦名"].ToString();
+			MapKammusuListBox.Refresh();
 		}
 		private void DeleteMapKammusuButton_Click(object sender, EventArgs e) {
-
+			if(MapPositionListBox.SelectedIndex == -1
+			|| MapPatternListBox.SelectedIndex == -1
+			|| MapKammusuListBox.SelectedIndex == -1)
+				return;
+			FormMapData.position[MapPositionListBox.SelectedIndex].fleet[MapPatternListBox.SelectedIndex].unit[0].RemoveAt(MapKammusuListBox.SelectedIndex);
+			MapKammusuListBox.Items.RemoveAt(MapKammusuListBox.SelectedIndex);
 		}
 		private void MapKammusuTypeComboBox_SelectedIndexChanged(object sender, EventArgs e) {
 			RedrawMapKammusuNameList();
@@ -494,8 +585,36 @@ namespace KCS_GUI
 			MapPatternListBox.Refresh();
 		}
 		private void MapPatternListBox_SelectedIndexChanged(object sender, EventArgs e) {
+			if(MapPositionListBox.SelectedIndex == -1
+			|| MapPatternListBox.SelectedIndex == -1)
+				return;
+			var selectPosition = FormMapData.position[MapPositionListBox.SelectedIndex];
+			// 選択したパターンについて、その陣形に関する情報
+			MapPatternFormationComboBox.SelectedIndex = selectPosition.formation[MapPatternListBox.SelectedIndex];
+			MapPatternFormationComboBox.Refresh();
+			// 選択したパターンについて、それに含まれる艦娘に関する情報
+			MapKammusuListBox.Items.Clear();
+			DataRow[] dr = KammusuData.Select();
+			var selectFleet = selectPosition.fleet[MapPatternListBox.SelectedIndex].unit[0];
+			foreach(var kammusu in selectFleet) {
+				MapKammusuListBox.Items.Add(dr[KammusuIDtoIndex[kammusu.id]]["艦名"].ToString());
+			}
+			MapKammusuListBox.Refresh();
 		}
 		private void MapKammusuListBox_SelectedIndexChanged(object sender, EventArgs e) {
+			if(MapPositionListBox.SelectedIndex == -1
+			|| MapPatternListBox.SelectedIndex == -1
+			|| MapKammusuListBox.SelectedIndex == -1)
+				return;
+			// 表示する艦娘を切り替える
+			Kammusu kammusu = FormMapData.position[MapPositionListBox.SelectedIndex].fleet[MapPatternListBox.SelectedIndex].unit[0][MapKammusuListBox.SelectedIndex];
+			int showKammusuIndex = KammusuIDtoIndex[kammusu.id];
+			DataRow[] dr = KammusuData.Select();
+			int showKammusuType = int.Parse(dr[showKammusuIndex]["艦種"].ToString()) - 1;
+			MapKammusuTypeComboBox.SelectedIndex = showKammusuType;
+			MapKammusuTypeComboBox.Refresh();
+			MapKammusuNameComboBox.Text = dr[showKammusuIndex]["艦名"].ToString();
+			RedrawMapKammusuNameList();
 		}
 
 		// シミュレーションタブ
