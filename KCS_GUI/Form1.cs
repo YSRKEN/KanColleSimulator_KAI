@@ -1020,6 +1020,10 @@ namespace KCS_GUI
 					// 追記
 					setKammusu.level = limit(int.Parse((string)jsonKammusu["lv"]), 1, 155);
 					setKammusu.luck = limit(int.Parse((string)jsonKammusu["luck"]), -1, 100);
+					if(jsonKammusu["cond"] != null)
+						setKammusu.cond = limit(int.Parse((string)jsonKammusu["cond"]), 0, 100);
+					else
+						setKammusu.cond = 49;
 					var jsonItems = (JObject)jsonKammusu["items"];
 					var slotSize = int.Parse(drKammusu[KammusuIDtoIndex[setKammusu.id]]["スロット数"].ToString());
 					// 装備を読み込む
