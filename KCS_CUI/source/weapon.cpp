@@ -10,7 +10,7 @@ constexpr WeaponClass ToWC(const cstring<wchar_t>& str) noexcept {
 
 const std::unordered_map<int, const Weapon> Weapon::db_ = {
 #define WEAPON(PREFIX, ID, NAME, WEAPON_CLASS, DEFENSE, ATTACK, TORPEDO, BOMB, ANTI_AIR, ANTI_SUB, HIT, EVADE, SEARCH, RANGE, POSTFIX)	\
-	{ ID, { ID, L ## #NAME ## s, std::integral_constant<WeaponClass, ToWC(L ## #WEAPON_CLASS ## _cs)>{}(),								\
+	{ ID, { ID, L ## NAME ## s, std::integral_constant<WeaponClass, ToWC(L ## WEAPON_CLASS ## _cs)>{}(),								\
 			DEFENSE, ATTACK, TORPEDO, BOMB, ANTI_AIR, ANTI_SUB, HIT, EVADE, SEARCH, static_cast<Range>(RANGE), 0, 0, 0 } },
 #include "slotitems.csv"
 #undef WEAPON
