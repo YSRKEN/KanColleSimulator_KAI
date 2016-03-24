@@ -638,7 +638,7 @@ namespace KCS_GUI
 			setKammusu.level = 1;
 			setKammusu.luck = -1;
 			setKammusu.cond = 49;
-			var firstWeaponID = drKammusu[index]["初期装備"].ToString().Split('-');
+			var firstWeaponID = drKammusu[index]["初期装備"].ToString().Split('/');
 			foreach(string weaponID in firstWeaponID){
 				var weaponIdToInt = int.Parse(weaponID);
 				if(weaponIdToInt <= 0)
@@ -675,7 +675,7 @@ namespace KCS_GUI
 			setKammusu.id = int.Parse(drKammusu[index]["艦船ID"].ToString());
 			setKammusu.level = 1;
 			setKammusu.luck = -1;
-			var firstWeaponID = drKammusu[index]["初期装備"].ToString().Split('-');
+			var firstWeaponID = drKammusu[index]["初期装備"].ToString().Split('/');
 			foreach(string weaponID in firstWeaponID) {
 				var weaponIdToInt = int.Parse(weaponID);
 				if(weaponIdToInt <= 0)
@@ -1101,7 +1101,7 @@ namespace KCS_GUI
 						kammusu.id = int.Parse((string)jsonFleet);
 						kammusu.level = 1;
 						kammusu.luck = -1;
-						var firstWeaponID = drKammusu[KammusuIDtoIndex[kammusu.id]]["初期装備"].ToString().Split('-');
+						var firstWeaponID = drKammusu[KammusuIDtoIndex[kammusu.id]]["初期装備"].ToString().Split('/');
 						foreach(string weaponID in firstWeaponID) {
 							var weaponIdToInt = int.Parse(weaponID);
 							if(weaponIdToInt <= 0)
@@ -1249,7 +1249,7 @@ namespace KCS_GUI
 				DataRow[] drWeapon = WeaponData.Select();
 				DataRow[] drKammusu = KammusuData.Select();
 				foreach(var kammusu in unit[0]) {
-					var slots = drKammusu[KammusuIDtoIndex[kammusu.id]]["搭載数"].ToString().Split('-');
+					var slots = drKammusu[KammusuIDtoIndex[kammusu.id]]["搭載数"].ToString().Split('/');
 					for(int wi = 0; wi < kammusu.weapon.Count; ++wi) {
 						var weapon = kammusu.weapon[wi];
 						// まず装備の種類を読み取り、制空計算に使えるかを判別する
@@ -1289,7 +1289,7 @@ namespace KCS_GUI
 				DataRow[] drKammusu = KammusuData.Select();
 				foreach(var kammusu in unit[0]) {
 					// 艦娘の索敵値は練度依存
-					var searchValueSet = drKammusu[KammusuIDtoIndex[kammusu.id]]["索敵"].ToString().Split('-');
+					var searchValueSet = drKammusu[KammusuIDtoIndex[kammusu.id]]["索敵"].ToString().Split('/');
 					var searchValueK = int.Parse(searchValueSet[1]);
 					searchPower += Math.Sqrt(searchValueK) * 1.6841056;
 					foreach(var weapon in kammusu.weapon) {
@@ -1346,7 +1346,7 @@ namespace KCS_GUI
 				DataRow[] drKammusu = KammusuData.Select();
 				foreach(var kammusu in unit[0]) {
 					// 艦娘の索敵値は練度依存
-					var searchValueSet = drKammusu[KammusuIDtoIndex[kammusu.id]]["索敵"].ToString().Split('-');
+					var searchValueSet = drKammusu[KammusuIDtoIndex[kammusu.id]]["索敵"].ToString().Split('/');
 					var searchValueK = int.Parse(searchValueSet[1]);
 					searchPower += Math.Sqrt(searchValueK);
 					foreach(var weapon in kammusu.weapon) {
