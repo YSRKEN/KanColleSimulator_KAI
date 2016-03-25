@@ -8,7 +8,7 @@
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
-[Rr]elease/
+[Rr]elease*/
 x64/
 build/
 bld/
@@ -199,10 +199,7 @@ html/
 /設計方針.txt
 output.json
 *.zip
-KCS_CUI/Release(OpenMP)/KCS_CUI.iobj
-KCS_CUI/Release(OpenMP)/KCS_CUI.ipdb
-KCS_CUI/Release(OpenMP_AVX2)/KCS_CUI.iobj
-KCS_CUI/Release(OpenMP_AVX2)/KCS_CUI.ipdb
-KCS_CUI/KCS_CUI.VC.db
+*.VC.db
 *.diagsession
 Manual.pptx
+*.csproj.user
