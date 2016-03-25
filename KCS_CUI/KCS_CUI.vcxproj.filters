@@ -101,9 +101,17 @@
     <ClInclude Include="source\lookup.hpp">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="..\version.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="source\ships.csv" />
     <None Include="source\slotitems.csv" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="source\KCS_CUI.rc">
+      <Filter>リソース ファイル</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

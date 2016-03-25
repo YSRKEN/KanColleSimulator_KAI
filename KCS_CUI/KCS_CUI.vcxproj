@@ -377,6 +377,7 @@
     <ClCompile Include="source\weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\version.h" />
     <ClInclude Include="source\arithmetic_convert.hpp" />
     <ClInclude Include="source\base.hpp" />
     <ClInclude Include="source\char_convert.hpp" />
@@ -398,6 +399,9 @@
   <ItemGroup>
     <None Include="source\ships.csv" />
     <None Include="source\slotitems.csv" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="source\KCS_CUI.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
