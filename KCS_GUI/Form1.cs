@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Reflection;
 
 namespace KCS_GUI
 {
@@ -271,13 +272,18 @@ namespace KCS_GUI
 		{
 			this.Close();
 		}
-		private void VersionInfoMenuItem_Click(object sender, EventArgs e){
-			/* バージョン情報表示 */
-			string verInfo = "";
-			verInfo += SoftName + "\n";
-			verInfo += "バージョン：1.5.0\n";
-			verInfo += "作成者：YSR\n";
-			verInfo += "最終更新日：2016/03/23";
+        //バージョン情報表示
+        private void VersionInfoMenuItem_Click(object sender, EventArgs e){
+            Assembly assem = Assembly.GetExecutingAssembly();
+            Version v = assem.GetName().Version;
+            string version = v.Major.ToString() + "." + v.Minor.ToString() + "." + v.Build.ToString() + "." + v.Revision.ToString();
+            string assemblyProduct = ((AssemblyProductAttribute)Attribute.GetCustomAttribute(assem, typeof(AssemblyProductAttribute))).Product;
+            string assemblyCopyright = ((AssemblyCopyrightAttribute)Attribute.GetCustomAttribute(assem, typeof(AssemblyCopyrightAttribute))).Copyright;
+            string verInfo
+                = assemblyProduct + ".exe\n" 
+                + "バージョン：" + version + "\n" 
+                + "作成者：YSR\n" 
+                + assemblyCopyright;
 			MessageBox.Show(verInfo, SoftName);
 		}
 
