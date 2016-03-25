@@ -640,10 +640,11 @@
 			this.KammusuLuckTextBox.Size = new System.Drawing.Size(40, 19);
 			this.KammusuLuckTextBox.TabIndex = 17;
 			this.KammusuLuckTextBox.Text = "-1";
-			// 
-			// KammusuLevelTextBox
-			// 
-			this.KammusuLevelTextBox.Location = new System.Drawing.Point(332, 80);
+            this.KammusuLuckTextBox.Leave += new System.EventHandler(this.KammusuLuckTextBox_Leave);
+            // 
+            // KammusuLevelTextBox
+            // 
+            this.KammusuLevelTextBox.Location = new System.Drawing.Point(332, 80);
 			this.KammusuLevelTextBox.Name = "KammusuLevelTextBox";
 			this.KammusuLevelTextBox.Size = new System.Drawing.Size(40, 19);
 			this.KammusuLevelTextBox.TabIndex = 16;

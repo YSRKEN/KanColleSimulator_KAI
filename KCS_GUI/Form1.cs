@@ -319,6 +319,9 @@ namespace KCS_GUI
         private void KammusuLevelTextBox_Leave(object sender, EventArgs e) {
             FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].level = limit(int.Parse(KammusuLevelTextBox.Text), 1, 155);
         }
+        private void KammusuLuckTextBox_Leave(object sender, EventArgs e) {
+            FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].luck = int.Parse(KammusuLuckTextBox.Text);
+        }
         private void ChangeKammusuButton_Click(object sender, EventArgs e) {
 			if(KammusuTypeComboBox.SelectedIndex == -1
 			|| KammusuNameComboBox.SelectedIndex == -1
