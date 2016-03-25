@@ -632,10 +632,11 @@
 			this.KammusuCondTextBox.Size = new System.Drawing.Size(40, 19);
 			this.KammusuCondTextBox.TabIndex = 18;
 			this.KammusuCondTextBox.Text = "49";
-			// 
-			// KammusuLuckTextBox
-			// 
-			this.KammusuLuckTextBox.Location = new System.Drawing.Point(332, 106);
+            this.KammusuCondTextBox.Leave += new System.EventHandler(this.KammusuCondTextBox_Leave);
+            // 
+            // KammusuLuckTextBox
+            // 
+            this.KammusuLuckTextBox.Location = new System.Drawing.Point(332, 106);
 			this.KammusuLuckTextBox.Name = "KammusuLuckTextBox";
 			this.KammusuLuckTextBox.Size = new System.Drawing.Size(40, 19);
 			this.KammusuLuckTextBox.TabIndex = 17;

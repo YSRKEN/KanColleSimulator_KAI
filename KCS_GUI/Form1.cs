@@ -320,7 +320,10 @@ namespace KCS_GUI
             FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].level = limit(int.Parse(KammusuLevelTextBox.Text), 1, 155);
         }
         private void KammusuLuckTextBox_Leave(object sender, EventArgs e) {
-            FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].luck = int.Parse(KammusuLuckTextBox.Text);
+            FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].luck = limit(int.Parse(KammusuLuckTextBox.Text), -1, 100);
+        }
+        private void KammusuCondTextBox_Leave(object sender, EventArgs e) {
+            FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].cond = limit(int.Parse(KammusuCondTextBox.Text), 0, 100);
         }
         private void ChangeKammusuButton_Click(object sender, EventArgs e) {
 			if(KammusuTypeComboBox.SelectedIndex == -1
@@ -334,14 +337,9 @@ namespace KCS_GUI
 			int index = KammusuTypeToIndexList[KammusuTypeComboBox.SelectedIndex][KammusuNameComboBox.SelectedIndex];
 			setKammusu.id = int.Parse(dr[index]["艦船ID"].ToString());
 			setKammusu.level = limit(int.Parse(KammusuLevelTextBox.Text), 1, 155);
-			setKammusu.luck = int.Parse(KammusuLuckTextBox.Text);
-			if(setKammusu.luck < 0) {
-				// 運に負数を指定した場合は、艦娘のデフォルト値とする(デッキビルダーの仕様上、"-1"でOK)
-				setKammusu.luck = -1;
-			} else {
-				// そうでない場合は、最大でも100までに抑える
-				setKammusu.luck = limit(setKammusu.luck, 0, 100);
-			}
+            // 運に負数を指定した場合は、艦娘のデフォルト値とする(デッキビルダーの仕様上、"-1"でOK)
+            // そうでない場合は、最大でも100までに抑える
+            setKammusu.luck = limit(int.Parse(KammusuLuckTextBox.Text), -1, 100);
 			setKammusu.cond = limit(int.Parse(KammusuCondTextBox.Text), 0, 100);
 			setKammusu.maxSlots = int.Parse(dr[index]["スロット数"].ToString());
 			// 作成した艦娘データで上書きする
