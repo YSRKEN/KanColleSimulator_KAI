@@ -3,14 +3,21 @@
 #include "char_convert.hpp"
 using namespace std::string_literals;
 
+const std::unordered_map<int, const std::wstring> weaponNameMap{
+#define WEAPON(PREFIX, ID, NAME, WEAPON_CLASS, DEFENSE, ATTACK, TORPEDO, BOMB, ANTI_AIR, ANTI_SUB, HIT, EVADE, SEARCH, RANGE, POSTFIX)	\
+	{ ID, L ## #NAME },
+#include "slotitems.csv"
+#undef WEAPON
+};
+
 constexpr WeaponClass ToWC(const cstring<wchar_t>& str) noexcept {
 	// CSVにはWeaponClassに定義されていないクラスが記載されているため、見つからなかった場合はOtherとしておく。
 	return FirstOrDefault(detail::weaponClassMap, str, WeaponClass::Other);
 }
 
-const std::unordered_map<int, const Weapon> Weapon::db_ = {
+const std::unordered_map<int, const Weapon> Weapon::db_{
 #define WEAPON(PREFIX, ID, NAME, WEAPON_CLASS, DEFENSE, ATTACK, TORPEDO, BOMB, ANTI_AIR, ANTI_SUB, HIT, EVADE, SEARCH, RANGE, POSTFIX)	\
-	{ ID, { ID, L ## NAME ## s, std::integral_constant<WeaponClass, ToWC(L ## WEAPON_CLASS ## _cs)>{}(),								\
+	{ ID, { ID, weaponNameMap.at(ID), std::integral_constant<WeaponClass, ToWC(L ## WEAPON_CLASS ## _cs)>{}(),							\
 			DEFENSE, ATTACK, TORPEDO, BOMB, ANTI_AIR, ANTI_SUB, HIT, EVADE, SEARCH, static_cast<Range>(RANGE), 0, 0, 0 } },
 #include "slotitems.csv"
 #undef WEAPON
@@ -19,10 +26,10 @@ const std::unordered_map<int, const Weapon> Weapon::db_ = {
 // コンストラクタ
 Weapon::Weapon() noexcept : Weapon(-1, {}, WC("その他"), 0, 0, 0, 0, 0, 0, 0, 0, 0, kRangeNone, 0, 0, 0) {}
 Weapon::Weapon(
-	const int id, wstring name, const WeaponClass weapon_class, const int defense,
+	const int id, const std::wstring& name, const WeaponClass weapon_class, const int defense,
 	const int attack, const int torpedo, const int bomb, const int anti_air, const int anti_sub,
 	const int hit, const int evade, const int search, const Range range, const int level, const int level_detail, const int air) noexcept :
-	id_(id), name_(move(name)), weapon_class_(weapon_class), defense_(defense), attack_(attack),
+	id_(id), name_(name), weapon_class_(weapon_class), defense_(defense), attack_(attack),
 	torpedo_(torpedo), bomb_(bomb), anti_air_(anti_air), anti_sub_(anti_sub), hit_(hit),
 	evade_(evade), search_(search), range_(range), level_(level), level_detail_(level_detail), air_(air) {
 	AntiAirBonus_();	//キャッシュする
@@ -30,7 +37,7 @@ Weapon::Weapon(
 
 // getter
 int Weapon::GetID() const noexcept { return id_; }
-const std::wstring & Weapon::GetName() const noexcept { return name_; }
+const std::wstring & Weapon::GetName() const noexcept { return name_.get(); }
 WeaponClass Weapon::GetWeaponClass() const noexcept { return weapon_class_; }
 int Weapon::GetDefense() const noexcept { return defense_; }
 int Weapon::GetAttack() const noexcept { return attack_; }
@@ -84,7 +91,7 @@ std::ostream & operator<<(std::ostream & os, const Weapon & conf)
 {
 	os
 		<< "装備ID：" << conf.id_ << endl
-		<< "　装備名：" << ((conf.name_.empty()) ? "なし" : char_cvt::utf_16_to_shift_jis(conf.name_)) << "　種別：" << conf.weapon_class_ << endl
+		<< "　装備名：" << (conf.id_ == -1 ? "なし" : char_cvt::utf_16_to_shift_jis(conf.GetName())) << "　種別：" << conf.weapon_class_ << endl
 		<< "　装甲：" << conf.defense_ << "　火力：" << conf.attack_ << "　雷撃：" << conf.torpedo_ << "　爆装：" << conf.bomb_ << endl
 		<< "　対空：" << conf.anti_air_ << "　対潜：" << conf.anti_sub_ << "　命中：" << conf.hit_ << "　回避：" << conf.evade_ << endl
 		<< "　索敵：" << conf.search_ << "　射程：" << char_cvt::utf_16_to_shift_jis(kRangeStr[conf.range_]) << "　改修/熟練：" << conf.level_ << endl;
@@ -95,7 +102,7 @@ std::wostream & operator<<(std::wostream & os, const Weapon & conf)
 {
 	os
 		<< L"装備ID：" << conf.id_ << endl
-		<< L"　装備名：" << ((conf.name_.empty()) ? L"なし" : conf.name_) << L"　種別：" << conf.weapon_class_ << endl
+		<< L"　装備名：" << (conf.id_ == -1 ? L"なし" : conf.GetName()) << L"　種別：" << conf.weapon_class_ << endl
 		<< L"　装甲：" << conf.defense_ << L"　火力：" << conf.attack_ << L"　雷撃：" << conf.torpedo_ << L"　爆装：" << conf.bomb_ << endl
 		<< L"　対空：" << conf.anti_air_ << L"　対潜：" << conf.anti_sub_ << L"　命中：" << conf.hit_ << L"　回避：" << conf.evade_ << endl
 		<< L"　索敵：" << conf.search_ << L"　射程：" << kRangeStr[conf.range_] << L"　改修/熟練：" << conf.level_ << endl;
