@@ -1,0 +1,44 @@
+#include <winver.h>
+#include "../../version.h"
+
+#define KCS_EXE_NAME            "KCS_CUI.exe"
+#define KCS_EXE_INFO            "KCS_CUI"
+
+#ifdef DEBUG
+#define VER_DEBUG   VS_FF_DEBUG
+#define VER_PRIVATE VS_FF_PRIVATEBUILD
+#else
+#define VER_DEBUG   0
+#define VER_PRIVATE 0
+#endif
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION    KCS_VERSION
+PRODUCTVERSION  KCS_VERSION
+FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
+FILEFLAGS       ( VER_DEBUG | VER_PRIVATE )
+FILEOS          VOS_NT_WINDOWS32
+FILETYPE        VFT_DLL
+FILESUBTYPE     VFT_APP
+BEGIN
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x411, 1200
+    END
+
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041104b0"
+        BEGIN
+            VALUE "Comments",         KCS_EXE_INFO
+            VALUE "CompanyName",      ""
+            VALUE "FileDescription",  KCS_FILE_DESCRIPTION 
+            VALUE "FileVersion",      KCS_VERSION_STR
+            VALUE "InternalName",     KCS_EXE_NAME
+            VALUE "OriginalFileName", KCS_EXE_NAME
+            VALUE "LegalCopyright",   KCS_COPYRIGHT_STR
+            VALUE "ProductName",      KCS_EXE_INFO
+            VALUE "ProductVersion",   KCS_VERSION_STR
+        END
+    END
+END
