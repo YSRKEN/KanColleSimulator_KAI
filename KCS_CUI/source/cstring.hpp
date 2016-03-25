@@ -2,13 +2,13 @@
 #include <cstddef>		// std::size_t
 #include <ostream>		// std::basic_ostream
 #include <stdexcept>	// std::out_of_range
-
+#include <limits>
 // ちょっとエッチなconstexprバージョンの文字列
 template<class Char>
 class cstring {
 public:
 	typedef std::size_t size_type;
-	static const size_type npos = -1;
+	static constexpr size_type npos = std::numeric_limits<size_type>::max();
 private:
 	const Char* s_;
 	const size_type n_;
