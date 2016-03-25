@@ -648,6 +648,7 @@
 			this.KammusuLevelTextBox.Size = new System.Drawing.Size(40, 19);
 			this.KammusuLevelTextBox.TabIndex = 16;
 			this.KammusuLevelTextBox.Text = "1";
+            this.KammusuLevelTextBox.Leave += new System.EventHandler(this.KammusuLevelTextBox_Leave);
 			// 
 			// label10
 			// 

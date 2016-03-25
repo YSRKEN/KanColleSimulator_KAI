@@ -1,20 +1,17 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Reflection;
+using System.Text;
+using System.Windows.Forms;
 
 namespace KCS_GUI
 {
-	public partial class MainForm : Form
+    public partial class MainForm : Form
 	{
 		/* メンバ変数 */
 		// 定数群
@@ -319,7 +316,10 @@ namespace KCS_GUI
 			RedrawAntiAirScore();
 			RedrawSearchPower();
 		}
-		private void ChangeKammusuButton_Click(object sender, EventArgs e) {
+        private void KammusuLevelTextBox_Leave(object sender, EventArgs e) {
+            FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].level = limit(int.Parse(KammusuLevelTextBox.Text), 1, 155);
+        }
+        private void ChangeKammusuButton_Click(object sender, EventArgs e) {
 			if(KammusuTypeComboBox.SelectedIndex == -1
 			|| KammusuNameComboBox.SelectedIndex == -1
 			|| FleetSelectComboBox.SelectedIndex == -1
@@ -961,11 +961,7 @@ namespace KCS_GUI
 		}
 		// 値を上下限で制限する
 		private int limit(int n, int min_n, int max_n) {
-			if(n < min_n)
-				return min_n;
-			if(n > max_n)
-				return max_n;
-			return n;
+            return (n < min_n) ? min_n : (max_n < n) ? max_n : n;
 		}
 		// 外部熟練度を内部熟練度に変換する
 		private int rfRoughToDetail(int rf) {
