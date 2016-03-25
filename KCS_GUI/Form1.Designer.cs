@@ -132,6 +132,7 @@
 			this.ExitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.ヘルプHToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.VersionInfoMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.label36 = new System.Windows.Forms.Label();
 			this.MainTabControl.SuspendLayout();
 			this.tabPage1.SuspendLayout();
 			this.tabPage2.SuspendLayout();
@@ -817,6 +818,7 @@
 			// 
 			// tabPage2
 			// 
+			this.tabPage2.Controls.Add(this.label36);
 			this.tabPage2.Controls.Add(this.ChangeMapKammusuButton);
 			this.tabPage2.Controls.Add(this.ChangeMapPatternButton);
 			this.tabPage2.Controls.Add(this.ChangeMapPositionButton);
@@ -1455,6 +1457,15 @@
 			this.VersionInfoMenuItem.Text = "バージョン情報(&A)";
 			this.VersionInfoMenuItem.Click += new System.EventHandler(this.VersionInfoMenuItem_Click);
 			// 
+			// label36
+			// 
+			this.label36.AutoSize = true;
+			this.label36.Location = new System.Drawing.Point(6, 173);
+			this.label36.Name = "label36";
+			this.label36.Size = new System.Drawing.Size(53, 12);
+			this.label36.TabIndex = 50;
+			this.label36.Text = "艦娘選択";
+			// 
 			// MainForm
 			// 
 			this.AllowDrop = true;
@@ -1590,6 +1601,7 @@
 		private System.Windows.Forms.Button ChangeMapPositionButton;
 		private System.Windows.Forms.Button ChangeMapPatternButton;
 		private System.Windows.Forms.Button ChangeMapKammusuButton;
+		private System.Windows.Forms.Label label36;
 	}
 }
 
