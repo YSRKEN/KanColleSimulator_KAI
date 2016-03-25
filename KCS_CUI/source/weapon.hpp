@@ -109,22 +109,22 @@ namespace detail {
 //装備クラス
 class Weapon {
 	static const std::unordered_map<int, const Weapon> db_;
-	int id_;					//装備ID
-	wstring name_;				//装備名
-	WeaponClass weapon_class_;	//種別
-	int defense_;				//装甲
-	int attack_;				//火力
-	int torpedo_;				//雷撃
-	int bomb_;					//爆装
-	int anti_air_;				//対空
-	int anti_sub_;				//対潜
-	int hit_;					//命中
-	int evade_;					//回避
-	int search_;				//索敵
-	Range range_;				//射程
-	int level_;					//装備改修度(0-10)、外部熟練度(0-7)
-	int level_detail_;			//内部熟練度(0-120)
-	int air_;					//現搭載数
+	int id_;											//装備ID
+	std::reference_wrapper<const std::wstring> name_;	//装備名
+	WeaponClass weapon_class_;							//種別
+	int defense_;										//装甲
+	int attack_;										//火力
+	int torpedo_;										//雷撃
+	int bomb_;											//爆装
+	int anti_air_;										//対空
+	int anti_sub_;										//対潜
+	int hit_;											//命中
+	int evade_;											//回避
+	int search_;										//索敵
+	Range range_;										//射程
+	int level_;											//装備改修度(0-10)、外部熟練度(0-7)
+	int level_detail_;									//内部熟練度(0-120)
+	int air_;											//現搭載数
 	// キャッシュ
 	double anti_air_bonus_;
 public:
@@ -132,7 +132,7 @@ public:
 	// コンストラクタ
 	Weapon() noexcept;
 	Weapon(
-		const int, wstring, const WeaponClass, const int, const int, const int, const int,
+		const int, const std::wstring&, const WeaponClass, const int, const int, const int, const int,
 		const int, const int, const int, const int, const int, const Range, const int, const int, const int) noexcept;
 	// getter
 	int GetID() const noexcept;
