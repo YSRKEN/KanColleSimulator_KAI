@@ -139,6 +139,9 @@ namespace KCS_GUI
 				RedrawMapAntiAirScore();
 			}
 		}
+        private String filepath_to_name(String path) {
+            return path.Substring(path.LastIndexOf('\\') + 1);
+        }
 		private void OpenFileMenuItem_Click(object sender, EventArgs e){
 			if(MainTabControl.SelectedIndex == 0) {
 				// ファイルを開くダイアログを表示する
@@ -151,7 +154,8 @@ namespace KCS_GUI
 				Tuple<Fleet, bool> setFleet = ReadJsonFile(FleetFilePath);
 				if(!setFleet.Item2)
 					return;
-				// 読み込んだデータを画面に反映する
+                // 読み込んだデータを画面に反映する
+                this.filename_echo.Text = filepath_to_name(this.FleetFilePath);
 				FormFleet = setFleet.Item1;
 				HQLevelTextBox.Text = FormFleet.level.ToString();
 				FleetTypeComboBox.SelectedIndex = FormFleet.type;
@@ -169,8 +173,9 @@ namespace KCS_GUI
 				Tuple<MapData, bool> setMapData = ReadMapFile(MapFilePath);
 				if(!setMapData.Item2)
 					return;
-				// 読み込んだデータを画面に反映する
-				FormMapData = setMapData.Item1;
+                // 読み込んだデータを画面に反映する
+                this.filename_echo.Text = filepath_to_name(this.MapFilePath);
+                FormMapData = setMapData.Item1;
 				MapPositionListBox.Items.Clear();
 				foreach(var position in FormMapData.position) {
 					MapPositionListBox.Items.Add(position.name);
