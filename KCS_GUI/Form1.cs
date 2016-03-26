@@ -39,7 +39,8 @@ namespace KCS_GUI
 		static List<double> bonusPF = new List<double> { 0.0, 0.0, 2.0, 5.0, 9.0, 14.0, 14.0, 22.0 };
 		static List<double> bonusWB = new List<double> { 0.0, 0.0, 1.0, 1.0, 1.0, 3.0, 3.0, 6.0 };
 
-		// 装備・艦娘データ
+        // 装備・艦娘データ
+        static CsvDataSet data = new CsvDataSet();
 		//装備データ
 		static DataTable WeaponData;
 		//装備ID→インデックス変換
@@ -65,6 +66,13 @@ namespace KCS_GUI
 		string MapFilePath;
 
 		/* コンストラクタ */
+        static MainForm()
+        {
+            using (var adapter = new CsvDataSetTableAdapters.ShipsTableAdapter())
+                adapter.Fill(data.Ships);
+            using (var adapter = new CsvDataSetTableAdapters.WeaponsTableAdapter())
+                adapter.Fill(data.Weapons);
+        }
 		public MainForm()
 		{
 			InitializeComponent();
