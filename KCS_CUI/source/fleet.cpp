@@ -505,13 +505,39 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuSS(const size_t fleet_index) const
 		list = { SecondIndex() };
 		break;
 	}
-	//生存する水上艦をリストアップ
+	//生存する潜水艦をリストアップ
 	vector<KammusuIndex> alived_list;
 	for (auto &fi : list) {
 		for (size_t ui = 0; ui < GetUnit()[fi].size(); ++ui) {
 			const auto &it_k = GetUnit()[fi][ui];
 			if (it_k.Status() == kStatusLost) continue;
 			if (!it_k.IsSubmarine()) continue;
+			alived_list.push_back({ fi, ui });
+		}
+	}
+	if (alived_list.size() == 0) return tuple<bool, KammusuIndex>(false, { 0 , 0 });
+	return tuple<bool, KammusuIndex>(true, rand_.select_random_in_range(alived_list));
+}
+
+// 陸上型の生存艦から艦娘をランダムに指定する
+tuple<bool, KammusuIndex> Fleet::RandomKammusuAF(const size_t fleet_index) const {
+	// 攻撃する艦隊の対象を選択する
+	vector<size_t> list;
+	switch (fleet_index) {
+	case 0:
+		list = { FirstIndex() };
+		break;
+	case 1:
+		list = { SecondIndex() };
+		break;
+	}
+	//生存する陸上型をリストアップ
+	vector<KammusuIndex> alived_list;
+	for (auto &fi : list) {
+		for (size_t ui = 0; ui < GetUnit()[fi].size(); ++ui) {
+			const auto &it_k = GetUnit()[fi][ui];
+			if (it_k.Status() == kStatusLost) continue;
+			if (!(it_k.AnyOf(SC("陸上型")))) continue;
 			alived_list.push_back({ fi, ui });
 		}
 	}
@@ -557,6 +583,11 @@ bool Fleet::HasLights() const noexcept {
 // 大破以上の艦が存在していた場合はtrue
 bool Fleet::HasHeavyDamage() const noexcept {
 	return any_of(this->unit_, [](const Kammusu& it_k) -> bool { return it_k.Status() >= kStatusHeavyDamage; });
+}
+
+// 陸上型がいた場合はtrue
+bool Fleet::HasAF() const noexcept {
+	return any_of(this->unit_, [](const Kammusu& it_k) -> bool { return it_k.GetShipClass() == ShipClass::AF && it_k.Status() != kStatusLost; });
 }
 
 std::ostream & operator<<(std::ostream & os, const Fleet & conf)
