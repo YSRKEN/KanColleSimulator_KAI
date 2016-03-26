@@ -422,10 +422,11 @@
 			this.WeaponDetailRfComboBox.TabIndex = 36;
 			this.WeaponDetailRfComboBox.Text = "0";
 			this.WeaponDetailRfComboBox.SelectedIndexChanged += new System.EventHandler(this.WeaponDetailRfComboBox_SelectedIndexChanged);
-			// 
-			// WeaponRfComboBox
-			// 
-			this.WeaponRfComboBox.Enabled = false;
+            this.WeaponDetailRfComboBox.Leave += new System.EventHandler(this.WeaponDetailRfComboBox_Leave);
+            // 
+            // WeaponRfComboBox
+            // 
+            this.WeaponRfComboBox.Enabled = false;
 			this.WeaponRfComboBox.FormattingEnabled = true;
 			this.WeaponRfComboBox.Items.AddRange(new object[] {
             "0",
@@ -445,10 +446,11 @@
 			this.WeaponRfComboBox.TabIndex = 35;
 			this.WeaponRfComboBox.Text = "0";
 			this.WeaponRfComboBox.SelectedIndexChanged += new System.EventHandler(this.WeaponRfComboBox_SelectedIndexChanged);
-			// 
-			// WeaponLevelComboBox
-			// 
-			this.WeaponLevelComboBox.FormattingEnabled = true;
+            this.WeaponRfComboBox.Leave += new System.EventHandler(this.WeaponRfComboBox_Leave);
+            // 
+            // WeaponLevelComboBox
+            // 
+            this.WeaponLevelComboBox.FormattingEnabled = true;
 			this.WeaponLevelComboBox.Items.AddRange(new object[] {
             "0",
             "1",
@@ -466,10 +468,11 @@
 			this.WeaponLevelComboBox.Size = new System.Drawing.Size(50, 20);
 			this.WeaponLevelComboBox.TabIndex = 34;
 			this.WeaponLevelComboBox.Text = "0";
-			// 
-			// label19
-			// 
-			this.label19.AutoSize = true;
+            this.WeaponLevelComboBox.Leave += new System.EventHandler(this.WeaponLevelComboBox_Leave);
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
 			this.label19.Location = new System.Drawing.Point(314, 219);
 			this.label19.Name = "label19";
 			this.label19.Size = new System.Drawing.Size(65, 12);

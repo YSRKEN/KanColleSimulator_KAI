@@ -316,10 +316,10 @@ namespace KCS_GUI
 			RedrawAntiAirScore();
 			RedrawSearchPower();
 		}
-        private bool IsInRange(int val, int min, int max) {
+        static private bool IsInRange(int val, int min, int max) {
             return (min <= val && val <= max);
         }
-        private bool IsVaidIndex(int val, int size) {
+        static private bool IsVaidIndex(int val, int size) {
             return IsInRange(val, 0, size - 1);
         }
         private void KammusuLevelTextBox_Leave(object sender, EventArgs e) {
@@ -403,7 +403,56 @@ namespace KCS_GUI
 			RedrawAntiAirScore();
 			RedrawSearchPower();
 		}
-		private void ChangeWeaponButton_Click(object sender, EventArgs e) {
+        private void WeaponLevelComboBox_Leave(object sender, EventArgs e) {
+            if (//Range Check
+                IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
+                && IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
+                && IsVaidIndex(
+                    this.WeaponSelectListBox.SelectedIndex, 
+                    this.FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].weapon.Count
+                )
+            )
+            this
+                .FormFleet
+                .unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex]
+                .weapon[WeaponSelectListBox.SelectedIndex]
+                .level = limit(WeaponLevelComboBox.SelectedIndex, 0, 10);
+        }
+        private void WeaponRfComboBox_Leave(object sender, EventArgs e) {
+            if (//Range Check
+                IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
+                && IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
+                && IsVaidIndex(
+                    this.WeaponSelectListBox.SelectedIndex,
+                    this.FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].weapon.Count
+                )
+            )
+            {
+                this
+                    .FormFleet
+                    .unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex]
+                    .weapon[WeaponSelectListBox.SelectedIndex]
+                    .set_rf(WeaponRfComboBox.SelectedIndex);
+            }
+        }
+        private void WeaponDetailRfComboBox_Leave(object sender, EventArgs e) {
+            if (//Range Check
+                IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
+                && IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
+                && IsVaidIndex(
+                    this.WeaponSelectListBox.SelectedIndex,
+                    this.FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].weapon.Count
+                )
+            )
+            {
+                this
+                    .FormFleet
+                    .unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex]
+                    .weapon[WeaponSelectListBox.SelectedIndex]
+                    .set_detailRf(WeaponDetailRfComboBox.SelectedIndex);
+            }
+        }
+        private void ChangeWeaponButton_Click(object sender, EventArgs e) {
 			if(FleetSelectComboBox.SelectedIndex == -1
 			|| KammusuSelectListBox.SelectedIndex == -1
 			|| WeaponTypeComboBox.SelectedIndex == -1
@@ -979,16 +1028,16 @@ namespace KCS_GUI
 			MapKammusuNameComboBox.Refresh();
 		}
 		// 値を上下限で制限する
-		private int limit(int n, int min_n, int max_n) {
+		static public int limit(int n, int min_n, int max_n) {
             return (n < min_n) ? min_n : (max_n < n) ? max_n : n;
 		}
 		// 外部熟練度を内部熟練度に変換する
-		private int rfRoughToDetail(int rf) {
+		static public int rfRoughToDetail(int rf) {
 			int[] roughToDetailList = new int[8] { 0, 10, 25, 40, 55, 70, 85, 100 };
 			return roughToDetailList[rf];
 		}
-		// 内部熟練度を外部熟練度に変換する
-		private int rfDetailToRough(int detailRf) {
+        // 内部熟練度を外部熟練度に変換する
+        static public int rfDetailToRough(int detailRf) {
 			int roughRf;
 			if(detailRf < 10)
 				roughRf = 0;
@@ -1146,8 +1195,7 @@ namespace KCS_GUI
 		}
 		// 制空値を計算して表示する(艦隊エディタ)
 		private void RedrawAntiAirScore() {
-			int antiAirScore = FormFleet.CalcAntiAirScore();
-			AllAntiAirTextBox.Text = antiAirScore.ToString();
+			AllAntiAirTextBox.Text = FormFleet.CalcAntiAirScore().ToString();
 		}
 		// 索敵値を計算して表示する(艦隊エディタ)
 		private void RedrawSearchPower() {
@@ -1175,7 +1223,18 @@ namespace KCS_GUI
 			public int rf;
 			// 内部熟練度
 			public int detailRf;
-		}
+
+            public void set_rf(int i_rf) {
+                this.rf = limit(i_rf, 0, 7);
+                this.detailRf = MainForm.rfRoughToDetail(this.rf);
+            }
+
+            public void set_detailRf(int i_detailRf) {
+                this.detailRf = limit(i_detailRf, 0, 120);
+                this.rf = MainForm.rfDetailToRough(this.detailRf);
+            }
+
+        }
 		// 艦娘
 		private class Kammusu {
 			// 艦船ID
