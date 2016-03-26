@@ -41,8 +41,6 @@ namespace KCS_GUI
 
         // 装備・艦娘データ
         static CsvDataSet data = new CsvDataSet();
-		//装備データ
-		static DataTable WeaponData;
 		//装備ID→インデックス変換
 		static Dictionary<int, int> WeaponIDtoIndex;
 		//種別番号→インデックスのリスト変換
@@ -386,17 +384,16 @@ namespace KCS_GUI
 			Kammusu selectedKammusu = FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex];
 			if(selectedKammusu.weapon.Count == selectedKammusu.maxSlots)
 				return;
-			DataRow[] dr = WeaponData.Select();
 			// 装備データを作成する
 			var setWeapon = new Weapon();
 			int index = WeaponTypeToIndexList[WeaponTypeComboBox.SelectedIndex][WeaponNameComboBox.SelectedIndex];
-			setWeapon.id = dr[index]["装備ID"].ToString().ParseInt();
+			setWeapon.id = data.Weapons[index].装備ID;
 			setWeapon.level = WeaponLevelComboBox.SelectedIndex.limit(0, 10);
 			setWeapon.rf = WeaponRfComboBox.SelectedIndex.limit(0, 7);
 			setWeapon.detailRf = WeaponDetailRfComboBox.SelectedIndex.limit(0, 120);
 			// 作成した装備データを追加する
 			selectedKammusu.weapon.Add(setWeapon);
-			WeaponSelectListBox.Items.Add(dr[WeaponIDtoIndex[setWeapon.id]]["装備名"].ToString());
+			WeaponSelectListBox.Items.Add(data.Weapons[WeaponIDtoIndex[setWeapon.id]].装備名);
 			WeaponSelectListBox.Refresh();
 			RedrawAntiAirScore();
 			RedrawSearchPower();
@@ -409,17 +406,16 @@ namespace KCS_GUI
 			|| WeaponSelectListBox.SelectedIndex == -1)
 				return;
 			Kammusu selectedKammusu = FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex];
-			DataRow[] dr = WeaponData.Select();
 			// 装備データを作成する
 			var setWeapon = new Weapon();
 			int index = WeaponTypeToIndexList[WeaponTypeComboBox.SelectedIndex][WeaponNameComboBox.SelectedIndex];
-			setWeapon.id = dr[index]["装備ID"].ToString().ParseInt();
+			setWeapon.id = data.Weapons[index].装備ID;
 			setWeapon.level = WeaponLevelComboBox.SelectedIndex.limit(0, 10);
 			setWeapon.rf = WeaponRfComboBox.SelectedIndex.limit(0, 7);
 			setWeapon.detailRf = WeaponDetailRfComboBox.SelectedIndex.limit(0, 120);
 			// 作成した装備データで上書きする
 			selectedKammusu.weapon[WeaponSelectListBox.SelectedIndex] = setWeapon;
-			WeaponSelectListBox.Items[WeaponSelectListBox.SelectedIndex] = dr[WeaponIDtoIndex[setWeapon.id]]["装備名"].ToString();
+			WeaponSelectListBox.Items[WeaponSelectListBox.SelectedIndex] = data.Weapons[WeaponIDtoIndex[setWeapon.id]].装備名;
 			WeaponSelectListBox.Refresh();
 			RedrawAntiAirScore();
 			RedrawSearchPower();
@@ -476,10 +472,9 @@ namespace KCS_GUI
 			KammusuLuckTextBox.Text = kammusu.luck.ToString();
 			KammusuCondTextBox.Text = kammusu.cond.ToString();
 			// 装備一覧を更新する
-			DataRow[] dr2 = WeaponData.Select();
 			WeaponSelectListBox.Items.Clear();
 			foreach(var weapon in kammusu.weapon) {
-				WeaponSelectListBox.Items.Add(dr2[WeaponIDtoIndex[weapon.id]]["装備名"].ToString());
+				WeaponSelectListBox.Items.Add(data.Weapons[WeaponIDtoIndex[weapon.id]].装備名);
 			}
 			WeaponSelectListBox.Refresh();
 		}
@@ -498,14 +493,13 @@ namespace KCS_GUI
 			Kammusu kammusu = FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex];
 			Weapon weapon = kammusu.weapon[WeaponSelectListBox.SelectedIndex];
 			int showWeaponIndex = WeaponIDtoIndex[weapon.id];
-			DataRow[] dr = WeaponData.Select();
 			int showWeaponType = WeaponTypeToNumber["その他"];
-			if(WeaponTypeToNumber.ContainsKey(dr[showWeaponIndex]["種別"].ToString())) {
-				showWeaponType = WeaponTypeToNumber[dr[showWeaponIndex]["種別"].ToString()];
+			if(WeaponTypeToNumber.ContainsKey(data.Weapons[showWeaponIndex].種別)) {
+				showWeaponType = WeaponTypeToNumber[data.Weapons[showWeaponIndex].種別];
 			}
 			WeaponTypeComboBox.SelectedIndex = showWeaponType;
 			WeaponTypeComboBox.Refresh();
-			WeaponNameComboBox.Text = dr[showWeaponIndex]["装備名"].ToString();
+			WeaponNameComboBox.Text = data.Weapons[showWeaponIndex].装備名;
 			RedrawWeaponNameList();
 			WeaponLevelComboBox.SelectedIndex = weapon.level;
 			WeaponLevelComboBox.Refresh();
@@ -693,7 +687,6 @@ namespace KCS_GUI
 			// 艦娘データを作成
 			var setKammusu = new Kammusu();
 			DataRow[] drKammusu = KammusuData.Select();
-			DataRow[] drWeapon = WeaponData.Select();
 			int index = KammusuTypeToIndexList[MapKammusuTypeComboBox.SelectedIndex][MapKammusuNameComboBox.SelectedIndex];
 			setKammusu.id = drKammusu[index]["艦船ID"].ToString().ParseInt();
 			setKammusu.level = 1;
@@ -878,19 +871,10 @@ namespace KCS_GUI
 		// 装備データを読み込み
 		private void ReadWeaponData()
 		{
-			// CSVをOLEで読み込む
-			string csvDir = System.IO.Directory.GetCurrentDirectory();
-			string csvFileName = "slotitems.csv";
-			string conString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + csvDir + ";Extended Properties=\"text;HDR=Yes;FMT=Delimited\"";
-			System.Data.OleDb.OleDbConnection con = new System.Data.OleDb.OleDbConnection(conString);
-			string commText = "SELECT * FROM [" + csvFileName + "]";
-			System.Data.OleDb.OleDbDataAdapter da = new System.Data.OleDb.OleDbDataAdapter(commText, con);
-			WeaponData = new DataTable();
-			da.Fill(WeaponData);
 			// 読み込んだデータからインデックスを張る
 			WeaponIDtoIndex = new Dictionary<int, int>();
 			WeaponTypeToIndexList = new Dictionary<int, List<int>>();
-			DataRow[] dr = WeaponData.Select();
+			DataRow[] dr = data.Weapons.Select();
 			for (int i = 0; i < dr.Length; ++i){
 				// ID→インデックスはそのまま
 				WeaponIDtoIndex[dr[i]["装備ID"].ToString().ParseInt()] = i;
@@ -935,9 +919,8 @@ namespace KCS_GUI
 			WeaponNameComboBox.Items.Clear();
 			// 選択した種別に従って、リストを生成する
 			if(WeaponTypeComboBox.SelectedIndex < 0) return;
-			DataRow[] dr = WeaponData.Select();
 			foreach(int index in WeaponTypeToIndexList[WeaponTypeComboBox.SelectedIndex]){
-				WeaponNameComboBox.Items.Add(dr[index]["装備名"].ToString());
+				WeaponNameComboBox.Items.Add(data.Weapons[index].装備名);
 			}
 			WeaponNameComboBox.Refresh();
 			// 改修度および熟練度の選択を切り替える
@@ -1026,7 +1009,6 @@ namespace KCS_GUI
 				setFleet.type = 0;
 			}
 			// 艦隊を読み込む
-			DataRow[] drWeapon = WeaponData.Select();
 			DataRow[] drKammusu = KammusuData.Select();
 			for(int fi = 1; fi <= MaxFleetSize; ++fi) {
 				if(json["f" + fi.ToString()] == null)
@@ -1073,8 +1055,8 @@ namespace KCS_GUI
 							return new Tuple<Fleet, bool>(setFleet, false);
 						// 種別を判定することで、"rf"が装備改修度か艦載機熟練度かを判別する
 						int setWeaponType = WeaponTypeToNumber["その他"];
-						if(WeaponTypeToNumber.ContainsKey(drWeapon[WeaponIDtoIndex[setWeapon.id]]["種別"].ToString())) {
-							setWeaponType = WeaponTypeToNumber[drWeapon[WeaponIDtoIndex[setWeapon.id]]["種別"].ToString()];
+						if(WeaponTypeToNumber.ContainsKey(data.Weapons[WeaponIDtoIndex[setWeapon.id]].種別)) {
+							setWeaponType = WeaponTypeToNumber[data.Weapons[WeaponIDtoIndex[setWeapon.id]].種別];
 						}
 						if(RfWeaponTypeList.IndexOf(setWeaponType) != -1) {
 							setWeapon.level = 0;
@@ -1224,7 +1206,6 @@ namespace KCS_GUI
 					writeFleets = 1;
 				}
 				// 艦隊を順に書き出していく
-				DataRow[] drWeapon = WeaponData.Select();
 				for(int fi = 0; fi < writeFleets; ++fi) {
 					// 艦隊
 					JObject setFleet = new JObject();
@@ -1243,8 +1224,8 @@ namespace KCS_GUI
 							setWeapon["id"] = unit[fi][si].weapon[wi].id;
 							//種別を判定することで、装備改修度か艦載機熟練度かを判別する
 							int setWeaponType = WeaponTypeToNumber["その他"];
-							if(WeaponTypeToNumber.ContainsKey(drWeapon[WeaponIDtoIndex[unit[fi][si].weapon[wi].id]]["種別"].ToString())) {
-								setWeaponType = WeaponTypeToNumber[drWeapon[WeaponIDtoIndex[unit[fi][si].weapon[wi].id]]["種別"].ToString()];
+							if(WeaponTypeToNumber.ContainsKey(data.Weapons[WeaponIDtoIndex[unit[fi][si].weapon[wi].id]].種別)) {
+								setWeaponType = WeaponTypeToNumber[data.Weapons[WeaponIDtoIndex[unit[fi][si].weapon[wi].id]].種別];
 							}
 							if(RfWeaponTypeList.IndexOf(setWeaponType) != -1) {
 								setWeapon["rf"] = unit[fi][si].weapon[wi].rf;
@@ -1265,15 +1246,14 @@ namespace KCS_GUI
 			// 制空値計算
 			public int CalcAntiAirScore() {
 				int antiAirScore = 0;
-				DataRow[] drWeapon = WeaponData.Select();
 				DataRow[] drKammusu = KammusuData.Select();
 				foreach(var kammusu in unit[0]) {
 					var slots = drKammusu[KammusuIDtoIndex[kammusu.id]]["搭載数"].ToString().Split('/');
 					for(int wi = 0; wi < kammusu.weapon.Count; ++wi) {
 						var weapon = kammusu.weapon[wi];
 						// まず装備の種類を読み取り、制空計算に使えるかを判別する
-						var weaponInfo = drWeapon[WeaponIDtoIndex[weapon.id]];
-						var type = weaponInfo["種別"].ToString();
+						var weaponInfo = data.Weapons[WeaponIDtoIndex[weapon.id]];
+						var type = weaponInfo.種別;
 						if(type != "艦上戦闘機"
 						&& type != "艦上爆撃機(爆戦)"
 						&& type != "艦上爆撃機"
@@ -1282,7 +1262,7 @@ namespace KCS_GUI
 						&& type != "水上戦闘機")
 							continue;
 						// 対空値・搭載数・内部熟練度で決まる制空値を代入する
-						var antiAir = weaponInfo["対空"].ToString().ParseInt();
+						var antiAir = weaponInfo.対空;
 						var slot = slots[wi].ParseInt();
 						double antiAirScoreWeapon = antiAir * Math.Sqrt(slot) + Math.Sqrt(0.1 * weapon.detailRf);
 						// 一部の種別には特別な補正を掛ける
@@ -1304,7 +1284,6 @@ namespace KCS_GUI
 				int roundUp5Level = ((level - 1) / 5 + 1) * 5;
 				searchPower += -0.6142467 * roundUp5Level;
 				// 艦娘・装備による補正
-				DataRow[] drWeapon = WeaponData.Select();
 				DataRow[] drKammusu = KammusuData.Select();
 				foreach(var kammusu in unit[0]) {
 					// 艦娘の索敵値は練度依存
@@ -1313,8 +1292,8 @@ namespace KCS_GUI
 					searchPower += Math.Sqrt(searchValueK) * 1.6841056;
 					foreach(var weapon in kammusu.weapon) {
 						// 装備の索敵値は種別によって係数が異なる
-						var searchValueW = drWeapon[WeaponIDtoIndex[weapon.id]]["索敵"].ToString().ParseInt();
-						switch(drWeapon[WeaponIDtoIndex[weapon.id]]["種別"].ToString()) {
+						var searchValueW = data.Weapons[WeaponIDtoIndex[weapon.id]].索敵;
+						switch(data.Weapons[WeaponIDtoIndex[weapon.id]].種別) {
 						case "艦上爆撃機":
 							searchPower += 1.0376255 * searchValueW;
 							break;
@@ -1361,7 +1340,6 @@ namespace KCS_GUI
 				// 司令部レベル補正
 				searchPower -= Math.Ceiling(0.4 * level);
 				// 艦娘・装備による補正
-				DataRow[] drWeapon = WeaponData.Select();
 				DataRow[] drKammusu = KammusuData.Select();
 				foreach(var kammusu in unit[0]) {
 					// 艦娘の索敵値は練度依存
@@ -1370,8 +1348,8 @@ namespace KCS_GUI
 					searchPower += Math.Sqrt(searchValueK);
 					foreach(var weapon in kammusu.weapon) {
 						// 装備の索敵値は種別によって係数が異なる
-						var searchValueW = drWeapon[WeaponIDtoIndex[weapon.id]]["索敵"].ToString().ParseInt();
-						switch(drWeapon[WeaponIDtoIndex[weapon.id]]["種別"].ToString()) {
+						var searchValueW = data.Weapons[WeaponIDtoIndex[weapon.id]].索敵;
+						switch(data.Weapons[WeaponIDtoIndex[weapon.id]].種別) {
 						case "水上爆撃機":
 							searchPower += 1.1 * searchValueW;
 							break;
