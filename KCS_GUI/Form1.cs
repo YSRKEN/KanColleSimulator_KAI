@@ -316,13 +316,31 @@ namespace KCS_GUI
 			RedrawAntiAirScore();
 			RedrawSearchPower();
 		}
+        private bool IsInRange(int val, int min, int max) {
+            return (min <= val && val <= max);
+        }
+        private bool IsVaidIndex(int val, int size) {
+            return IsInRange(val, 0, size - 1);
+        }
         private void KammusuLevelTextBox_Leave(object sender, EventArgs e) {
+            if(//Range Check
+                IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
+                && IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
+            )
             FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].level = limit(int.Parse(KammusuLevelTextBox.Text), 1, 155);
         }
         private void KammusuLuckTextBox_Leave(object sender, EventArgs e) {
+            if (//Range Check
+                IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
+                && IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
+            )
             FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].luck = limit(int.Parse(KammusuLuckTextBox.Text), -1, 100);
         }
         private void KammusuCondTextBox_Leave(object sender, EventArgs e) {
+            if (//Range Check
+                IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
+                && IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
+            )
             FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].cond = limit(int.Parse(KammusuCondTextBox.Text), 0, 100);
         }
         private void ChangeKammusuButton_Click(object sender, EventArgs e) {
