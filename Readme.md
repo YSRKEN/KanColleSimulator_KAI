@@ -111,7 +111,7 @@ MITライセンスとします。
 |taba       |https://github.com/taba256    |https://twitter.com/__taba__ |
 
 ## バージョン履歴
-### Ver.1.5.0
+### Ver.2.0.0
 GUIをVisual C#で実装した。  
 コンパイル時にcsvのデータを取り込むので、CUI版だけ実行する際はcsvが不要になった。  
 索敵計算式は2-5式(秋)だけでなく33式も実装した。
