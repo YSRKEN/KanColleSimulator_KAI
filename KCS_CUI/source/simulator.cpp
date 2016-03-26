@@ -128,6 +128,7 @@ tuple<Result, vector<Fleet>> Simulator::Calc() {
 	}
 	else {
 		// 夜戦フェイズ(連合艦隊では第2艦隊のみ)
+		air_war_result_ = tuple<AirWarStatus, vector<double>>(kAirWarStatusGood, { 1.0, 1.0 });
 		NightPhase();
 	}
 
@@ -457,7 +458,7 @@ vector<vector<std::pair<KammusuIndex, Range>>> Simulator::DetermineAttackOrder(F
 		auto &unit2 = unit[fleet_index];
 		attack_list[bi].reserve(unit2.size());//unit2.size()はたかが1桁程度の値だから気にせずallocateする
 		for (size_t ui = 0; ui < unit2.size(); ++ui) {
-			if (!unit2[ui].IsMoveGun()) continue;
+			if (!unit2[ui].IsMoveGun(false)) continue;
 			attack_list[bi].push_back({ { fleet_index, ui }, unit2[ui].MaxRange() });
 		}
 		if (fire_turn == kFireFirst) {
@@ -516,11 +517,14 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 			// 担当する艦娘が攻撃参加できない場合は飛ばす
 			const auto &friend_index = attack_list[bi][ui].first;
 			const auto &hunter_kammusu = fleet_[bi].GetUnit()[friend_index.fleet_no][friend_index.fleet_i];
-			if (!hunter_kammusu.IsFireGun()) continue;
+			if (!hunter_kammusu.IsFireGun(fleet_[other_side].HasAF())) continue;
 			// 攻撃の種類を判断し、攻撃対象を選択する
 			tuple<bool, KammusuIndex> target(false, {0, 0});
 			if (hunter_kammusu.IsAntiSubDay()) {
 				target = fleet_[other_side].RandomKammusuSS(fleet_index);
+			}
+			if (hunter_kammusu.IsSubmarine() && fleet_[other_side].HasAF()) {
+				target = fleet_[other_side].RandomKammusuAF(fleet_index);
 			}
 			if (!std::get<is_attackable>(target)) {
 				target = fleet_[other_side].RandomKammusuNonSS(hunter_kammusu.HasAirBomb(), TargetType(fleet_index));
@@ -815,6 +819,16 @@ int Simulator::CalcDamage(
 	// キャップ後補正
 	damage = int(damage);	//※この切り捨ては仕様です
 	{
+		// WG42 vs 集積地棲姫補正
+		// なお集積地棲姫を実装できないので（ｒｙ
+		/*if (target_kammusu.AnyOf(WID("集積地棲姫")) | target_kammusu.AnyOf(WID("集積地棲姫-壊")) {
+			auto wg_count = 0;
+			for (auto &it_w : hunter_kammusu.GetWeapon()) {
+				if (it_w.AnyOf(WID("WG42 (Wurfgerat 42)"))) ++wg_count;
+			}
+			static const double wg_plus2[] = { 1.0, 1.25, 1.62, 1.62, 1.62 };
+			damage *= int(wg_plus2[wg_count]);	//※この切り捨ては仕様です
+		}*/
 		// 徹甲弾補正
 		if (target_kammusu.IsSpecialEffectAP()) {
 			damage *= int(hunter_kammusu.SpecialEffectApPlus());	//※この切り捨ては仕様です
@@ -840,6 +854,9 @@ int Simulator::CalcDamage(
 		damage *= all_attack_plus[turn_player];
 		// 弾着観測射撃補正
 		if (battle_phase == kBattlePhaseGun && is_special_attack) damage *= multiple;
+		// PT子鬼群補正
+		// なおPT子鬼群を実装できないので（ｒｙ
+		/*if (target_kammusu.AnyOf(WID("PT小鬼群"))) damage *= hunter_kammusu.SpecialEffectPtPlus();*/
 	}
 	// 装甲乱数の分だけダメージを減少させる
 	damage -= 0.7 * target_kammusu.AllDefense() + 0.6 * rand.RandInt(target_kammusu.AllDefense());
@@ -969,6 +986,8 @@ double Simulator::CalcHitProb(
 			default:
 				break;
 			}
+			//夜戦時の重巡による命中率補正
+			hit_value += hunter_kammusu.FitNightHitPlus();
 			//引き算により命中率を決定する(上限あり)
 			hit_prob = hit_value - evade_value;
 			// 残燃料による回避補正

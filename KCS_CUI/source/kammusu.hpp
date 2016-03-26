@@ -195,6 +195,8 @@ public:
 	double SpecialEffectApPlus() const noexcept;	//徹甲弾補正
 	double CL2ProbPlus() const noexcept;			//熟練艦載機によるCL2率上昇
 	double CL2AttackPlus() const noexcept;			//熟練艦載機によるダメージ補正
+	double SpecialEffectPtPlus() const noexcept;	//PT子鬼群補正
+	double FitNightHitPlus() const noexcept;		//夜戦時の重巡による命中率補正
 	int AllDefense() const noexcept;				//総装甲を返す
 	Range MaxRange() const noexcept;				//射程を返す
 	int DayAttack(const DayFireType, const bool, const FleetType, const size_t) const noexcept;	//昼戦火力を返す
@@ -211,8 +213,8 @@ public:
 	bool IsSpecialEffectAP() const noexcept;				//徹甲弾補正を食らう側ならtrue
 	bool HasAirPss() const noexcept;						//彩雲を保有していた場合はtrue
 	bool IsFireTorpedo(const TorpedoTurn&) const noexcept;	//魚雷を発射できればtrue
-	bool IsMoveGun() const noexcept;						//砲撃戦で行動可能な艦ならtrue
-	bool IsFireGun() const noexcept;						//砲撃戦で攻撃可能な艦ならtrue
+	bool IsMoveGun(const bool) const noexcept;				//砲撃戦で行動可能な艦ならtrue
+	bool IsFireGun(const bool) const noexcept;				//砲撃戦で攻撃可能な艦ならtrue
 	bool IsAntiSubDay() const noexcept;						//昼戦で対潜可能な艦ならtrue
 	bool IsFireGunPlane() const noexcept;					//空撃可能ならtrue
 	bool IsFireNight() const noexcept;						//夜戦で攻撃可能な艦ならtrue

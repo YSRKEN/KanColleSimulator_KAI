@@ -560,6 +560,51 @@ double Kammusu::CL2AttackPlus() const noexcept {
 	return cl_attack_plus;
 }
 
+// PT子鬼群補正
+double Kammusu::SpecialEffectPtPlus() const noexcept {
+	double multiple = 1.0;
+	// 数を数えておく
+	int sum_small_gun = 0, sum_aag = 0, sum_sub_gun = 0, sum_aaa = 0;
+	for (auto &it_w : weapons_) {
+		if (it_w.AnyOf(WC("主砲")) && it_w.GetRange() == kRangeShort)
+			++sum_small_gun;
+		else if (it_w.AnyOf(WC("対空機銃")))
+			++sum_aag;
+		else if (it_w.AnyOf(WC("副砲")))
+			++sum_sub_gun;
+		else if (it_w.AnyOf(WC("対空強化弾")))
+			++sum_aaa;
+	}
+	// 小口径主砲補正(速吸・秋津洲以外)
+	if (sum_small_gun >= 2 && !AnyOf(SID("速吸"), SID("秋津洲"), SID("速吸改"), SID("秋津洲改"))) multiple *= 1.2;
+	// 機銃補正
+	if (sum_aag >= 2) multiple *= 1.1;
+	// 副砲補正(軽巡・雷巡以外)
+	if (sum_sub_gun >= 2 && !AnyOf(SC("軽巡洋艦"), SC("駆逐艦"))) multiple *= 1.2;
+	// 三式弾補正
+	if (sum_aaa >= 1) multiple *= 1.3;
+	return multiple;
+}
+
+// 夜戦時の重巡による命中率補正
+double Kammusu::FitNightHitPlus() const noexcept {
+	// 重巡以外は関係ないので除く
+	if (!AnyOf(SC("重巡洋艦") | SC("航空巡洋艦"))) return 0.0;
+	// 数を数えておく
+	int sum_normal = 0, sum_3rd = 0;
+	for (auto &it_w : weapons_) {
+		if (it_w.AnyOf(WID("20.3cm連装砲")))
+			++sum_normal;
+		else if (it_w.AnyOf(WID("20.3cm(3号)連装砲")))
+			++sum_3rd;
+	}
+	// 補正を適用する
+	double hit_prob_plus = 0.0;
+	const static double plus_3rd[] = {0.0, 0.0765, 0.0905, 0.1045, 0.1185};
+	hit_prob_plus = 0.061 * sum_normal + plus_3rd[sum_3rd];
+	return hit_prob_plus;
+}
+
 // 総装甲を返す
 int Kammusu::AllDefense() const noexcept {
 	return defense_ + SumWeapons(&Weapon::GetDefense);
@@ -856,11 +901,18 @@ bool Kammusu::IsFireTorpedo(const TorpedoTurn &torpedo_turn) const noexcept {
 }
 
 // 砲撃戦で行動可能な艦ならtrue
-bool Kammusu::IsMoveGun() const noexcept {
+bool Kammusu::IsMoveGun(const bool af_flg) const noexcept {
 	// 撃沈していたら当然行動できない
 	if (Status() == kStatusLost) return false;
 	// 潜水艦系も砲撃フェイズでは行動できない
-	if (IsSubmarine()) return false;
+	// ただし対地攻撃を仕掛ける際を除く
+	if (IsSubmarine()) {
+		if (!af_flg) return false;
+		for (auto &it_w : weapons_) {
+			if (it_w.AnyOf(WID("WG42 (Wurfgerat 42)"), WID("特二式内火艇"))) return true;
+		}
+		return false;
+	}
 	// 艦載機が切れた空母も砲撃フェイズでは行動できない
 	if (AnyOf(SC("軽空母") | SC("正規空母") | SC("装甲空母")))
 		return HasAirAttack();
@@ -868,11 +920,18 @@ bool Kammusu::IsMoveGun() const noexcept {
 }
 
 // 砲撃戦で攻撃可能な艦ならtrue
-bool Kammusu::IsFireGun() const noexcept {
+bool Kammusu::IsFireGun(const bool af_flg) const noexcept {
 	// 撃沈していたら当然攻撃できない
 	if (Status() == kStatusLost) return false;
 	// 潜水艦系も砲撃フェイズでは攻撃できない
-	if (IsSubmarine()) return false;
+	// ただし対地攻撃を仕掛ける際を除く
+	if (IsSubmarine()) {
+		if (!af_flg) return false;
+		for (auto &it_w : weapons_) {
+			if (it_w.AnyOf(WID("WG42 (Wurfgerat 42)"), WID("特二式内火艇"))) return true;
+		}
+		return false;
+	}
 	// 艦載機が切れた空母も砲撃フェイズでは攻撃できない
 	// また、中破した空母系・大破した装甲空母も攻撃できない
 	if (AnyOf(SC("軽空母") | SC("正規空母") | SC("陸上型")))
