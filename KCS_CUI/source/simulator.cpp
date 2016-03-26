@@ -901,6 +901,32 @@ double Simulator::CalcHitProb(
 	double hit_prob = 1.0;
 	switch (battle_phase) {
 	case kBattlePhaseAir:
+		{
+			/* 航空戦命中率 */
+			// 回避値から回避項を求める
+			double evade_sum = target_kammusu.AllEvade();
+			double evade_value;
+			if (evade_sum <= 40) {
+				evade_value = 0.03 + evade_sum / 80;
+			}
+			else {
+				evade_value = 0.03 + evade_sum / (evade_sum + 40);
+			}
+			// 命中項は熟練度に依存する
+			// 搭載艦載機が全て熟練度MAXなら+15％だが、
+			// それ以外の場合が不明なので適宜調整を入れた
+			double hit_value = 1.0;
+			if (hunter_kammusu.GetSlots() != 0) {
+				for (auto &it_w : hunter_kammusu.GetWeapon()) {
+					if (!it_w.AnyOf(WeaponClass::Air)) continue;
+					hit_value += 1.0 * it_w.GetLevel() / 7 * (0.15 / hunter_kammusu.GetSlots());
+				}
+			}
+			//引き算により命中率を決定する(上限あり)
+			hit_prob = hit_value - evade_value;
+			hit_prob = std::min(hit_prob, 0.97);
+		}
+	break;
 	case kBattlePhaseGun:
 	case kBattlePhaseNight:
 		{
