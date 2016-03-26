@@ -560,6 +560,32 @@ double Kammusu::CL2AttackPlus() const noexcept {
 	return cl_attack_plus;
 }
 
+// PT子鬼群補正
+double Kammusu::SpecialEffectPtPlus() const noexcept {
+	double multiple = 1.0;
+	// 数を数えておく
+	int sum_small_gun = 0, sum_aag = 0, sum_sub_gun = 0, sum_aaa = 0;
+	for (auto &it_w : weapons_) {
+		if (it_w.AnyOf(WC("主砲")) && it_w.GetRange() == kRangeShort)
+			++sum_small_gun;
+		else if (it_w.AnyOf(WC("対空機銃")))
+			++sum_aag;
+		else if (it_w.AnyOf(WC("副砲")))
+			++sum_sub_gun;
+		else if (it_w.AnyOf(WC("対空強化弾")))
+			++sum_aaa;
+	}
+	// 小口径主砲補正(速吸・秋津洲以外)
+	if (sum_small_gun >= 2 && !AnyOf(SID("速吸"), SID("秋津洲"), SID("速吸改"), SID("秋津洲改"))) multiple *= 1.2;
+	// 機銃補正
+	if (sum_aag >= 2) multiple *= 1.1;
+	// 副砲補正(軽巡・雷巡以外)
+	if (sum_sub_gun >= 2 && !AnyOf(SC("軽巡洋艦"), SC("駆逐艦"))) multiple *= 1.2;
+	// 三式弾補正
+	if (sum_aaa >= 1) multiple *= 1.3;
+	return multiple;
+}
+
 // 総装甲を返す
 int Kammusu::AllDefense() const noexcept {
 	return defense_ + SumWeapons(&Weapon::GetDefense);
