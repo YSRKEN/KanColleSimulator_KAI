@@ -856,11 +856,18 @@ bool Kammusu::IsFireTorpedo(const TorpedoTurn &torpedo_turn) const noexcept {
 }
 
 // 砲撃戦で行動可能な艦ならtrue
-bool Kammusu::IsMoveGun() const noexcept {
+bool Kammusu::IsMoveGun(const bool af_flg) const noexcept {
 	// 撃沈していたら当然行動できない
 	if (Status() == kStatusLost) return false;
 	// 潜水艦系も砲撃フェイズでは行動できない
-	if (IsSubmarine()) return false;
+	// ただし対地攻撃を仕掛ける際を除く
+	if (IsSubmarine()) {
+		if (!af_flg) return false;
+		for (auto &it_w : weapons_) {
+			if (it_w.AnyOf(WID("WG42 (Wurfgerat 42)"), WID("特二式内火艇"))) return true;
+		}
+		return false;
+	}
 	// 艦載機が切れた空母も砲撃フェイズでは行動できない
 	if (AnyOf(SC("軽空母") | SC("正規空母") | SC("装甲空母")))
 		return HasAirAttack();
@@ -868,11 +875,18 @@ bool Kammusu::IsMoveGun() const noexcept {
 }
 
 // 砲撃戦で攻撃可能な艦ならtrue
-bool Kammusu::IsFireGun() const noexcept {
+bool Kammusu::IsFireGun(const bool af_flg) const noexcept {
 	// 撃沈していたら当然攻撃できない
 	if (Status() == kStatusLost) return false;
 	// 潜水艦系も砲撃フェイズでは攻撃できない
-	if (IsSubmarine()) return false;
+	// ただし対地攻撃を仕掛ける際を除く
+	if (IsSubmarine()) {
+		if (!af_flg) return false;
+		for (auto &it_w : weapons_) {
+			if (it_w.AnyOf(WID("WG42 (Wurfgerat 42)"), WID("特二式内火艇"))) return true;
+		}
+		return false;
+	}
 	// 艦載機が切れた空母も砲撃フェイズでは攻撃できない
 	// また、中破した空母系・大破した装甲空母も攻撃できない
 	if (AnyOf(SC("軽空母") | SC("正規空母") | SC("陸上型")))

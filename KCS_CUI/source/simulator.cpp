@@ -457,7 +457,7 @@ vector<vector<std::pair<KammusuIndex, Range>>> Simulator::DetermineAttackOrder(F
 		auto &unit2 = unit[fleet_index];
 		attack_list[bi].reserve(unit2.size());//unit2.size()はたかが1桁程度の値だから気にせずallocateする
 		for (size_t ui = 0; ui < unit2.size(); ++ui) {
-			if (!unit2[ui].IsMoveGun()) continue;
+			if (!unit2[ui].IsMoveGun(false)) continue;
 			attack_list[bi].push_back({ { fleet_index, ui }, unit2[ui].MaxRange() });
 		}
 		if (fire_turn == kFireFirst) {
@@ -516,11 +516,14 @@ void Simulator::FirePhase(const FireTurn &fire_turn, const size_t &fleet_index) 
 			// 担当する艦娘が攻撃参加できない場合は飛ばす
 			const auto &friend_index = attack_list[bi][ui].first;
 			const auto &hunter_kammusu = fleet_[bi].GetUnit()[friend_index.fleet_no][friend_index.fleet_i];
-			if (!hunter_kammusu.IsFireGun()) continue;
+			if (!hunter_kammusu.IsFireGun(fleet_[other_side].HasAF())) continue;
 			// 攻撃の種類を判断し、攻撃対象を選択する
 			tuple<bool, KammusuIndex> target(false, {0, 0});
 			if (hunter_kammusu.IsAntiSubDay()) {
 				target = fleet_[other_side].RandomKammusuSS(fleet_index);
+			}
+			if (hunter_kammusu.IsSubmarine() && fleet_[other_side].HasAF()) {
+				target = fleet_[other_side].RandomKammusuAF(fleet_index);
 			}
 			if (!std::get<is_attackable>(target)) {
 				target = fleet_[other_side].RandomKammusuNonSS(hunter_kammusu.HasAirBomb(), TargetType(fleet_index));

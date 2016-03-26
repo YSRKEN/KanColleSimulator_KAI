@@ -51,6 +51,7 @@ public:
 	bool HasAirFight() const noexcept;		//航空戦に参加する艦載機をいずれかの艦が保有していた場合はtrue
 	bool HasAirTrailer() const noexcept;	//触接に参加する艦載機をいずれかの艦が保有していた場合はtrue
 	bool HasAirPss() const noexcept;		//彩雲をいずれかの艦が保有していた場合はtrue
+	bool HasAF() const noexcept;			//陸上型がいた場合はtrue
 	int AntiAirBonus() const;				//艦隊対空ボーナス値を計算する
 	friend std::ostream& operator<<(std::ostream& os, const Fleet& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Fleet& conf);
@@ -61,6 +62,7 @@ public:
 	tuple<bool, size_t> RandomKammusu() const;					//生存艦から艦娘をランダムに指定する
 	tuple<bool, KammusuIndex> RandomKammusuNonSS(const bool, const TargetType, const bool has_sl = false) const;	//水上の生存艦から艦娘をランダムに指定する
 	tuple<bool, KammusuIndex> RandomKammusuSS(const size_t) const;												//潜水の生存艦から艦娘をランダムに指定する
+	tuple<bool, KammusuIndex> RandomKammusuAF(const size_t) const;												//陸上型の生存艦から艦娘をランダムに指定する
 	bool HasLights() const noexcept;		//探照灯や照明弾をいずれかの艦が保有していた場合はtrue
 	bool HasHeavyDamage() const noexcept;	// 大破以上の艦が存在していた場合はtrue
 };
