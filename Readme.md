@@ -80,6 +80,24 @@
 - 航空戦マス、および空襲戦マスには対応していません
 - 支援艦隊には対応していません
 
+## オプションで変更可能な箇所(予定)
+- 艦娘のレベルの最大値
+- 索敵計算のメソッド
+- 索敵フェイズの成功判定
+- 触接開始率の計算方法(開始率および選択率)
+- 空中戦における敵機の撃墜率
+- 対空カットインにおける発動確率
+- かばいが発生する確率、およびかばう艦の選定方法
+- 命中率計算式
+- フィット砲補正の計算式
+- クリティカル発動率
+- 弾薬量補正
+- 弾着観測射撃(カットイン)成功時における命中率補正
+- 弾着観測射撃の発動確率
+- 連合艦隊における命中率補正
+- 探照灯による誘引率
+- 重巡による夜戦砲撃命中率補正
+
 ## ライセンス
 MITライセンスとします。
 
@@ -139,5 +157,6 @@ https://twitter.com/Xe_UCH/status/705281106011029505
 http://ch.nicovideo.jp/biikame/blomaga/ar850895  
 https://docs.google.com/spreadsheets/d/1O91DpCaHbjCZV2jy1GlMyqjwyWULdjK5kwhYALPFJGE/edit  
 http://ch.nicovideo.jp/umya/blomaga/ar899278
+https://twitter.com/noratako5/status/707526758434607104
 - おのれSourceTree……勝手に特定拡張子を自動で除外するとは……  
 http://tech.nitoyon.com/ja/blog/2013/04/05/sourcetree/

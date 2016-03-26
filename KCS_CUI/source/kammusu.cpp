@@ -586,6 +586,25 @@ double Kammusu::SpecialEffectPtPlus() const noexcept {
 	return multiple;
 }
 
+// 夜戦時の重巡による命中率補正
+double Kammusu::FitNightHitPlus() const noexcept {
+	// 重巡以外は関係ないので除く
+	if (!AnyOf(SC("重巡洋艦") | SC("航空巡洋艦"))) return 0.0;
+	// 数を数えておく
+	int sum_normal = 0, sum_3rd = 0;
+	for (auto &it_w : weapons_) {
+		if (it_w.AnyOf(WID("20.3cm連装砲")))
+			++sum_normal;
+		else if (it_w.AnyOf(WID("20.3cm(3号)連装砲")))
+			++sum_3rd;
+	}
+	// 補正を適用する
+	double hit_prob_plus = 0.0;
+	const static double plus_3rd[] = {0.0, 0.0765, 0.0905, 0.1045, 0.1185};
+	hit_prob_plus = 0.061 * sum_normal + plus_3rd[sum_3rd];
+	return hit_prob_plus;
+}
+
 // 総装甲を返す
 int Kammusu::AllDefense() const noexcept {
 	return defense_ + SumWeapons(&Weapon::GetDefense);

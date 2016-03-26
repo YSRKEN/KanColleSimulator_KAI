@@ -985,6 +985,8 @@ double Simulator::CalcHitProb(
 			default:
 				break;
 			}
+			//夜戦時の重巡による命中率補正
+			hit_value += hunter_kammusu.FitNightHitPlus();
 			//引き算により命中率を決定する(上限あり)
 			hit_prob = hit_value - evade_value;
 			// 残燃料による回避補正

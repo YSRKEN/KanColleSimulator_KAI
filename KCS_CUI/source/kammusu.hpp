@@ -196,6 +196,7 @@ public:
 	double CL2ProbPlus() const noexcept;			//熟練艦載機によるCL2率上昇
 	double CL2AttackPlus() const noexcept;			//熟練艦載機によるダメージ補正
 	double SpecialEffectPtPlus() const noexcept;	//PT子鬼群補正
+	double FitNightHitPlus() const noexcept;		//夜戦時の重巡による命中率補正
 	int AllDefense() const noexcept;				//総装甲を返す
 	Range MaxRange() const noexcept;				//射程を返す
 	int DayAttack(const DayFireType, const bool, const FleetType, const size_t) const noexcept;	//昼戦火力を返す
