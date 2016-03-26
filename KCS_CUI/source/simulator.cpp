@@ -128,6 +128,7 @@ tuple<Result, vector<Fleet>> Simulator::Calc() {
 	}
 	else {
 		// 夜戦フェイズ(連合艦隊では第2艦隊のみ)
+		air_war_result_ = tuple<AirWarStatus, vector<double>>(kAirWarStatusGood, { 1.0, 1.0 });
 		NightPhase();
 	}
 
