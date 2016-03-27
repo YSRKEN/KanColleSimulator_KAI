@@ -1,6 +1,7 @@
 ﻿#ifndef NOMINMAX
 #define NOMINMAX
 #endif
+#include "../../version.h"
 #include "base.hpp"
 #include "config.hpp"
 #include <codecvt>
@@ -20,6 +21,7 @@ struct ForConfigImpl {
 	size_t threads_;	//スレッド数
 	string output_filename_;	//出力ファイル名
 	bool json_prettify_flg_;	//出力ファイルを整形するか
+	bool help_flg_;				//ヘルプを表示するか
 };
 struct Config::Impl {
 	ForConfigImpl e;
@@ -27,12 +29,27 @@ struct Config::Impl {
 namespace detail {
 	void print_verison() noexcept(false)
 	{
-		std::cout << "version" << std::endl;
+	std::cout << "version" << std::endl;
+	using std::endl;
+	std::cout
+		<< KCS_FILE_DESCRIPTION << endl
+		<< KCS_COPYRIGHT_STR << endl;
 	}
 	void print_commandline_help() noexcept(false)
 	{
 		detail::print_verison();
-		std::cout << "help" << std::endl;
+		std::cout << std::endl;
+		std::cout << "Usage: KCS_CUI -i input1.json input2.json|input2.map [-f formation1 formation2]" << std::endl;
+		std::cout << "        [-n times] [-t threads] [-o output.json] [--result-json-prettify | --no-result-json-prettify]" << std::endl;
+		std::cout << std::endl;
+		std::cout << "-i input1.json input2.json|input2.map  : input file path" << std::endl;
+		std::cout << "-f formation1 formation2               : fleet formation(0-5)" << std::endl;
+		std::cout << "-n times                               : number of trials" << std::endl;
+		std::cout << "-t threads                             : using threads" << std::endl;
+		std::cout << "-o output.json                         : output file path" << std::endl;
+		std::cout << "--result-json-prettify                 : prettify result json" << std::endl;
+		std::cout << "--no-result-json-prettify              : no prettify result json" << std::endl;
+		std::cout << std::endl;
 	}
 }
 void print_commandline_help() noexcept(false)
