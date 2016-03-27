@@ -11,10 +11,6 @@ public:
 		return generator_;
 	}
 
-	//generater
-	static double RandReal() {
-		return std::uniform_real_distribution<double>{}(generator_);
-	}
 	//[a, b]の一様整数乱数を取り出す
 	template<class Int>
 	static Int RandInt(const Int min, const Int max) {
@@ -25,7 +21,7 @@ public:
 	static Int RandInt(const Int n) {
 		return RandInt<Int>(0, n - 1); 
 	}
-	static double RandReal(const double min, const double max) {
+	static double RandReal(const double min = 0, const double max = 1) {
 		return std::uniform_real_distribution<double>{min, max}(generator_);
 	}
 	static bool RandBool(double rate = 0.5) {
