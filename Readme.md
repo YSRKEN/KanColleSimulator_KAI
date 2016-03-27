@@ -2,7 +2,9 @@
 
 ## 概要
 艦これの戦闘をシミュレートします。
-実行時にDLLを要求された際は、[Visual Studio 2015 Update 1のVisual C++再頒布可能パッケージ](https://www.microsoft.com/ja-jp/download/details.aspx?id=49984)を導入してください。
+GUI実行時にDLLを要求された際は、[Visual Studio 2015 Update 1のVisual C++再頒布可能パッケージ](https://www.microsoft.com/ja-jp/download/details.aspx?id=49984)を導入してください。
+また、x64フォルダには64bit版のKCS_CUI.exeおよびDLLを、x86フォルダには32bit版のKCS_CUI.exeおよびDLLを同梱しています。
+実行前に、お好きな方をKCS_GUI.exeと同じフォルダにコピーしてください。
 
 ## 使い方(GUI編)
 - 艦隊エディタ・マップエディタ・シミュレートと3つのタブに分かれています
