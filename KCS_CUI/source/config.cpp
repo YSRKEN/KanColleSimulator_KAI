@@ -11,6 +11,7 @@
 #include <algorithm>
 #include "exception.hpp"
 #include <iostream>
+#include "../../version.h"
 
 struct ForConfigImpl {
 	ForConfigImpl() : input_filename_(), formation_({{ kFormationTrail , kFormationTrail }}), times_(1), threads_(1), json_prettify_flg_(true) {}
@@ -27,7 +28,11 @@ struct Config::Impl {
 namespace detail {
 	void print_verison() noexcept(false)
 	{
-		std::cout << "version" << std::endl;
+		using std::endl;
+		std::cout
+			<< KCS_FILE_DESCRIPTION << endl
+			<< KCS_COPYRIGHT_STR << endl
+			<< "version " KCS_VERSION_STR << endl;
 	}
 	void print_commandline_help() noexcept(false)
 	{
