@@ -14,7 +14,7 @@ using System.Reflection;
 
 namespace KCS_GUI
 {
-	public partial class MainForm : Form
+    public partial class MainForm : Form
 	{
 		/* メンバ変数 */
 		// 定数群
@@ -305,9 +305,9 @@ namespace KCS_GUI
 			// 艦娘データを作成する
 			var setKammusu = new Kammusu();
 			int index = KammusuTypeToIndexList[KammusuTypeComboBox.SelectedIndex][KammusuNameComboBox.SelectedIndex];
-			setKammusu.id = int.Parse(dr[index]["艦船ID"].ToString());
-			setKammusu.level = limit(int.Parse(KammusuLevelTextBox.Text), 1, 155);
-			setKammusu.luck = int.Parse(KammusuLuckTextBox.Text);
+			setKammusu.id = dr[index]["艦船ID"].ToString().ParseInt();
+			setKammusu.level = KammusuLevelTextBox.Text.ParseInt().limit(1, 155);
+			setKammusu.luck = KammusuLuckTextBox.Text.ParseInt();
 			if(setKammusu.luck < 0) {
 				// 運に負数を指定した場合は、艦娘のデフォルト値とする(デッキビルダーの仕様上、"-1"でOK)
 				setKammusu.luck = -1;
@@ -315,8 +315,8 @@ namespace KCS_GUI
 				// そうでない場合は、最大でも100までに抑える
 				setKammusu.luck = limit(setKammusu.luck, 0, 100);
 			}
-			setKammusu.cond = limit(int.Parse(KammusuCondTextBox.Text), 0, 100);
-			setKammusu.maxSlots = int.Parse(dr[index]["スロット数"].ToString());
+			setKammusu.cond = limit(KammusuCondTextBox.Text.ParseInt(), 0, 100);
+			setKammusu.maxSlots = dr[index]["スロット数"].ToString().ParseInt();
 			// 作成した艦娘データを追加する
 			FormFleet.unit[FleetSelectComboBox.SelectedIndex].Add(setKammusu);
 			KammusuSelectListBox.Items.Add(dr[KammusuIDtoIndex[setKammusu.id]]["艦名"].ToString());
@@ -334,18 +334,18 @@ namespace KCS_GUI
 			// 艦娘データを作成する
 			var setKammusu = new Kammusu();
 			int index = KammusuTypeToIndexList[KammusuTypeComboBox.SelectedIndex][KammusuNameComboBox.SelectedIndex];
-			setKammusu.id = int.Parse(dr[index]["艦船ID"].ToString());
-			setKammusu.level = limit(int.Parse(KammusuLevelTextBox.Text), 1, 155);
-			setKammusu.luck = int.Parse(KammusuLuckTextBox.Text);
+			setKammusu.id = dr[index]["艦船ID"].ToString().ParseInt();
+			setKammusu.level = KammusuLevelTextBox.Text.ParseInt().limit(1, 155);
+			setKammusu.luck = KammusuLuckTextBox.Text.ParseInt();
 			if(setKammusu.luck < 0) {
 				// 運に負数を指定した場合は、艦娘のデフォルト値とする(デッキビルダーの仕様上、"-1"でOK)
 				setKammusu.luck = -1;
 			} else {
 				// そうでない場合は、最大でも100までに抑える
-				setKammusu.luck = limit(setKammusu.luck, 0, 100);
+				setKammusu.luck = setKammusu.luck.limit(0, 100);
 			}
-			setKammusu.cond = limit(int.Parse(KammusuCondTextBox.Text), 0, 100);
-			setKammusu.maxSlots = int.Parse(dr[index]["スロット数"].ToString());
+			setKammusu.cond = KammusuCondTextBox.Text.ParseInt().limit(0, 100);
+			setKammusu.maxSlots = dr[index]["スロット数"].ToString().ParseInt();
 			// 作成した艦娘データで上書きする
 			FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex] = setKammusu;
 			KammusuSelectListBox.Items[KammusuSelectListBox.SelectedIndex] = dr[KammusuIDtoIndex[setKammusu.id]]["艦名"].ToString();
@@ -378,10 +378,10 @@ namespace KCS_GUI
 			// 装備データを作成する
 			var setWeapon = new Weapon();
 			int index = WeaponTypeToIndexList[WeaponTypeComboBox.SelectedIndex][WeaponNameComboBox.SelectedIndex];
-			setWeapon.id = int.Parse(dr[index]["装備ID"].ToString());
-			setWeapon.level = limit(WeaponLevelComboBox.SelectedIndex, 0, 10);
-			setWeapon.rf = limit(WeaponRfComboBox.SelectedIndex, 0, 7);
-			setWeapon.detailRf = limit(WeaponDetailRfComboBox.SelectedIndex, 0, 120);
+			setWeapon.id = dr[index]["装備ID"].ToString().ParseInt();
+			setWeapon.level = WeaponLevelComboBox.SelectedIndex.limit(0, 10);
+			setWeapon.rf = WeaponRfComboBox.SelectedIndex.limit(0, 7);
+			setWeapon.detailRf = WeaponDetailRfComboBox.SelectedIndex.limit(0, 120);
 			// 作成した装備データを追加する
 			selectedKammusu.weapon.Add(setWeapon);
 			WeaponSelectListBox.Items.Add(dr[WeaponIDtoIndex[setWeapon.id]]["装備名"].ToString());
@@ -401,10 +401,10 @@ namespace KCS_GUI
 			// 装備データを作成する
 			var setWeapon = new Weapon();
 			int index = WeaponTypeToIndexList[WeaponTypeComboBox.SelectedIndex][WeaponNameComboBox.SelectedIndex];
-			setWeapon.id = int.Parse(dr[index]["装備ID"].ToString());
-			setWeapon.level = limit(WeaponLevelComboBox.SelectedIndex, 0, 10);
-			setWeapon.rf = limit(WeaponRfComboBox.SelectedIndex, 0, 7);
-			setWeapon.detailRf = limit(WeaponDetailRfComboBox.SelectedIndex, 0, 120);
+			setWeapon.id = dr[index]["装備ID"].ToString().ParseInt();
+			setWeapon.level = WeaponLevelComboBox.SelectedIndex.limit(0, 10);
+			setWeapon.rf = WeaponRfComboBox.SelectedIndex.limit(0, 7);
+			setWeapon.detailRf = WeaponDetailRfComboBox.SelectedIndex.limit(0, 120);
 			// 作成した装備データで上書きする
 			selectedKammusu.weapon[WeaponSelectListBox.SelectedIndex] = setWeapon;
 			WeaponSelectListBox.Items[WeaponSelectListBox.SelectedIndex] = dr[WeaponIDtoIndex[setWeapon.id]]["装備名"].ToString();
@@ -426,7 +426,7 @@ namespace KCS_GUI
 		}
 		private void HQLevelTextBox_TextChanged(object sender, EventArgs e) {
 			// 司令部レベルが書き換わった際は反映する
-			FormFleet.level = limit(int.Parse(HQLevelTextBox.Text), 1, 120);
+			FormFleet.level = HQLevelTextBox.Text.ParseInt().limit(1, 120);
 			RedrawSearchPower();
 		}
 		private void FleetTypeComboBox_SelectedIndexChanged(object sender, EventArgs e) {
@@ -455,7 +455,7 @@ namespace KCS_GUI
 			Kammusu kammusu = FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex];
 			int showKammusuIndex = KammusuIDtoIndex[kammusu.id];
 			DataRow[] dr = KammusuData.Select();
-			int showKammusuType = int.Parse(dr[showKammusuIndex]["艦種"].ToString()) - 1;
+			int showKammusuType = dr[showKammusuIndex]["艦種"].ToString().ParseInt() - 1;
 			KammusuTypeComboBox.SelectedIndex = showKammusuType;
 			KammusuTypeComboBox.Refresh();
 			KammusuNameComboBox.Text = dr[showKammusuIndex]["艦名"].ToString();
@@ -645,13 +645,13 @@ namespace KCS_GUI
 			var setKammusu = new Kammusu();
 			DataRow[] drKammusu = KammusuData.Select();
 			int index = KammusuTypeToIndexList[MapKammusuTypeComboBox.SelectedIndex][MapKammusuNameComboBox.SelectedIndex];
-			setKammusu.id = int.Parse(drKammusu[index]["艦船ID"].ToString());
+			setKammusu.id = drKammusu[index]["艦船ID"].ToString().ParseInt();
 			setKammusu.level = 1;
 			setKammusu.luck = -1;
 			setKammusu.cond = 49;
 			var firstWeaponID = drKammusu[index]["初期装備"].ToString().Split('/');
 			foreach(string weaponID in firstWeaponID){
-				var weaponIdToInt = int.Parse(weaponID);
+				var weaponIdToInt = weaponID.ParseInt();
 				if(weaponIdToInt <= 0)
 					break;
 				var setWeapon = new Weapon();
@@ -683,12 +683,12 @@ namespace KCS_GUI
 			DataRow[] drKammusu = KammusuData.Select();
 			DataRow[] drWeapon = WeaponData.Select();
 			int index = KammusuTypeToIndexList[MapKammusuTypeComboBox.SelectedIndex][MapKammusuNameComboBox.SelectedIndex];
-			setKammusu.id = int.Parse(drKammusu[index]["艦船ID"].ToString());
+			setKammusu.id = drKammusu[index]["艦船ID"].ToString().ParseInt();
 			setKammusu.level = 1;
 			setKammusu.luck = -1;
 			var firstWeaponID = drKammusu[index]["初期装備"].ToString().Split('/');
 			foreach(string weaponID in firstWeaponID) {
-				var weaponIdToInt = int.Parse(weaponID);
+				var weaponIdToInt = weaponID.ParseInt();
 				if(weaponIdToInt <= 0)
 					break;
 				var setWeapon = new Weapon();
@@ -763,7 +763,7 @@ namespace KCS_GUI
 			Kammusu kammusu = FormMapData.position[MapPositionListBox.SelectedIndex].fleet[MapPatternListBox.SelectedIndex].unit[0][MapKammusuListBox.SelectedIndex];
 			int showKammusuIndex = KammusuIDtoIndex[kammusu.id];
 			DataRow[] dr = KammusuData.Select();
-			int showKammusuType = int.Parse(dr[showKammusuIndex]["艦種"].ToString()) - 1;
+			int showKammusuType = dr[showKammusuIndex]["艦種"].ToString().ParseInt() - 1;
 			MapKammusuTypeComboBox.SelectedIndex = showKammusuType;
 			MapKammusuTypeComboBox.Refresh();
 			MapKammusuNameComboBox.Text = dr[showKammusuIndex]["艦名"].ToString();
@@ -881,7 +881,7 @@ namespace KCS_GUI
 			DataRow[] dr = WeaponData.Select();
 			for (int i = 0; i < dr.Length; ++i){
 				// ID→インデックスはそのまま
-				WeaponIDtoIndex[int.Parse(dr[i]["装備ID"].ToString())] = i;
+				WeaponIDtoIndex[dr[i]["装備ID"].ToString().ParseInt()] = i;
 				// 種類→インデックスは例外を考慮する
 				int type = WeaponTypeToNumber["その他"];
 				if(WeaponTypeToNumber.ContainsKey(dr[i]["種別"].ToString())) {
@@ -909,9 +909,9 @@ namespace KCS_GUI
 			DataRow[] dr = KammusuData.Select();
 			for(int i = 0; i < dr.Length; ++i) {
 				// ID→インデックスはそのまま
-				KammusuIDtoIndex[int.Parse(dr[i]["艦船ID"].ToString())] = i;
+				KammusuIDtoIndex[dr[i]["艦船ID"].ToString().ParseInt()] = i;
 				// 種類→インデックスは例外を考慮する
-				int type = int.Parse(dr[i]["艦種"].ToString()) - 1;	//1を引くのはインデックスとの対応のため
+				int type = dr[i]["艦種"].ToString().ParseInt() - 1;	//1を引くのはインデックスとの対応のため
 				if(!KammusuTypeToIndexList.ContainsKey(type)) {
 					KammusuTypeToIndexList.Add(type, new List<int>());
 				}
@@ -965,20 +965,16 @@ namespace KCS_GUI
 			MapKammusuNameComboBox.Refresh();
 		}
 		// 値を上下限で制限する
-		private int limit(int n, int min_n, int max_n) {
-			if(n < min_n)
-				return min_n;
-			if(n > max_n)
-				return max_n;
-			return n;
+		static public int limit(int n, int min_n, int max_n) {
+            return (n < min_n) ? min_n : (max_n < n) ? max_n : n;
 		}
 		// 外部熟練度を内部熟練度に変換する
-		private int rfRoughToDetail(int rf) {
+		static public int rfRoughToDetail(int rf) {
 			int[] roughToDetailList = new int[8] { 0, 10, 25, 40, 55, 70, 85, 100 };
 			return roughToDetailList[rf];
 		}
 		// 内部熟練度を外部熟練度に変換する
-		private int rfDetailToRough(int detailRf) {
+		static public int rfDetailToRough(int detailRf) {
 			int roughRf;
 			if(detailRf < 10)
 				roughRf = 0;
@@ -1114,7 +1110,7 @@ namespace KCS_GUI
 						kammusu.luck = -1;
 						var firstWeaponID = drKammusu[KammusuIDtoIndex[kammusu.id]]["初期装備"].ToString().Split('/');
 						foreach(string weaponID in firstWeaponID) {
-							var weaponIdToInt = int.Parse(weaponID);
+							var weaponIdToInt = weaponID.ParseInt();
 							if(weaponIdToInt <= 0)
 								break;
 							var setWeapon = new Weapon();
@@ -1274,8 +1270,8 @@ namespace KCS_GUI
 						&& type != "水上戦闘機")
 							continue;
 						// 対空値・搭載数・内部熟練度で決まる制空値を代入する
-						var antiAir = int.Parse(weaponInfo["対空"].ToString());
-						var slot = int.Parse(slots[wi]);
+						var antiAir = weaponInfo["対空"].ToString().ParseInt();
+						var slot = slots[wi].ParseInt();
 						double antiAirScoreWeapon = antiAir * Math.Sqrt(slot) + Math.Sqrt(0.1 * weapon.detailRf);
 						// 一部の種別には特別な補正を掛ける
 						if(type == "艦上戦闘機") {
@@ -1301,11 +1297,11 @@ namespace KCS_GUI
 				foreach(var kammusu in unit[0]) {
 					// 艦娘の索敵値は練度依存
 					var searchValueSet = drKammusu[KammusuIDtoIndex[kammusu.id]]["索敵"].ToString().Split('/');
-					var searchValueK = int.Parse(searchValueSet[1]);
+					var searchValueK = searchValueSet[1].ParseInt();
 					searchPower += Math.Sqrt(searchValueK) * 1.6841056;
 					foreach(var weapon in kammusu.weapon) {
 						// 装備の索敵値は種別によって係数が異なる
-						var searchValueW = int.Parse(drWeapon[WeaponIDtoIndex[weapon.id]]["索敵"].ToString());
+						var searchValueW = drWeapon[WeaponIDtoIndex[weapon.id]]["索敵"].ToString().ParseInt();
 						switch(drWeapon[WeaponIDtoIndex[weapon.id]]["種別"].ToString()) {
 						case "艦上爆撃機":
 							searchPower += 1.0376255 * searchValueW;
@@ -1358,11 +1354,11 @@ namespace KCS_GUI
 				foreach(var kammusu in unit[0]) {
 					// 艦娘の索敵値は練度依存
 					var searchValueSet = drKammusu[KammusuIDtoIndex[kammusu.id]]["索敵"].ToString().Split('/');
-					var searchValueK = int.Parse(searchValueSet[1]);
+					var searchValueK = searchValueSet[1].ParseInt();
 					searchPower += Math.Sqrt(searchValueK);
 					foreach(var weapon in kammusu.weapon) {
 						// 装備の索敵値は種別によって係数が異なる
-						var searchValueW = int.Parse(drWeapon[WeaponIDtoIndex[weapon.id]]["索敵"].ToString());
+						var searchValueW = drWeapon[WeaponIDtoIndex[weapon.id]]["索敵"].ToString().ParseInt();
 						switch(drWeapon[WeaponIDtoIndex[weapon.id]]["種別"].ToString()) {
 						case "水上爆撃機":
 							searchPower += 1.1 * searchValueW;
@@ -1454,4 +1450,13 @@ namespace KCS_GUI
 			}
 		}
 	}
+    static class Extensions
+    {
+        public static int ParseInt(this string str) {
+            return int.Parse(str);
+        }
+        public static int limit(this int n, int min, int max) {
+            return MainForm.limit(n, min, max);
+        }
+    }
 }
