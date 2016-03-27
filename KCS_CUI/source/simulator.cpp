@@ -6,19 +6,12 @@
 #include <cassert>
 using namespace std::string_literals;
 
-Simulator::Simulator(const vector<Fleet>& fleet, const unsigned int seed, const SimulateMode& simulate_mode)
-	: Simulator(fleet, SharedRand(seed), simulate_mode)
-{}
-
-Simulator::Simulator(const vector<Fleet>& fleet, SharedRand generator, const SimulateMode & simulate_mode)
-	: fleet_(fleet), result_(), rand(generator), simulate_mode_(simulate_mode), search_result_(),
+Simulator::Simulator(const vector<Fleet>& fleet, const SimulateMode & simulate_mode)
+	: fleet_(fleet), result_(), simulate_mode_(simulate_mode), search_result_(),
 	stopper_(),
 	is_calculated()
 {
-	for (auto& f : this->fleet_) f.SetRandGenerator(rand);
 }
-
-SharedRand Simulator::GetGenerator() noexcept { return this->rand; }
 
 inline void Simulator::Flush_Calc_Result(const vector<Fleet>& fleet) {
 	this->fleet_ = fleet;
@@ -194,24 +187,24 @@ void Simulator::AirWarPhase() {
 	double killed_airs_per[kBattleSize];
 	switch (air_war_status) {
 	case kAirWarStatusBest:
-		killed_airs_per[kFriendSide] = rand.RandReal(7, 15) / 256;
-		killed_airs_per[kEnemySide] = rand.RandReal();
+		killed_airs_per[kFriendSide] = SharedRand::RandReal(7, 15) / 256;
+		killed_airs_per[kEnemySide] = SharedRand::RandReal();
 		break;
 	case kAirWarStatusGood:
-		killed_airs_per[kFriendSide] = rand.RandReal(20, 45) / 256;
-		killed_airs_per[kEnemySide] = rand.RandReal() * 0.8;
+		killed_airs_per[kFriendSide] = SharedRand::RandReal(20, 45) / 256;
+		killed_airs_per[kEnemySide] = SharedRand::RandReal() * 0.8;
 		break;
 	case kAirWarStatusNormal:
-		killed_airs_per[kFriendSide] = rand.RandReal(30, 75) / 256;
-		killed_airs_per[kEnemySide] = rand.RandReal() * 0.6;
+		killed_airs_per[kFriendSide] = SharedRand::RandReal(30, 75) / 256;
+		killed_airs_per[kEnemySide] = SharedRand::RandReal() * 0.6;
 		break;
 	case kAirWarStatusBad:
-		killed_airs_per[kFriendSide] = rand.RandReal(45, 105) / 256;
-		killed_airs_per[kEnemySide] = rand.RandReal() * 0.4;
+		killed_airs_per[kFriendSide] = SharedRand::RandReal(45, 105) / 256;
+		killed_airs_per[kEnemySide] = SharedRand::RandReal() * 0.4;
 		break;
 	case kAirWarStatusWorst:
-		killed_airs_per[kFriendSide] = rand.RandReal(65, 150) / 256;
-		killed_airs_per[kEnemySide] = rand.RandReal() * 0.1;
+		killed_airs_per[kFriendSide] = SharedRand::RandReal(65, 150) / 256;
+		killed_airs_per[kEnemySide] = SharedRand::RandReal() * 0.1;
 		break;
 	}
 	for (size_t i = 0; i < kBattleSize; ++i) {
@@ -234,7 +227,7 @@ void Simulator::AirWarPhase() {
 		if (!fleet_[i].HasAirTrailer()) continue;
 		// 触接の開始率を計算する
 		auto trailer_aircraft_prob = fleet_[i].TrailerAircraftProb(air_war_status);
-		if (trailer_aircraft_prob < rand.RandReal()) continue;	//触接は確率的に開始される
+		if (trailer_aircraft_prob < SharedRand::RandReal()) continue;	//触接は確率的に開始される
 		// 触接の選択率を計算する
 		all_attack_plus[i] = fleet_[i].TrailerAircraftPlus();
 	}
@@ -261,7 +254,7 @@ void Simulator::AirWarPhase() {
 				auto all_anti_air = intercept_kammusu.AllAntiAir();								//加重対空値
 				int killed_airs = 0;
 				//固定撃墜
-				if (rand.RandBool()) {
+				if (SharedRand::RandBool()) {
 					if (intercept_kammusu.IsKammusu()) {
 						killed_airs += int(0.1 * (all_anti_air + anti_air_bonus));
 					}
@@ -282,7 +275,7 @@ void Simulator::AirWarPhase() {
 					}
 				}
 				//割合撃墜
-				if (rand.RandBool()) killed_airs += int(int(0.9 * all_anti_air) * it_w.GetAir() / 360);
+				if (SharedRand::RandBool()) killed_airs += int(int(0.9 * all_anti_air) * it_w.GetAir() / 360);
 				//対空カットイン成功時の固定ボーナス
 				killed_airs += aac_bonus_add1[aac_type];
 				//艦娘限定ボーナス
@@ -327,7 +320,7 @@ void Simulator::AirWarPhase() {
 					break;
 				case WC("艦上攻撃機"):
 					// 雷撃は150％か80％かがランダムで決まる
-					base_attack = int((rand.RandBool() ? 1.5 : 0.8) * (it_w.GetTorpedo() * sqrt(it_w.GetAir()) + 25));
+					base_attack = int((SharedRand::RandBool() ? 1.5 : 0.8) * (it_w.GetTorpedo() * sqrt(it_w.GetAir()) + 25));
 					break;
 				default:
 					base_attack = 0;
@@ -346,7 +339,6 @@ void Simulator::AirWarPhase() {
 		for (size_t fi = 0; fi < fleet_[bi].FleetSize(); ++fi) {
 			auto &friend_unit = fleet_[bi].GetUnit()[fi];
 			for (size_t ui = 0; ui < friend_unit.size(); ++ui) {
-				friend_unit[ui].SetRandGenerator(this->rand);
 				friend_unit[ui].MinusHP(all_damage[bi][fi][ui], stopper_[bi][fi][ui]);
 			}
 		}
@@ -383,7 +375,7 @@ void Simulator::AirWarPhase() {
 void Simulator::BattlePositionOracle() noexcept {
 	// 彩雲を持っているかを判断する
 	auto has_pss = fleet_[0].HasAirPss();
-	int dice = rand.RandInt(100);
+	int dice = SharedRand::RandInt(100);
 	if (dice < 45) {
 		battle_position_ = kBattlePositionSame;
 	}
@@ -430,7 +422,6 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 	for (size_t bi = 0; bi < kBattleSize; ++bi) {
 		auto &friend_unit = fleet_[bi].GetUnit().back();
 		for (size_t ui = 0; ui < friend_unit.size(); ++ui) {
-			friend_unit[ui].SetRandGenerator(this->rand);
 			friend_unit[ui].MinusHP(all_damage[bi][ui], stopper_[bi][fleet_[bi].SecondIndex()][ui]);
 		}
 	}
@@ -463,7 +454,7 @@ vector<vector<std::pair<KammusuIndex, Range>>> Simulator::DetermineAttackOrder(F
 		}
 		if (fire_turn == kFireFirst) {
 			// 一覧をシャッフルする
-			std::shuffle(attack_list[bi].begin(), attack_list[bi].end(), this->rand.get());
+			std::shuffle(attack_list[bi].begin(), attack_list[bi].end(), SharedRand::get());
 			// 一覧を射程で安定ソートする
 			std::stable_sort(attack_list[bi].begin(), attack_list[bi].end(), [](const auto& a, const auto& b) {return (b.second < a.second); });
 		}
@@ -583,7 +574,7 @@ void Simulator::NightPhase() {
 			for (auto &it_w : it_k.GetWeapon()) {
 				if (it_w.GetWeaponClass() != WC("水上偵察機(夜偵)")) continue;
 				double prob = ((sqrt(50 * it_k.GetLevel()) - 3) / 100) | limit(0.0, 0.99);
-				if (!rand.RandBool(prob)) continue;
+				if (!SharedRand::RandBool(prob)) continue;
 				wsn_flg = true;
 				break;
 			}
@@ -846,7 +837,7 @@ int Simulator::CalcDamage(
 			prob_per = 0.25 * hit_prob / (hit_prob + 1) + 0.0125;
 		}
 		prob_per += hunter_kammusu.CL2ProbPlus();	//熟練艦載機によるCL2率上昇(試験実装)
-		if (rand.RandBool(prob_per)) {
+		if (SharedRand::RandBool(prob_per)) {
 			damage *= 1.5 * hunter_kammusu.CL2AttackPlus();	//熟練艦載機によるダメージ補正
 		}
 		damage = int(damage);	//※この切り捨ては仕様です
@@ -859,7 +850,7 @@ int Simulator::CalcDamage(
 		/*if (target_kammusu.AnyOf(WID("PT小鬼群"))) damage *= hunter_kammusu.SpecialEffectPtPlus();*/
 	}
 	// 装甲乱数の分だけダメージを減少させる
-	damage -= 0.7 * target_kammusu.AllDefense() + 0.6 * rand.RandInt(target_kammusu.AllDefense());
+	damage -= 0.7 * target_kammusu.AllDefense() + 0.6 * SharedRand::RandInt(target_kammusu.AllDefense());
 	// 弾薬量補正
 	if (hunter_kammusu.GetAmmo() < 50) {
 		damage *= 2.0 * hunter_kammusu.GetAmmo() / 100;
@@ -869,14 +860,14 @@ int Simulator::CalcDamage(
 		if (hit_prob < 0.9) hit_prob = 0.9;
 	}
 	// 弾着観測射撃および夜間特殊攻撃ならば回避してもカスダメ、それ以外では0ダメージ
-	if (!rand.RandBool(hit_prob | limit(0.0, 1.0))) {
+	if (!SharedRand::RandBool(hit_prob | limit(0.0, 1.0))) {
 		if (is_special_attack) damage = 0.0; else return 0;
 	}
 	// 夜戦における対潜攻撃は常にカスダメ(ただし開幕夜戦および連合艦隊では無視される)
 	if (friend_side.GetFleetType() == FleetType::Normal && simulate_mode_ != kSimulateModeN && is_target_submarine && battle_phase == kBattlePhaseNight) damage = 0.0;
 	// カスダメの際は相手残り耐久の6～14％を与える
 	if (damage < 1.0) {
-		damage = 0.06 * target_kammusu.GetHP() + 0.08 * rand.RandInt(target_kammusu.GetHP());
+		damage = 0.06 * target_kammusu.GetHP() + 0.08 * SharedRand::RandInt(target_kammusu.GetHP());
 	}
 	return int(damage);
 }
@@ -905,8 +896,8 @@ void Simulator::ProtectOracle(const size_t defense_side, KammusuIndex &defense_i
 	}
 	if (block_list_size == 0) return;
 	// かばいは確率的に発生し、どの艦がかばうかも確率的に決まる
-	if (rand.RandBool(0.4)) {	//とりあえず4割に設定している
-		defense_index.fleet_i = rand.select_random_in_range(block_list, block_list_size);
+	if (SharedRand::RandBool(0.4)) {	//とりあえず4割に設定している
+		defense_index.fleet_i = SharedRand::select_random_in_range(block_list, block_list_size);
 	}
 	return;
 }
@@ -1148,7 +1139,7 @@ tuple<bool, double> Simulator::JudgeDaySpecialAttack(const size_t turn_player, c
 		oracle += 0.06 * fleet_[turn_player].SearchValue();
 		oracle += (attack_index.fleet_i == 0 ? 0.1 : 0.0);
 		oracle += (std::get<condition>(air_war_result_) == kAirWarStatusBest ? 0.1 : 0.0);
-		if (rand.RandBool(oracle | limit(0.0, 0.99))) {
+		if (SharedRand::RandBool(oracle | limit(0.0, 0.99))) {
 			std::array<size_t, 9> roulette = {};
 			size_t roulette_size = 0;
 			if (cutin_gg_flg) { roulette[roulette_size++] = 0; roulette[roulette_size++] = 0; }
@@ -1159,7 +1150,7 @@ tuple<bool, double> Simulator::JudgeDaySpecialAttack(const size_t turn_player, c
 			assert(roulette_size <= roulette.size());
 			static constexpr std::bitset<5> dflg = 1;
 			static constexpr std::array<double, 5> mlt = { { 1.5, 1.3, 1.2, 1.1, 1.2 } };
-			const size_t rand_pos = rand.select_random_in_range(roulette, roulette_size);
+			const size_t rand_pos = SharedRand::select_random_in_range(roulette, roulette_size);
 			return tuple<bool, double>(dflg[rand_pos], mlt[rand_pos]);//2つの配列は対応している・・・？
 		}
 	}
@@ -1218,7 +1209,7 @@ tuple<bool, double> Simulator::JudgeNightSpecialAttack(const size_t turn_player,
 	}
 	// 発動確率は、連撃が99％、他はキャップに従って計算される
 	if (attack_type == 5) {
-		if (rand.RandBool(0.99)) {
+		if (SharedRand::RandBool(0.99)) {
 			return tuple<bool, double>(true, 1.2);
 		}
 		else {
@@ -1259,7 +1250,7 @@ tuple<bool, double> Simulator::JudgeNightSpecialAttack(const size_t turn_player,
 	if (fleet_[other_side].HasLights()) oracle -= 0.10;
 	// 乱数によって決定される
 	oracle = oracle | limit(0.0, 0.99);
-	if (rand.RandBool(oracle)) {
+	if (SharedRand::RandBool(oracle)) {
 		static const bool dflg[] = { false, true, false, false, true };
 		static const double mlt[] = { 1.0, 1.5, 2.0, 1.75, 1.3 };
 		return tuple<bool, double>(dflg[attack_type], mlt[attack_type]);

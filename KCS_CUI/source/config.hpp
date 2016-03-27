@@ -28,9 +28,6 @@ public:
 	size_t GetThreads() const noexcept;
 	const string& GetOutputFilename() noexcept;
 	bool GetJsonPrettifyFlg() const noexcept;
-	//calc
-	size_t CalcSeedArrSize() const noexcept;
-	size_t CalcSeedVNo(int n) const noexcept;
 	//
 	friend std::ostream& operator<<(std::ostream& os, const Config& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Config& conf);

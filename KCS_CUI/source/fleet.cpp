@@ -118,8 +118,8 @@ void Fleet::LoadJson(std::istream & file, char_cvt::char_enc fileenc)
 	}
 }
 // コンストラクタ
-Fleet::Fleet(const string &file_name, const Formation &formation, const SharedRand& rand, char_cvt::char_enc fileenc)
-	: formation_(formation), rand_(rand)// 陣形はそのまま反映させる
+Fleet::Fleet(const string &file_name, const Formation &formation, char_cvt::char_enc fileenc)
+	: formation_(formation)// 陣形はそのまま反映させる
 {
 	ENCODE_THROW_WITH_MESSAGE_IF(fileenc == char_cvt::char_enc::unknown, "unknown char enc type.")//文字コード自動判別なんてやらない
 	// ファイルを読み込む
@@ -129,17 +129,14 @@ Fleet::Fleet(const string &file_name, const Formation &formation, const SharedRa
 	this->LoadJson(fin, fileenc);
 }
 
-Fleet::Fleet(std::istream & file, const Formation & formation, const SharedRand& rand, char_cvt::char_enc fileenc)
-	: formation_(formation), rand_(rand)// 陣形はそのまま反映させる
+Fleet::Fleet(std::istream & file, const Formation & formation, char_cvt::char_enc fileenc)
+	: formation_(formation)// 陣形はそのまま反映させる
 {
 	ENCODE_THROW_WITH_MESSAGE_IF(fileenc == char_cvt::char_enc::unknown, "unknown char enc type.")//文字コード自動判別なんてやらない
 	this->LoadJson(file, fileenc);
 }
 
 // setter
-void Fleet::SetRandGenerator(const SharedRand & rand) {
-	this->rand_ = rand;
-}
 void Fleet::SetFormation(const Formation formation) { formation_ = formation; }
 
 // getter
@@ -370,7 +367,7 @@ double Fleet::TrailerAircraftPlus() const {
 		if (it_k.Status() == kStatusLost) continue;
 		for (auto &it_w : it_k.GetWeapon()) {
 			if (!it_w.AnyOf(WeaponClass::AirTrailer) || it_w.GetAir() == 0) continue;
-			if (0.07 * it_w.GetSearch() >= rand_.RandReal()) {
+			if (0.07 * it_w.GetSearch() >= SharedRand::RandReal()) {
 				return all_attack_plus_list[it_w.GetHit()];
 			}
 		}
@@ -386,7 +383,7 @@ int Fleet::AacType() const {
 			if (it_k.Status() == kStatusLost) continue;
 			auto aac_type = it_k.AacType();
 			if (aac_type <= 3) continue;
-			if (it_k.AacProb(aac_type) < rand_.RandReal()) continue;
+			if (it_k.AacProb(aac_type) < SharedRand::RandReal()) continue;
 			return aac_type;
 		}
 	}
@@ -396,7 +393,7 @@ int Fleet::AacType() const {
 			if (it_k.Status() == kStatusLost) continue;
 			auto aac_type = it_k.AacType();
 			if (aac_type != limit(aac_type, 1, 3)) continue;
-			if (it_k.AacProb(aac_type) < rand_.RandReal()) continue;
+			if (it_k.AacProb(aac_type) < SharedRand::RandReal()) continue;
 			return aac_type;
 		}
 	}
@@ -429,7 +426,7 @@ tuple<bool, size_t> Fleet::RandomKammusu() const {
 		}
 	}
 	if (alived_list_size == 0) return tuple<bool, size_t>(false, 0);
-	return tuple<bool, size_t>(true, rand_.select_random_in_range(alived_list, alived_list_size));
+	return tuple<bool, size_t>(true, SharedRand::select_random_in_range(alived_list, alived_list_size));
 }
 
 // 生存する水上艦から艦娘をランダムに指定する
@@ -474,10 +471,10 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const T
 			for (const auto &it_w : it_k.GetWeapon()) {
 				if (!it_w.AnyOf(WC("探照灯"))) continue;
 				if (it_w.AnyOf(WID("96式150cm探照灯"))) {
-					if (rand_.RandBool(0.3 + 0.01 * it_w.GetLevel())) large_sl_index = i;
+					if (SharedRand::RandBool(0.3 + 0.01 * it_w.GetLevel())) large_sl_index = i;
 				}
 				else {
-					if (rand_.RandBool(0.2 + 0.01 * it_w.GetLevel())) small_sl_index = i;
+					if (SharedRand::RandBool(0.2 + 0.01 * it_w.GetLevel())) small_sl_index = i;
 				}
 				break;
 			}
@@ -490,7 +487,7 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const T
 			return tuple<bool, KammusuIndex>(true, alived_list[small_sl_index]);
 		}
 	}
-	return tuple<bool, KammusuIndex>(true, rand_.select_random_in_range(alived_list, alived_list_size));
+	return tuple<bool, KammusuIndex>(true, SharedRand::select_random_in_range(alived_list, alived_list_size));
 }
 
 // 潜水の生存艦から艦娘をランダムに指定する
@@ -516,7 +513,7 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuSS(const size_t fleet_index) const
 		}
 	}
 	if (alived_list.size() == 0) return tuple<bool, KammusuIndex>(false, { 0 , 0 });
-	return tuple<bool, KammusuIndex>(true, rand_.select_random_in_range(alived_list));
+	return tuple<bool, KammusuIndex>(true, SharedRand::select_random_in_range(alived_list));
 }
 
 // 陸上型の生存艦から艦娘をランダムに指定する
@@ -542,7 +539,7 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuAF(const size_t fleet_index) const
 		}
 	}
 	if (alived_list.size() == 0) return tuple<bool, KammusuIndex>(false, { 0 , 0 });
-	return tuple<bool, KammusuIndex>(true, rand_.select_random_in_range(alived_list));
+	return tuple<bool, KammusuIndex>(true, SharedRand::select_random_in_range(alived_list));
 }
 
 template<typename CondFunc>
