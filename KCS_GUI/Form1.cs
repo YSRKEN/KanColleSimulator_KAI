@@ -14,15 +14,6 @@ using System.Reflection;
 
 namespace KCS_GUI
 {
-    static class Extensions
-    {
-        public static int ParseInt(this string str) {
-            return int.Parse(str);
-        }
-        public static int limit(this int n, int min, int max) {
-            return MainForm.limit(n, min, max);
-        }
-    }
     public partial class MainForm : Form
 	{
 		/* メンバ変数 */
@@ -1454,4 +1445,13 @@ namespace KCS_GUI
 			}
 		}
 	}
+    static class Extensions
+    {
+        public static int ParseInt(this string str) {
+            return int.Parse(str);
+        }
+        public static int limit(this int n, int min, int max) {
+            return MainForm.limit(n, min, max);
+        }
+    }
 }
