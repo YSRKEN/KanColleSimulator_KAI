@@ -1,16 +1,13 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Reflection;
+using System.Text;
+using System.Windows.Forms;
 
 namespace KCS_GUI
 {
@@ -318,7 +315,34 @@ namespace KCS_GUI
 			RedrawAntiAirScore();
 			RedrawSearchPower();
 		}
-		private void ChangeKammusuButton_Click(object sender, EventArgs e) {
+        static private bool IsInRange(int val, int min, int max) {
+            return (min <= val && val <= max);
+        }
+        static private bool IsVaidIndex(int val, int size) {
+            return IsInRange(val, 0, size - 1);
+        }
+        private void KammusuLevelTextBox_Leave(object sender, EventArgs e) {
+            if(//Range Check
+                IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
+                && IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
+            )
+            FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].level = limit(int.Parse(KammusuLevelTextBox.Text), 1, 155);
+        }
+        private void KammusuLuckTextBox_Leave(object sender, EventArgs e) {
+            if (//Range Check
+                IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
+                && IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
+            )
+            FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].luck = limit(int.Parse(KammusuLuckTextBox.Text), -1, 100);
+        }
+        private void KammusuCondTextBox_Leave(object sender, EventArgs e) {
+            if (//Range Check
+                IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
+                && IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
+            )
+            FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].cond = limit(int.Parse(KammusuCondTextBox.Text), 0, 100);
+        }
+        private void ChangeKammusuButton_Click(object sender, EventArgs e) {
 			if(KammusuTypeComboBox.SelectedIndex == -1
 			|| KammusuNameComboBox.SelectedIndex == -1
 			|| FleetSelectComboBox.SelectedIndex == -1
@@ -381,7 +405,56 @@ namespace KCS_GUI
 			RedrawAntiAirScore();
 			RedrawSearchPower();
 		}
-		private void ChangeWeaponButton_Click(object sender, EventArgs e) {
+        private void WeaponLevelComboBox_Leave(object sender, EventArgs e) {
+            if (//Range Check
+                IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
+                && IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
+                && IsVaidIndex(
+                    this.WeaponSelectListBox.SelectedIndex, 
+                    this.FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].weapon.Count
+                )
+            )
+            this
+                .FormFleet
+                .unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex]
+                .weapon[WeaponSelectListBox.SelectedIndex]
+                .level = limit(WeaponLevelComboBox.SelectedIndex, 0, 10);
+        }
+        private void WeaponRfComboBox_Leave(object sender, EventArgs e) {
+            if (//Range Check
+                IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
+                && IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
+                && IsVaidIndex(
+                    this.WeaponSelectListBox.SelectedIndex,
+                    this.FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].weapon.Count
+                )
+            )
+            {
+                this
+                    .FormFleet
+                    .unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex]
+                    .weapon[WeaponSelectListBox.SelectedIndex]
+                    .set_rf(WeaponRfComboBox.SelectedIndex);
+            }
+        }
+        private void WeaponDetailRfComboBox_Leave(object sender, EventArgs e) {
+            if (//Range Check
+                IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
+                && IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
+                && IsVaidIndex(
+                    this.WeaponSelectListBox.SelectedIndex,
+                    this.FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].weapon.Count
+                )
+            )
+            {
+                this
+                    .FormFleet
+                    .unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex]
+                    .weapon[WeaponSelectListBox.SelectedIndex]
+                    .set_detailRf(WeaponDetailRfComboBox.SelectedIndex);
+            }
+        }
+        private void ChangeWeaponButton_Click(object sender, EventArgs e) {
 			if(FleetSelectComboBox.SelectedIndex == -1
 			|| KammusuSelectListBox.SelectedIndex == -1
 			|| WeaponTypeComboBox.SelectedIndex == -1
@@ -1085,8 +1158,7 @@ namespace KCS_GUI
 		}
 		// 制空値を計算して表示する(艦隊エディタ)
 		private void RedrawAntiAirScore() {
-			int antiAirScore = FormFleet.CalcAntiAirScore();
-			AllAntiAirTextBox.Text = antiAirScore.ToString();
+			AllAntiAirTextBox.Text = FormFleet.CalcAntiAirScore().ToString();
 		}
 		// 索敵値を計算して表示する(艦隊エディタ)
 		private void RedrawSearchPower() {
@@ -1114,7 +1186,18 @@ namespace KCS_GUI
 			public int rf;
 			// 内部熟練度
 			public int detailRf;
-		}
+
+            public void set_rf(int i_rf) {
+                this.rf = limit(i_rf, 0, 7);
+                this.detailRf = MainForm.rfRoughToDetail(this.rf);
+            }
+
+            public void set_detailRf(int i_detailRf) {
+                this.detailRf = limit(i_detailRf, 0, 120);
+                this.rf = MainForm.rfDetailToRough(this.detailRf);
+            }
+
+        }
 		// 艦娘
 		private class Kammusu {
 			// 艦船ID
