@@ -1,0 +1,217 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="CsvDataSet" targetNamespace="http://tempuri.org/CsvDataSet.xsd" xmlns:mstns="http://tempuri.org/CsvDataSet.xsd" xmlns="http://tempuri.org/CsvDataSet.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="Settings" AppSettingsPropertyName="CsvConnectionString" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="CsvConnectionString (Settings)" PropertyReference="ApplicationSettings.KCS_GUI.Properties.Settings.GlobalReference.Default.CsvConnectionString" Provider="System.Data.OleDb" />
+        </Connections>
+        <Tables>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="ShipsTableAdapter" GeneratorDataComponentClassName="ShipsTableAdapter" Name="Ships" UserDataComponentName="ShipsTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="CsvConnectionString (Settings)" DbObjectName="ships#csv" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT 艦船ID, 艦名, 艦種, 耐久, 装甲, 火力, 雷撃, 対空, 運, 速力, 射程, スロット数, 搭載数, 回避, 対潜, 索敵, 初期装備, 艦娘フラグ FROM [ships#csv]</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="艦船ID" DataSetColumn="艦船ID" />
+              <Mapping SourceColumn="艦名" DataSetColumn="艦名" />
+              <Mapping SourceColumn="艦種" DataSetColumn="艦種" />
+              <Mapping SourceColumn="耐久" DataSetColumn="耐久" />
+              <Mapping SourceColumn="装甲" DataSetColumn="装甲" />
+              <Mapping SourceColumn="火力" DataSetColumn="火力" />
+              <Mapping SourceColumn="雷撃" DataSetColumn="雷撃" />
+              <Mapping SourceColumn="対空" DataSetColumn="対空" />
+              <Mapping SourceColumn="運" DataSetColumn="運" />
+              <Mapping SourceColumn="速力" DataSetColumn="速力" />
+              <Mapping SourceColumn="射程" DataSetColumn="射程" />
+              <Mapping SourceColumn="スロット数" DataSetColumn="スロット数" />
+              <Mapping SourceColumn="搭載数" DataSetColumn="搭載数" />
+              <Mapping SourceColumn="回避" DataSetColumn="回避" />
+              <Mapping SourceColumn="対潜" DataSetColumn="対潜" />
+              <Mapping SourceColumn="索敵" DataSetColumn="索敵" />
+              <Mapping SourceColumn="初期装備" DataSetColumn="初期装備" />
+              <Mapping SourceColumn="艦娘フラグ" DataSetColumn="艦娘フラグ" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="WeaponsTableAdapter" GeneratorDataComponentClassName="WeaponsTableAdapter" Name="Weapons" UserDataComponentName="WeaponsTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="CsvConnectionString (Settings)" DbObjectName="slotitems#csv" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT 装備ID, 装備名, 種別, 装甲, 火力, 雷撃, 爆装, 対空, 対潜, 命中, 回避, 索敵, 射程 FROM [slotitems#csv]</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="装備ID" DataSetColumn="装備ID" />
+              <Mapping SourceColumn="装備名" DataSetColumn="装備名" />
+              <Mapping SourceColumn="種別" DataSetColumn="種別" />
+              <Mapping SourceColumn="装甲" DataSetColumn="装甲" />
+              <Mapping SourceColumn="火力" DataSetColumn="火力" />
+              <Mapping SourceColumn="雷撃" DataSetColumn="雷撃" />
+              <Mapping SourceColumn="爆装" DataSetColumn="爆装" />
+              <Mapping SourceColumn="対空" DataSetColumn="対空" />
+              <Mapping SourceColumn="対潜" DataSetColumn="対潜" />
+              <Mapping SourceColumn="命中" DataSetColumn="命中" />
+              <Mapping SourceColumn="回避" DataSetColumn="回避" />
+              <Mapping SourceColumn="索敵" DataSetColumn="索敵" />
+              <Mapping SourceColumn="射程" DataSetColumn="射程" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+        </Tables>
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="CsvDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msdata:EnforceConstraints="False" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="CsvDataSet" msprop:Generator_UserDSName="CsvDataSet">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="Ships" msprop:Generator_TableClassName="ShipsDataTable" msprop:Generator_TableVarName="tableShips" msprop:Generator_TablePropName="Ships" msprop:Generator_RowDeletingName="ShipsRowDeleting" msprop:Generator_RowChangingName="ShipsRowChanging" msprop:Generator_RowEvHandlerName="ShipsRowChangeEventHandler" msprop:Generator_RowDeletedName="ShipsRowDeleted" msprop:Generator_UserTableName="Ships" msprop:Generator_RowChangedName="ShipsRowChanged" msprop:Generator_RowEvArgName="ShipsRowChangeEvent" msprop:Generator_RowClassName="ShipsRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="艦船ID" msprop:Generator_ColumnVarNameInTable="column艦船ID" msprop:Generator_ColumnPropNameInRow="艦船ID" msprop:Generator_ColumnPropNameInTable="艦船IDColumn" msprop:Generator_UserColumnName="艦船ID" type="xs:int" />
+              <xs:element name="艦名" msprop:Generator_ColumnVarNameInTable="column艦名" msprop:Generator_ColumnPropNameInRow="艦名" msprop:Generator_ColumnPropNameInTable="艦名Column" msprop:Generator_UserColumnName="艦名">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="艦種" msprop:Generator_ColumnVarNameInTable="column艦種" msprop:Generator_ColumnPropNameInRow="艦種" msprop:Generator_ColumnPropNameInTable="艦種Column" msprop:Generator_UserColumnName="艦種" type="xs:int" />
+              <xs:element name="耐久" msprop:Generator_ColumnVarNameInTable="column耐久" msprop:Generator_ColumnPropNameInRow="耐久" msprop:Generator_ColumnPropNameInTable="耐久Column" msprop:Generator_UserColumnName="耐久">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="装甲" msprop:Generator_ColumnVarNameInTable="column装甲" msprop:Generator_ColumnPropNameInRow="装甲" msprop:Generator_ColumnPropNameInTable="装甲Column" msprop:Generator_UserColumnName="装甲">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="火力" msprop:Generator_ColumnVarNameInTable="column火力" msprop:Generator_ColumnPropNameInRow="火力" msprop:Generator_ColumnPropNameInTable="火力Column" msprop:Generator_UserColumnName="火力">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="雷撃" msprop:Generator_ColumnVarNameInTable="column雷撃" msprop:Generator_ColumnPropNameInRow="雷撃" msprop:Generator_ColumnPropNameInTable="雷撃Column" msprop:Generator_UserColumnName="雷撃">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="対空" msprop:Generator_ColumnVarNameInTable="column対空" msprop:Generator_ColumnPropNameInRow="対空" msprop:Generator_ColumnPropNameInTable="対空Column" msprop:Generator_UserColumnName="対空">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="運" msprop:Generator_ColumnVarNameInTable="column運" msprop:Generator_ColumnPropNameInRow="運" msprop:Generator_ColumnPropNameInTable="運Column" msprop:Generator_UserColumnName="運">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="速力" msprop:Generator_ColumnVarNameInTable="column速力" msprop:Generator_ColumnPropNameInRow="速力" msprop:Generator_ColumnPropNameInTable="速力Column" msprop:Generator_UserColumnName="速力" type="xs:int" />
+              <xs:element name="射程" msprop:Generator_ColumnVarNameInTable="column射程" msprop:Generator_ColumnPropNameInRow="射程" msprop:Generator_ColumnPropNameInTable="射程Column" msprop:Generator_UserColumnName="射程" type="xs:int" />
+              <xs:element name="スロット数" msprop:Generator_ColumnVarNameInTable="columnスロット数" msprop:Generator_ColumnPropNameInRow="スロット数" msprop:Generator_ColumnPropNameInTable="スロット数Column" msprop:Generator_UserColumnName="スロット数" type="xs:int" />
+              <xs:element name="搭載数" msprop:Generator_ColumnVarNameInTable="column搭載数" msprop:Generator_ColumnPropNameInRow="搭載数" msprop:Generator_ColumnPropNameInTable="搭載数Column" msprop:Generator_UserColumnName="搭載数">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="回避" msprop:Generator_ColumnVarNameInTable="column回避" msprop:Generator_ColumnPropNameInRow="回避" msprop:Generator_ColumnPropNameInTable="回避Column" msprop:Generator_UserColumnName="回避">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="対潜" msprop:Generator_ColumnVarNameInTable="column対潜" msprop:Generator_ColumnPropNameInRow="対潜" msprop:Generator_ColumnPropNameInTable="対潜Column" msprop:Generator_UserColumnName="対潜">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="索敵" msprop:Generator_ColumnVarNameInTable="column索敵" msprop:Generator_ColumnPropNameInRow="索敵" msprop:Generator_ColumnPropNameInTable="索敵Column" msprop:Generator_UserColumnName="索敵">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="初期装備" msprop:Generator_ColumnVarNameInTable="column初期装備" msprop:Generator_ColumnPropNameInRow="初期装備" msprop:Generator_ColumnPropNameInTable="初期装備Column" msprop:Generator_UserColumnName="初期装備">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="艦娘フラグ" msprop:Generator_ColumnVarNameInTable="column艦娘フラグ" msprop:Generator_ColumnPropNameInRow="艦娘フラグ" msprop:Generator_ColumnPropNameInTable="艦娘フラグColumn" msprop:Generator_UserColumnName="艦娘フラグ" type="xs:int" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Weapons" msprop:Generator_TableClassName="WeaponsDataTable" msprop:Generator_TableVarName="tableWeapons" msprop:Generator_TablePropName="Weapons" msprop:Generator_RowDeletingName="WeaponsRowDeleting" msprop:Generator_RowChangingName="WeaponsRowChanging" msprop:Generator_RowEvHandlerName="WeaponsRowChangeEventHandler" msprop:Generator_RowDeletedName="WeaponsRowDeleted" msprop:Generator_UserTableName="Weapons" msprop:Generator_RowChangedName="WeaponsRowChanged" msprop:Generator_RowEvArgName="WeaponsRowChangeEvent" msprop:Generator_RowClassName="WeaponsRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="装備ID" msprop:Generator_ColumnVarNameInTable="column装備ID" msprop:Generator_ColumnPropNameInRow="装備ID" msprop:Generator_ColumnPropNameInTable="装備IDColumn" msprop:Generator_UserColumnName="装備ID" type="xs:int" />
+              <xs:element name="装備名" msprop:Generator_ColumnVarNameInTable="column装備名" msprop:Generator_ColumnPropNameInRow="装備名" msprop:Generator_ColumnPropNameInTable="装備名Column" msprop:Generator_UserColumnName="装備名">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="種別" msprop:Generator_ColumnVarNameInTable="column種別" msprop:Generator_ColumnPropNameInRow="種別" msprop:Generator_ColumnPropNameInTable="種別Column" msprop:Generator_UserColumnName="種別">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="装甲" msprop:Generator_ColumnVarNameInTable="column装甲" msprop:Generator_ColumnPropNameInRow="装甲" msprop:Generator_ColumnPropNameInTable="装甲Column" msprop:Generator_UserColumnName="装甲" type="xs:int" />
+              <xs:element name="火力" msprop:Generator_ColumnVarNameInTable="column火力" msprop:Generator_ColumnPropNameInRow="火力" msprop:Generator_ColumnPropNameInTable="火力Column" msprop:Generator_UserColumnName="火力" type="xs:int" />
+              <xs:element name="雷撃" msprop:Generator_ColumnVarNameInTable="column雷撃" msprop:Generator_ColumnPropNameInRow="雷撃" msprop:Generator_ColumnPropNameInTable="雷撃Column" msprop:Generator_UserColumnName="雷撃" type="xs:int" />
+              <xs:element name="爆装" msprop:Generator_ColumnVarNameInTable="column爆装" msprop:Generator_ColumnPropNameInRow="爆装" msprop:Generator_ColumnPropNameInTable="爆装Column" msprop:Generator_UserColumnName="爆装" type="xs:int" />
+              <xs:element name="対空" msprop:Generator_ColumnVarNameInTable="column対空" msprop:Generator_ColumnPropNameInRow="対空" msprop:Generator_ColumnPropNameInTable="対空Column" msprop:Generator_UserColumnName="対空" type="xs:int" />
+              <xs:element name="対潜" msprop:Generator_ColumnVarNameInTable="column対潜" msprop:Generator_ColumnPropNameInRow="対潜" msprop:Generator_ColumnPropNameInTable="対潜Column" msprop:Generator_UserColumnName="対潜" type="xs:int" />
+              <xs:element name="命中" msprop:Generator_ColumnVarNameInTable="column命中" msprop:Generator_ColumnPropNameInRow="命中" msprop:Generator_ColumnPropNameInTable="命中Column" msprop:Generator_UserColumnName="命中" type="xs:int" />
+              <xs:element name="回避" msprop:Generator_ColumnVarNameInTable="column回避" msprop:Generator_ColumnPropNameInRow="回避" msprop:Generator_ColumnPropNameInTable="回避Column" msprop:Generator_UserColumnName="回避" type="xs:int" />
+              <xs:element name="索敵" msprop:Generator_ColumnVarNameInTable="column索敵" msprop:Generator_ColumnPropNameInRow="索敵" msprop:Generator_ColumnPropNameInTable="索敵Column" msprop:Generator_UserColumnName="索敵" type="xs:int" />
+              <xs:element name="射程" msprop:Generator_ColumnVarNameInTable="column射程" msprop:Generator_ColumnPropNameInRow="射程" msprop:Generator_ColumnPropNameInTable="射程Column" msprop:Generator_UserColumnName="射程" type="xs:int" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+    <xs:unique name="Constraint1">
+      <xs:selector xpath=".//mstns:Ships" />
+      <xs:field xpath="mstns:艦船ID" />
+    </xs:unique>
+    <xs:unique name="Weapons_Constraint1" msdata:ConstraintName="Constraint1">
+      <xs:selector xpath=".//mstns:Weapons" />
+      <xs:field xpath="mstns:装備ID" />
+    </xs:unique>
+  </xs:element>
+</xs:schema>
