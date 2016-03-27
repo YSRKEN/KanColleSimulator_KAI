@@ -861,6 +861,10 @@ namespace KCS_GUI {
 			this.Text = SoftName + "(計算中)";
 			ProcessStartInfo psInfo = new ProcessStartInfo();
 			psInfo.FileName = @System.IO.Directory.GetCurrentDirectory() + @"\KCS_CUI.exe"; //実行するファイル
+			if(!System.IO.File.Exists(psInfo.FileName)) {
+				this.Text = SoftName;
+				return;
+			}
 			System.Console.WriteLine(commandLine);
 			System.Console.WriteLine(psInfo.FileName);
 			psInfo.CreateNoWindow = true;           //コンソール・ウィンドウを開かない
