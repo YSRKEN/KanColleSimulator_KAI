@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using System.ComponentModel;
 
 namespace KCS_GUI {
 	public partial class MainForm : Form {
@@ -42,9 +43,12 @@ namespace KCS_GUI {
 		string FleetFilePath;
 		//マップタブにおけるファイルパス
 		string MapFilePath;
-
-		/* コンストラクタ */
-		static MainForm() {
+        //ErrorProvider
+        private System.Windows.Forms.ErrorProvider error_provider_level;
+        private System.Windows.Forms.ErrorProvider error_provider_luck;
+        private System.Windows.Forms.ErrorProvider error_provider_cond;
+        /* コンストラクタ */
+        static MainForm() {
 			using(var adapter = new CsvDataSetTableAdapters.ShipsTableAdapter())
 				adapter.Fill(data.Ships);
 			using(var adapter = new CsvDataSetTableAdapters.WeaponsTableAdapter())
@@ -106,7 +110,10 @@ namespace KCS_GUI {
 				RedrawMapKammusuNameList();
 				FormFleet = new Fleet();
 				FormMapData = new MapData();
-			} catch(Exception ex) {
+                error_provider_level = new System.Windows.Forms.ErrorProvider();
+                error_provider_luck = new System.Windows.Forms.ErrorProvider();
+                error_provider_cond = new System.Windows.Forms.ErrorProvider();
+            } catch(Exception ex) {
 				MessageBox.Show(ex.Message, SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
 				this.Close();
 			}
@@ -313,21 +320,69 @@ namespace KCS_GUI {
 		static private bool IsVaidIndex(int val, int size) {
 			return IsInRange(val, 0, size - 1);
 		}
-		private void KammusuLevelTextBox_Leave(object sender, EventArgs e) {
+        private void KammusuLevelTextBox_Validating(object sender, CancelEventArgs e) {
+            try {
+                int level = int.Parse(KammusuLevelTextBox.Text);
+                if (level < 1 || 155 < level) {
+                    e.Cancel = true;
+                    error_provider_level.SetError(KammusuLevelTextBox, "1-255の値を入力してください");//range error
+                }
+                else {
+                    error_provider_level.SetError(KammusuLevelTextBox, "");//error clear
+                }
+            }
+            catch (Exception) {
+                e.Cancel = true;
+                error_provider_level.SetError(KammusuLevelTextBox, "整数値以外の文字が入力されました！！");
+            }
+        }
+        private void KammusuLevelTextBox_Leave(object sender, EventArgs e) {
 			if(//Range Check
 				IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
 				&& IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
 			)
 				FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].level = limit(int.Parse(KammusuLevelTextBox.Text), 1, 155);
 		}
-		private void KammusuLuckTextBox_Leave(object sender, EventArgs e) {
+        private void KammusuLuckTextBox_Validating(object sender, CancelEventArgs e) {
+            try {
+                int luck = int.Parse(KammusuLuckTextBox.Text);
+                if (luck < -1 || 100 < luck) {
+                    e.Cancel = true;
+                    error_provider_luck.SetError(KammusuLuckTextBox, "-1～100の値を入力してください");//range error
+                }
+                else {
+                    error_provider_luck.SetError(KammusuLuckTextBox, "");//error clear
+                }
+            }
+            catch (Exception) {
+                e.Cancel = true;
+                error_provider_luck.SetError(KammusuLuckTextBox, "整数値以外の文字が入力されました！！");
+            }
+        }
+        private void KammusuLuckTextBox_Leave(object sender, EventArgs e) {
 			if(//Range Check
 				IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
 				&& IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
 			)
 				FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].luck = limit(int.Parse(KammusuLuckTextBox.Text), -1, 100);
 		}
-		private void KammusuCondTextBox_Leave(object sender, EventArgs e) {
+        private void KammusuCondTextBox_Validating(object sender, CancelEventArgs e) {
+            try {
+                int cond = int.Parse(KammusuCondTextBox.Text);
+                if (cond < 0 || 100 < cond) {
+                    e.Cancel = true;
+                    error_provider_cond.SetError(KammusuCondTextBox, "0-100の値を入力してください");//range error
+                }
+                else {
+                    error_provider_cond.SetError(KammusuCondTextBox, "");//error clear
+                }
+            }
+            catch (Exception) {
+                e.Cancel = true;
+                error_provider_cond.SetError(KammusuCondTextBox, "整数値以外の文字が入力されました！！");
+            }
+        }
+        private void KammusuCondTextBox_Leave(object sender, EventArgs e) {
 			if(//Range Check
 				IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
 				&& IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)

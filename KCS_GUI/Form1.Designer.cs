@@ -636,6 +636,7 @@
 			this.KammusuCondTextBox.TabIndex = 18;
 			this.KammusuCondTextBox.Text = "49";
             this.KammusuCondTextBox.Leave += new System.EventHandler(this.KammusuCondTextBox_Leave);
+            this.KammusuCondTextBox.Validating += this.KammusuCondTextBox_Validating;
             // 
             // KammusuLuckTextBox
             // 
@@ -645,6 +646,7 @@
 			this.KammusuLuckTextBox.TabIndex = 17;
 			this.KammusuLuckTextBox.Text = "-1";
             this.KammusuLuckTextBox.Leave += new System.EventHandler(this.KammusuLuckTextBox_Leave);
+            this.KammusuLuckTextBox.Validating += this.KammusuLuckTextBox_Validating;
             // 
             // KammusuLevelTextBox
             // 
@@ -654,10 +656,11 @@
 			this.KammusuLevelTextBox.TabIndex = 16;
 			this.KammusuLevelTextBox.Text = "1";
             this.KammusuLevelTextBox.Leave += new System.EventHandler(this.KammusuLevelTextBox_Leave);
-			// 
-			// label10
-			// 
-			this.label10.AutoSize = true;
+            this.KammusuLevelTextBox.Validating += this.KammusuLevelTextBox_Validating;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
 			this.label10.Location = new System.Drawing.Point(285, 134);
 			this.label10.Name = "label10";
 			this.label10.Size = new System.Drawing.Size(41, 12);
