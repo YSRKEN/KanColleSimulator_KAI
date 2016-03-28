@@ -20,7 +20,7 @@ public:
 	// setter
 	void SetRandGenerator(const unsigned int seed);
 	// その他
-	void Put();	//内容を表示する
+	void Put() const;	//内容を表示する
 };
 
 #endif
