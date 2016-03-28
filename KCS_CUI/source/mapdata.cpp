@@ -60,7 +60,7 @@ SharedRand MapData::GetGenerator() noexcept { return this->rand_; }
 void MapData::SetRandGenerator(const unsigned int seed) { rand_ = SharedRand(seed); }
 
 //内容を表示する
-void MapData::Put() {
+void MapData::Put() const {
 	wcout << L"マス数：" << fleet_.size() << endl;
 	for (size_t p = 0; p < fleet_.size(); ++p) {
 		wcout << L"　" << point_name_[p] << L"マス：" << fleet_[p].size() << L"艦隊　" << kSimulateModeStr[simulate_mode_[p]] << endl;
