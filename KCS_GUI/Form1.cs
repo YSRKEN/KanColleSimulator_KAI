@@ -45,7 +45,7 @@ namespace KCS_GUI {
 		//マップタブにおけるファイルパス
 		string MapFilePath;
         //ファイルの状態
-        FileState file_state;
+        OpenFileInfo[] file;
         //ErrorProvider
         private System.Windows.Forms.ErrorProvider error_provider_level;
         private System.Windows.Forms.ErrorProvider error_provider_luck;
@@ -113,7 +113,11 @@ namespace KCS_GUI {
 				RedrawMapKammusuNameList();
 				FormFleet = new Fleet();
 				FormMapData = new MapData();
-                file_state = FileState.none;
+                file = new OpenFileInfo[2]
+                {
+                    new OpenFileInfo(),
+                    new OpenFileInfo()
+                };
                 error_provider_level = new System.Windows.Forms.ErrorProvider();
                 error_provider_luck = new System.Windows.Forms.ErrorProvider();
                 error_provider_cond = new System.Windows.Forms.ErrorProvider();
@@ -125,28 +129,45 @@ namespace KCS_GUI {
 
 		/* 各イベント毎の処理 */
         private void file_state_modified(FileState new_state) {
-            this.file_state = new_state;
-            this.filename_echo.ForeColor = (FileState.none != new_state) ? SystemColors.ControlText : SystemColors.GradientInactiveCaption;
-            switch (new_state) {
-                case FileState.none:
-                    this.filename_echo.BackColor = SystemColors.Control;
-                    this.filename_echo.Text = "filename...";
-                    break;
-                case FileState.modified:
-                    this.filename_echo.BackColor = Color.FromArgb(253, 239, 242);
-                    break;
-                case FileState.saved:
-                    this.filename_echo.BackColor = Color.FromArgb(235, 246, 247);
-                    break;
-                default:
-                    break;
+            if (0 <= MainTabControl.SelectedIndex || MainTabControl.SelectedIndex <= 2) {
+                this.file[MainTabControl.SelectedIndex].state = new_state;
+                this.filename_echo.ForeColor = (FileState.none != new_state) ? SystemColors.ControlText : SystemColors.GradientInactiveCaption;
+                switch (new_state) {
+                    case FileState.none:
+                        this.filename_echo.BackColor = SystemColors.Control;
+                        this.file[MainTabControl.SelectedIndex].name = this.filename_echo.Text = "filename...";
+                        break;
+                    case FileState.modified:
+                        this.filename_echo.BackColor = Color.FromArgb(253, 239, 242);
+                        break;
+                    case FileState.saved:
+                        this.filename_echo.BackColor = Color.FromArgb(235, 246, 247);
+                        break;
+                    default:
+                        break;
+                }
+                this.file[MainTabControl.SelectedIndex].bg_color = this.filename_echo.BackColor;
             }
         }
         private void file_state_modified(String filename, FileState new_state) {
-            file_state_modified(new_state);
-            if(FileState.none != new_state) {
-                this.filename_echo.Text = ("" == filename) ? "untitled" : filename;
+            if (0 <= MainTabControl.SelectedIndex || MainTabControl.SelectedIndex <= 2) {
+                file_state_modified(new_state);
+                if (FileState.none != new_state) {
+                    this.file[MainTabControl.SelectedIndex].name = this.filename_echo.Text = (0 == filename.Length) ? "untitled" : filename;
+                }
             }
+        }
+
+        private void MainTAbControl_SelectedIndexChanged(object sender, EventArgs e) {
+            if (MainTabControl.SelectedIndex < 0 || 2 < MainTabControl.SelectedIndex) {
+                this.filename_echo.Text = "";
+                this.filename_echo.BackColor = SystemColors.Control;
+            }
+            else {
+                this.filename_echo.Text = this.file[MainTabControl.SelectedIndex].name;
+                this.filename_echo.BackColor = this.file[MainTabControl.SelectedIndex].bg_color;
+            }
+            this.filename_echo.ForeColor = (FileState.none != this.file[MainTabControl.SelectedIndex].state) ? SystemColors.ControlText : SystemColors.GradientInactiveCaption;
         }
         // メニュー
         private void NewFileMenuItem_Click(object sender, EventArgs e) {
@@ -157,18 +178,19 @@ namespace KCS_GUI {
 				FleetSelectComboBox_SelectedIndexChanged(sender, e);
 				RedrawAntiAirScore();
 				RedrawSearchPower();
-			} else if(MainTabControl.SelectedIndex == 1) {
+                file_state_modified("untitled.json", FileState.modified);
+            } else if(MainTabControl.SelectedIndex == 1) {
 				FormMapData = new MapData();
 				MapPositionListBox.Items.Clear();
 				MapPositionListBox.Refresh();
 				RedrawMapAntiAirScore();
-			}
-            file_state_modified("", FileState.modified);
+                file_state_modified("untitled.map", FileState.modified);
+            }
         }
         private String filepath_to_name(String path) {
             return path.Substring(path.LastIndexOf('\\') + 1);
         }
-		private void OpenFileMenuItem_Click(object sender, EventArgs e) {
+        private void OpenFileMenuItem_Click(object sender, EventArgs e) {
 			if(MainTabControl.SelectedIndex == 0) {
 				// ファイルを開くダイアログを表示する
 				OpenFileDialog ofd = new OpenFileDialog();
@@ -306,8 +328,8 @@ namespace KCS_GUI {
             }
         }
 		private void ExitMenuItem_Click(object sender, EventArgs e) {
-			this.Close();
-		}
+			this.Close();//jump to MainForm_FormClosing
+        }
 		//バージョン情報表示
 		private void VersionInfoMenuItem_Click(object sender, EventArgs e) {
 			Assembly assem = Assembly.GetExecutingAssembly();
@@ -1569,8 +1591,30 @@ namespace KCS_GUI {
 				return o.ToString();
 			}
 		}
-	}
-	static class Extensions {
+
+        private String GetFilePath(int MainTabIndex) {
+            if (MainTabIndex < 0 || 2 < MainTabIndex) throw new ArgumentOutOfRangeException("MainTabIndex");
+            return (0 == MainTabIndex) ? MapFilePath : FleetFilePath;
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e) {
+            for (int i = 0; i < this.file.Length; ++i) {
+                if (FileState.saved != this.file[i].state) {
+                    DialogResult result = MessageBox.Show(this.file[i].name + " has been modified, save changes ?",
+                        "Save Change?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2
+                    );
+                    switch (result) {
+                    case DialogResult.Cancel:
+                        e.Cancel = true;
+                        break;
+                    case DialogResult.Yes:
+
+                    }
+                }
+            }
+        }
+    }
+    static class Extensions {
 		public static int ParseInt(this string str) {
 			return int.Parse(str);
 		}
@@ -1582,5 +1626,19 @@ namespace KCS_GUI {
         none,
         modified,
         saved
+    }
+    class OpenFileInfo {
+        public OpenFileInfo() {
+            this.name = "filename...";
+            this.state = FileState.none;
+            this.bg_color = SystemColors.Control;
+        }
+        public OpenFileInfo(string name_, FileState state_) {
+            this.name = name_;
+            this.state = state_;
+        }
+        public string name;
+        public FileState state;
+        public Color bg_color;
     }
 }

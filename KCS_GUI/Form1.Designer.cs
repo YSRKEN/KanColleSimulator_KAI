@@ -153,6 +153,7 @@
             this.MainTabControl.SelectedIndex = 0;
             this.MainTabControl.Size = new System.Drawing.Size(460, 282);
             this.MainTabControl.TabIndex = 0;
+            this.MainTabControl.SelectedIndexChanged += new System.EventHandler(this.MainTAbControl_SelectedIndexChanged);
             // 
             // tabPage1
             // 
@@ -1507,6 +1508,7 @@
             this.MaximizeBox = false;
             this.Name = "MainForm";
             this.Text = "KanColleSimulator";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.MainForm_DragDrop);
             this.DragEnter += new System.Windows.Forms.DragEventHandler(this.MainForm_DragEnter);
             this.MainTabControl.ResumeLayout(false);
