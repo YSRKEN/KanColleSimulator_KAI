@@ -242,6 +242,8 @@ namespace KCS_GUI {
 			string saveData = FormFleet.ToJson();
 			// 作成したデータを保存する
 			var sfd = new SaveFileDialog();
+			sfd.ShowHelp = true;//http://stackoverflow.com/questions/17163784/default-name-with-openfiledialog-c
+			sfd.FileName = this.file[0].name;
 			sfd.Filter = "艦隊データ(*.json)|*.json|すべてのファイル(*.*)|*.*";
 			if (sfd.ShowDialog() != DialogResult.OK)
 				return false;
@@ -268,6 +270,8 @@ namespace KCS_GUI {
 			string saveData = FormMapData.ToJson();
 			// 作成したデータを保存する
 			var sfd = new SaveFileDialog();
+			sfd.ShowHelp = true;//http://stackoverflow.com/questions/17163784/default-name-with-openfiledialog-c
+			sfd.FileName = this.file[1].name;
 			sfd.Filter = "マップデータ(*.map)|*.map|すべてのファイル(*.*)|*.*";
 			if (sfd.ShowDialog() != DialogResult.OK)
 				return false;
