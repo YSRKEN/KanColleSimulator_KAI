@@ -177,15 +177,16 @@ namespace KCS_GUI {
 			}
 			return;
 		}
-		private void CreateFleetFile() {
+		private bool CreateFleetFile() {
 			// セーブデータを作成する
 			string saveData = FormFleet.ToJson();
 			// 作成したデータを保存する
 			var sfd = new SaveFileDialog();
 			sfd.Filter = "艦隊データ(*.json)|*.json|すべてのファイル(*.*)|*.*";
 			if (sfd.ShowDialog() != DialogResult.OK)
-				return;
+				return false;
 			this.FleetFilePath = sfd.FileName;
+			return true;
 		}
 		private void SaveFleetFile(bool force_create = false) {
 			// 事前チェック
@@ -193,9 +194,7 @@ namespace KCS_GUI {
 				MessageBox.Show("艦娘を第1艦隊に1隻以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return;
 			}
-			if (FleetFilePath == null || FleetFilePath == "" || force_create) {
-				CreateFleetFile();
-			}
+			if ((FleetFilePath == null || FleetFilePath == "" || force_create) && !CreateFleetFile()) return;
 			// セーブデータを作成する
 			string saveData = FormFleet.ToJson();
 			// 作成したデータを保存する
@@ -203,15 +202,16 @@ namespace KCS_GUI {
 			sw.Write(saveData);
 			sw.Close();
 		}
-		private void CreateMapFile() {
+		private bool CreateMapFile() {
 			// セーブデータを作成する
 			string saveData = FormMapData.ToJson();
 			// 作成したデータを保存する
 			var sfd = new SaveFileDialog();
 			sfd.Filter = "マップデータ(*.map)|*.map|すべてのファイル(*.*)|*.*";
 			if (sfd.ShowDialog() != DialogResult.OK)
-				return;
+				return false;
 			this.MapFilePath = sfd.FileName;
+			return true;
 		}
 		private void SaveMapFile(bool force_create = false) {
 			// 事前チェック
@@ -227,9 +227,7 @@ namespace KCS_GUI {
 				MessageBox.Show("艦娘を艦隊に1隻以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return;
 			}
-			if (MapFilePath == null || MapFilePath == "" || force_create) {
-				CreateMapFile();
-			}
+			if ((MapFilePath == null || MapFilePath == "" || force_create) && !CreateMapFile()) return;
 			// セーブデータを作成する
 			string saveData = FormMapData.ToJson();
 			// 作成したデータを保存する
