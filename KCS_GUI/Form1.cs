@@ -43,12 +43,12 @@ namespace KCS_GUI {
 		string FleetFilePath;
 		//マップタブにおけるファイルパス
 		string MapFilePath;
-        //ErrorProvider
-        private System.Windows.Forms.ErrorProvider error_provider_level;
-        private System.Windows.Forms.ErrorProvider error_provider_luck;
-        private System.Windows.Forms.ErrorProvider error_provider_cond;
-        /* コンストラクタ */
-        static MainForm() {
+		//ErrorProvider
+		private System.Windows.Forms.ErrorProvider error_provider_level;
+		private System.Windows.Forms.ErrorProvider error_provider_luck;
+		private System.Windows.Forms.ErrorProvider error_provider_cond;
+		/* コンストラクタ */
+		static MainForm() {
 			using(var adapter = new CsvDataSetTableAdapters.ShipsTableAdapter())
 				adapter.Fill(data.Ships);
 			using(var adapter = new CsvDataSetTableAdapters.WeaponsTableAdapter())
@@ -110,10 +110,10 @@ namespace KCS_GUI {
 				RedrawMapKammusuNameList();
 				FormFleet = new Fleet();
 				FormMapData = new MapData();
-                error_provider_level = new System.Windows.Forms.ErrorProvider();
-                error_provider_luck = new System.Windows.Forms.ErrorProvider();
-                error_provider_cond = new System.Windows.Forms.ErrorProvider();
-            } catch(Exception ex) {
+				error_provider_level = new System.Windows.Forms.ErrorProvider();
+				error_provider_luck = new System.Windows.Forms.ErrorProvider();
+				error_provider_cond = new System.Windows.Forms.ErrorProvider();
+			} catch(Exception ex) {
 				MessageBox.Show(ex.Message, SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
 				this.Close();
 			}
@@ -177,81 +177,81 @@ namespace KCS_GUI {
 			}
 			return;
 		}
-        private void CreateFleetFile() {
-            // セーブデータを作成する
-            string saveData = FormFleet.ToJson();
-            // 作成したデータを保存する
-            var sfd = new SaveFileDialog();
-            sfd.Filter = "艦隊データ(*.json)|*.json|すべてのファイル(*.*)|*.*";
-            if (sfd.ShowDialog() != DialogResult.OK)
-                return;
-            this.FleetFilePath = sfd.FileName;
-        }
-        private void SaveFleetFile(bool force_create = false) {
-            // 事前チェック
-            if (FormFleet.unit[0].Count == 0) {
-                MessageBox.Show("艦娘を第1艦隊に1隻以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            if (FleetFilePath == null || FleetFilePath == "" || force_create) {
-                CreateFleetFile();
-            }
-            // セーブデータを作成する
-            string saveData = FormFleet.ToJson();
-            // 作成したデータを保存する
-            var sw = new StreamWriter(FleetFilePath, false, Encoding.GetEncoding("shift-jis"));
-            sw.Write(saveData);
-            sw.Close();
-        }
-        private void CreateMapFile() {
-            // セーブデータを作成する
-            string saveData = FormMapData.ToJson();
-            // 作成したデータを保存する
-            var sfd = new SaveFileDialog();
-            sfd.Filter = "マップデータ(*.map)|*.map|すべてのファイル(*.*)|*.*";
-            if (sfd.ShowDialog() != DialogResult.OK)
-                return;
-            this.MapFilePath = sfd.FileName;
-        }
-        private void SaveMapFile(bool force_create = false) {
-            // 事前チェック
-            if (FormMapData.position.Count == 0) {
-                MessageBox.Show("パターンをマスに1つ以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            if (FormMapData.position[0].fleet.Count == 0) {
-                MessageBox.Show("艦隊をパターンに1つ以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            if (FormMapData.position[0].fleet[0].unit[0].Count == 0) {
-                MessageBox.Show("艦娘を艦隊に1隻以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            if (MapFilePath == null || MapFilePath == "" || force_create) {
-                CreateMapFile();
-            }
-            // セーブデータを作成する
-            string saveData = FormMapData.ToJson();
-            // 作成したデータを保存する
-            var sw = new StreamWriter(MapFilePath, false, Encoding.GetEncoding("shift-jis"));
-            sw.Write(saveData);
-            sw.Close();
-        }
-        private void SaveSFileMenuItem_Click(object sender, EventArgs e) {
+		private void CreateFleetFile() {
+			// セーブデータを作成する
+			string saveData = FormFleet.ToJson();
+			// 作成したデータを保存する
+			var sfd = new SaveFileDialog();
+			sfd.Filter = "艦隊データ(*.json)|*.json|すべてのファイル(*.*)|*.*";
+			if (sfd.ShowDialog() != DialogResult.OK)
+				return;
+			this.FleetFilePath = sfd.FileName;
+		}
+		private void SaveFleetFile(bool force_create = false) {
+			// 事前チェック
+			if (FormFleet.unit[0].Count == 0) {
+				MessageBox.Show("艦娘を第1艦隊に1隻以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return;
+			}
+			if (FleetFilePath == null || FleetFilePath == "" || force_create) {
+				CreateFleetFile();
+			}
+			// セーブデータを作成する
+			string saveData = FormFleet.ToJson();
+			// 作成したデータを保存する
+			var sw = new StreamWriter(FleetFilePath, false, Encoding.GetEncoding("shift-jis"));
+			sw.Write(saveData);
+			sw.Close();
+		}
+		private void CreateMapFile() {
+			// セーブデータを作成する
+			string saveData = FormMapData.ToJson();
+			// 作成したデータを保存する
+			var sfd = new SaveFileDialog();
+			sfd.Filter = "マップデータ(*.map)|*.map|すべてのファイル(*.*)|*.*";
+			if (sfd.ShowDialog() != DialogResult.OK)
+				return;
+			this.MapFilePath = sfd.FileName;
+		}
+		private void SaveMapFile(bool force_create = false) {
+			// 事前チェック
+			if (FormMapData.position.Count == 0) {
+				MessageBox.Show("パターンをマスに1つ以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return;
+			}
+			if (FormMapData.position[0].fleet.Count == 0) {
+				MessageBox.Show("艦隊をパターンに1つ以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return;
+			}
+			if (FormMapData.position[0].fleet[0].unit[0].Count == 0) {
+				MessageBox.Show("艦娘を艦隊に1隻以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return;
+			}
+			if (MapFilePath == null || MapFilePath == "" || force_create) {
+				CreateMapFile();
+			}
+			// セーブデータを作成する
+			string saveData = FormMapData.ToJson();
+			// 作成したデータを保存する
+			var sw = new StreamWriter(MapFilePath, false, Encoding.GetEncoding("shift-jis"));
+			sw.Write(saveData);
+			sw.Close();
+		}
+		private void SaveSFileMenuItem_Click(object sender, EventArgs e) {
 			if(MainTabControl.SelectedIndex == 0) {
-                SaveFleetFile();
-            } else if(MainTabControl.SelectedIndex == 1) {
-                SaveMapFile();
-            }
+				SaveFleetFile();
+			} else if(MainTabControl.SelectedIndex == 1) {
+				SaveMapFile();
+			}
 		}
 		private void SaveAFileMenuItem_Click(object sender, EventArgs e) {
 			if(MainTabControl.SelectedIndex == 0) {
-                SaveFleetFile(true);
-            }
-            else if(MainTabControl.SelectedIndex == 1) {
-                SaveMapFile(true);
-            }
-        }
+				SaveFleetFile(true);
+			}
+			else if(MainTabControl.SelectedIndex == 1) {
+				SaveMapFile(true);
+			}
+		}
 		private void ExitMenuItem_Click(object sender, EventArgs e) {
 			this.Close();
 		}
@@ -307,69 +307,69 @@ namespace KCS_GUI {
 		static private bool IsVaidIndex(int val, int size) {
 			return IsInRange(val, 0, size - 1);
 		}
-        private void KammusuLevelTextBox_Validating(object sender, CancelEventArgs e) {
-            try {
-                int level = int.Parse(KammusuLevelTextBox.Text);
-                if (level < 1 || 155 < level) {
-                    e.Cancel = true;
-                    error_provider_level.SetError(KammusuLevelTextBox, "1-255の値を入力してください");//range error
-                }
-                else {
-                    error_provider_level.SetError(KammusuLevelTextBox, "");//error clear
-                }
-            }
-            catch (Exception) {
-                e.Cancel = true;
-                error_provider_level.SetError(KammusuLevelTextBox, "整数値以外の文字が入力されました！！");
-            }
-        }
-        private void KammusuLevelTextBox_Leave(object sender, EventArgs e) {
+		private void KammusuLevelTextBox_Validating(object sender, CancelEventArgs e) {
+			try {
+				int level = int.Parse(KammusuLevelTextBox.Text);
+				if (level < 1 || 155 < level) {
+					e.Cancel = true;
+					error_provider_level.SetError(KammusuLevelTextBox, "1-255の値を入力してください");//range error
+				}
+				else {
+					error_provider_level.SetError(KammusuLevelTextBox, "");//error clear
+				}
+			}
+			catch (Exception) {
+				e.Cancel = true;
+				error_provider_level.SetError(KammusuLevelTextBox, "整数値以外の文字が入力されました！！");
+			}
+		}
+		private void KammusuLevelTextBox_Leave(object sender, EventArgs e) {
 			if(//Range Check
 				IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
 				&& IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
 			)
 				FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].level = limit(int.Parse(KammusuLevelTextBox.Text), 1, 155);
 		}
-        private void KammusuLuckTextBox_Validating(object sender, CancelEventArgs e) {
-            try {
-                int luck = int.Parse(KammusuLuckTextBox.Text);
-                if (luck < -1 || 100 < luck) {
-                    e.Cancel = true;
-                    error_provider_luck.SetError(KammusuLuckTextBox, "-1～100の値を入力してください");//range error
-                }
-                else {
-                    error_provider_luck.SetError(KammusuLuckTextBox, "");//error clear
-                }
-            }
-            catch (Exception) {
-                e.Cancel = true;
-                error_provider_luck.SetError(KammusuLuckTextBox, "整数値以外の文字が入力されました！！");
-            }
-        }
-        private void KammusuLuckTextBox_Leave(object sender, EventArgs e) {
+		private void KammusuLuckTextBox_Validating(object sender, CancelEventArgs e) {
+			try {
+				int luck = int.Parse(KammusuLuckTextBox.Text);
+				if (luck < -1 || 100 < luck) {
+					e.Cancel = true;
+					error_provider_luck.SetError(KammusuLuckTextBox, "-1～100の値を入力してください");//range error
+				}
+				else {
+					error_provider_luck.SetError(KammusuLuckTextBox, "");//error clear
+				}
+			}
+			catch (Exception) {
+				e.Cancel = true;
+				error_provider_luck.SetError(KammusuLuckTextBox, "整数値以外の文字が入力されました！！");
+			}
+		}
+		private void KammusuLuckTextBox_Leave(object sender, EventArgs e) {
 			if(//Range Check
 				IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
 				&& IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
 			)
 				FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].luck = limit(int.Parse(KammusuLuckTextBox.Text), -1, 100);
 		}
-        private void KammusuCondTextBox_Validating(object sender, CancelEventArgs e) {
-            try {
-                int cond = int.Parse(KammusuCondTextBox.Text);
-                if (cond < 0 || 100 < cond) {
-                    e.Cancel = true;
-                    error_provider_cond.SetError(KammusuCondTextBox, "0-100の値を入力してください");//range error
-                }
-                else {
-                    error_provider_cond.SetError(KammusuCondTextBox, "");//error clear
-                }
-            }
-            catch (Exception) {
-                e.Cancel = true;
-                error_provider_cond.SetError(KammusuCondTextBox, "整数値以外の文字が入力されました！！");
-            }
-        }
-        private void KammusuCondTextBox_Leave(object sender, EventArgs e) {
+		private void KammusuCondTextBox_Validating(object sender, CancelEventArgs e) {
+			try {
+				int cond = int.Parse(KammusuCondTextBox.Text);
+				if (cond < 0 || 100 < cond) {
+					e.Cancel = true;
+					error_provider_cond.SetError(KammusuCondTextBox, "0-100の値を入力してください");//range error
+				}
+				else {
+					error_provider_cond.SetError(KammusuCondTextBox, "");//error clear
+				}
+			}
+			catch (Exception) {
+				e.Cancel = true;
+				error_provider_cond.SetError(KammusuCondTextBox, "整数値以外の文字が入力されました！！");
+			}
+		}
+		private void KammusuCondTextBox_Leave(object sender, EventArgs e) {
 			if(//Range Check
 				IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
 				&& IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
@@ -909,9 +909,9 @@ namespace KCS_GUI {
 			this.Text = SoftName + "(計算中)";
 			System.Console.WriteLine(commandLine);
 			System.Console.WriteLine(psInfo.FileName);
-			psInfo.CreateNoWindow = true;           //コンソール・ウィンドウを開かない
-			psInfo.UseShellExecute = false;         //シェル機能を使用しない
-			psInfo.Arguments = commandLine;         //コマンドライン引数を設定
+			psInfo.CreateNoWindow = true;		   //コンソール・ウィンドウを開かない
+			psInfo.UseShellExecute = false;		 //シェル機能を使用しない
+			psInfo.Arguments = commandLine;		 //コマンドライン引数を設定
 			psInfo.RedirectStandardOutput = true;   //標準出力を取り込むようにする
 			Process p = Process.Start(psInfo);
 			string output = p.StandardOutput.ReadToEnd();
