@@ -1591,7 +1591,11 @@ namespace KCS_GUI {
                         e.Cancel = true;
                         break;
                     case DialogResult.Yes:
-
+                        if (0 == i) SaveFleetFile();
+                        else if (1 == i) SaveMapFile();
+                        goto case DialogResult.No;
+                    case DialogResult.No:
+                        break;
                     }
                 }
             }
