@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using System.ComponentModel;
+using System.Drawing;
 
 namespace KCS_GUI {
 	public partial class MainForm : Form {
@@ -43,6 +44,8 @@ namespace KCS_GUI {
 		string FleetFilePath;
 		//マップタブにおけるファイルパス
 		string MapFilePath;
+        //ファイルの状態
+        FileState file_state;
         //ErrorProvider
         private System.Windows.Forms.ErrorProvider error_provider_level;
         private System.Windows.Forms.ErrorProvider error_provider_luck;
@@ -110,6 +113,7 @@ namespace KCS_GUI {
 				RedrawMapKammusuNameList();
 				FormFleet = new Fleet();
 				FormMapData = new MapData();
+                file_state = FileState.none;
                 error_provider_level = new System.Windows.Forms.ErrorProvider();
                 error_provider_luck = new System.Windows.Forms.ErrorProvider();
                 error_provider_cond = new System.Windows.Forms.ErrorProvider();
@@ -120,8 +124,32 @@ namespace KCS_GUI {
 		}
 
 		/* 各イベント毎の処理 */
-		// メニュー
-		private void NewFileMenuItem_Click(object sender, EventArgs e) {
+        private void file_state_modified(FileState new_state) {
+            this.file_state = new_state;
+            this.filename_echo.ForeColor = (FileState.none != new_state) ? SystemColors.ControlText : SystemColors.GradientInactiveCaption;
+            switch (new_state) {
+                case FileState.none:
+                    this.filename_echo.BackColor = SystemColors.Control;
+                    this.filename_echo.Text = "filename...";
+                    break;
+                case FileState.modified:
+                    this.filename_echo.BackColor = Color.FromArgb(253, 239, 242);
+                    break;
+                case FileState.saved:
+                    this.filename_echo.BackColor = Color.FromArgb(235, 246, 247);
+                    break;
+                default:
+                    break;
+            }
+        }
+        private void file_state_modified(String filename, FileState new_state) {
+            file_state_modified(new_state);
+            if(FileState.none != new_state) {
+                this.filename_echo.Text = ("" == filename) ? "untitled" : filename;
+            }
+        }
+        // メニュー
+        private void NewFileMenuItem_Click(object sender, EventArgs e) {
 			if(MainTabControl.SelectedIndex == 0) {
 				FormFleet = new Fleet();
 				HQLevelTextBox.Text = FormFleet.level.ToString();
@@ -135,7 +163,8 @@ namespace KCS_GUI {
 				MapPositionListBox.Refresh();
 				RedrawMapAntiAirScore();
 			}
-		}
+            file_state_modified("", FileState.modified);
+        }
         private String filepath_to_name(String path) {
             return path.Substring(path.LastIndexOf('\\') + 1);
         }
@@ -152,8 +181,8 @@ namespace KCS_GUI {
 				if(!setFleet.Item2)
 					return;
                 // 読み込んだデータを画面に反映する
-                this.filename_echo.Text = filepath_to_name(this.FleetFilePath);
-				FormFleet = setFleet.Item1;
+                file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
+                FormFleet = setFleet.Item1;
 				HQLevelTextBox.Text = FormFleet.level.ToString();
 				FleetTypeComboBox.SelectedIndex = FormFleet.type;
 				FleetSelectComboBox_SelectedIndexChanged(sender, e);
@@ -171,7 +200,7 @@ namespace KCS_GUI {
 				if(!setMapData.Item2)
 					return;
                 // 読み込んだデータを画面に反映する
-                this.filename_echo.Text = filepath_to_name(this.MapFilePath);
+                file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
                 FormMapData = setMapData.Item1;
 				MapPositionListBox.Items.Clear();
 				foreach(var position in FormMapData.position) {
@@ -199,7 +228,9 @@ namespace KCS_GUI {
 				var sw = new StreamWriter(FleetFilePath, false, Encoding.GetEncoding("shift-jis"));
 				sw.Write(saveData);
 				sw.Close();
-			} else if(MainTabControl.SelectedIndex == 1) {
+                file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
+            }
+            else if(MainTabControl.SelectedIndex == 1) {
 				// 事前チェック
 				if(MapFilePath == null || MapFilePath == "") {
 					SaveAFileMenuItem_Click(sender, e);
@@ -223,8 +254,9 @@ namespace KCS_GUI {
 				var sw = new StreamWriter(MapFilePath, false, Encoding.GetEncoding("shift-jis"));
 				sw.Write(saveData);
 				sw.Close();
-			}
-		}
+                file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
+            }
+        }
 		private void SaveAFileMenuItem_Click(object sender, EventArgs e) {
 			if(MainTabControl.SelectedIndex == 0) {
 				// 事前チェック
@@ -243,7 +275,9 @@ namespace KCS_GUI {
 				var sw = new StreamWriter(FleetFilePath, false, Encoding.GetEncoding("shift-jis"));
 				sw.Write(saveData);
 				sw.Close();
-			} else if(MainTabControl.SelectedIndex == 1) {
+                file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
+            }
+            else if(MainTabControl.SelectedIndex == 1) {
 				// 事前チェック
 				if(FormMapData.position.Count == 0) {
 					MessageBox.Show("パターンをマスに1つ以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -268,8 +302,9 @@ namespace KCS_GUI {
 				var sw = new StreamWriter(MapFilePath, false, Encoding.GetEncoding("shift-jis"));
 				sw.Write(saveData);
 				sw.Close();
-			}
-		}
+                file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
+            }
+        }
 		private void ExitMenuItem_Click(object sender, EventArgs e) {
 			this.Close();
 		}
@@ -640,8 +675,9 @@ namespace KCS_GUI {
 				Tuple<Fleet, bool> setFleet = ReadJsonFile(FleetFilePath);
 				if(!setFleet.Item2)
 					return;
-				// 読み込んだデータを画面に反映する
-				FormFleet = setFleet.Item1;
+                // 読み込んだデータを画面に反映する
+                file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
+                FormFleet = setFleet.Item1;
 				HQLevelTextBox.Text = FormFleet.level.ToString();
 				FleetTypeComboBox.SelectedIndex = FormFleet.type;
 				FleetSelectComboBox_SelectedIndexChanged(sender, e);
@@ -660,8 +696,9 @@ namespace KCS_GUI {
 				Tuple<MapData, bool> setMapData = ReadMapFile(MapFilePath);
 				if(!setMapData.Item2)
 					return;
-				// 読み込んだデータを画面に反映する
-				FormMapData = setMapData.Item1;
+                // 読み込んだデータを画面に反映する
+                file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
+                FormMapData = setMapData.Item1;
 				MapPositionListBox.Items.Clear();
 				foreach(var position in FormMapData.position) {
 					MapPositionListBox.Items.Add(position.name);
@@ -1541,4 +1578,9 @@ namespace KCS_GUI {
 			return MainForm.limit(n, min, max);
 		}
 	}
+    enum FileState{
+        none,
+        modified,
+        saved
+    }
 }

@@ -419,19 +419,19 @@
             "118",
             "119",
             "120"});
-			this.WeaponDetailRfComboBox.Location = new System.Drawing.Point(385, 216);
-			this.WeaponDetailRfComboBox.Name = "WeaponDetailRfComboBox";
-			this.WeaponDetailRfComboBox.Size = new System.Drawing.Size(50, 20);
-			this.WeaponDetailRfComboBox.TabIndex = 36;
-			this.WeaponDetailRfComboBox.Text = "0";
-			this.WeaponDetailRfComboBox.SelectedIndexChanged += new System.EventHandler(this.WeaponDetailRfComboBox_SelectedIndexChanged);
+            this.WeaponDetailRfComboBox.Location = new System.Drawing.Point(385, 216);
+            this.WeaponDetailRfComboBox.Name = "WeaponDetailRfComboBox";
+            this.WeaponDetailRfComboBox.Size = new System.Drawing.Size(50, 20);
+            this.WeaponDetailRfComboBox.TabIndex = 36;
+            this.WeaponDetailRfComboBox.Text = "0";
+            this.WeaponDetailRfComboBox.SelectedIndexChanged += new System.EventHandler(this.WeaponDetailRfComboBox_SelectedIndexChanged);
             this.WeaponDetailRfComboBox.Leave += new System.EventHandler(this.WeaponDetailRfComboBox_Leave);
             // 
             // WeaponRfComboBox
             // 
             this.WeaponRfComboBox.Enabled = false;
-			this.WeaponRfComboBox.FormattingEnabled = true;
-			this.WeaponRfComboBox.Items.AddRange(new object[] {
+            this.WeaponRfComboBox.FormattingEnabled = true;
+            this.WeaponRfComboBox.Items.AddRange(new object[] {
             "0",
             "1",
             "2",
@@ -443,18 +443,18 @@
             "8",
             "9",
             "10"});
-			this.WeaponRfComboBox.Location = new System.Drawing.Point(385, 188);
-			this.WeaponRfComboBox.Name = "WeaponRfComboBox";
-			this.WeaponRfComboBox.Size = new System.Drawing.Size(50, 20);
-			this.WeaponRfComboBox.TabIndex = 35;
-			this.WeaponRfComboBox.Text = "0";
-			this.WeaponRfComboBox.SelectedIndexChanged += new System.EventHandler(this.WeaponRfComboBox_SelectedIndexChanged);
+            this.WeaponRfComboBox.Location = new System.Drawing.Point(385, 188);
+            this.WeaponRfComboBox.Name = "WeaponRfComboBox";
+            this.WeaponRfComboBox.Size = new System.Drawing.Size(50, 20);
+            this.WeaponRfComboBox.TabIndex = 35;
+            this.WeaponRfComboBox.Text = "0";
+            this.WeaponRfComboBox.SelectedIndexChanged += new System.EventHandler(this.WeaponRfComboBox_SelectedIndexChanged);
             this.WeaponRfComboBox.Leave += new System.EventHandler(this.WeaponRfComboBox_Leave);
             // 
             // WeaponLevelComboBox
             // 
             this.WeaponLevelComboBox.FormattingEnabled = true;
-			this.WeaponLevelComboBox.Items.AddRange(new object[] {
+            this.WeaponLevelComboBox.Items.AddRange(new object[] {
             "0",
             "1",
             "2",
@@ -466,113 +466,113 @@
             "8",
             "9",
             "10"});
-			this.WeaponLevelComboBox.Location = new System.Drawing.Point(385, 162);
-			this.WeaponLevelComboBox.Name = "WeaponLevelComboBox";
-			this.WeaponLevelComboBox.Size = new System.Drawing.Size(50, 20);
-			this.WeaponLevelComboBox.TabIndex = 34;
-			this.WeaponLevelComboBox.Text = "0";
+            this.WeaponLevelComboBox.Location = new System.Drawing.Point(385, 162);
+            this.WeaponLevelComboBox.Name = "WeaponLevelComboBox";
+            this.WeaponLevelComboBox.Size = new System.Drawing.Size(50, 20);
+            this.WeaponLevelComboBox.TabIndex = 34;
+            this.WeaponLevelComboBox.Text = "0";
             this.WeaponLevelComboBox.Leave += new System.EventHandler(this.WeaponLevelComboBox_Leave);
             // 
             // label19
             // 
             this.label19.AutoSize = true;
-			this.label19.Location = new System.Drawing.Point(314, 219);
-			this.label19.Name = "label19";
-			this.label19.Size = new System.Drawing.Size(65, 12);
-			this.label19.TabIndex = 33;
-			this.label19.Text = "内部熟練度";
-			// 
-			// label18
-			// 
-			this.label18.AutoSize = true;
-			this.label18.Location = new System.Drawing.Point(314, 191);
-			this.label18.Name = "label18";
-			this.label18.Size = new System.Drawing.Size(65, 12);
-			this.label18.TabIndex = 32;
-			this.label18.Text = "外部熟練度";
-			// 
-			// label17
-			// 
-			this.label17.AutoSize = true;
-			this.label17.Location = new System.Drawing.Point(314, 165);
-			this.label17.Name = "label17";
-			this.label17.Size = new System.Drawing.Size(65, 12);
-			this.label17.TabIndex = 31;
-			this.label17.Text = "装備改修度";
-			// 
-			// label16
-			// 
-			this.label16.AutoSize = true;
-			this.label16.Location = new System.Drawing.Point(153, 191);
-			this.label16.Name = "label16";
-			this.label16.Size = new System.Drawing.Size(29, 12);
-			this.label16.TabIndex = 30;
-			this.label16.Text = "名称";
-			// 
-			// SearchPower33TextBox
-			// 
-			this.SearchPower33TextBox.Enabled = false;
-			this.SearchPower33TextBox.Location = new System.Drawing.Point(248, 56);
-			this.SearchPower33TextBox.Name = "SearchPower33TextBox";
-			this.SearchPower33TextBox.Size = new System.Drawing.Size(40, 19);
-			this.SearchPower33TextBox.TabIndex = 28;
-			// 
-			// label15
-			// 
-			this.label15.AutoSize = true;
-			this.label15.Location = new System.Drawing.Point(151, 60);
-			this.label15.Name = "label15";
-			this.label15.Size = new System.Drawing.Size(85, 12);
-			this.label15.TabIndex = 27;
-			this.label15.Text = "総索敵値(33式)";
-			// 
-			// SearchPower25TextBox
-			// 
-			this.SearchPower25TextBox.Enabled = false;
-			this.SearchPower25TextBox.Location = new System.Drawing.Point(248, 31);
-			this.SearchPower25TextBox.Name = "SearchPower25TextBox";
-			this.SearchPower25TextBox.Size = new System.Drawing.Size(40, 19);
-			this.SearchPower25TextBox.TabIndex = 26;
-			// 
-			// AllAntiAirTextBox
-			// 
-			this.AllAntiAirTextBox.Enabled = false;
-			this.AllAntiAirTextBox.Location = new System.Drawing.Point(210, 6);
-			this.AllAntiAirTextBox.Name = "AllAntiAirTextBox";
-			this.AllAntiAirTextBox.Size = new System.Drawing.Size(40, 19);
-			this.AllAntiAirTextBox.TabIndex = 25;
-			// 
-			// label14
-			// 
-			this.label14.AutoSize = true;
-			this.label14.Location = new System.Drawing.Point(151, 34);
-			this.label14.Name = "label14";
-			this.label14.Size = new System.Drawing.Size(91, 12);
-			this.label14.TabIndex = 24;
-			this.label14.Text = "総索敵値(2-5秋)";
-			// 
-			// label13
-			// 
-			this.label13.AutoSize = true;
-			this.label13.Location = new System.Drawing.Point(151, 9);
-			this.label13.Name = "label13";
-			this.label13.Size = new System.Drawing.Size(53, 12);
-			this.label13.TabIndex = 23;
-			this.label13.Text = "総制空値";
-			// 
-			// label12
-			// 
-			this.label12.AutoSize = true;
-			this.label12.Location = new System.Drawing.Point(153, 165);
-			this.label12.Name = "label12";
-			this.label12.Size = new System.Drawing.Size(29, 12);
-			this.label12.TabIndex = 22;
-			this.label12.Text = "種別";
-			// 
-			// WeaponTypeComboBox
-			// 
-			this.WeaponTypeComboBox.FormattingEnabled = true;
-			this.WeaponTypeComboBox.Items.AddRange(new object[] {
+            this.label19.Location = new System.Drawing.Point(314, 219);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(65, 12);
+            this.label19.TabIndex = 33;
+            this.label19.Text = "内部熟練度";
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(314, 191);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(65, 12);
+            this.label18.TabIndex = 32;
+            this.label18.Text = "外部熟練度";
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(314, 165);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(65, 12);
+            this.label17.TabIndex = 31;
+            this.label17.Text = "装備改修度";
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(153, 191);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(29, 12);
+            this.label16.TabIndex = 30;
+            this.label16.Text = "名称";
+            // 
+            // SearchPower33TextBox
+            // 
+            this.SearchPower33TextBox.Enabled = false;
+            this.SearchPower33TextBox.Location = new System.Drawing.Point(248, 56);
+            this.SearchPower33TextBox.Name = "SearchPower33TextBox";
+            this.SearchPower33TextBox.Size = new System.Drawing.Size(40, 19);
+            this.SearchPower33TextBox.TabIndex = 28;
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(151, 60);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(85, 12);
+            this.label15.TabIndex = 27;
+            this.label15.Text = "総索敵値(33式)";
+            // 
+            // SearchPower25TextBox
+            // 
+            this.SearchPower25TextBox.Enabled = false;
+            this.SearchPower25TextBox.Location = new System.Drawing.Point(248, 31);
+            this.SearchPower25TextBox.Name = "SearchPower25TextBox";
+            this.SearchPower25TextBox.Size = new System.Drawing.Size(40, 19);
+            this.SearchPower25TextBox.TabIndex = 26;
+            // 
+            // AllAntiAirTextBox
+            // 
+            this.AllAntiAirTextBox.Enabled = false;
+            this.AllAntiAirTextBox.Location = new System.Drawing.Point(210, 6);
+            this.AllAntiAirTextBox.Name = "AllAntiAirTextBox";
+            this.AllAntiAirTextBox.Size = new System.Drawing.Size(40, 19);
+            this.AllAntiAirTextBox.TabIndex = 25;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(151, 34);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(91, 12);
+            this.label14.TabIndex = 24;
+            this.label14.Text = "総索敵値(2-5秋)";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(151, 9);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(53, 12);
+            this.label13.TabIndex = 23;
+            this.label13.Text = "総制空値";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(153, 165);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(29, 12);
+            this.label12.TabIndex = 22;
+            this.label12.Text = "種別";
+            // 
+            // WeaponTypeComboBox
+            // 
+            this.WeaponTypeComboBox.FormattingEnabled = true;
+            this.WeaponTypeComboBox.Items.AddRange(new object[] {
             "主砲",
             "対艦強化弾",
             "副砲",
@@ -606,93 +606,89 @@
             "洋上補給",
             "水上戦闘機",
             "その他"});
-
-			this.WeaponTypeComboBox.Location = new System.Drawing.Point(188, 162);
-			this.WeaponTypeComboBox.Name = "WeaponTypeComboBox";
-			this.WeaponTypeComboBox.Size = new System.Drawing.Size(120, 20);
-			this.WeaponTypeComboBox.TabIndex = 21;
-			this.WeaponTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.WeaponTypeComboBox_SelectedIndexChanged);
-			// 
-			// label11
-			// 
-			this.label11.AutoSize = true;
-			this.label11.Location = new System.Drawing.Point(6, 165);
-			this.label11.Name = "label11";
-			this.label11.Size = new System.Drawing.Size(53, 12);
-			this.label11.TabIndex = 20;
-			this.label11.Text = "装備選択";
-			// 
-			// WeaponSelectListBox
-			// 
-			this.WeaponSelectListBox.FormattingEnabled = true;
-			this.WeaponSelectListBox.ItemHeight = 12;
-			this.WeaponSelectListBox.Location = new System.Drawing.Point(65, 165);
-			this.WeaponSelectListBox.Name = "WeaponSelectListBox";
-			this.WeaponSelectListBox.Size = new System.Drawing.Size(80, 52);
-			this.WeaponSelectListBox.TabIndex = 19;
-			this.WeaponSelectListBox.SelectedIndexChanged += new System.EventHandler(this.WeaponSelectListBox_SelectedIndexChanged);
-			// 
-			// KammusuCondTextBox
-			// 
-			this.KammusuCondTextBox.Location = new System.Drawing.Point(332, 131);
-			this.KammusuCondTextBox.Name = "KammusuCondTextBox";
-			this.KammusuCondTextBox.Size = new System.Drawing.Size(40, 19);
-			this.KammusuCondTextBox.TabIndex = 18;
-			this.KammusuCondTextBox.Text = "49";
+            this.WeaponTypeComboBox.Location = new System.Drawing.Point(188, 162);
+            this.WeaponTypeComboBox.Name = "WeaponTypeComboBox";
+            this.WeaponTypeComboBox.Size = new System.Drawing.Size(120, 20);
+            this.WeaponTypeComboBox.TabIndex = 21;
+            this.WeaponTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.WeaponTypeComboBox_SelectedIndexChanged);
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(6, 165);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(53, 12);
+            this.label11.TabIndex = 20;
+            this.label11.Text = "装備選択";
+            // 
+            // WeaponSelectListBox
+            // 
+            this.WeaponSelectListBox.FormattingEnabled = true;
+            this.WeaponSelectListBox.ItemHeight = 12;
+            this.WeaponSelectListBox.Location = new System.Drawing.Point(65, 165);
+            this.WeaponSelectListBox.Name = "WeaponSelectListBox";
+            this.WeaponSelectListBox.Size = new System.Drawing.Size(80, 52);
+            this.WeaponSelectListBox.TabIndex = 19;
+            this.WeaponSelectListBox.SelectedIndexChanged += new System.EventHandler(this.WeaponSelectListBox_SelectedIndexChanged);
+            // 
+            // KammusuCondTextBox
+            // 
+            this.KammusuCondTextBox.Location = new System.Drawing.Point(332, 131);
+            this.KammusuCondTextBox.Name = "KammusuCondTextBox";
+            this.KammusuCondTextBox.Size = new System.Drawing.Size(40, 19);
+            this.KammusuCondTextBox.TabIndex = 18;
+            this.KammusuCondTextBox.Text = "49";
             this.KammusuCondTextBox.Leave += new System.EventHandler(this.KammusuCondTextBox_Leave);
-            this.KammusuCondTextBox.Validating += this.KammusuCondTextBox_Validating;
             // 
             // KammusuLuckTextBox
             // 
             this.KammusuLuckTextBox.Location = new System.Drawing.Point(332, 106);
-			this.KammusuLuckTextBox.Name = "KammusuLuckTextBox";
-			this.KammusuLuckTextBox.Size = new System.Drawing.Size(40, 19);
-			this.KammusuLuckTextBox.TabIndex = 17;
-			this.KammusuLuckTextBox.Text = "-1";
+            this.KammusuLuckTextBox.Name = "KammusuLuckTextBox";
+            this.KammusuLuckTextBox.Size = new System.Drawing.Size(40, 19);
+            this.KammusuLuckTextBox.TabIndex = 17;
+            this.KammusuLuckTextBox.Text = "-1";
             this.KammusuLuckTextBox.Leave += new System.EventHandler(this.KammusuLuckTextBox_Leave);
-            this.KammusuLuckTextBox.Validating += this.KammusuLuckTextBox_Validating;
             // 
             // KammusuLevelTextBox
             // 
             this.KammusuLevelTextBox.Location = new System.Drawing.Point(332, 80);
-			this.KammusuLevelTextBox.Name = "KammusuLevelTextBox";
-			this.KammusuLevelTextBox.Size = new System.Drawing.Size(40, 19);
-			this.KammusuLevelTextBox.TabIndex = 16;
-			this.KammusuLevelTextBox.Text = "1";
+            this.KammusuLevelTextBox.Name = "KammusuLevelTextBox";
+            this.KammusuLevelTextBox.Size = new System.Drawing.Size(40, 19);
+            this.KammusuLevelTextBox.TabIndex = 16;
+            this.KammusuLevelTextBox.Text = "1";
             this.KammusuLevelTextBox.Leave += new System.EventHandler(this.KammusuLevelTextBox_Leave);
-            this.KammusuLevelTextBox.Validating += this.KammusuLevelTextBox_Validating;
             // 
             // label10
             // 
             this.label10.AutoSize = true;
-			this.label10.Location = new System.Drawing.Point(285, 134);
-			this.label10.Name = "label10";
-			this.label10.Size = new System.Drawing.Size(41, 12);
-			this.label10.TabIndex = 15;
-			this.label10.Text = "cond値";
-			// 
-			// label9
-			// 
-			this.label9.AutoSize = true;
-			this.label9.Location = new System.Drawing.Point(331, 109);
-			this.label9.Name = "label9";
-			this.label9.Size = new System.Drawing.Size(17, 12);
-			this.label9.TabIndex = 14;
-			this.label9.Text = "運";
-			// 
-			// label8
-			// 
-			this.label8.AutoSize = true;
-			this.label8.Location = new System.Drawing.Point(292, 83);
-			this.label8.Name = "label8";
-			this.label8.Size = new System.Drawing.Size(34, 12);
-			this.label8.TabIndex = 13;
-			this.label8.Text = "レベル";
-			// 
-			// KammusuTypeComboBox
-			// 
-			this.KammusuTypeComboBox.FormattingEnabled = true;
-			this.KammusuTypeComboBox.Items.AddRange(new object[] {
+            this.label10.Location = new System.Drawing.Point(285, 134);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(41, 12);
+            this.label10.TabIndex = 15;
+            this.label10.Text = "cond値";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(331, 109);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(17, 12);
+            this.label9.TabIndex = 14;
+            this.label9.Text = "運";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(292, 83);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(34, 12);
+            this.label8.TabIndex = 13;
+            this.label8.Text = "レベル";
+            // 
+            // KammusuTypeComboBox
+            // 
+            this.KammusuTypeComboBox.FormattingEnabled = true;
+            this.KammusuTypeComboBox.Items.AddRange(new object[] {
             "魚雷艇",
             "駆逐艦",
             "軽巡洋艦",
@@ -1483,16 +1479,19 @@
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.filename_echo});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 315);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 314);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(484, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(484, 23);
             this.statusStrip1.TabIndex = 2;
             this.statusStrip1.Text = "statusStrip1";
             // 
             // filename_echo
             // 
+            this.filename_echo.BackColor = System.Drawing.SystemColors.Control;
+            this.filename_echo.ForeColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.filename_echo.Name = "filename_echo";
-            this.filename_echo.Size = new System.Drawing.Size(340, 17);
+            this.filename_echo.Size = new System.Drawing.Size(70, 18);
+            this.filename_echo.Text = "filename...";
             // 
             // MainForm
             // 
