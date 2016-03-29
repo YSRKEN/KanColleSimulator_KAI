@@ -1384,7 +1384,7 @@ namespace KCS_GUI {
 							}
 							if(RfWeaponTypeList.IndexOf(setWeaponType) != -1) {
 								setWeapon["rf"] = unit[fi][si].weapon[wi].rf;
-								setWeapon["detail_rf"] = unit[fi][si].weapon[wi].detailRf;
+								setWeapon["rf_detail"] = unit[fi][si].weapon[wi].detailRf;
 							} else {
 								setWeapon["rf"] = unit[fi][si].weapon[wi].level;
 							}
