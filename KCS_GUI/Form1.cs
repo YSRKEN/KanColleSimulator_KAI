@@ -152,7 +152,7 @@ namespace KCS_GUI {
                 this.file[MainTabControl.SelectedIndex].bg_color = this.filename_echo.BackColor;
             }
         }
-        private void file_state_modified(String filename, FileState new_state) {
+        private void file_state_modified(string filename, FileState new_state) {
             if (0 <= MainTabControl.SelectedIndex || MainTabControl.SelectedIndex <= 1) {
                 file_state_modified(new_state);
                 if (FileState.none != new_state) {
@@ -191,7 +191,7 @@ namespace KCS_GUI {
                 file_state_modified("untitled.map", FileState.new_created);
             }
         }
-        private String filepath_to_name(String path) {
+        private string filepath_to_name(string path) {
             return path.Substring(path.LastIndexOf('\\') + 1);
         }
         private void OpenFileMenuItem_Click(object sender, EventArgs e) {
@@ -1604,7 +1604,7 @@ namespace KCS_GUI {
 			}
 		}
 
-        private String GetFilePath(int MainTabIndex) {
+        private string GetFilePath(int MainTabIndex) {
             if (MainTabIndex < 0 || 2 < MainTabIndex) throw new ArgumentOutOfRangeException("MainTabIndex");
             return (0 == MainTabIndex) ? MapFilePath : FleetFilePath;
         }
@@ -1639,10 +1639,10 @@ namespace KCS_GUI {
 		}
 	}
     enum FileState{
-        none,
-        new_created,
-        modified,
-        saved
+        none,//ファイル作ってない
+        new_created,//「新規」で作った直後
+        modified,//どこかしら変更した
+        saved//ファイルに保存されている(ファイル開いた直後or保存直後)
     }
     class OpenFileInfo {
         public OpenFileInfo() {
