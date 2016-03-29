@@ -233,98 +233,81 @@ namespace KCS_GUI {
 			}
 			return;
 		}
-		private void SaveSFileMenuItem_Click(object sender, EventArgs e) {
-			if(MainTabControl.SelectedIndex == 0) {
-				// 事前チェック
-				if(FleetFilePath == null || FleetFilePath == "") {
-					SaveAFileMenuItem_Click(sender, e);
-					return;
-				}
-				if(FormFleet.unit[0].Count == 0) {
-					MessageBox.Show("艦娘を第1艦隊に1隻以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-					return;
-				}
-				// セーブデータを作成する
-				string saveData = FormFleet.ToJson();
-				// 作成したデータを保存する
-				var sw = new StreamWriter(FleetFilePath, false, Encoding.GetEncoding("shift-jis"));
-				sw.Write(saveData);
-				sw.Close();
-                file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
-            }
-            else if(MainTabControl.SelectedIndex == 1) {
-				// 事前チェック
-				if(MapFilePath == null || MapFilePath == "") {
-					SaveAFileMenuItem_Click(sender, e);
-					return;
-				}
-				if(FormMapData.position.Count == 0) {
-					MessageBox.Show("パターンをマスに1つ以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-					return;
-				}
-				if(FormMapData.position[0].fleet.Count == 0) {
-					MessageBox.Show("艦隊をパターンに1つ以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-					return;
-				}
-				if(FormMapData.position[0].fleet[0].unit[0].Count == 0) {
-					MessageBox.Show("艦娘を艦隊に1隻以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-					return;
-				}
-				// セーブデータを作成する
-				string saveData = FormMapData.ToJson();
-				// 作成したデータを保存する
-				var sw = new StreamWriter(MapFilePath, false, Encoding.GetEncoding("shift-jis"));
-				sw.Write(saveData);
-				sw.Close();
-                file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
-            }
+        private void CreateFleetFile() {
+            // セーブデータを作成する
+            string saveData = FormFleet.ToJson();
+            // 作成したデータを保存する
+            var sfd = new SaveFileDialog();
+            sfd.Filter = "艦隊データ(*.json)|*.json|すべてのファイル(*.*)|*.*";
+            if (sfd.ShowDialog() != DialogResult.OK)
+                return;
+            this.FleetFilePath = sfd.FileName;
         }
+        private void SaveFleetFile(bool force_create = false) {
+            // 事前チェック
+            if (FormFleet.unit[0].Count == 0) {
+                MessageBox.Show("艦娘を第1艦隊に1隻以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (FleetFilePath == null || FleetFilePath == "" || force_create) {
+                CreateFleetFile();
+            }
+            // セーブデータを作成する
+            string saveData = FormFleet.ToJson();
+            // 作成したデータを保存する
+            var sw = new StreamWriter(FleetFilePath, false, Encoding.GetEncoding("shift-jis"));
+            sw.Write(saveData);
+            sw.Close();
+            file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
+        }
+        private void CreateMapFile() {
+            // セーブデータを作成する
+            string saveData = FormMapData.ToJson();
+            // 作成したデータを保存する
+            var sfd = new SaveFileDialog();
+            sfd.Filter = "マップデータ(*.map)|*.map|すべてのファイル(*.*)|*.*";
+            if (sfd.ShowDialog() != DialogResult.OK)
+                return;
+            this.MapFilePath = sfd.FileName;
+        }
+        private void SaveMapFile(bool force_create = false) {
+            // 事前チェック
+            if (FormMapData.position.Count == 0) {
+                MessageBox.Show("パターンをマスに1つ以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (FormMapData.position[0].fleet.Count == 0) {
+                MessageBox.Show("艦隊をパターンに1つ以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (FormMapData.position[0].fleet[0].unit[0].Count == 0) {
+                MessageBox.Show("艦娘を艦隊に1隻以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (MapFilePath == null || MapFilePath == "" || force_create) {
+                CreateMapFile();
+            }
+            // セーブデータを作成する
+            string saveData = FormMapData.ToJson();
+            // 作成したデータを保存する
+            var sw = new StreamWriter(MapFilePath, false, Encoding.GetEncoding("shift-jis"));
+            sw.Write(saveData);
+            sw.Close();
+            file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
+        }
+        private void SaveSFileMenuItem_Click(object sender, EventArgs e) {
+			if(MainTabControl.SelectedIndex == 0) {
+                SaveFleetFile();
+            } else if(MainTabControl.SelectedIndex == 1) {
+                SaveMapFile();
+            }
+		}
 		private void SaveAFileMenuItem_Click(object sender, EventArgs e) {
 			if(MainTabControl.SelectedIndex == 0) {
-				// 事前チェック
-				if(FormFleet.unit[0].Count == 0) {
-					MessageBox.Show("艦娘を第1艦隊に1隻以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-					return;
-				}
-				// セーブデータを作成する
-				string saveData = FormFleet.ToJson();
-				// 作成したデータを保存する
-				var sfd = new SaveFileDialog();
-				sfd.Filter = "艦隊データ(*.json)|*.json|すべてのファイル(*.*)|*.*";
-				if(sfd.ShowDialog() != DialogResult.OK)
-					return;
-				FleetFilePath = sfd.FileName;
-				var sw = new StreamWriter(FleetFilePath, false, Encoding.GetEncoding("shift-jis"));
-				sw.Write(saveData);
-				sw.Close();
-                file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
+                SaveFleetFile(true);
             }
             else if(MainTabControl.SelectedIndex == 1) {
-				// 事前チェック
-				if(FormMapData.position.Count == 0) {
-					MessageBox.Show("パターンをマスに1つ以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-					return;
-				}
-				if(FormMapData.position[0].fleet.Count == 0) {
-					MessageBox.Show("艦隊をパターンに1つ以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-					return;
-				}
-				if(FormMapData.position[0].fleet[0].unit[0].Count == 0) {
-					MessageBox.Show("艦娘を艦隊に1隻以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-					return;
-				}
-				// セーブデータを作成する
-				string saveData = FormMapData.ToJson();
-				// 作成したデータを保存する
-				var sfd = new SaveFileDialog();
-				sfd.Filter = "マップデータ(*.map)|*.map|すべてのファイル(*.*)|*.*";
-				if(sfd.ShowDialog() != DialogResult.OK)
-					return;
-				MapFilePath = sfd.FileName;
-				var sw = new StreamWriter(MapFilePath, false, Encoding.GetEncoding("shift-jis"));
-				sw.Write(saveData);
-				sw.Close();
-                file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
+                SaveMapFile(true);
             }
         }
 		private void ExitMenuItem_Click(object sender, EventArgs e) {
