@@ -129,28 +129,31 @@ namespace KCS_GUI {
 
 		/* 各イベント毎の処理 */
         private void file_state_modified(FileState new_state) {
-            if (0 <= MainTabControl.SelectedIndex || MainTabControl.SelectedIndex <= 2) {
+            if (0 <= MainTabControl.SelectedIndex || MainTabControl.SelectedIndex <= 1) {
                 this.file[MainTabControl.SelectedIndex].state = new_state;
                 this.filename_echo.ForeColor = (FileState.none != new_state) ? SystemColors.ControlText : SystemColors.GradientInactiveCaption;
                 switch (new_state) {
-                    case FileState.none:
-                        this.filename_echo.BackColor = SystemColors.Control;
-                        this.file[MainTabControl.SelectedIndex].name = this.filename_echo.Text = "filename...";
-                        break;
-                    case FileState.modified:
-                        this.filename_echo.BackColor = Color.FromArgb(253, 239, 242);
-                        break;
-                    case FileState.saved:
-                        this.filename_echo.BackColor = Color.FromArgb(235, 246, 247);
-                        break;
-                    default:
-                        break;
+                case FileState.none:
+                    this.filename_echo.BackColor = SystemColors.Control;
+                    this.file[MainTabControl.SelectedIndex].name = this.filename_echo.Text = "filename...";
+                    break;
+                case FileState.new_created:
+                    this.filename_echo.BackColor = SystemColors.Info;
+                    break;
+                case FileState.modified:
+                    this.filename_echo.BackColor = Color.FromArgb(253, 239, 242);
+                    break;
+                case FileState.saved:
+                    this.filename_echo.BackColor = Color.FromArgb(235, 246, 247);
+                    break;
+                default:
+                    break;
                 }
                 this.file[MainTabControl.SelectedIndex].bg_color = this.filename_echo.BackColor;
             }
         }
         private void file_state_modified(String filename, FileState new_state) {
-            if (0 <= MainTabControl.SelectedIndex || MainTabControl.SelectedIndex <= 2) {
+            if (0 <= MainTabControl.SelectedIndex || MainTabControl.SelectedIndex <= 1) {
                 file_state_modified(new_state);
                 if (FileState.none != new_state) {
                     this.file[MainTabControl.SelectedIndex].name = this.filename_echo.Text = (0 == filename.Length) ? "untitled" : filename;
@@ -159,15 +162,16 @@ namespace KCS_GUI {
         }
 
         private void MainTAbControl_SelectedIndexChanged(object sender, EventArgs e) {
-            if (MainTabControl.SelectedIndex < 0 || 2 < MainTabControl.SelectedIndex) {
+            if (MainTabControl.SelectedIndex < 0 || 1 < MainTabControl.SelectedIndex) {
                 this.filename_echo.Text = "";
                 this.filename_echo.BackColor = SystemColors.Control;
+                this.filename_echo.ForeColor = SystemColors.ControlText;
             }
             else {
                 this.filename_echo.Text = this.file[MainTabControl.SelectedIndex].name;
                 this.filename_echo.BackColor = this.file[MainTabControl.SelectedIndex].bg_color;
+                this.filename_echo.ForeColor = (FileState.none != this.file[MainTabControl.SelectedIndex].state) ? SystemColors.ControlText : SystemColors.GradientInactiveCaption;
             }
-            this.filename_echo.ForeColor = (FileState.none != this.file[MainTabControl.SelectedIndex].state) ? SystemColors.ControlText : SystemColors.GradientInactiveCaption;
         }
         // メニュー
         private void NewFileMenuItem_Click(object sender, EventArgs e) {
@@ -178,13 +182,13 @@ namespace KCS_GUI {
 				FleetSelectComboBox_SelectedIndexChanged(sender, e);
 				RedrawAntiAirScore();
 				RedrawSearchPower();
-                file_state_modified("untitled.json", FileState.modified);
+                file_state_modified("untitled.json", FileState.new_created);
             } else if(MainTabControl.SelectedIndex == 1) {
 				FormMapData = new MapData();
 				MapPositionListBox.Items.Clear();
 				MapPositionListBox.Refresh();
 				RedrawMapAntiAirScore();
-                file_state_modified("untitled.map", FileState.modified);
+                file_state_modified("untitled.map", FileState.new_created);
             }
         }
         private String filepath_to_name(String path) {
@@ -358,7 +362,8 @@ namespace KCS_GUI {
 			KammusuSelectListBox.Refresh();
 			RedrawAntiAirScore();
 			RedrawSearchPower();
-		}
+            file_state_modified(FileState.modified);
+        }
 		static private bool IsInRange(int val, int min, int max) {
 			return (min <= val && val <= max);
 		}
@@ -405,12 +410,14 @@ namespace KCS_GUI {
             }
         }
         private void KammusuLuckTextBox_Leave(object sender, EventArgs e) {
-			if(//Range Check
-				IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
-				&& IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
-			)
-				FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].luck = limit(int.Parse(KammusuLuckTextBox.Text), -1, 100);
-		}
+            if (//Range Check
+                IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
+                && IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
+            ) {
+                FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].luck = KammusuLuckTextBox.Text.ParseInt();
+                file_state_modified(FileState.modified);
+            }
+        }
         private void KammusuCondTextBox_Validating(object sender, CancelEventArgs e) {
             try {
                 int cond = int.Parse(KammusuCondTextBox.Text);
@@ -428,12 +435,14 @@ namespace KCS_GUI {
             }
         }
         private void KammusuCondTextBox_Leave(object sender, EventArgs e) {
-			if(//Range Check
-				IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
-				&& IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
-			)
-				FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].cond = limit(int.Parse(KammusuCondTextBox.Text), 0, 100);
-		}
+            if (//Range Check
+                IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
+                && IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
+            ) {
+                FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].cond = KammusuCondTextBox.Text.ParseInt();
+                file_state_modified(FileState.modified);
+            }
+        }
 		private void ChangeKammusuButton_Click(object sender, EventArgs e) {
 			if(KammusuTypeComboBox.SelectedIndex == -1
 			|| KammusuNameComboBox.SelectedIndex == -1
@@ -461,7 +470,8 @@ namespace KCS_GUI {
 			KammusuSelectListBox.Refresh();
 			RedrawAntiAirScore();
 			RedrawSearchPower();
-		}
+            file_state_modified(FileState.modified);
+        }
 		private void DeleteKammusuButton_Click(object sender, EventArgs e) {
 			if(FleetSelectComboBox.SelectedIndex == -1
 			|| KammusuSelectListBox.SelectedIndex == -1)
@@ -472,7 +482,8 @@ namespace KCS_GUI {
 			KammusuSelectListBox.Refresh();
 			RedrawAntiAirScore();
 			RedrawSearchPower();
-		}
+            file_state_modified(FileState.modified);
+        }
 		private void AddWeaponButton_Click(object sender, EventArgs e) {
 			if(FleetSelectComboBox.SelectedIndex == -1
 			|| KammusuSelectListBox.SelectedIndex == -1
@@ -496,21 +507,24 @@ namespace KCS_GUI {
 			WeaponSelectListBox.Refresh();
 			RedrawAntiAirScore();
 			RedrawSearchPower();
-		}
+            file_state_modified(FileState.modified);
+        }
 		private void WeaponLevelComboBox_Leave(object sender, EventArgs e) {
-			if(//Range Check
-				IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
-				&& IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
-				&& IsVaidIndex(
-					this.WeaponSelectListBox.SelectedIndex,
-					this.FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].weapon.Count
-				)
-			)
-				this
-					.FormFleet
-					.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex]
-					.weapon[WeaponSelectListBox.SelectedIndex]
-					.level = limit(WeaponLevelComboBox.SelectedIndex, 0, 10);
+            if (//Range Check
+                IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
+                && IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
+                && IsVaidIndex(
+                    this.WeaponSelectListBox.SelectedIndex,
+                    this.FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].weapon.Count
+                )
+            ) {
+                this
+                    .FormFleet
+                    .unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex]
+                    .weapon[WeaponSelectListBox.SelectedIndex]
+                    .level = WeaponLevelComboBox.SelectedIndex.limit(0, 10);
+                file_state_modified(FileState.modified);
+            }
 		}
 		private void WeaponRfComboBox_Leave(object sender, EventArgs e) {
 			if(//Range Check
@@ -526,7 +540,8 @@ namespace KCS_GUI {
 					.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex]
 					.weapon[WeaponSelectListBox.SelectedIndex]
 					.set_rf(WeaponRfComboBox.SelectedIndex);
-			}
+                file_state_modified(FileState.modified);
+            }
 		}
 		private void WeaponDetailRfComboBox_Leave(object sender, EventArgs e) {
 			if(//Range Check
@@ -542,7 +557,8 @@ namespace KCS_GUI {
 					.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex]
 					.weapon[WeaponSelectListBox.SelectedIndex]
 					.set_detailRf(WeaponDetailRfComboBox.SelectedIndex);
-			}
+                file_state_modified(FileState.modified);
+            }
 		}
 		private void ChangeWeaponButton_Click(object sender, EventArgs e) {
 			if(FleetSelectComboBox.SelectedIndex == -1
@@ -565,7 +581,8 @@ namespace KCS_GUI {
 			WeaponSelectListBox.Refresh();
 			RedrawAntiAirScore();
 			RedrawSearchPower();
-		}
+            file_state_modified(FileState.modified);
+        }
 		private void DeleteWeaponButton_Click(object sender, EventArgs e) {
 			if(FleetSelectComboBox.SelectedIndex == -1
 			|| KammusuSelectListBox.SelectedIndex == -1
@@ -577,17 +594,20 @@ namespace KCS_GUI {
 			WeaponSelectListBox.Refresh();
 			RedrawAntiAirScore();
 			RedrawSearchPower();
-		}
+            file_state_modified(FileState.modified);
+        }
 		private void HQLevelTextBox_TextChanged(object sender, EventArgs e) {
 			// 司令部レベルが書き換わった際は反映する
 			FormFleet.level = HQLevelTextBox.Text.ParseInt().limit(1, 120);
 			RedrawSearchPower();
-		}
+            file_state_modified(FileState.modified);
+        }
 		private void FleetTypeComboBox_SelectedIndexChanged(object sender, EventArgs e) {
 			if(FleetTypeComboBox.SelectedIndex == -1)
 				return;
 			// 艦隊形式が書き換わった際は反映する
 			FormFleet.type = FleetTypeComboBox.SelectedIndex;
+            file_state_modified(FileState.modified);
 		}
 		private void FleetSelectComboBox_SelectedIndexChanged(object sender, EventArgs e) {
 			if(FleetSelectComboBox.SelectedIndex == -1)
@@ -731,7 +751,8 @@ namespace KCS_GUI {
 			FormMapData.position.Add(setPosition);
 			MapPositionListBox.Items.Add(setPosition.name);
 			MapPositionListBox.Refresh();
-		}
+            file_state_modified(FileState.modified);
+        }
 		private void ChangeMapPositionButton_Click(object sender, EventArgs e) {
 			if(MapPositionNameTextBox.Text == ""
 			|| MapPositionBattleModeComboBox.SelectedIndex == -1
@@ -741,14 +762,16 @@ namespace KCS_GUI {
 			FormMapData.position[MapPositionListBox.SelectedIndex].mode = MapPositionBattleModeComboBox.SelectedIndex;
 			MapPositionListBox.Items[MapPositionListBox.SelectedIndex] = MapPositionNameTextBox.Text;
 			MapPositionListBox.Refresh();
-		}
+            file_state_modified(FileState.modified);
+        }
 		private void DeleteMapPositionButton_Click(object sender, EventArgs e) {
 			if(MapPositionListBox.SelectedIndex == -1)
 				return;
 			FormMapData.position.RemoveAt(MapPositionListBox.SelectedIndex);
 			MapPositionListBox.Items.RemoveAt(MapPositionListBox.SelectedIndex);
 			MapPositionListBox.Refresh();
-		}
+            file_state_modified(FileState.modified);
+        }
 		private void AddMapPatternButton_Click(object sender, EventArgs e) {
 			if(MapPositionListBox.SelectedIndex == -1
 			|| MapPatternFormationComboBox.SelectedIndex == -1)
@@ -764,14 +787,16 @@ namespace KCS_GUI {
 			int selectPositionCount = selectPosition.fleet.Count;
 			MapPatternListBox.Items.Add(selectPositionCount.ToString() + " : " + selectPosition.fleet[selectPositionCount - 1].unit[0].Count.ToString() + "隻");
 			MapPatternListBox.Refresh();
-		}
+            file_state_modified(FileState.modified);
+        }
 		private void ChangeMapPatternButton_Click(object sender, EventArgs e) {
 			if(MapPositionListBox.SelectedIndex == -1
 			|| MapPatternFormationComboBox.SelectedIndex == -1
 			|| MapPatternListBox.SelectedIndex == -1)
 				return;
 			FormMapData.position[MapPositionListBox.SelectedIndex].formation[MapPatternListBox.SelectedIndex] = MapPatternFormationComboBox.SelectedIndex;
-		}
+            file_state_modified(FileState.modified);
+        }
 		private void DeleteMapPatternButton_Click(object sender, EventArgs e) {
 			if(MapPositionListBox.SelectedIndex == -1
 			|| MapPatternListBox.SelectedIndex == -1)
@@ -784,7 +809,8 @@ namespace KCS_GUI {
 				MapPatternListBox.Items.Add((fi + 1).ToString() + " : " + selectPosition.fleet[fi].unit[0].Count.ToString());
 			}
 			MapPatternListBox.Refresh();
-		}
+            file_state_modified(FileState.modified);
+        }
 		private void AddMapKammusuButton_Click(object sender, EventArgs e) {
 			if(MapPositionListBox.SelectedIndex == -1
 			|| MapPatternListBox.SelectedIndex == -1
@@ -821,7 +847,8 @@ namespace KCS_GUI {
 			MapKammusuListBox.Refresh();
 			MapPatternListBox.Items[MapPatternListBox.SelectedIndex] = selectPositionCount.ToString() + " : " + selectFleet.unit[0].Count.ToString() + "隻";
 			RedrawMapAntiAirScore();
-		}
+            file_state_modified(FileState.modified);
+        }
 		private void ChangeMapKammusuButton_Click(object sender, EventArgs e) {
 			if(MapPositionListBox.SelectedIndex == -1
 			|| MapPatternListBox.SelectedIndex == -1
@@ -853,7 +880,8 @@ namespace KCS_GUI {
 			MapKammusuListBox.Items[MapKammusuListBox.SelectedIndex] = data.Ships.Single(s => s.艦船ID == setKammusu.id).艦名;
 			MapKammusuListBox.Refresh();
 			RedrawMapAntiAirScore();
-		}
+            file_state_modified(FileState.modified);
+        }
 		private void DeleteMapKammusuButton_Click(object sender, EventArgs e) {
 			if(MapPositionListBox.SelectedIndex == -1
 			|| MapPatternListBox.SelectedIndex == -1
@@ -866,7 +894,8 @@ namespace KCS_GUI {
 			int selectPositionCount = selectPosition.fleet.Count;
 			MapPatternListBox.Items[MapPatternListBox.SelectedIndex] = selectPositionCount.ToString() + " : " + selectFleet.unit[0].Count.ToString() + "隻";
 			RedrawMapAntiAirScore();
-		}
+            file_state_modified(FileState.modified);
+        }
 		private void MapKammusuTypeComboBox_SelectedIndexChanged(object sender, EventArgs e) {
 			RedrawMapKammusuNameList();
 		}
@@ -1582,7 +1611,7 @@ namespace KCS_GUI {
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e) {
             for (int i = 0; i < this.file.Length; ++i) {
-                if (FileState.saved != this.file[i].state) {
+                if (FileState.modified == this.file[i].state) {
                     DialogResult result = MessageBox.Show(this.file[i].name + " has been modified, save changes ?",
                         "Save Change?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2
                     );
@@ -1611,6 +1640,7 @@ namespace KCS_GUI {
 	}
     enum FileState{
         none,
+        new_created,
         modified,
         saved
     }
