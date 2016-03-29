@@ -44,14 +44,14 @@ namespace KCS_GUI {
 		string FleetFilePath;
 		//マップタブにおけるファイルパス
 		string MapFilePath;
-        //ファイルの状態
-        OpenFileInfo[] file;
-        //ErrorProvider
-        private System.Windows.Forms.ErrorProvider error_provider_level;
-        private System.Windows.Forms.ErrorProvider error_provider_luck;
-        private System.Windows.Forms.ErrorProvider error_provider_cond;
-        /* コンストラクタ */
-        static MainForm() {
+		//ファイルの状態
+		OpenFileInfo[] file;
+		//ErrorProvider
+		private System.Windows.Forms.ErrorProvider error_provider_level;
+		private System.Windows.Forms.ErrorProvider error_provider_luck;
+		private System.Windows.Forms.ErrorProvider error_provider_cond;
+		/* コンストラクタ */
+		static MainForm() {
 			using(var adapter = new CsvDataSetTableAdapters.ShipsTableAdapter())
 				adapter.Fill(data.Ships);
 			using(var adapter = new CsvDataSetTableAdapters.WeaponsTableAdapter())
@@ -113,68 +113,68 @@ namespace KCS_GUI {
 				RedrawMapKammusuNameList();
 				FormFleet = new Fleet();
 				FormMapData = new MapData();
-                file = new OpenFileInfo[2]
-                {
-                    new OpenFileInfo(),
-                    new OpenFileInfo()
-                };
-                error_provider_level = new System.Windows.Forms.ErrorProvider();
-                error_provider_luck = new System.Windows.Forms.ErrorProvider();
-                error_provider_cond = new System.Windows.Forms.ErrorProvider();
-            } catch(Exception ex) {
+				file = new OpenFileInfo[2]
+				{
+					new OpenFileInfo(),
+					new OpenFileInfo()
+				};
+				error_provider_level = new System.Windows.Forms.ErrorProvider();
+				error_provider_luck = new System.Windows.Forms.ErrorProvider();
+				error_provider_cond = new System.Windows.Forms.ErrorProvider();
+			} catch(Exception ex) {
 				MessageBox.Show(ex.Message, SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
 				this.Close();
 			}
 		}
 
 		/* 各イベント毎の処理 */
-        private void file_state_modified(FileState new_state) {
-            if (0 <= MainTabControl.SelectedIndex || MainTabControl.SelectedIndex <= 1) {
-                this.file[MainTabControl.SelectedIndex].state = new_state;
-                this.filename_echo.ForeColor = (FileState.none != new_state) ? SystemColors.ControlText : SystemColors.GradientInactiveCaption;
-                switch (new_state) {
-                case FileState.none:
-                    this.filename_echo.BackColor = SystemColors.Control;
-                    this.file[MainTabControl.SelectedIndex].name = this.filename_echo.Text = "filename...";
-                    break;
-                case FileState.new_created:
-                    this.filename_echo.BackColor = SystemColors.Info;
-                    break;
-                case FileState.modified:
-                    this.filename_echo.BackColor = Color.FromArgb(253, 239, 242);
-                    break;
-                case FileState.saved:
-                    this.filename_echo.BackColor = Color.FromArgb(235, 246, 247);
-                    break;
-                default:
-                    break;
-                }
-                this.file[MainTabControl.SelectedIndex].bg_color = this.filename_echo.BackColor;
-            }
-        }
-        private void file_state_modified(string filename, FileState new_state) {
-            if (0 <= MainTabControl.SelectedIndex || MainTabControl.SelectedIndex <= 1) {
-                file_state_modified(new_state);
-                if (FileState.none != new_state) {
-                    this.file[MainTabControl.SelectedIndex].name = this.filename_echo.Text = (0 == filename.Length) ? "untitled" : filename;
-                }
-            }
-        }
+		private void file_state_modified(FileState new_state) {
+			if (0 <= MainTabControl.SelectedIndex || MainTabControl.SelectedIndex <= 1) {
+				this.file[MainTabControl.SelectedIndex].state = new_state;
+				this.filename_echo.ForeColor = (FileState.none != new_state) ? SystemColors.ControlText : SystemColors.GradientInactiveCaption;
+				switch (new_state) {
+				case FileState.none:
+					this.filename_echo.BackColor = SystemColors.Control;
+					this.file[MainTabControl.SelectedIndex].name = this.filename_echo.Text = "filename...";
+					break;
+				case FileState.new_created:
+					this.filename_echo.BackColor = SystemColors.Info;
+					break;
+				case FileState.modified:
+					this.filename_echo.BackColor = Color.FromArgb(253, 239, 242);
+					break;
+				case FileState.saved:
+					this.filename_echo.BackColor = Color.FromArgb(235, 246, 247);
+					break;
+				default:
+					break;
+				}
+				this.file[MainTabControl.SelectedIndex].bg_color = this.filename_echo.BackColor;
+			}
+		}
+		private void file_state_modified(string filename, FileState new_state) {
+			if (0 <= MainTabControl.SelectedIndex || MainTabControl.SelectedIndex <= 1) {
+				file_state_modified(new_state);
+				if (FileState.none != new_state) {
+					this.file[MainTabControl.SelectedIndex].name = this.filename_echo.Text = (0 == filename.Length) ? "untitled" : filename;
+				}
+			}
+		}
 
-        private void MainTAbControl_SelectedIndexChanged(object sender, EventArgs e) {
-            if (MainTabControl.SelectedIndex < 0 || 1 < MainTabControl.SelectedIndex) {
-                this.filename_echo.Text = "";
-                this.filename_echo.BackColor = SystemColors.Control;
-                this.filename_echo.ForeColor = SystemColors.ControlText;
-            }
-            else {
-                this.filename_echo.Text = this.file[MainTabControl.SelectedIndex].name;
-                this.filename_echo.BackColor = this.file[MainTabControl.SelectedIndex].bg_color;
-                this.filename_echo.ForeColor = (FileState.none != this.file[MainTabControl.SelectedIndex].state) ? SystemColors.ControlText : SystemColors.GradientInactiveCaption;
-            }
-        }
-        // メニュー
-        private void NewFileMenuItem_Click(object sender, EventArgs e) {
+		private void MainTAbControl_SelectedIndexChanged(object sender, EventArgs e) {
+			if (MainTabControl.SelectedIndex < 0 || 1 < MainTabControl.SelectedIndex) {
+				this.filename_echo.Text = "";
+				this.filename_echo.BackColor = SystemColors.Control;
+				this.filename_echo.ForeColor = SystemColors.ControlText;
+			}
+			else {
+				this.filename_echo.Text = this.file[MainTabControl.SelectedIndex].name;
+				this.filename_echo.BackColor = this.file[MainTabControl.SelectedIndex].bg_color;
+				this.filename_echo.ForeColor = (FileState.none != this.file[MainTabControl.SelectedIndex].state) ? SystemColors.ControlText : SystemColors.GradientInactiveCaption;
+			}
+		}
+		// メニュー
+		private void NewFileMenuItem_Click(object sender, EventArgs e) {
 			if(MainTabControl.SelectedIndex == 0) {
 				FormFleet = new Fleet();
 				HQLevelTextBox.Text = FormFleet.level.ToString();
@@ -182,19 +182,19 @@ namespace KCS_GUI {
 				FleetSelectComboBox_SelectedIndexChanged(sender, e);
 				RedrawAntiAirScore();
 				RedrawSearchPower();
-                file_state_modified("untitled.json", FileState.new_created);
-            } else if(MainTabControl.SelectedIndex == 1) {
+				file_state_modified("untitled.json", FileState.new_created);
+			} else if(MainTabControl.SelectedIndex == 1) {
 				FormMapData = new MapData();
 				MapPositionListBox.Items.Clear();
 				MapPositionListBox.Refresh();
 				RedrawMapAntiAirScore();
-                file_state_modified("untitled.map", FileState.new_created);
-            }
-        }
-        private string filepath_to_name(string path) {
-            return path.Substring(path.LastIndexOf('\\') + 1);
-        }
-        private void OpenFileMenuItem_Click(object sender, EventArgs e) {
+				file_state_modified("untitled.map", FileState.new_created);
+			}
+		}
+		private string filepath_to_name(string path) {
+			return path.Substring(path.LastIndexOf('\\') + 1);
+		}
+		private void OpenFileMenuItem_Click(object sender, EventArgs e) {
 			if(MainTabControl.SelectedIndex == 0) {
 				// ファイルを開くダイアログを表示する
 				OpenFileDialog ofd = new OpenFileDialog();
@@ -206,9 +206,9 @@ namespace KCS_GUI {
 				Tuple<Fleet, bool> setFleet = ReadJsonFile(FleetFilePath);
 				if(!setFleet.Item2)
 					return;
-                // 読み込んだデータを画面に反映する
-                file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
-                FormFleet = setFleet.Item1;
+				// 読み込んだデータを画面に反映する
+				file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
+				FormFleet = setFleet.Item1;
 				HQLevelTextBox.Text = FormFleet.level.ToString();
 				FleetTypeComboBox.SelectedIndex = FormFleet.type;
 				FleetSelectComboBox_SelectedIndexChanged(sender, e);
@@ -225,9 +225,9 @@ namespace KCS_GUI {
 				Tuple<MapData, bool> setMapData = ReadMapFile(MapFilePath);
 				if(!setMapData.Item2)
 					return;
-                // 読み込んだデータを画面に反映する
-                file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
-                FormMapData = setMapData.Item1;
+				// 読み込んだデータを画面に反映する
+				file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
+				FormMapData = setMapData.Item1;
 				MapPositionListBox.Items.Clear();
 				foreach(var position in FormMapData.position) {
 					MapPositionListBox.Items.Add(position.name);
@@ -237,86 +237,86 @@ namespace KCS_GUI {
 			}
 			return;
 		}
-        private void CreateFleetFile() {
-            // セーブデータを作成する
-            string saveData = FormFleet.ToJson();
-            // 作成したデータを保存する
-            var sfd = new SaveFileDialog();
-            sfd.Filter = "艦隊データ(*.json)|*.json|すべてのファイル(*.*)|*.*";
-            if (sfd.ShowDialog() != DialogResult.OK)
-                return;
-            this.FleetFilePath = sfd.FileName;
-        }
-        private void SaveFleetFile(bool force_create = false) {
-            // 事前チェック
-            if (FormFleet.unit[0].Count == 0) {
-                MessageBox.Show("艦娘を第1艦隊に1隻以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            if (FleetFilePath == null || FleetFilePath == "" || force_create) {
-                CreateFleetFile();
-            }
-            // セーブデータを作成する
-            string saveData = FormFleet.ToJson();
-            // 作成したデータを保存する
-            var sw = new StreamWriter(FleetFilePath, false, Encoding.GetEncoding("shift-jis"));
-            sw.Write(saveData);
-            sw.Close();
-            file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
-        }
-        private void CreateMapFile() {
-            // セーブデータを作成する
-            string saveData = FormMapData.ToJson();
-            // 作成したデータを保存する
-            var sfd = new SaveFileDialog();
-            sfd.Filter = "マップデータ(*.map)|*.map|すべてのファイル(*.*)|*.*";
-            if (sfd.ShowDialog() != DialogResult.OK)
-                return;
-            this.MapFilePath = sfd.FileName;
-        }
-        private void SaveMapFile(bool force_create = false) {
-            // 事前チェック
-            if (FormMapData.position.Count == 0) {
-                MessageBox.Show("パターンをマスに1つ以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            if (FormMapData.position[0].fleet.Count == 0) {
-                MessageBox.Show("艦隊をパターンに1つ以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            if (FormMapData.position[0].fleet[0].unit[0].Count == 0) {
-                MessageBox.Show("艦娘を艦隊に1隻以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            if (MapFilePath == null || MapFilePath == "" || force_create) {
-                CreateMapFile();
-            }
-            // セーブデータを作成する
-            string saveData = FormMapData.ToJson();
-            // 作成したデータを保存する
-            var sw = new StreamWriter(MapFilePath, false, Encoding.GetEncoding("shift-jis"));
-            sw.Write(saveData);
-            sw.Close();
-            file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
-        }
-        private void SaveSFileMenuItem_Click(object sender, EventArgs e) {
+		private void CreateFleetFile() {
+			// セーブデータを作成する
+			string saveData = FormFleet.ToJson();
+			// 作成したデータを保存する
+			var sfd = new SaveFileDialog();
+			sfd.Filter = "艦隊データ(*.json)|*.json|すべてのファイル(*.*)|*.*";
+			if (sfd.ShowDialog() != DialogResult.OK)
+				return;
+			this.FleetFilePath = sfd.FileName;
+		}
+		private void SaveFleetFile(bool force_create = false) {
+			// 事前チェック
+			if (FormFleet.unit[0].Count == 0) {
+				MessageBox.Show("艦娘を第1艦隊に1隻以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return;
+			}
+			if (FleetFilePath == null || FleetFilePath == "" || force_create) {
+				CreateFleetFile();
+			}
+			// セーブデータを作成する
+			string saveData = FormFleet.ToJson();
+			// 作成したデータを保存する
+			var sw = new StreamWriter(FleetFilePath, false, Encoding.GetEncoding("shift-jis"));
+			sw.Write(saveData);
+			sw.Close();
+			file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
+		}
+		private void CreateMapFile() {
+			// セーブデータを作成する
+			string saveData = FormMapData.ToJson();
+			// 作成したデータを保存する
+			var sfd = new SaveFileDialog();
+			sfd.Filter = "マップデータ(*.map)|*.map|すべてのファイル(*.*)|*.*";
+			if (sfd.ShowDialog() != DialogResult.OK)
+				return;
+			this.MapFilePath = sfd.FileName;
+		}
+		private void SaveMapFile(bool force_create = false) {
+			// 事前チェック
+			if (FormMapData.position.Count == 0) {
+				MessageBox.Show("パターンをマスに1つ以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return;
+			}
+			if (FormMapData.position[0].fleet.Count == 0) {
+				MessageBox.Show("艦隊をパターンに1つ以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return;
+			}
+			if (FormMapData.position[0].fleet[0].unit[0].Count == 0) {
+				MessageBox.Show("艦娘を艦隊に1隻以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return;
+			}
+			if (MapFilePath == null || MapFilePath == "" || force_create) {
+				CreateMapFile();
+			}
+			// セーブデータを作成する
+			string saveData = FormMapData.ToJson();
+			// 作成したデータを保存する
+			var sw = new StreamWriter(MapFilePath, false, Encoding.GetEncoding("shift-jis"));
+			sw.Write(saveData);
+			sw.Close();
+			file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
+		}
+		private void SaveSFileMenuItem_Click(object sender, EventArgs e) {
 			if(MainTabControl.SelectedIndex == 0) {
-                SaveFleetFile();
-            } else if(MainTabControl.SelectedIndex == 1) {
-                SaveMapFile();
-            }
+				SaveFleetFile();
+			} else if(MainTabControl.SelectedIndex == 1) {
+				SaveMapFile();
+			}
 		}
 		private void SaveAFileMenuItem_Click(object sender, EventArgs e) {
 			if(MainTabControl.SelectedIndex == 0) {
-                SaveFleetFile(true);
-            }
-            else if(MainTabControl.SelectedIndex == 1) {
-                SaveMapFile(true);
-            }
-        }
+				SaveFleetFile(true);
+			}
+			else if(MainTabControl.SelectedIndex == 1) {
+				SaveMapFile(true);
+			}
+		}
 		private void ExitMenuItem_Click(object sender, EventArgs e) {
 			this.Close();//jump to MainForm_FormClosing
-        }
+		}
 		//バージョン情報表示
 		private void VersionInfoMenuItem_Click(object sender, EventArgs e) {
 			Assembly assem = Assembly.GetExecutingAssembly();
@@ -362,87 +362,87 @@ namespace KCS_GUI {
 			KammusuSelectListBox.Refresh();
 			RedrawAntiAirScore();
 			RedrawSearchPower();
-            file_state_modified(FileState.modified);
-        }
+			file_state_modified(FileState.modified);
+		}
 		static private bool IsInRange(int val, int min, int max) {
 			return (min <= val && val <= max);
 		}
 		static private bool IsVaidIndex(int val, int size) {
 			return IsInRange(val, 0, size - 1);
 		}
-        private void KammusuLevelTextBox_Validating(object sender, CancelEventArgs e) {
-            try {
-                int level = int.Parse(KammusuLevelTextBox.Text);
-                if (level < 1 || 155 < level) {
-                    e.Cancel = true;
-                    error_provider_level.SetError(KammusuLevelTextBox, "1-255の値を入力してください");//range error
-                }
-                else {
-                    error_provider_level.SetError(KammusuLevelTextBox, "");//error clear
-                }
-            }
-            catch (Exception) {
-                e.Cancel = true;
-                error_provider_level.SetError(KammusuLevelTextBox, "整数値以外の文字が入力されました！！");
-            }
-        }
-        private void KammusuLevelTextBox_Leave(object sender, EventArgs e) {
+		private void KammusuLevelTextBox_Validating(object sender, CancelEventArgs e) {
+			try {
+				int level = int.Parse(KammusuLevelTextBox.Text);
+				if (level < 1 || 155 < level) {
+					e.Cancel = true;
+					error_provider_level.SetError(KammusuLevelTextBox, "1-255の値を入力してください");//range error
+				}
+				else {
+					error_provider_level.SetError(KammusuLevelTextBox, "");//error clear
+				}
+			}
+			catch (Exception) {
+				e.Cancel = true;
+				error_provider_level.SetError(KammusuLevelTextBox, "整数値以外の文字が入力されました！！");
+			}
+		}
+		private void KammusuLevelTextBox_Leave(object sender, EventArgs e) {
 			if(//Range Check
 				IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
 				&& IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
 			)
 				FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].level = limit(int.Parse(KammusuLevelTextBox.Text), 1, 155);
 		}
-        private void KammusuLuckTextBox_Validating(object sender, CancelEventArgs e) {
-            try {
-                int luck = int.Parse(KammusuLuckTextBox.Text);
-                if (luck < -1 || 100 < luck) {
-                    e.Cancel = true;
-                    error_provider_luck.SetError(KammusuLuckTextBox, "-1～100の値を入力してください");//range error
-                }
-                else {
-                    error_provider_luck.SetError(KammusuLuckTextBox, "");//error clear
-                }
-            }
-            catch (Exception) {
-                e.Cancel = true;
-                error_provider_luck.SetError(KammusuLuckTextBox, "整数値以外の文字が入力されました！！");
-            }
-        }
-        private void KammusuLuckTextBox_Leave(object sender, EventArgs e) {
-            if (//Range Check
-                IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
-                && IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
-            ) {
-                FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].luck = KammusuLuckTextBox.Text.ParseInt();
-                file_state_modified(FileState.modified);
-            }
-        }
-        private void KammusuCondTextBox_Validating(object sender, CancelEventArgs e) {
-            try {
-                int cond = int.Parse(KammusuCondTextBox.Text);
-                if (cond < 0 || 100 < cond) {
-                    e.Cancel = true;
-                    error_provider_cond.SetError(KammusuCondTextBox, "0-100の値を入力してください");//range error
-                }
-                else {
-                    error_provider_cond.SetError(KammusuCondTextBox, "");//error clear
-                }
-            }
-            catch (Exception) {
-                e.Cancel = true;
-                error_provider_cond.SetError(KammusuCondTextBox, "整数値以外の文字が入力されました！！");
-            }
-        }
-        private void KammusuCondTextBox_Leave(object sender, EventArgs e) {
-            if (//Range Check
-                IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
-                && IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
-            ) {
-                FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].cond = KammusuCondTextBox.Text.ParseInt();
-                file_state_modified(FileState.modified);
-            }
-        }
+		private void KammusuLuckTextBox_Validating(object sender, CancelEventArgs e) {
+			try {
+				int luck = int.Parse(KammusuLuckTextBox.Text);
+				if (luck < -1 || 100 < luck) {
+					e.Cancel = true;
+					error_provider_luck.SetError(KammusuLuckTextBox, "-1～100の値を入力してください");//range error
+				}
+				else {
+					error_provider_luck.SetError(KammusuLuckTextBox, "");//error clear
+				}
+			}
+			catch (Exception) {
+				e.Cancel = true;
+				error_provider_luck.SetError(KammusuLuckTextBox, "整数値以外の文字が入力されました！！");
+			}
+		}
+		private void KammusuLuckTextBox_Leave(object sender, EventArgs e) {
+			if (//Range Check
+				IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
+				&& IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
+			) {
+				FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].luck = KammusuLuckTextBox.Text.ParseInt();
+				file_state_modified(FileState.modified);
+			}
+		}
+		private void KammusuCondTextBox_Validating(object sender, CancelEventArgs e) {
+			try {
+				int cond = int.Parse(KammusuCondTextBox.Text);
+				if (cond < 0 || 100 < cond) {
+					e.Cancel = true;
+					error_provider_cond.SetError(KammusuCondTextBox, "0-100の値を入力してください");//range error
+				}
+				else {
+					error_provider_cond.SetError(KammusuCondTextBox, "");//error clear
+				}
+			}
+			catch (Exception) {
+				e.Cancel = true;
+				error_provider_cond.SetError(KammusuCondTextBox, "整数値以外の文字が入力されました！！");
+			}
+		}
+		private void KammusuCondTextBox_Leave(object sender, EventArgs e) {
+			if (//Range Check
+				IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
+				&& IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
+			) {
+				FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].cond = KammusuCondTextBox.Text.ParseInt();
+				file_state_modified(FileState.modified);
+			}
+		}
 		private void ChangeKammusuButton_Click(object sender, EventArgs e) {
 			if(KammusuTypeComboBox.SelectedIndex == -1
 			|| KammusuNameComboBox.SelectedIndex == -1
@@ -470,8 +470,8 @@ namespace KCS_GUI {
 			KammusuSelectListBox.Refresh();
 			RedrawAntiAirScore();
 			RedrawSearchPower();
-            file_state_modified(FileState.modified);
-        }
+			file_state_modified(FileState.modified);
+		}
 		private void DeleteKammusuButton_Click(object sender, EventArgs e) {
 			if(FleetSelectComboBox.SelectedIndex == -1
 			|| KammusuSelectListBox.SelectedIndex == -1)
@@ -482,8 +482,8 @@ namespace KCS_GUI {
 			KammusuSelectListBox.Refresh();
 			RedrawAntiAirScore();
 			RedrawSearchPower();
-            file_state_modified(FileState.modified);
-        }
+			file_state_modified(FileState.modified);
+		}
 		private void AddWeaponButton_Click(object sender, EventArgs e) {
 			if(FleetSelectComboBox.SelectedIndex == -1
 			|| KammusuSelectListBox.SelectedIndex == -1
@@ -507,24 +507,24 @@ namespace KCS_GUI {
 			WeaponSelectListBox.Refresh();
 			RedrawAntiAirScore();
 			RedrawSearchPower();
-            file_state_modified(FileState.modified);
-        }
+			file_state_modified(FileState.modified);
+		}
 		private void WeaponLevelComboBox_Leave(object sender, EventArgs e) {
-            if (//Range Check
-                IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
-                && IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
-                && IsVaidIndex(
-                    this.WeaponSelectListBox.SelectedIndex,
-                    this.FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].weapon.Count
-                )
-            ) {
-                this
-                    .FormFleet
-                    .unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex]
-                    .weapon[WeaponSelectListBox.SelectedIndex]
-                    .level = WeaponLevelComboBox.SelectedIndex.limit(0, 10);
-                file_state_modified(FileState.modified);
-            }
+			if (//Range Check
+				IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
+				&& IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
+				&& IsVaidIndex(
+					this.WeaponSelectListBox.SelectedIndex,
+					this.FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].weapon.Count
+				)
+			) {
+				this
+					.FormFleet
+					.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex]
+					.weapon[WeaponSelectListBox.SelectedIndex]
+					.level = WeaponLevelComboBox.SelectedIndex.limit(0, 10);
+				file_state_modified(FileState.modified);
+			}
 		}
 		private void WeaponRfComboBox_Leave(object sender, EventArgs e) {
 			if(//Range Check
@@ -540,8 +540,8 @@ namespace KCS_GUI {
 					.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex]
 					.weapon[WeaponSelectListBox.SelectedIndex]
 					.set_rf(WeaponRfComboBox.SelectedIndex);
-                file_state_modified(FileState.modified);
-            }
+				file_state_modified(FileState.modified);
+			}
 		}
 		private void WeaponDetailRfComboBox_Leave(object sender, EventArgs e) {
 			if(//Range Check
@@ -557,8 +557,8 @@ namespace KCS_GUI {
 					.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex]
 					.weapon[WeaponSelectListBox.SelectedIndex]
 					.set_detailRf(WeaponDetailRfComboBox.SelectedIndex);
-                file_state_modified(FileState.modified);
-            }
+				file_state_modified(FileState.modified);
+			}
 		}
 		private void ChangeWeaponButton_Click(object sender, EventArgs e) {
 			if(FleetSelectComboBox.SelectedIndex == -1
@@ -581,8 +581,8 @@ namespace KCS_GUI {
 			WeaponSelectListBox.Refresh();
 			RedrawAntiAirScore();
 			RedrawSearchPower();
-            file_state_modified(FileState.modified);
-        }
+			file_state_modified(FileState.modified);
+		}
 		private void DeleteWeaponButton_Click(object sender, EventArgs e) {
 			if(FleetSelectComboBox.SelectedIndex == -1
 			|| KammusuSelectListBox.SelectedIndex == -1
@@ -594,20 +594,20 @@ namespace KCS_GUI {
 			WeaponSelectListBox.Refresh();
 			RedrawAntiAirScore();
 			RedrawSearchPower();
-            file_state_modified(FileState.modified);
-        }
+			file_state_modified(FileState.modified);
+		}
 		private void HQLevelTextBox_TextChanged(object sender, EventArgs e) {
 			// 司令部レベルが書き換わった際は反映する
 			FormFleet.level = HQLevelTextBox.Text.ParseInt().limit(1, 120);
 			RedrawSearchPower();
-            file_state_modified(FileState.modified);
-        }
+			file_state_modified(FileState.modified);
+		}
 		private void FleetTypeComboBox_SelectedIndexChanged(object sender, EventArgs e) {
 			if(FleetTypeComboBox.SelectedIndex == -1)
 				return;
 			// 艦隊形式が書き換わった際は反映する
 			FormFleet.type = FleetTypeComboBox.SelectedIndex;
-            file_state_modified(FileState.modified);
+			file_state_modified(FileState.modified);
 		}
 		private void FleetSelectComboBox_SelectedIndexChanged(object sender, EventArgs e) {
 			if(FleetSelectComboBox.SelectedIndex == -1)
@@ -700,9 +700,9 @@ namespace KCS_GUI {
 				Tuple<Fleet, bool> setFleet = ReadJsonFile(FleetFilePath);
 				if(!setFleet.Item2)
 					return;
-                // 読み込んだデータを画面に反映する
-                file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
-                FormFleet = setFleet.Item1;
+				// 読み込んだデータを画面に反映する
+				file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
+				FormFleet = setFleet.Item1;
 				HQLevelTextBox.Text = FormFleet.level.ToString();
 				FleetTypeComboBox.SelectedIndex = FormFleet.type;
 				FleetSelectComboBox_SelectedIndexChanged(sender, e);
@@ -721,9 +721,9 @@ namespace KCS_GUI {
 				Tuple<MapData, bool> setMapData = ReadMapFile(MapFilePath);
 				if(!setMapData.Item2)
 					return;
-                // 読み込んだデータを画面に反映する
-                file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
-                FormMapData = setMapData.Item1;
+				// 読み込んだデータを画面に反映する
+				file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
+				FormMapData = setMapData.Item1;
 				MapPositionListBox.Items.Clear();
 				foreach(var position in FormMapData.position) {
 					MapPositionListBox.Items.Add(position.name);
@@ -751,8 +751,8 @@ namespace KCS_GUI {
 			FormMapData.position.Add(setPosition);
 			MapPositionListBox.Items.Add(setPosition.name);
 			MapPositionListBox.Refresh();
-            file_state_modified(FileState.modified);
-        }
+			file_state_modified(FileState.modified);
+		}
 		private void ChangeMapPositionButton_Click(object sender, EventArgs e) {
 			if(MapPositionNameTextBox.Text == ""
 			|| MapPositionBattleModeComboBox.SelectedIndex == -1
@@ -762,16 +762,16 @@ namespace KCS_GUI {
 			FormMapData.position[MapPositionListBox.SelectedIndex].mode = MapPositionBattleModeComboBox.SelectedIndex;
 			MapPositionListBox.Items[MapPositionListBox.SelectedIndex] = MapPositionNameTextBox.Text;
 			MapPositionListBox.Refresh();
-            file_state_modified(FileState.modified);
-        }
+			file_state_modified(FileState.modified);
+		}
 		private void DeleteMapPositionButton_Click(object sender, EventArgs e) {
 			if(MapPositionListBox.SelectedIndex == -1)
 				return;
 			FormMapData.position.RemoveAt(MapPositionListBox.SelectedIndex);
 			MapPositionListBox.Items.RemoveAt(MapPositionListBox.SelectedIndex);
 			MapPositionListBox.Refresh();
-            file_state_modified(FileState.modified);
-        }
+			file_state_modified(FileState.modified);
+		}
 		private void AddMapPatternButton_Click(object sender, EventArgs e) {
 			if(MapPositionListBox.SelectedIndex == -1
 			|| MapPatternFormationComboBox.SelectedIndex == -1)
@@ -787,16 +787,16 @@ namespace KCS_GUI {
 			int selectPositionCount = selectPosition.fleet.Count;
 			MapPatternListBox.Items.Add(selectPositionCount.ToString() + " : " + selectPosition.fleet[selectPositionCount - 1].unit[0].Count.ToString() + "隻");
 			MapPatternListBox.Refresh();
-            file_state_modified(FileState.modified);
-        }
+			file_state_modified(FileState.modified);
+		}
 		private void ChangeMapPatternButton_Click(object sender, EventArgs e) {
 			if(MapPositionListBox.SelectedIndex == -1
 			|| MapPatternFormationComboBox.SelectedIndex == -1
 			|| MapPatternListBox.SelectedIndex == -1)
 				return;
 			FormMapData.position[MapPositionListBox.SelectedIndex].formation[MapPatternListBox.SelectedIndex] = MapPatternFormationComboBox.SelectedIndex;
-            file_state_modified(FileState.modified);
-        }
+			file_state_modified(FileState.modified);
+		}
 		private void DeleteMapPatternButton_Click(object sender, EventArgs e) {
 			if(MapPositionListBox.SelectedIndex == -1
 			|| MapPatternListBox.SelectedIndex == -1)
@@ -809,8 +809,8 @@ namespace KCS_GUI {
 				MapPatternListBox.Items.Add((fi + 1).ToString() + " : " + selectPosition.fleet[fi].unit[0].Count.ToString());
 			}
 			MapPatternListBox.Refresh();
-            file_state_modified(FileState.modified);
-        }
+			file_state_modified(FileState.modified);
+		}
 		private void AddMapKammusuButton_Click(object sender, EventArgs e) {
 			if(MapPositionListBox.SelectedIndex == -1
 			|| MapPatternListBox.SelectedIndex == -1
@@ -847,8 +847,8 @@ namespace KCS_GUI {
 			MapKammusuListBox.Refresh();
 			MapPatternListBox.Items[MapPatternListBox.SelectedIndex] = selectPositionCount.ToString() + " : " + selectFleet.unit[0].Count.ToString() + "隻";
 			RedrawMapAntiAirScore();
-            file_state_modified(FileState.modified);
-        }
+			file_state_modified(FileState.modified);
+		}
 		private void ChangeMapKammusuButton_Click(object sender, EventArgs e) {
 			if(MapPositionListBox.SelectedIndex == -1
 			|| MapPatternListBox.SelectedIndex == -1
@@ -880,8 +880,8 @@ namespace KCS_GUI {
 			MapKammusuListBox.Items[MapKammusuListBox.SelectedIndex] = data.Ships.Single(s => s.艦船ID == setKammusu.id).艦名;
 			MapKammusuListBox.Refresh();
 			RedrawMapAntiAirScore();
-            file_state_modified(FileState.modified);
-        }
+			file_state_modified(FileState.modified);
+		}
 		private void DeleteMapKammusuButton_Click(object sender, EventArgs e) {
 			if(MapPositionListBox.SelectedIndex == -1
 			|| MapPatternListBox.SelectedIndex == -1
@@ -894,8 +894,8 @@ namespace KCS_GUI {
 			int selectPositionCount = selectPosition.fleet.Count;
 			MapPatternListBox.Items[MapPatternListBox.SelectedIndex] = selectPositionCount.ToString() + " : " + selectFleet.unit[0].Count.ToString() + "隻";
 			RedrawMapAntiAirScore();
-            file_state_modified(FileState.modified);
-        }
+			file_state_modified(FileState.modified);
+		}
 		private void MapKammusuTypeComboBox_SelectedIndexChanged(object sender, EventArgs e) {
 			RedrawMapKammusuNameList();
 		}
@@ -998,9 +998,9 @@ namespace KCS_GUI {
 			this.Text = SoftName + "(計算中)";
 			System.Console.WriteLine(commandLine);
 			System.Console.WriteLine(psInfo.FileName);
-			psInfo.CreateNoWindow = true;           //コンソール・ウィンドウを開かない
-			psInfo.UseShellExecute = false;         //シェル機能を使用しない
-			psInfo.Arguments = commandLine;         //コマンドライン引数を設定
+			psInfo.CreateNoWindow = true;		   //コンソール・ウィンドウを開かない
+			psInfo.UseShellExecute = false;		 //シェル機能を使用しない
+			psInfo.Arguments = commandLine;		 //コマンドライン引数を設定
 			psInfo.RedirectStandardOutput = true;   //標準出力を取り込むようにする
 			Process p = Process.Start(psInfo);
 			string output = p.StandardOutput.ReadToEnd();
@@ -1604,33 +1604,33 @@ namespace KCS_GUI {
 			}
 		}
 
-        private string GetFilePath(int MainTabIndex) {
-            if (MainTabIndex < 0 || 2 < MainTabIndex) throw new ArgumentOutOfRangeException("MainTabIndex");
-            return (0 == MainTabIndex) ? MapFilePath : FleetFilePath;
-        }
+		private string GetFilePath(int MainTabIndex) {
+			if (MainTabIndex < 0 || 2 < MainTabIndex) throw new ArgumentOutOfRangeException("MainTabIndex");
+			return (0 == MainTabIndex) ? MapFilePath : FleetFilePath;
+		}
 
-        private void MainForm_FormClosing(object sender, FormClosingEventArgs e) {
-            for (int i = 0; i < this.file.Length; ++i) {
-                if (FileState.modified == this.file[i].state) {
-                    DialogResult result = MessageBox.Show(this.file[i].name + " has been modified, save changes ?",
-                        "Save Change?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2
-                    );
-                    switch (result) {
-                    case DialogResult.Cancel:
-                        e.Cancel = true;
-                        break;
-                    case DialogResult.Yes:
-                        if (0 == i) SaveFleetFile();
-                        else if (1 == i) SaveMapFile();
-                        goto case DialogResult.No;
-                    case DialogResult.No:
-                        break;
-                    }
-                }
-            }
-        }
-    }
-    static class Extensions {
+		private void MainForm_FormClosing(object sender, FormClosingEventArgs e) {
+			for (int i = 0; i < this.file.Length; ++i) {
+				if (FileState.modified == this.file[i].state) {
+					DialogResult result = MessageBox.Show(this.file[i].name + " has been modified, save changes ?",
+						"Save Change?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2
+					);
+					switch (result) {
+					case DialogResult.Cancel:
+						e.Cancel = true;
+						break;
+					case DialogResult.Yes:
+						if (0 == i) SaveFleetFile();
+						else if (1 == i) SaveMapFile();
+						goto case DialogResult.No;
+					case DialogResult.No:
+						break;
+					}
+				}
+			}
+		}
+	}
+	static class Extensions {
 		public static int ParseInt(this string str) {
 			return int.Parse(str);
 		}
@@ -1638,24 +1638,24 @@ namespace KCS_GUI {
 			return MainForm.limit(n, min, max);
 		}
 	}
-    enum FileState{
-        none,//ファイル作ってない
-        new_created,//「新規」で作った直後
-        modified,//どこかしら変更した
-        saved//ファイルに保存されている(ファイル開いた直後or保存直後)
-    }
-    class OpenFileInfo {
-        public OpenFileInfo() {
-            this.name = "filename...";
-            this.state = FileState.none;
-            this.bg_color = SystemColors.Control;
-        }
-        public OpenFileInfo(string name_, FileState state_) {
-            this.name = name_;
-            this.state = state_;
-        }
-        public string name;
-        public FileState state;
-        public Color bg_color;
-    }
+	enum FileState{
+		none,//ファイル作ってない
+		new_created,//「新規」で作った直後
+		modified,//どこかしら変更した
+		saved//ファイルに保存されている(ファイル開いた直後or保存直後)
+	}
+	class OpenFileInfo {
+		public OpenFileInfo() {
+			this.name = "filename...";
+			this.state = FileState.none;
+			this.bg_color = SystemColors.Control;
+		}
+		public OpenFileInfo(string name_, FileState state_) {
+			this.name = name_;
+			this.state = state_;
+		}
+		public string name;
+		public FileState state;
+		public Color bg_color;
+	}
 }
