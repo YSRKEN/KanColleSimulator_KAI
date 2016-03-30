@@ -17,7 +17,6 @@ using namespace std::chrono;
 
 class NormalMode {
 	const Config& config;
-	const std::vector<unsigned int>& seed;
 	const std::vector<Fleet> fleet;
 	std::atomic<size_t> global_n{ 0 };
 	std::vector<Result> result_db;
@@ -33,13 +32,13 @@ class NormalMode {
 		return fleet;
 	}
 public:
-	NormalMode(const Config& config, const std::vector<unsigned int>& seed) : config(config), seed(seed), fleet(read(config)), result_db(config.GetTimes()) {
-		for (const auto& f : fleet) f.Put();
+	NormalMode(const Config& config) : config(config), fleet(read(config)), result_db(config.GetTimes()) {
+			for (const auto& f : fleet) f.Put();
 	}
 	void work() {
 		size_t n;
 		while ((n = global_n++) < config.GetTimes()) {
-			Simulator simulator(fleet, seed[n], kSimulateModeDN);//戦闘のたびにSimulatorインスタンスを設定する
+			Simulator simulator(fleet, kSimulateModeDN);//戦闘のたびにSimulatorインスタンスを設定する
 			vector<Fleet> fleet_;
 			std::tie(result_db[n], fleet_) = simulator.Calc();
 		}
@@ -50,7 +49,7 @@ public:
 		if (config.GetOutputFilename().empty()) {
 			// 標準出力モード
 			result_stat.Put(fleet);
-		} 
+		}
 		else {
 			// ファイル出力モード
 			result_stat.Put(fleet);	//一応標準出力にも出すようにする
@@ -61,7 +60,6 @@ public:
 
 class MapMode {
 	const Config& config;
-	const std::vector<unsigned int>& seed;
 	const MapData map_Data;
 	const Fleet my_fleet;
 	std::mutex mutex;
@@ -70,7 +68,7 @@ class MapMode {
 	std::vector<Result> result_db;
 
 public:
-	MapMode(const Config& config, const std::vector<unsigned int>& seed) : config(config), seed(seed), map_Data(config.GetInputFilename(kEnemySide)), my_fleet(config.GetInputFilename(kFriendSide), kFormationTrail), point_count(map_Data.GetSize()) {
+	MapMode(const Config& config) : config(config), map_Data(config.GetInputFilename(kEnemySide)), my_fleet(config.GetInputFilename(kFriendSide), kFormationTrail), point_count(map_Data.GetSize()) {
 		// ファイルから艦隊とマップを読み込む
 		my_fleet.Put();
 		map_Data.Put();
@@ -82,7 +80,6 @@ public:
 		local_result_db.reserve(map_Data.GetSize() * config.GetTimes());
 		size_t n;
 		while ((n = global_n++) < config.GetTimes()) {
-			map_data_this_thread.SetRandGenerator(seed[n]);
 			// 自艦隊をセットする
 			vector<Fleet> fleet(kBattleSize);
 			fleet[kFriendSide] = my_fleet;
@@ -94,15 +91,13 @@ public:
 				// 敵艦隊の形態、および戦闘モードにより自艦隊の陣形を変更する
 				if (fleet[kEnemySide].GetUnit().front().front().IsSubmarine()) {
 					fleet[kFriendSide].SetFormation(kFormationAbreast);
-				}
-				else if (map_data_this_thread.GetSimulateMode(p) == kSimulateModeN) {
+				} else if (map_data_this_thread.GetSimulateMode(p) == kSimulateModeN) {
 					fleet[kFriendSide].SetFormation(config.GetFormation(kFriendSide));
-				}
-				else {
+				} else {
 					fleet[kFriendSide].SetFormation(kFormationTrail);
 				}
 				// シミュレートを行う
-				Simulator simulator(fleet, map_data_this_thread.GetGenerator(), map_data_this_thread.GetSimulateMode(p));
+				Simulator simulator(fleet, map_data_this_thread.GetSimulateMode(p));
 				vector<Fleet> fleet_;
 				Result result_;
 				std::tie(result_, fleet_) = simulator.Calc();
@@ -111,7 +106,7 @@ public:
 				if (p != map_data_this_thread.GetSize() - 1) {
 					// 大破していたら撤退する
 					if (fleet[kFriendSide].HasHeavyDamage()) break;
-				}else{
+				} else {
 					// ボスマスなら結果を記録する
 					local_result_db.push_back(result_);
 				}
@@ -151,8 +146,7 @@ public:
 
 template<class Mode>
 void run(const time_point<high_resolution_clock>& preprocess_begin_time, Config& config) {
-	const auto seed = make_SharedRand().make_unique_rand_array<unsigned int>(config.GetTimes());
-	Mode mode{ config, seed };
+	Mode mode{ config };
 	const auto preprocess_end_time = high_resolution_clock::now();
 	cout << "preprocess:" << duration_cast<nanoseconds>(preprocess_end_time - preprocess_begin_time).count() << "[ns]\n" << endl;
 	const auto process_begin_time = high_resolution_clock::now();
