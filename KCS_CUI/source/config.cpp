@@ -1,6 +1,7 @@
 ﻿#ifndef NOMINMAX
 #define NOMINMAX
 #endif
+#include "../../version.h"
 #include "base.hpp"
 #include "config.hpp"
 #include <codecvt>
@@ -11,6 +12,7 @@
 #include <algorithm>
 #include "exception.hpp"
 #include <iostream>
+#include "../../version.h"
 
 struct ForConfigImpl {
 	ForConfigImpl() : input_filename_(), formation_({{ kFormationTrail , kFormationTrail }}), times_(1), threads_(1), json_prettify_flg_(true) {}
@@ -27,12 +29,29 @@ struct Config::Impl {
 namespace detail {
 	void print_verison() noexcept(false)
 	{
-		std::cout << "version" << std::endl;
+		using std::endl;
+		std::cout
+			<< KCS_FILE_DESCRIPTION << endl
+			<< KCS_COPYRIGHT_STR << endl
+			<< "version " KCS_VERSION_STR << endl;
 	}
 	void print_commandline_help() noexcept(false)
 	{
+		using std::endl;
 		detail::print_verison();
-		std::cout << "help" << std::endl;
+		std::cout 
+			<< endl
+			<< "Usage: KCS_CUI -i input1.json input2.json|input2.map [-f formation1 formation2]" << endl
+			<< "        [-n times] [-t threads] [-o output.json] [--result-json-prettify | --no-result-json-prettify]" << endl
+			<< endl
+			<< "-i input1.json input2.json|input2.map  : input file path" << endl
+			<< "-f formation1 formation2               : fleet formation(0-5)" << endl
+			<< "-n times                               : number of trials" << endl
+			<< "-t threads                             : using threads" << endl
+			<< "-o output.json                         : output file path" << endl
+			<< "--result-json-prettify                 : prettify result json" << endl
+			<< "--no-result-json-prettify              : no prettify result json" << endl
+			<< endl;
 	}
 }
 void print_commandline_help() noexcept(false)
@@ -50,7 +69,7 @@ void print_verison() noexcept(false)
 
 namespace detail {
 	ForConfigImpl commandline_analyzer(int argc, char* argv[]) noexcept(false) {
-		CONFIG_THROW_WITH_MESSAGE_IF(argc < 4, "引数の数が足りていません.")
+		//CONFIG_THROW_WITH_MESSAGE_IF(argc < 4, "引数の数が足りていません.")
 		using std::unordered_map;
 		using std::function;
 		ForConfigImpl re = {};
@@ -84,10 +103,22 @@ namespace detail {
 			} }
 		};
 		unordered_map<string, function<void()>> case_exist = {
-			{ "-h", print_commandline_help },
-			{ "--help", print_commandline_help },
-			{ "-v", print_verison },
-			{ "--version", print_verison }
+			{ "-h", []() {
+				detail::print_commandline_help();
+				SUCCESSFUL_TERMINATION_THROW_WITH_MESSAGE("");
+			} },
+			{ "--help", []() {
+				detail::print_commandline_help();
+				SUCCESSFUL_TERMINATION_THROW_WITH_MESSAGE("");
+			} },
+			{ "-v", []() {
+				detail::print_verison();
+				SUCCESSFUL_TERMINATION_THROW_WITH_MESSAGE("");
+			} },
+			{ "--version", []() {
+				detail::print_verison();
+				SUCCESSFUL_TERMINATION_THROW_WITH_MESSAGE("");
+			} }
 		};
 		for (int i = 1; i < argc; ++i) {
 			if (case_two_arg.count(argv[i])) {
@@ -109,6 +140,7 @@ namespace detail {
 				INVAID_ARGUMENT_THROW_WITH_MESSAGE(string("unknown option : ") + argv[i]);
 			}
 		}
+		CONFIG_THROW_WITH_MESSAGE_IF(argc < 4, "引数の数が足りていません.")
 		return re;
 	}
 }
@@ -153,7 +185,7 @@ size_t Config::GetTimes() const noexcept { return this->pimpl->e.times_; }
 
 size_t Config::GetThreads() const noexcept { return this->pimpl->e.threads_; }
 
-const string & Config::GetOutputFilename() noexcept { return this->pimpl->e.output_filename_; }
+const string & Config::GetOutputFilename() const noexcept { return this->pimpl->e.output_filename_; }
 
 bool Config::GetJsonPrettifyFlg() const noexcept { return this->pimpl->e.json_prettify_flg_; }
 

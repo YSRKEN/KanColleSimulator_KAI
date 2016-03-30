@@ -16,7 +16,7 @@ public:
 	SimulateMode GetSimulateMode(const size_t) const noexcept;
 	wstring GetPointName(const size_t) const noexcept;
 	// その他
-	void Put();	//内容を表示する
+	void Put() const;	//内容を表示する
 };
 
 #endif

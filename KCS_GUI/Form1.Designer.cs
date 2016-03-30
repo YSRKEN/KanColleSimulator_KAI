@@ -422,10 +422,11 @@
 			this.WeaponDetailRfComboBox.TabIndex = 36;
 			this.WeaponDetailRfComboBox.Text = "0";
 			this.WeaponDetailRfComboBox.SelectedIndexChanged += new System.EventHandler(this.WeaponDetailRfComboBox_SelectedIndexChanged);
-			// 
-			// WeaponRfComboBox
-			// 
-			this.WeaponRfComboBox.Enabled = false;
+            this.WeaponDetailRfComboBox.Leave += new System.EventHandler(this.WeaponDetailRfComboBox_Leave);
+            // 
+            // WeaponRfComboBox
+            // 
+            this.WeaponRfComboBox.Enabled = false;
 			this.WeaponRfComboBox.FormattingEnabled = true;
 			this.WeaponRfComboBox.Items.AddRange(new object[] {
             "0",
@@ -445,10 +446,11 @@
 			this.WeaponRfComboBox.TabIndex = 35;
 			this.WeaponRfComboBox.Text = "0";
 			this.WeaponRfComboBox.SelectedIndexChanged += new System.EventHandler(this.WeaponRfComboBox_SelectedIndexChanged);
-			// 
-			// WeaponLevelComboBox
-			// 
-			this.WeaponLevelComboBox.FormattingEnabled = true;
+            this.WeaponRfComboBox.Leave += new System.EventHandler(this.WeaponRfComboBox_Leave);
+            // 
+            // WeaponLevelComboBox
+            // 
+            this.WeaponLevelComboBox.FormattingEnabled = true;
 			this.WeaponLevelComboBox.Items.AddRange(new object[] {
             "0",
             "1",
@@ -466,10 +468,11 @@
 			this.WeaponLevelComboBox.Size = new System.Drawing.Size(50, 20);
 			this.WeaponLevelComboBox.TabIndex = 34;
 			this.WeaponLevelComboBox.Text = "0";
-			// 
-			// label19
-			// 
-			this.label19.AutoSize = true;
+            this.WeaponLevelComboBox.Leave += new System.EventHandler(this.WeaponLevelComboBox_Leave);
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
 			this.label19.Location = new System.Drawing.Point(314, 219);
 			this.label19.Name = "label19";
 			this.label19.Size = new System.Drawing.Size(65, 12);
@@ -632,26 +635,32 @@
 			this.KammusuCondTextBox.Size = new System.Drawing.Size(40, 19);
 			this.KammusuCondTextBox.TabIndex = 18;
 			this.KammusuCondTextBox.Text = "49";
-			// 
-			// KammusuLuckTextBox
-			// 
-			this.KammusuLuckTextBox.Location = new System.Drawing.Point(332, 106);
+            this.KammusuCondTextBox.Leave += new System.EventHandler(this.KammusuCondTextBox_Leave);
+            this.KammusuCondTextBox.Validating += this.KammusuCondTextBox_Validating;
+            // 
+            // KammusuLuckTextBox
+            // 
+            this.KammusuLuckTextBox.Location = new System.Drawing.Point(332, 106);
 			this.KammusuLuckTextBox.Name = "KammusuLuckTextBox";
 			this.KammusuLuckTextBox.Size = new System.Drawing.Size(40, 19);
 			this.KammusuLuckTextBox.TabIndex = 17;
 			this.KammusuLuckTextBox.Text = "-1";
-			// 
-			// KammusuLevelTextBox
-			// 
-			this.KammusuLevelTextBox.Location = new System.Drawing.Point(332, 80);
+            this.KammusuLuckTextBox.Leave += new System.EventHandler(this.KammusuLuckTextBox_Leave);
+            this.KammusuLuckTextBox.Validating += this.KammusuLuckTextBox_Validating;
+            // 
+            // KammusuLevelTextBox
+            // 
+            this.KammusuLevelTextBox.Location = new System.Drawing.Point(332, 80);
 			this.KammusuLevelTextBox.Name = "KammusuLevelTextBox";
 			this.KammusuLevelTextBox.Size = new System.Drawing.Size(40, 19);
 			this.KammusuLevelTextBox.TabIndex = 16;
 			this.KammusuLevelTextBox.Text = "1";
-			// 
-			// label10
-			// 
-			this.label10.AutoSize = true;
+            this.KammusuLevelTextBox.Leave += new System.EventHandler(this.KammusuLevelTextBox_Leave);
+            this.KammusuLevelTextBox.Validating += this.KammusuLevelTextBox_Validating;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
 			this.label10.Location = new System.Drawing.Point(285, 134);
 			this.label10.Name = "label10";
 			this.label10.Size = new System.Drawing.Size(41, 12);
