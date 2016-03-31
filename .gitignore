@@ -203,3 +203,4 @@ output.json
 *.diagsession
 Manual.pptx
 *.csproj.user
+zip/
