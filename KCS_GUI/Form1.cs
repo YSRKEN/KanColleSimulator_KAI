@@ -367,15 +367,15 @@ namespace KCS_GUI {
 			if(selectedKammusu.weapon.Count == selectedKammusu.maxSlots)
 				return;
 			// 装備データを作成する
-			var setWeapon = new Weapon();
 			int index = WeaponTypeToIndexList[WeaponTypeComboBox.SelectedIndex][WeaponNameComboBox.SelectedIndex];
-			setWeapon.id = data.Weapons[index].装備ID;
-			setWeapon.level = WeaponLevelComboBox.SelectedIndex.limit(0, 10);
-			setWeapon.rf = WeaponRfComboBox.SelectedIndex.limit(0, 7);
-			setWeapon.detailRf = WeaponDetailRfComboBox.SelectedIndex.limit(0, 120);
+			var id = data.Weapons[index].装備ID;
+			var level = WeaponLevelComboBox.SelectedIndex;
+			var rf = WeaponRfComboBox.SelectedIndex;
+			var detailRf = WeaponDetailRfComboBox.SelectedIndex;
+			var setWeapon = new Weapon(id, level, rf, detailRf);
 			// 作成した装備データを追加する
 			selectedKammusu.weapon.Add(setWeapon);
-			WeaponSelectListBox.Items.Add(data.Weapons.Single(w => w.装備ID == setWeapon.id).装備名);
+			WeaponSelectListBox.Items.Add(setWeapon.装備名);
 			WeaponSelectListBox.Refresh();
 			RedrawAntiAirScore();
 			RedrawSearchPower();
@@ -393,7 +393,7 @@ namespace KCS_GUI {
 					.FormFleet
 					.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex]
 					.weapon[WeaponSelectListBox.SelectedIndex]
-					.level = limit(WeaponLevelComboBox.SelectedIndex, 0, 10);
+					.level = WeaponLevelComboBox.SelectedIndex;
 		}
 		private void WeaponRfComboBox_Leave(object sender, EventArgs e) {
 			if(//Range Check
@@ -408,7 +408,7 @@ namespace KCS_GUI {
 					.FormFleet
 					.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex]
 					.weapon[WeaponSelectListBox.SelectedIndex]
-					.set_rf(WeaponRfComboBox.SelectedIndex);
+					.rf = WeaponRfComboBox.SelectedIndex;
 			}
 		}
 		private void WeaponDetailRfComboBox_Leave(object sender, EventArgs e) {
@@ -424,7 +424,7 @@ namespace KCS_GUI {
 					.FormFleet
 					.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex]
 					.weapon[WeaponSelectListBox.SelectedIndex]
-					.set_detailRf(WeaponDetailRfComboBox.SelectedIndex);
+					.rf_detail = WeaponDetailRfComboBox.SelectedIndex;
 			}
 		}
 		private void ChangeWeaponButton_Click(object sender, EventArgs e) {
@@ -436,15 +436,15 @@ namespace KCS_GUI {
 				return;
 			Kammusu selectedKammusu = FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex];
 			// 装備データを作成する
-			var setWeapon = new Weapon();
 			int index = WeaponTypeToIndexList[WeaponTypeComboBox.SelectedIndex][WeaponNameComboBox.SelectedIndex];
-			setWeapon.id = data.Weapons[index].装備ID;
-			setWeapon.level = WeaponLevelComboBox.SelectedIndex.limit(0, 10);
-			setWeapon.rf = WeaponRfComboBox.SelectedIndex.limit(0, 7);
-			setWeapon.detailRf = WeaponDetailRfComboBox.SelectedIndex.limit(0, 120);
+			var id = data.Weapons[index].装備ID;
+			var level = WeaponLevelComboBox.SelectedIndex.limit(0, 10);
+			var rf = WeaponRfComboBox.SelectedIndex.limit(0, 7);
+			var detailRf = WeaponDetailRfComboBox.SelectedIndex.limit(0, 120);
+			var setWeapon = new Weapon(id, level, rf, detailRf);
 			// 作成した装備データで上書きする
 			selectedKammusu.weapon[WeaponSelectListBox.SelectedIndex] = setWeapon;
-			WeaponSelectListBox.Items[WeaponSelectListBox.SelectedIndex] = data.Weapons.Single(w => w.装備ID == setWeapon.id).装備名;
+			WeaponSelectListBox.Items[WeaponSelectListBox.SelectedIndex] = setWeapon.装備名;
 			WeaponSelectListBox.Refresh();
 			RedrawAntiAirScore();
 			RedrawSearchPower();
@@ -532,19 +532,19 @@ namespace KCS_GUI {
 			WeaponLevelComboBox.Refresh();
 			WeaponRfComboBox.SelectedIndex = weapon.rf;
 			WeaponRfComboBox.Refresh();
-			WeaponDetailRfComboBox.SelectedIndex = weapon.detailRf;
+			WeaponDetailRfComboBox.SelectedIndex = weapon.rf_detail;
 			WeaponDetailRfComboBox.Refresh();
 		}
 		private void WeaponRfComboBox_SelectedIndexChanged(object sender, EventArgs e) {
 			// 外部熟練度を弄った場合、内部熟練度を自動補正する
-			WeaponDetailRfComboBox.SelectedIndex = rfRoughToDetail(WeaponRfComboBox.SelectedIndex);
+			WeaponDetailRfComboBox.SelectedIndex = Weapon.ToDetail(WeaponRfComboBox.SelectedIndex);
 			WeaponDetailRfComboBox.Refresh();
 			RedrawAntiAirScore();
 			RedrawSearchPower();
 		}
 		private void WeaponDetailRfComboBox_SelectedIndexChanged(object sender, EventArgs e) {
 			// 内部熟練度を弄った場合、外部熟練度を自動補正する
-			WeaponRfComboBox.SelectedIndex = rfDetailToRough(WeaponDetailRfComboBox.SelectedIndex);
+			WeaponRfComboBox.SelectedIndex = Weapon.FromDetail(WeaponDetailRfComboBox.SelectedIndex);
 			WeaponRfComboBox.Refresh();
 			RedrawAntiAirScore();
 			RedrawSearchPower();
@@ -686,12 +686,7 @@ namespace KCS_GUI {
 				var weaponIdToInt = weaponID.ParseInt();
 				if(weaponIdToInt <= 0)
 					break;
-				var setWeapon = new Weapon();
-				setWeapon.id = weaponIdToInt;
-				setWeapon.level = 0;
-				setWeapon.rf = 0;
-				setWeapon.detailRf = 0;
-				setKammusu.weapon.Add(setWeapon);
+				setKammusu.weapon.Add(new Weapon(weaponIdToInt));
 			}
 			// 艦娘データを追加
 			var selectPosition = FormMapData.position[MapPositionListBox.SelectedIndex];
@@ -721,12 +716,7 @@ namespace KCS_GUI {
 				var weaponIdToInt = weaponID.ParseInt();
 				if(weaponIdToInt <= 0)
 					break;
-				var setWeapon = new Weapon();
-				setWeapon.id = weaponIdToInt;
-				setWeapon.level = 0;
-				setWeapon.rf = 0;
-				setWeapon.detailRf = 0;
-				setKammusu.weapon.Add(setWeapon);
+				setKammusu.weapon.Add(new Weapon(weaponIdToInt));
 			}
 			// 艦娘データを追加
 			var selectFleet = FormMapData.position[MapPositionListBox.SelectedIndex].fleet[MapPatternListBox.SelectedIndex];
@@ -974,32 +964,6 @@ namespace KCS_GUI {
 		static public int limit(int n, int min_n, int max_n) {
 			return (n < min_n) ? min_n : (max_n < n) ? max_n : n;
 		}
-		// 外部熟練度を内部熟練度に変換する
-		static public int rfRoughToDetail(int rf) {
-			int[] roughToDetailList = new int[8] { 0, 10, 25, 40, 55, 70, 85, 100 };
-			return roughToDetailList[rf];
-		}
-		// 内部熟練度を外部熟練度に変換する
-		static public int rfDetailToRough(int detailRf) {
-			int roughRf;
-			if(detailRf < 10)
-				roughRf = 0;
-			else if(detailRf < 25)
-				roughRf = 1;
-			else if(detailRf < 40)
-				roughRf = 2;
-			else if(detailRf < 55)
-				roughRf = 3;
-			else if(detailRf < 70)
-				roughRf = 4;
-			else if(detailRf < 85)
-				roughRf = 5;
-			else if(detailRf < 100)
-				roughRf = 6;
-			else
-				roughRf = 7;
-			return roughRf;
-		}
 		private Tuple<Fleet, bool> ReadJsonFile(string jsonFileName) {
 			Fleet setFleet = new Fleet();
 			// テキストを読み込んでJSONにパースする
@@ -1052,37 +1016,15 @@ namespace KCS_GUI {
 					// 装備を読み込む
 					for(int wi = 1; wi <= slotSize; ++wi) {
 						// JSONデータとしての判定
-						if(jsonItems["i" + wi.ToString()] == null)
+						var jsonWeapon = jsonItems["i" + wi];
+						if (jsonWeapon == null)
 							break;
-						var jsonWeapon = (JObject)jsonItems["i" + wi.ToString()];
-						if(jsonWeapon["id"] == null
-						|| jsonWeapon["rf"] == null)
-							return new Tuple<Fleet, bool>(setFleet, false);
-						var setWeapon = new Weapon();
-						// IDがデータベースに存在するか判定
-						setWeapon.id = limit(int.Parse((string)jsonWeapon["id"]), 1, 999);
-						if(!data.Weapons.Any(w => w.装備ID == setWeapon.id))
-							return new Tuple<Fleet, bool>(setFleet, false);
-						// 種別を判定することで、"rf"が装備改修度か艦載機熟練度かを判別する
-						int setWeaponType = WeaponTypeToNumber["その他"];
-						if(WeaponTypeToNumber.ContainsKey(data.Weapons.Single(w => w.装備ID == setWeapon.id).種別)) {
-							setWeaponType = WeaponTypeToNumber[data.Weapons.Single(w => w.装備ID == setWeapon.id).種別];
+						try {
+							setKammusu.weapon.Add(jsonWeapon.ToObject<Weapon>());
 						}
-						if(RfWeaponTypeList.Contains(setWeaponType)) {
-							setWeapon.level = 0;
-							setWeapon.rf = limit(int.Parse((string)jsonWeapon["rf"]), 0, 7);
-							if(jsonWeapon["rf_detail"] == null) {
-								setWeapon.detailRf = rfRoughToDetail(setWeapon.rf);
-							} else {
-								setWeapon.detailRf = limit(int.Parse((string)jsonWeapon["rf_detail"]), 0, 120);
-								setWeapon.rf = rfDetailToRough(setWeapon.detailRf);
-							}
-						} else {
-							setWeapon.level = limit(int.Parse((string)jsonWeapon["rf"]), 0, 10);
-							setWeapon.rf = 0;
-							setWeapon.detailRf = 0;
+						catch {
+							return new Tuple<Fleet, bool>(setFleet, false);
 						}
-						setKammusu.weapon.Add(setWeapon);
 					}
 					setFleet.unit[fi - 1].Add(setKammusu);
 				}
@@ -1116,12 +1058,7 @@ namespace KCS_GUI {
 							var weaponIdToInt = weaponID.ParseInt();
 							if(weaponIdToInt <= 0)
 								break;
-							var setWeapon = new Weapon();
-							setWeapon.id = weaponIdToInt;
-							setWeapon.level = 0;
-							setWeapon.rf = 0;
-							setWeapon.detailRf = 0;
-							kammusu.weapon.Add(setWeapon);
+							kammusu.weapon.Add(new Weapon(weaponIdToInt));
 						}
 						kammusu.maxSlots = kammusu.weapon.Count();
 						fleet.unit[0].Add(kammusu);
@@ -1153,28 +1090,6 @@ namespace KCS_GUI {
 			MapPatternAllAntiAirTextBox.Text = antiAirScore.ToString();
 		}
 		/* サブクラス */
-		// 装備
-		private class Weapon {
-			// 装備ID
-			public int id;
-			// 装備改修度
-			public int level;
-			// 外部熟練度
-			public int rf;
-			// 内部熟練度
-			public int detailRf;
-
-			public void set_rf(int i_rf) {
-				this.rf = limit(i_rf, 0, 7);
-				this.detailRf = MainForm.rfRoughToDetail(this.rf);
-			}
-
-			public void set_detailRf(int i_detailRf) {
-				this.detailRf = limit(i_detailRf, 0, 120);
-				this.rf = MainForm.rfDetailToRough(this.detailRf);
-			}
-
-		}
 		// 艦娘
 		private class Kammusu {
 			// 艦船ID
@@ -1239,20 +1154,7 @@ namespace KCS_GUI {
 						JObject setItems = new JObject();
 						for(int wi = 0; wi < unit[fi][si].weapon.Count; ++wi) {
 							// 装備
-							JObject setWeapon = new JObject();
-							setWeapon["id"] = unit[fi][si].weapon[wi].id;
-							//種別を判定することで、装備改修度か艦載機熟練度かを判別する
-							int setWeaponType = WeaponTypeToNumber["その他"];
-							if(WeaponTypeToNumber.ContainsKey(data.Weapons.Single(w => w.装備ID == unit[fi][si].weapon[wi].id).種別)) {
-								setWeaponType = WeaponTypeToNumber[data.Weapons.Single(w => w.装備ID == unit[fi][si].weapon[wi].id).種別];
-							}
-							if(RfWeaponTypeList.Contains(setWeaponType)) {
-								setWeapon["rf"] = unit[fi][si].weapon[wi].rf;
-								setWeapon["rf_detail"] = unit[fi][si].weapon[wi].detailRf;
-							} else {
-								setWeapon["rf"] = unit[fi][si].weapon[wi].level;
-							}
-							setItems["i" + (wi + 1).ToString()] = setWeapon;
+							setItems[$"i{wi + 1}"] = new JValue(unit[fi][si].weapon[wi]);
 						}
 						setKammusu["items"] = setItems;
 						setFleet["s" + (si + 1).ToString()] = setKammusu;
@@ -1282,7 +1184,7 @@ namespace KCS_GUI {
 						// 対空値・搭載数・内部熟練度で決まる制空値を代入する
 						var antiAir = weaponInfo.対空;
 						var slot = slots[wi].ParseInt();
-						double antiAirScoreWeapon = antiAir * Math.Sqrt(slot) + Math.Sqrt(0.1 * weapon.detailRf);
+						double antiAirScoreWeapon = antiAir * Math.Sqrt(slot) + Math.Sqrt(0.1 * weapon.rf_detail);
 						// 一部の種別には特別な補正を掛ける
 						if(type == "艦上戦闘機") {
 							antiAirScoreWeapon += bonusPF[weapon.rf];
