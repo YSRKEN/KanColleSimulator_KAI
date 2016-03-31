@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using System.ComponentModel;
+using static KCS_GUI.CsvDataSet;
 
 namespace KCS_GUI {
 	public partial class MainForm : Form {
@@ -20,18 +21,12 @@ namespace KCS_GUI {
 		const int MaxFleetSize = 2;
 		//艦隊における艦船数の最大
 		const int MaxUnitSize = 6;
-		//種別→種別番号変換
-		static Dictionary<string, int> WeaponTypeToNumber;
 		//制空計算用(艦戦ボーナスと艦爆ボーナス)
 		static List<double> bonusPF = new List<double> { 0.0, 0.0, 2.0, 5.0, 9.0, 14.0, 14.0, 22.0 };
 		static List<double> bonusWB = new List<double> { 0.0, 0.0, 1.0, 1.0, 1.0, 3.0, 3.0, 6.0 };
 
-		// 装備・艦娘データ
-		static CsvDataSet data = new CsvDataSet();
 		//種別番号→インデックスのリスト変換
 		Dictionary<int, List<int>> WeaponTypeToIndexList;
-		//熟練度が存在する装備の種別番号一覧
-		static List<int> RfWeaponTypeList;
 		//艦種番号→インデックスのリスト変換
 		Dictionary<int, List<int>> KammusuTypeToIndexList;
 		// 画面表示用データ
@@ -48,61 +43,9 @@ namespace KCS_GUI {
 		private System.Windows.Forms.ErrorProvider error_provider_luck;
 		private System.Windows.Forms.ErrorProvider error_provider_cond;
 		/* コンストラクタ */
-		static MainForm() {
-			using(var adapter = new CsvDataSetTableAdapters.ShipsTableAdapter())
-				adapter.Fill(data.Ships);
-			using(var adapter = new CsvDataSetTableAdapters.WeaponsTableAdapter())
-				adapter.Fill(data.Weapons);
-		}
 		public MainForm() {
 			InitializeComponent();
 			try {
-				WeaponTypeToNumber = new Dictionary<string, int>() {
-					{"主砲",0},
-					{"対艦強化弾",1},
-					{"副砲",2},
-					{"魚雷",3},
-					{"特殊潜航艇",4},
-					{"艦上戦闘機",5},
-					{"艦上爆撃機",6},
-					{"艦上爆撃機(爆戦)",7},
-					{"水上爆撃機",8},
-					{"艦上攻撃機",9},
-					{"艦上偵察機",10},
-					{"艦上偵察機(彩雲)",11},
-					{"大型飛行艇",12},
-					{"水上偵察機",13},
-					{"水上偵察機(夜偵)",14},
-					{"対潜哨戒機",15},
-					{"オートジャイロ",16},
-					{"小型電探",17},
-					{"大型電探",18},
-					{"対空機銃",19},
-					{"対空強化弾",20},
-					{"高射装置",21},
-					{"爆雷",22},
-					{"ソナー",23},
-					{"応急修理要員",24},
-					{"探照灯",25},
-					{"照明弾",26},
-					{"艦隊司令部施設",27},
-					{"水上艦要員",28},
-					{"戦闘糧食",29},
-					{"洋上補給",30},
-					{"水上戦闘機",31},
-					{"その他",32}
-				};
-				RfWeaponTypeList = new List<int> {
-					WeaponTypeToNumber["艦上戦闘機"],
-					WeaponTypeToNumber["艦上爆撃機"],
-					WeaponTypeToNumber["艦上爆撃機(爆戦)"],
-					WeaponTypeToNumber["水上爆撃機"],
-					WeaponTypeToNumber["艦上攻撃機"],
-					WeaponTypeToNumber["艦上偵察機"],
-					WeaponTypeToNumber["艦上偵察機(彩雲)"],
-					WeaponTypeToNumber["大型飛行艇"],
-					WeaponTypeToNumber["水上戦闘機"]
-				};
 				ReadWeaponData();
 				ReadKammusuData();
 				RedrawWeaponNameList();
@@ -994,7 +937,7 @@ namespace KCS_GUI {
 			}
 			WeaponNameComboBox.Refresh();
 			// 改修度および熟練度の選択を切り替える
-			if(RfWeaponTypeList.IndexOf(WeaponTypeComboBox.SelectedIndex) != -1) {
+			if(RfWeaponTypeList.Contains(WeaponTypeComboBox.SelectedIndex)) {
 				// 熟練度
 				WeaponLevelComboBox.Enabled = false;
 				WeaponRfComboBox.Enabled = true;
@@ -1125,7 +1068,7 @@ namespace KCS_GUI {
 						if(WeaponTypeToNumber.ContainsKey(data.Weapons.Single(w => w.装備ID == setWeapon.id).種別)) {
 							setWeaponType = WeaponTypeToNumber[data.Weapons.Single(w => w.装備ID == setWeapon.id).種別];
 						}
-						if(RfWeaponTypeList.IndexOf(setWeaponType) != -1) {
+						if(RfWeaponTypeList.Contains(setWeaponType)) {
 							setWeapon.level = 0;
 							setWeapon.rf = limit(int.Parse((string)jsonWeapon["rf"]), 0, 7);
 							if(jsonWeapon["rf_detail"] == null) {
@@ -1303,7 +1246,7 @@ namespace KCS_GUI {
 							if(WeaponTypeToNumber.ContainsKey(data.Weapons.Single(w => w.装備ID == unit[fi][si].weapon[wi].id).種別)) {
 								setWeaponType = WeaponTypeToNumber[data.Weapons.Single(w => w.装備ID == unit[fi][si].weapon[wi].id).種別];
 							}
-							if(RfWeaponTypeList.IndexOf(setWeaponType) != -1) {
+							if(RfWeaponTypeList.Contains(setWeaponType)) {
 								setWeapon["rf"] = unit[fi][si].weapon[wi].rf;
 								setWeapon["rf_detail"] = unit[fi][si].weapon[wi].detailRf;
 							} else {

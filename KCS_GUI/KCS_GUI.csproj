@@ -47,6 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CsvDataSet.cs">
+      <DependentUpon>CsvDataSet.xsd</DependentUpon>
+    </Compile>
     <Compile Include="CsvDataSet.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
