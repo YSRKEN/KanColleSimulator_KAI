@@ -1,0 +1,2 @@
+﻿namespace KCS_GUI {
+}
