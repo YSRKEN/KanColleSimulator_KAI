@@ -129,7 +129,7 @@ namespace KCS_GUI {
 
 		/* 各イベント毎の処理 */
 		private void file_state_modified(FileState new_state) {
-			if (0 <= MainTabControl.SelectedIndex || MainTabControl.SelectedIndex <= 1) {
+			if (IsInRange(MainTabControl.SelectedIndex, 0, 1)) {
 				this.file[MainTabControl.SelectedIndex].state = new_state;
 				this.filename_echo.ForeColor = (FileState.none != new_state) ? SystemColors.ControlText : SystemColors.GradientInactiveCaption;
 				switch (new_state) {
@@ -153,7 +153,7 @@ namespace KCS_GUI {
 			}
 		}
 		private void file_state_modified(string filename, FileState new_state) {
-			if (0 <= MainTabControl.SelectedIndex || MainTabControl.SelectedIndex <= 1) {
+			if (IsInRange(MainTabControl.SelectedIndex, 0, 1)) {
 				file_state_modified(new_state);
 				if (FileState.none != new_state) {
 					this.file[MainTabControl.SelectedIndex].name = this.filename_echo.Text = (0 == filename.Length) ? "untitled" : filename;
@@ -174,68 +174,77 @@ namespace KCS_GUI {
 			}
 		}
 		// メニュー
+		private bool SaveChangeBreforeNewCreate() {
+			return (IsInRange(MainTabControl.SelectedIndex, 0, 1))
+				&& (FileState.modified != this.file[MainTabControl.SelectedIndex].state
+				|| SaveChangeBeforeClear(MainTabControl.SelectedIndex));
+		}
 		private void NewFileMenuItem_Click(object sender, EventArgs e) {
-			if(MainTabControl.SelectedIndex == 0) {
-				FormFleet = new Fleet();
-				HQLevelTextBox.Text = FormFleet.level.ToString();
-				FleetTypeComboBox.SelectedIndex = FormFleet.type;
-				FleetSelectComboBox_SelectedIndexChanged(sender, e);
-				RedrawAntiAirScore();
-				RedrawSearchPower();
-				file_state_modified("untitled.json", FileState.new_created);
-			} else if(MainTabControl.SelectedIndex == 1) {
-				FormMapData = new MapData();
-				MapPositionListBox.Items.Clear();
-				MapPositionListBox.Refresh();
-				RedrawMapAntiAirScore();
-				file_state_modified("untitled.map", FileState.new_created);
+			if (SaveChangeBreforeNewCreate()) {
+				if (MainTabControl.SelectedIndex == 0) {
+					FormFleet = new Fleet();
+					HQLevelTextBox.Text = FormFleet.level.ToString();
+					FleetTypeComboBox.SelectedIndex = FormFleet.type;
+					FleetSelectComboBox_SelectedIndexChanged(sender, e);
+					RedrawAntiAirScore();
+					RedrawSearchPower();
+					file_state_modified("untitled.json", FileState.new_created);
+				} else if(MainTabControl.SelectedIndex == 1) {
+					FormMapData = new MapData();
+					MapPositionListBox.Items.Clear();
+					MapPositionListBox.Refresh();
+					RedrawMapAntiAirScore();
+					file_state_modified("untitled.map", FileState.new_created);
+				}
 			}
 		}
 		private string filepath_to_name(string path) {
 			return path.Substring(path.LastIndexOf('\\') + 1);
 		}
 		private void OpenFileMenuItem_Click(object sender, EventArgs e) {
-			if(MainTabControl.SelectedIndex == 0) {
-				// ファイルを開くダイアログを表示する
-				OpenFileDialog ofd = new OpenFileDialog();
-				ofd.Filter = "艦隊データ(*.json)|*.json|すべてのファイル(*.*)|*.*";
-				if(ofd.ShowDialog() != DialogResult.OK)
-					return;
-				FleetFilePath = ofd.FileName;
-				// ファイルを詠みこみ、JSONとして解釈する
-				Tuple<Fleet, bool> setFleet = ReadJsonFile(FleetFilePath);
-				if(!setFleet.Item2)
-					return;
-				// 読み込んだデータを画面に反映する
-				file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
-				FormFleet = setFleet.Item1;
-				HQLevelTextBox.Text = FormFleet.level.ToString();
-				FleetTypeComboBox.SelectedIndex = FormFleet.type;
-				FleetSelectComboBox_SelectedIndexChanged(sender, e);
-				RedrawAntiAirScore();
-				RedrawSearchPower();
-			} else if(MainTabControl.SelectedIndex == 1) {
-				// ファイルを開くダイアログを表示する
-				OpenFileDialog ofd = new OpenFileDialog();
-				ofd.Filter = "マップデータ(*.map)|*.map|すべてのファイル(*.*)|*.*";
-				if(ofd.ShowDialog() != DialogResult.OK)
-					return;
-				MapFilePath = ofd.FileName;
-				// ファイルを詠みこみ、マップデータのJSONとして解釈する
-				Tuple<MapData, bool> setMapData = ReadMapFile(MapFilePath);
-				if(!setMapData.Item2)
-					return;
-				// 読み込んだデータを画面に反映する
-				file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
-				FormMapData = setMapData.Item1;
-				MapPositionListBox.Items.Clear();
-				foreach(var position in FormMapData.position) {
-					MapPositionListBox.Items.Add(position.name);
+			if (SaveChangeBreforeNewCreate()) {
+				if (MainTabControl.SelectedIndex == 0) {
+					// ファイルを開くダイアログを表示する
+					OpenFileDialog ofd = new OpenFileDialog();
+					ofd.Filter = "艦隊データ(*.json)|*.json|すべてのファイル(*.*)|*.*";
+					if (ofd.ShowDialog() != DialogResult.OK)
+						return;
+					FleetFilePath = ofd.FileName;
+					// ファイルを詠みこみ、JSONとして解釈する
+					Tuple<Fleet, bool> setFleet = ReadJsonFile(FleetFilePath);
+					if (!setFleet.Item2)
+						return;
+					// 読み込んだデータを画面に反映する
+					file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
+					FormFleet = setFleet.Item1;
+					HQLevelTextBox.Text = FormFleet.level.ToString();
+					FleetTypeComboBox.SelectedIndex = FormFleet.type;
+					FleetSelectComboBox_SelectedIndexChanged(sender, e);
+					RedrawAntiAirScore();
+					RedrawSearchPower();
 				}
-				MapPositionListBox.Refresh();
-				RedrawMapAntiAirScore();
+				else if (MainTabControl.SelectedIndex == 1) {
+					// ファイルを開くダイアログを表示する
+					OpenFileDialog ofd = new OpenFileDialog();
+					ofd.Filter = "マップデータ(*.map)|*.map|すべてのファイル(*.*)|*.*";
+					if (ofd.ShowDialog() != DialogResult.OK)
+						return;
+					MapFilePath = ofd.FileName;
+					// ファイルを詠みこみ、マップデータのJSONとして解釈する
+					Tuple<MapData, bool> setMapData = ReadMapFile(MapFilePath);
+					if (!setMapData.Item2)
+						return;
+					// 読み込んだデータを画面に反映する
+					file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
+					FormMapData = setMapData.Item1;
+					MapPositionListBox.Items.Clear();
+					foreach (var position in FormMapData.position) {
+						MapPositionListBox.Items.Add(position.name);
+					}
+					MapPositionListBox.Refresh();
+					RedrawMapAntiAirScore();
+				}
 			}
-			return;
 		}
 		private bool CreateFleetFile() {
 			// セーブデータを作成する
@@ -689,49 +698,52 @@ namespace KCS_GUI {
 			RedrawSearchPower();
 		}
 		private void MainForm_DragDrop(object sender, DragEventArgs e) {
-			if(MainTabControl.SelectedIndex == 0) {
-				// ドラッグされたファイルを認識する
-				string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
-				if(files.Length < 1)
-					return;
-				FleetFilePath = files[0];
-				// 拡張子で判別する
-				if(Path.GetExtension(FleetFilePath) != ".json")
-					return;
-				// ファイルを詠みこみ、JSONとして解釈する
-				Tuple<Fleet, bool> setFleet = ReadJsonFile(FleetFilePath);
-				if(!setFleet.Item2)
-					return;
-				// 読み込んだデータを画面に反映する
-				file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
-				FormFleet = setFleet.Item1;
-				HQLevelTextBox.Text = FormFleet.level.ToString();
-				FleetTypeComboBox.SelectedIndex = FormFleet.type;
-				FleetSelectComboBox_SelectedIndexChanged(sender, e);
-				RedrawAntiAirScore();
-				RedrawSearchPower();
-			} else if(MainTabControl.SelectedIndex == 1) {
-				// ドラッグされたファイルを認識する
-				string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
-				if(files.Length < 1)
-					return;
-				MapFilePath = files[0];
-				// 拡張子で判別する
-				if(Path.GetExtension(MapFilePath) != ".map")
-					return;
-				// ファイルを詠みこみ、JSONとして解釈する
-				Tuple<MapData, bool> setMapData = ReadMapFile(MapFilePath);
-				if(!setMapData.Item2)
-					return;
-				// 読み込んだデータを画面に反映する
-				file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
-				FormMapData = setMapData.Item1;
-				MapPositionListBox.Items.Clear();
-				foreach(var position in FormMapData.position) {
-					MapPositionListBox.Items.Add(position.name);
+			if (SaveChangeBreforeNewCreate()) {
+				if (MainTabControl.SelectedIndex == 0) {
+					// ドラッグされたファイルを認識する
+					string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+					if (files.Length < 1)
+						return;
+					FleetFilePath = files[0];
+					// 拡張子で判別する
+					if (Path.GetExtension(FleetFilePath) != ".json")
+						return;
+					// ファイルを詠みこみ、JSONとして解釈する
+					Tuple<Fleet, bool> setFleet = ReadJsonFile(FleetFilePath);
+					if (!setFleet.Item2)
+						return;
+					// 読み込んだデータを画面に反映する
+					file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
+					FormFleet = setFleet.Item1;
+					HQLevelTextBox.Text = FormFleet.level.ToString();
+					FleetTypeComboBox.SelectedIndex = FormFleet.type;
+					FleetSelectComboBox_SelectedIndexChanged(sender, e);
+					RedrawAntiAirScore();
+					RedrawSearchPower();
 				}
-				MapPositionListBox.Refresh();
-				RedrawMapAntiAirScore();
+				else if (MainTabControl.SelectedIndex == 1) {
+					// ドラッグされたファイルを認識する
+					string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+					if (files.Length < 1)
+						return;
+					MapFilePath = files[0];
+					// 拡張子で判別する
+					if (Path.GetExtension(MapFilePath) != ".map")
+						return;
+					// ファイルを詠みこみ、JSONとして解釈する
+					Tuple<MapData, bool> setMapData = ReadMapFile(MapFilePath);
+					if (!setMapData.Item2)
+						return;
+					// 読み込んだデータを画面に反映する
+					file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
+					FormMapData = setMapData.Item1;
+					MapPositionListBox.Items.Clear();
+					foreach (var position in FormMapData.position) {
+						MapPositionListBox.Items.Add(position.name);
+					}
+					MapPositionListBox.Refresh();
+					RedrawMapAntiAirScore();
+				}
 			}
 		}
 		private void MainForm_DragEnter(object sender, DragEventArgs e) {
@@ -1607,28 +1619,31 @@ namespace KCS_GUI {
 		}
 
 		private string GetFilePath(int MainTabIndex) {
-			if (MainTabIndex < 0 || 2 < MainTabIndex) throw new ArgumentOutOfRangeException("MainTabIndex");
+			if (!IsInRange(MainTabIndex, 0, 1)) throw new ArgumentOutOfRangeException("MainTabIndex");
 			return (0 == MainTabIndex) ? MapFilePath : FleetFilePath;
 		}
-
+		private static DialogResult AskSaveChange(string filename) {
+			return MessageBox.Show(filename + " has been modified, save changes ?",
+				"Save Change?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2
+			);
+		}
+		private bool SaveChangeBeforeClear(int filename_index) {
+			DialogResult result = AskSaveChange(this.file[MainTabControl.SelectedIndex].name);
+			switch (result) {
+			case DialogResult.Cancel:
+				return false;
+			case DialogResult.Yes:
+				if (0 == MainTabControl.SelectedIndex) SaveFleetFile();
+				else if (1 == MainTabControl.SelectedIndex) SaveMapFile();
+				goto case DialogResult.No;
+			case DialogResult.No:
+				break;
+			}
+			return true;
+		}
 		private void MainForm_FormClosing(object sender, FormClosingEventArgs e) {
 			for (int i = 0; i < this.file.Length; ++i) {
-				if (FileState.modified == this.file[i].state) {
-					DialogResult result = MessageBox.Show(this.file[i].name + " has been modified, save changes ?",
-						"Save Change?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2
-					);
-					switch (result) {
-					case DialogResult.Cancel:
-						e.Cancel = true;
-						break;
-					case DialogResult.Yes:
-						if (0 == i) SaveFleetFile();
-						else if (1 == i) SaveMapFile();
-						goto case DialogResult.No;
-					case DialogResult.No:
-						break;
-					}
-				}
+				if(FileState.modified == this.file[i].state && !SaveChangeBeforeClear(i)) e.Cancel = true;
 			}
 		}
 	}
