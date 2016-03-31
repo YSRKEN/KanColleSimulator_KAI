@@ -328,6 +328,10 @@ namespace KCS_GUI {
 		private void ExitMenuItem_Click(object sender, EventArgs e) {
 			this.Close();//jump to MainForm_FormClosing
 		}
+		// ヘルプの表示
+		private void ShowHelpToolStripMenuItem_Click(object sender, EventArgs e) {
+			System.Diagnostics.Process.Start("https://YSRKEN.github.io/KanColleSimulator_KAI/gui/index.html");
+		}
 		//バージョン情報表示
 		private void VersionInfoMenuItem_Click(object sender, EventArgs e) {
 			Assembly assem = Assembly.GetExecutingAssembly();

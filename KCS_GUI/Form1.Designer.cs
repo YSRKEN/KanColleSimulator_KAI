@@ -135,6 +135,7 @@
 			this.VersionInfoMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
 			this.filename_echo = new System.Windows.Forms.ToolStripStatusLabel();
+			this.ShowHelpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.MainTabControl.SuspendLayout();
 			this.tabPage1.SuspendLayout();
 			this.tabPage2.SuspendLayout();
@@ -1470,6 +1471,7 @@
 			// ヘルプHToolStripMenuItem
 			// 
 			this.ヘルプHToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ShowHelpToolStripMenuItem,
             this.VersionInfoMenuItem});
 			this.ヘルプHToolStripMenuItem.Name = "ヘルプHToolStripMenuItem";
 			this.ヘルプHToolStripMenuItem.Size = new System.Drawing.Size(75, 22);
@@ -1499,6 +1501,12 @@
 			this.filename_echo.Name = "filename_echo";
 			this.filename_echo.Size = new System.Drawing.Size(70, 18);
 			this.filename_echo.Text = "filename...";
+			// ShowHelpToolStripMenuItem
+			// 
+			this.ShowHelpToolStripMenuItem.Name = "ShowHelpToolStripMenuItem";
+			this.ShowHelpToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+			this.ShowHelpToolStripMenuItem.Text = "ヘルプの表示(&V)";
+			this.ShowHelpToolStripMenuItem.Click += new System.EventHandler(this.ShowHelpToolStripMenuItem_Click);
 			// 
 			// MainForm
 			// 
@@ -1642,6 +1650,7 @@
 		private System.Windows.Forms.Label label36;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel filename_echo;
-    }
+		private System.Windows.Forms.ToolStripMenuItem ShowHelpToolStripMenuItem;
+	}
 }
 
