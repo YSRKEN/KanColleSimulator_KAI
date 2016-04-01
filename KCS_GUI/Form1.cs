@@ -1105,12 +1105,12 @@ namespace KCS_GUI {
 		}
 		// 制空値を計算して表示する(艦隊エディタ)
 		private void RedrawAntiAirScore() {
-			AllAntiAirTextBox.Text = FormFleet.CalcAntiAirScore().ToString();
+			AllAntiAirTextBox.Text = CalcAntiAirScore(FormFleet.unit[0]).ToString();
 		}
 		// 索敵値を計算して表示する(艦隊エディタ)
 		private void RedrawSearchPower() {
-			double searchPower25A = FormFleet.CalcSearchPower25A();
-			double searchPower33 = FormFleet.CalcSearchPower33();
+			double searchPower25A = CalcSearchPower25A(FormFleet.level, FormFleet.unit[0]);
+			double searchPower33 = CalcSearchPower33(FormFleet.level, FormFleet.unit[0]);
 			SearchPower25TextBox.Text = searchPower25A.ToString();
 			SearchPower33TextBox.Text = searchPower33.ToString();
 		}
@@ -1119,8 +1119,147 @@ namespace KCS_GUI {
 			if(MapPositionListBox.SelectedIndex == -1
 			|| MapPatternListBox.SelectedIndex == -1)
 				return;
-			int antiAirScore = FormMapData.position[MapPositionListBox.SelectedIndex].fleet[MapPatternListBox.SelectedIndex].CalcAntiAirScore();
+			int antiAirScore = CalcAntiAirScore(FormMapData.position[MapPositionListBox.SelectedIndex].fleet[MapPatternListBox.SelectedIndex].unit[0]);
 			MapPatternAllAntiAirTextBox.Text = antiAirScore.ToString();
+		}
+		// 制空値計算
+		static int CalcAntiAirScore(IList<Kammusu> unit) {
+			int antiAirScore = 0;
+			foreach(var kammusu in unit) {
+				var slots = data.Ships.Single(s => s.艦船ID == kammusu.id).搭載数.Split('/');
+				for(int wi = 0; wi < kammusu.items.Count; ++wi) {
+					var weapon = kammusu.items[wi];
+					// まず装備の種類を読み取り、制空計算に使えるかを判別する
+					var weaponInfo = data.Weapons.Single(w => w.装備ID == weapon.id);
+					var type = weaponInfo.種別;
+					if(type != "艦上戦闘機"
+					&& type != "艦上爆撃機(爆戦)"
+					&& type != "艦上爆撃機"
+					&& type != "水上爆撃機"
+					&& type != "艦上攻撃機"
+					&& type != "水上戦闘機")
+						continue;
+					// 対空値・搭載数・内部熟練度で決まる制空値を代入する
+					var antiAir = weaponInfo.対空;
+					var slot = slots[wi].ParseInt();
+					double antiAirScoreWeapon = antiAir * Math.Sqrt(slot) + Math.Sqrt(0.1 * weapon.rf_detail);
+					// 一部の種別には特別な補正を掛ける
+					if(type == "艦上戦闘機") {
+						antiAirScoreWeapon += bonusPF[weapon.rf];
+					} else if(type == "水上爆撃機") {
+						antiAirScoreWeapon += bonusWB[weapon.rf];
+					}
+					// 小数点以下を切り捨てたものを加算する
+					antiAirScore += (int)(antiAirScoreWeapon);
+				}
+			}
+			return antiAirScore;
+		}
+		// 索敵値計算
+		static double CalcSearchPower25A(int level, IList<Kammusu> unit) {
+			double searchPower = 0.0;
+			// 司令部レベル補正
+			int roundUp5Level = ((level - 1) / 5 + 1) * 5;
+			searchPower += -0.6142467 * roundUp5Level;
+			// 艦娘・装備による補正
+			foreach(var kammusu in unit) {
+				// 艦娘の索敵値は練度依存
+				var searchValueSet = data.Ships.Single(s => s.艦船ID == kammusu.id).索敵.Split('/');
+				var searchValueK = searchValueSet[1].ParseInt();
+				searchPower += Math.Sqrt(searchValueK) * 1.6841056;
+				foreach(var weapon in kammusu.items) {
+					// 装備の索敵値は種別によって係数が異なる
+					var searchValueW = data.Weapons.Single(w => w.装備ID == weapon.id).索敵;
+					switch(data.Weapons.Single(w => w.装備ID == weapon.id).種別) {
+						case "艦上爆撃機":
+							searchPower += 1.0376255 * searchValueW;
+							break;
+						case "艦上爆撃機(爆戦)":
+							searchPower += 1.0376255 * searchValueW;
+							break;
+						case "水上爆撃機":
+							searchPower += 1.7787282 * searchValueW;
+							break;
+						case "艦上攻撃機":
+							searchPower += 1.3677954 * searchValueW;
+							break;
+						case "艦上偵察機":
+							searchPower += 1.6592780 * searchValueW;
+							break;
+						case "艦上偵察機(彩雲)":
+							searchPower += 1.6592780 * searchValueW;
+							break;
+						case "水上偵察機":
+							searchPower += 2.0000000 * searchValueW;
+							break;
+						case "水上偵察機(夜偵)":
+							searchPower += 2.0000000 * searchValueW;
+							break;
+						case "小型電探":
+							searchPower += 1.0045358 * searchValueW;
+							break;
+						case "大型電探":
+							searchPower += 0.9906638 * searchValueW;
+							break;
+						case "探照灯":
+							searchPower += 0.9067950 * searchValueW;
+							break;
+						default:
+							break;
+					}
+				}
+			}
+			// 小数第2位を四捨五入
+			return 0.1 * Math.Round(10.0 * searchPower);
+		}
+		static double CalcSearchPower33(int level, IList<Kammusu> unit) {
+			double searchPower = 0.0;
+			// 司令部レベル補正
+			searchPower -= Math.Ceiling(0.4 * level);
+			// 艦娘・装備による補正
+			foreach(var kammusu in unit) {
+				// 艦娘の索敵値は練度依存
+				var searchValueSet = data.Ships.Single(s => s.艦船ID == kammusu.id).索敵.Split('/');
+				var searchValueK = searchValueSet[1].ParseInt();
+				searchPower += Math.Sqrt(searchValueK);
+				foreach(var weapon in kammusu.items) {
+					// 装備の索敵値は種別によって係数が異なる
+					var searchValueW = data.Weapons.Single(w => w.装備ID == weapon.id).索敵;
+					switch(data.Weapons.Single(w => w.装備ID == weapon.id).種別) {
+						case "水上爆撃機":
+							searchPower += 1.1 * searchValueW;
+							break;
+						case "艦上攻撃機":
+							searchPower += 0.8 * searchValueW;
+							break;
+						case "艦上偵察機":
+							searchPower += 1.0 * searchValueW;
+							break;
+						case "艦上偵察機(彩雲)":
+							searchPower += 1.0 * searchValueW;
+							break;
+						case "水上偵察機":
+							searchPower += 1.2 * searchValueW + 1.2 * Math.Sqrt(weapon.level);
+							break;
+						case "水上偵察機(夜偵)":
+							searchPower += 1.2 * searchValueW + 1.2 * Math.Sqrt(weapon.level);
+							break;
+						case "小型電探":
+							searchPower += 0.6 * searchValueW + 1.25 * Math.Sqrt(weapon.level);
+							break;
+						case "大型電探":
+							searchPower += 0.6 * searchValueW + 1.25 * Math.Sqrt(weapon.level);
+							break;
+						default:
+							searchPower += 0.6 * searchValueW;
+							break;
+					}
+				}
+			}
+			// 隻数による補正
+			searchPower += 2.0 * (6.0 - unit.Count);
+			// 小数第2位を四捨五入
+			return 0.1 * Math.Round(10.0 * searchPower);
 		}
 		/* サブクラス */
 		// 艦隊
@@ -1165,145 +1304,6 @@ namespace KCS_GUI {
 				}
 				// 最後にデシリアライズしておしまい
 				return o.ToString();
-			}
-			// 制空値計算
-			public int CalcAntiAirScore() {
-				int antiAirScore = 0;
-				foreach(var kammusu in unit[0]) {
-					var slots = data.Ships.Single(s => s.艦船ID == kammusu.id).搭載数.Split('/');
-					for(int wi = 0; wi < kammusu.items.Count; ++wi) {
-						var weapon = kammusu.items[wi];
-						// まず装備の種類を読み取り、制空計算に使えるかを判別する
-						var weaponInfo = data.Weapons.Single(w => w.装備ID == weapon.id);
-						var type = weaponInfo.種別;
-						if(type != "艦上戦闘機"
-						&& type != "艦上爆撃機(爆戦)"
-						&& type != "艦上爆撃機"
-						&& type != "水上爆撃機"
-						&& type != "艦上攻撃機"
-						&& type != "水上戦闘機")
-							continue;
-						// 対空値・搭載数・内部熟練度で決まる制空値を代入する
-						var antiAir = weaponInfo.対空;
-						var slot = slots[wi].ParseInt();
-						double antiAirScoreWeapon = antiAir * Math.Sqrt(slot) + Math.Sqrt(0.1 * weapon.rf_detail);
-						// 一部の種別には特別な補正を掛ける
-						if(type == "艦上戦闘機") {
-							antiAirScoreWeapon += bonusPF[weapon.rf];
-						} else if(type == "水上爆撃機") {
-							antiAirScoreWeapon += bonusWB[weapon.rf];
-						}
-						// 小数点以下を切り捨てたものを加算する
-						antiAirScore += (int)(antiAirScoreWeapon);
-					}
-				}
-				return antiAirScore;
-			}
-			// 索敵値計算
-			public double CalcSearchPower25A() {
-				double searchPower = 0.0;
-				// 司令部レベル補正
-				int roundUp5Level = ((level - 1) / 5 + 1) * 5;
-				searchPower += -0.6142467 * roundUp5Level;
-				// 艦娘・装備による補正
-				foreach(var kammusu in unit[0]) {
-					// 艦娘の索敵値は練度依存
-					var searchValueSet = data.Ships.Single(s => s.艦船ID == kammusu.id).索敵.Split('/');
-					var searchValueK = searchValueSet[1].ParseInt();
-					searchPower += Math.Sqrt(searchValueK) * 1.6841056;
-					foreach(var weapon in kammusu.items) {
-						// 装備の索敵値は種別によって係数が異なる
-						var searchValueW = data.Weapons.Single(w => w.装備ID == weapon.id).索敵;
-						switch(data.Weapons.Single(w => w.装備ID == weapon.id).種別) {
-						case "艦上爆撃機":
-							searchPower += 1.0376255 * searchValueW;
-							break;
-						case "艦上爆撃機(爆戦)":
-							searchPower += 1.0376255 * searchValueW;
-							break;
-						case "水上爆撃機":
-							searchPower += 1.7787282 * searchValueW;
-							break;
-						case "艦上攻撃機":
-							searchPower += 1.3677954 * searchValueW;
-							break;
-						case "艦上偵察機":
-							searchPower += 1.6592780 * searchValueW;
-							break;
-						case "艦上偵察機(彩雲)":
-							searchPower += 1.6592780 * searchValueW;
-							break;
-						case "水上偵察機":
-							searchPower += 2.0000000 * searchValueW;
-							break;
-						case "水上偵察機(夜偵)":
-							searchPower += 2.0000000 * searchValueW;
-							break;
-						case "小型電探":
-							searchPower += 1.0045358 * searchValueW;
-							break;
-						case "大型電探":
-							searchPower += 0.9906638 * searchValueW;
-							break;
-						case "探照灯":
-							searchPower += 0.9067950 * searchValueW;
-							break;
-						default:
-							break;
-						}
-					}
-				}
-				// 小数第2位を四捨五入
-				return 0.1 * Math.Round(10.0 * searchPower);
-			}
-			public double CalcSearchPower33() {
-				double searchPower = 0.0;
-				// 司令部レベル補正
-				searchPower -= Math.Ceiling(0.4 * level);
-				// 艦娘・装備による補正
-				foreach(var kammusu in unit[0]) {
-					// 艦娘の索敵値は練度依存
-					var searchValueSet = data.Ships.Single(s => s.艦船ID == kammusu.id).索敵.Split('/');
-					var searchValueK = searchValueSet[1].ParseInt();
-					searchPower += Math.Sqrt(searchValueK);
-					foreach(var weapon in kammusu.items) {
-						// 装備の索敵値は種別によって係数が異なる
-						var searchValueW = data.Weapons.Single(w => w.装備ID == weapon.id).索敵;
-						switch(data.Weapons.Single(w => w.装備ID == weapon.id).種別) {
-						case "水上爆撃機":
-							searchPower += 1.1 * searchValueW;
-							break;
-						case "艦上攻撃機":
-							searchPower += 0.8 * searchValueW;
-							break;
-						case "艦上偵察機":
-							searchPower += 1.0 * searchValueW;
-							break;
-						case "艦上偵察機(彩雲)":
-							searchPower += 1.0 * searchValueW;
-							break;
-						case "水上偵察機":
-							searchPower += 1.2 * searchValueW + 1.2 * Math.Sqrt(weapon.level);
-							break;
-						case "水上偵察機(夜偵)":
-							searchPower += 1.2 * searchValueW + 1.2 * Math.Sqrt(weapon.level);
-							break;
-						case "小型電探":
-							searchPower += 0.6 * searchValueW + 1.25 * Math.Sqrt(weapon.level);
-							break;
-						case "大型電探":
-							searchPower += 0.6 * searchValueW + 1.25 * Math.Sqrt(weapon.level);
-							break;
-						default:
-							searchPower += 0.6 * searchValueW;
-							break;
-						}
-					}
-				}
-				// 隻数による補正
-				searchPower += 2.0 * (6.0 - unit[0].Count);
-				// 小数第2位を四捨五入
-				return 0.1 * Math.Round(10.0 * searchPower);
 			}
 		}
 		// マスデータ
