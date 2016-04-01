@@ -115,9 +115,12 @@ namespace KCS_GUI {
 				FormMapData = new MapData();
 				file = new OpenFileInfo[2]
 				{
-					new OpenFileInfo(),
-					new OpenFileInfo()
+					new OpenFileInfo("untitled.json", FileState.new_created),
+					new OpenFileInfo("untitled.map", FileState.new_created)
 				};
+				if (IsInRange(MainTabControl.SelectedIndex, 0, 1)) {
+					OpenFileInfoToStatusBar(this.file[MainTabControl.SelectedIndex]);
+				}
 				error_provider_level = new System.Windows.Forms.ErrorProvider();
 				error_provider_luck = new System.Windows.Forms.ErrorProvider();
 				error_provider_cond = new System.Windows.Forms.ErrorProvider();
@@ -128,28 +131,15 @@ namespace KCS_GUI {
 		}
 
 		/* 各イベント毎の処理 */
+		private void OpenFileInfoToStatusBar(OpenFileInfo info) {
+			this.filename_echo.ForeColor = (FileState.none != info.state) ? SystemColors.ControlText : SystemColors.GradientInactiveCaption;
+			this.filename_echo.BackColor = info.bg_color;
+			this.filename_echo.Text = info.name;
+		}
 		private void file_state_modified(FileState new_state) {
 			if (IsInRange(MainTabControl.SelectedIndex, 0, 1)) {
-				this.file[MainTabControl.SelectedIndex].state = new_state;
-				this.filename_echo.ForeColor = (FileState.none != new_state) ? SystemColors.ControlText : SystemColors.GradientInactiveCaption;
-				switch (new_state) {
-				case FileState.none:
-					this.filename_echo.BackColor = SystemColors.Control;
-					this.file[MainTabControl.SelectedIndex].name = this.filename_echo.Text = "filename...";
-					break;
-				case FileState.new_created:
-					this.filename_echo.BackColor = SystemColors.Info;
-					break;
-				case FileState.modified:
-					this.filename_echo.BackColor = Color.FromArgb(253, 239, 242);
-					break;
-				case FileState.saved:
-					this.filename_echo.BackColor = Color.FromArgb(235, 246, 247);
-					break;
-				default:
-					break;
-				}
-				this.file[MainTabControl.SelectedIndex].bg_color = this.filename_echo.BackColor;
+				this.file[MainTabControl.SelectedIndex].UpdateState(new_state);
+				OpenFileInfoToStatusBar(this.file[MainTabControl.SelectedIndex]);
 			}
 		}
 		private void file_state_modified(string filename, FileState new_state) {
@@ -1672,8 +1662,28 @@ namespace KCS_GUI {
 			this.bg_color = SystemColors.Control;
 		}
 		public OpenFileInfo(string name_, FileState state_) {
+			this.UpdateState(state_);
 			this.name = name_;
-			this.state = state_;
+		}
+		public void UpdateState(FileState new_state) {
+			this.state = new_state;
+			switch (new_state) {
+			case FileState.none:
+				this.bg_color = SystemColors.Control;
+				this.name = "filename...";
+				break;
+			case FileState.new_created:
+				this.bg_color = SystemColors.Info;
+				break;
+			case FileState.modified:
+				this.bg_color = Color.FromArgb(253, 239, 242);
+				break;
+			case FileState.saved:
+				this.bg_color = Color.FromArgb(235, 246, 247);
+				break;
+			default:
+				break;
+			}
 		}
 		public string name;
 		public FileState state;
