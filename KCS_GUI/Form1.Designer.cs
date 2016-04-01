@@ -75,6 +75,7 @@
 			this.KammusuSelectListBox = new System.Windows.Forms.ListBox();
 			this.FleetSelectComboBox = new System.Windows.Forms.ComboBox();
 			this.tabPage2 = new System.Windows.Forms.TabPage();
+			this.label36 = new System.Windows.Forms.Label();
 			this.ChangeMapKammusuButton = new System.Windows.Forms.Button();
 			this.ChangeMapPatternButton = new System.Windows.Forms.Button();
 			this.ChangeMapPositionButton = new System.Windows.Forms.Button();
@@ -132,12 +133,15 @@
 			this.ExitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.ヘルプHToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.VersionInfoMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.label36 = new System.Windows.Forms.Label();
+			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+			this.filename_echo = new System.Windows.Forms.ToolStripStatusLabel();
+			this.ShowHelpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.MainTabControl.SuspendLayout();
 			this.tabPage1.SuspendLayout();
 			this.tabPage2.SuspendLayout();
 			this.tabPage3.SuspendLayout();
 			this.menuStrip1.SuspendLayout();
+			this.statusStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// MainTabControl
@@ -150,6 +154,7 @@
 			this.MainTabControl.SelectedIndex = 0;
 			this.MainTabControl.Size = new System.Drawing.Size(460, 282);
 			this.MainTabControl.TabIndex = 0;
+			this.MainTabControl.SelectedIndexChanged += new System.EventHandler(this.MainTAbControl_SelectedIndexChanged);
 			// 
 			// tabPage1
 			// 
@@ -422,11 +427,11 @@
 			this.WeaponDetailRfComboBox.TabIndex = 36;
 			this.WeaponDetailRfComboBox.Text = "0";
 			this.WeaponDetailRfComboBox.SelectedIndexChanged += new System.EventHandler(this.WeaponDetailRfComboBox_SelectedIndexChanged);
-            this.WeaponDetailRfComboBox.Leave += new System.EventHandler(this.WeaponDetailRfComboBox_Leave);
-            // 
-            // WeaponRfComboBox
-            // 
-            this.WeaponRfComboBox.Enabled = false;
+			this.WeaponDetailRfComboBox.Leave += new System.EventHandler(this.WeaponDetailRfComboBox_Leave);
+			// 
+			// WeaponRfComboBox
+			// 
+			this.WeaponRfComboBox.Enabled = false;
 			this.WeaponRfComboBox.FormattingEnabled = true;
 			this.WeaponRfComboBox.Items.AddRange(new object[] {
             "0",
@@ -446,11 +451,11 @@
 			this.WeaponRfComboBox.TabIndex = 35;
 			this.WeaponRfComboBox.Text = "0";
 			this.WeaponRfComboBox.SelectedIndexChanged += new System.EventHandler(this.WeaponRfComboBox_SelectedIndexChanged);
-            this.WeaponRfComboBox.Leave += new System.EventHandler(this.WeaponRfComboBox_Leave);
-            // 
-            // WeaponLevelComboBox
-            // 
-            this.WeaponLevelComboBox.FormattingEnabled = true;
+			this.WeaponRfComboBox.Leave += new System.EventHandler(this.WeaponRfComboBox_Leave);
+			// 
+			// WeaponLevelComboBox
+			// 
+			this.WeaponLevelComboBox.FormattingEnabled = true;
 			this.WeaponLevelComboBox.Items.AddRange(new object[] {
             "0",
             "1",
@@ -468,11 +473,11 @@
 			this.WeaponLevelComboBox.Size = new System.Drawing.Size(50, 20);
 			this.WeaponLevelComboBox.TabIndex = 34;
 			this.WeaponLevelComboBox.Text = "0";
-            this.WeaponLevelComboBox.Leave += new System.EventHandler(this.WeaponLevelComboBox_Leave);
-            // 
-            // label19
-            // 
-            this.label19.AutoSize = true;
+			this.WeaponLevelComboBox.Leave += new System.EventHandler(this.WeaponLevelComboBox_Leave);
+			// 
+			// label19
+			// 
+			this.label19.AutoSize = true;
 			this.label19.Location = new System.Drawing.Point(314, 219);
 			this.label19.Name = "label19";
 			this.label19.Size = new System.Drawing.Size(65, 12);
@@ -635,32 +640,29 @@
 			this.KammusuCondTextBox.Size = new System.Drawing.Size(40, 19);
 			this.KammusuCondTextBox.TabIndex = 18;
 			this.KammusuCondTextBox.Text = "49";
-            this.KammusuCondTextBox.Leave += new System.EventHandler(this.KammusuCondTextBox_Leave);
-            this.KammusuCondTextBox.Validating += this.KammusuCondTextBox_Validating;
-            // 
-            // KammusuLuckTextBox
-            // 
-            this.KammusuLuckTextBox.Location = new System.Drawing.Point(332, 106);
+			this.KammusuCondTextBox.Leave += new System.EventHandler(this.KammusuCondTextBox_Leave);
+			// 
+			// KammusuLuckTextBox
+			// 
+			this.KammusuLuckTextBox.Location = new System.Drawing.Point(332, 106);
 			this.KammusuLuckTextBox.Name = "KammusuLuckTextBox";
 			this.KammusuLuckTextBox.Size = new System.Drawing.Size(40, 19);
 			this.KammusuLuckTextBox.TabIndex = 17;
 			this.KammusuLuckTextBox.Text = "-1";
-            this.KammusuLuckTextBox.Leave += new System.EventHandler(this.KammusuLuckTextBox_Leave);
-            this.KammusuLuckTextBox.Validating += this.KammusuLuckTextBox_Validating;
-            // 
-            // KammusuLevelTextBox
-            // 
-            this.KammusuLevelTextBox.Location = new System.Drawing.Point(332, 80);
+			this.KammusuLuckTextBox.Leave += new System.EventHandler(this.KammusuLuckTextBox_Leave);
+			// 
+			// KammusuLevelTextBox
+			// 
+			this.KammusuLevelTextBox.Location = new System.Drawing.Point(332, 80);
 			this.KammusuLevelTextBox.Name = "KammusuLevelTextBox";
 			this.KammusuLevelTextBox.Size = new System.Drawing.Size(40, 19);
 			this.KammusuLevelTextBox.TabIndex = 16;
 			this.KammusuLevelTextBox.Text = "1";
-            this.KammusuLevelTextBox.Leave += new System.EventHandler(this.KammusuLevelTextBox_Leave);
-            this.KammusuLevelTextBox.Validating += this.KammusuLevelTextBox_Validating;
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
+			this.KammusuLevelTextBox.Leave += new System.EventHandler(this.KammusuLevelTextBox_Leave);
+			// 
+			// label10
+			// 
+			this.label10.AutoSize = true;
 			this.label10.Location = new System.Drawing.Point(285, 134);
 			this.label10.Name = "label10";
 			this.label10.Size = new System.Drawing.Size(41, 12);
@@ -861,6 +863,15 @@
 			this.tabPage2.TabIndex = 1;
 			this.tabPage2.Text = "マップエディタ";
 			this.tabPage2.UseVisualStyleBackColor = true;
+			// 
+			// label36
+			// 
+			this.label36.AutoSize = true;
+			this.label36.Location = new System.Drawing.Point(6, 173);
+			this.label36.Name = "label36";
+			this.label36.Size = new System.Drawing.Size(53, 12);
+			this.label36.TabIndex = 50;
+			this.label36.Text = "艦娘選択";
 			// 
 			// ChangeMapKammusuButton
 			// 
@@ -1400,7 +1411,7 @@
             this.ヘルプHToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(484, 24);
+			this.menuStrip1.Size = new System.Drawing.Size(484, 26);
 			this.menuStrip1.TabIndex = 1;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
@@ -1413,74 +1424,97 @@
             this.SaveAFileMenuItem,
             this.ExitMenuItem});
 			this.ファイルFToolStripMenuItem.Name = "ファイルFToolStripMenuItem";
-			this.ファイルFToolStripMenuItem.Size = new System.Drawing.Size(66, 20);
+			this.ファイルFToolStripMenuItem.Size = new System.Drawing.Size(85, 22);
 			this.ファイルFToolStripMenuItem.Text = "ファイル(&F)";
 			// 
 			// NewFileMenuItem
 			// 
 			this.NewFileMenuItem.Name = "NewFileMenuItem";
-			this.NewFileMenuItem.Size = new System.Drawing.Size(186, 22);
+			this.NewFileMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
+			this.NewFileMenuItem.Size = new System.Drawing.Size(286, 22);
 			this.NewFileMenuItem.Text = "新規(&N)";
 			this.NewFileMenuItem.Click += new System.EventHandler(this.NewFileMenuItem_Click);
 			// 
 			// OpenFileMenuItem
 			// 
 			this.OpenFileMenuItem.Name = "OpenFileMenuItem";
-			this.OpenFileMenuItem.Size = new System.Drawing.Size(186, 22);
+			this.OpenFileMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
+			this.OpenFileMenuItem.Size = new System.Drawing.Size(286, 22);
 			this.OpenFileMenuItem.Text = "開く(&O)...";
 			this.OpenFileMenuItem.Click += new System.EventHandler(this.OpenFileMenuItem_Click);
 			// 
 			// SaveSFileMenuItem
 			// 
 			this.SaveSFileMenuItem.Name = "SaveSFileMenuItem";
-			this.SaveSFileMenuItem.Size = new System.Drawing.Size(186, 22);
+			this.SaveSFileMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
+			this.SaveSFileMenuItem.Size = new System.Drawing.Size(286, 22);
 			this.SaveSFileMenuItem.Text = "上書き保存(&S)";
 			this.SaveSFileMenuItem.Click += new System.EventHandler(this.SaveSFileMenuItem_Click);
 			// 
 			// SaveAFileMenuItem
 			// 
 			this.SaveAFileMenuItem.Name = "SaveAFileMenuItem";
-			this.SaveAFileMenuItem.Size = new System.Drawing.Size(186, 22);
+			this.SaveAFileMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.S)));
+			this.SaveAFileMenuItem.Size = new System.Drawing.Size(286, 22);
 			this.SaveAFileMenuItem.Text = "名前を付けて保存(&A)...";
 			this.SaveAFileMenuItem.Click += new System.EventHandler(this.SaveAFileMenuItem_Click);
 			// 
 			// ExitMenuItem
 			// 
 			this.ExitMenuItem.Name = "ExitMenuItem";
-			this.ExitMenuItem.Size = new System.Drawing.Size(186, 22);
+			this.ExitMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
+			this.ExitMenuItem.Size = new System.Drawing.Size(286, 22);
 			this.ExitMenuItem.Text = "終了(&X)";
 			this.ExitMenuItem.Click += new System.EventHandler(this.ExitMenuItem_Click);
 			// 
 			// ヘルプHToolStripMenuItem
 			// 
 			this.ヘルプHToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ShowHelpToolStripMenuItem,
             this.VersionInfoMenuItem});
 			this.ヘルプHToolStripMenuItem.Name = "ヘルプHToolStripMenuItem";
-			this.ヘルプHToolStripMenuItem.Size = new System.Drawing.Size(65, 20);
+			this.ヘルプHToolStripMenuItem.Size = new System.Drawing.Size(75, 22);
 			this.ヘルプHToolStripMenuItem.Text = "ヘルプ(&H)";
 			// 
 			// VersionInfoMenuItem
 			// 
 			this.VersionInfoMenuItem.Name = "VersionInfoMenuItem";
-			this.VersionInfoMenuItem.Size = new System.Drawing.Size(158, 22);
+			this.VersionInfoMenuItem.Size = new System.Drawing.Size(178, 22);
 			this.VersionInfoMenuItem.Text = "バージョン情報(&A)";
 			this.VersionInfoMenuItem.Click += new System.EventHandler(this.VersionInfoMenuItem_Click);
 			// 
-			// label36
+			// statusStrip1
 			// 
-			this.label36.AutoSize = true;
-			this.label36.Location = new System.Drawing.Point(6, 173);
-			this.label36.Name = "label36";
-			this.label36.Size = new System.Drawing.Size(53, 12);
-			this.label36.TabIndex = 50;
-			this.label36.Text = "艦娘選択";
+			this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.filename_echo});
+			this.statusStrip1.Location = new System.Drawing.Point(0, 314);
+			this.statusStrip1.Name = "statusStrip1";
+			this.statusStrip1.Size = new System.Drawing.Size(484, 23);
+			this.statusStrip1.TabIndex = 2;
+			this.statusStrip1.Text = "statusStrip1";
+			// 
+			// filename_echo
+			// 
+			this.filename_echo.BackColor = System.Drawing.SystemColors.Control;
+			this.filename_echo.ForeColor = System.Drawing.SystemColors.GradientInactiveCaption;
+			this.filename_echo.Name = "filename_echo";
+			this.filename_echo.Size = new System.Drawing.Size(70, 18);
+			this.filename_echo.Text = "filename...";
+			// ShowHelpToolStripMenuItem
+			// 
+			this.ShowHelpToolStripMenuItem.Name = "ShowHelpToolStripMenuItem";
+			this.ShowHelpToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+			this.ShowHelpToolStripMenuItem.Text = "ヘルプの表示(&V)";
+			this.ShowHelpToolStripMenuItem.Click += new System.EventHandler(this.ShowHelpToolStripMenuItem_Click);
 			// 
 			// MainForm
 			// 
 			this.AllowDrop = true;
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(484, 321);
+			this.ClientSize = new System.Drawing.Size(484, 337);
+			this.Controls.Add(this.statusStrip1);
 			this.Controls.Add(this.MainTabControl);
 			this.Controls.Add(this.menuStrip1);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -1488,6 +1522,7 @@
 			this.MaximizeBox = false;
 			this.Name = "MainForm";
 			this.Text = "KanColleSimulator";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
 			this.DragDrop += new System.Windows.Forms.DragEventHandler(this.MainForm_DragDrop);
 			this.DragEnter += new System.Windows.Forms.DragEventHandler(this.MainForm_DragEnter);
 			this.MainTabControl.ResumeLayout(false);
@@ -1499,6 +1534,8 @@
 			this.tabPage3.PerformLayout();
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
+			this.statusStrip1.ResumeLayout(false);
+			this.statusStrip1.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -1611,6 +1648,9 @@
 		private System.Windows.Forms.Button ChangeMapPatternButton;
 		private System.Windows.Forms.Button ChangeMapKammusuButton;
 		private System.Windows.Forms.Label label36;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel filename_echo;
+		private System.Windows.Forms.ToolStripMenuItem ShowHelpToolStripMenuItem;
 	}
 }
 
