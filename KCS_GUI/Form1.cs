@@ -1,12 +1,10 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Windows.Forms;
 using System.ComponentModel;
 using System.Drawing;
@@ -152,12 +150,9 @@ namespace KCS_GUI {
 						return;
 					FleetFilePath = ofd.FileName;
 					// ファイルを詠みこみ、JSONとして解釈する
-					try {
-						FormFleet = Fleet.ReadFrom(FleetFilePath);
-					}
-					catch {
+					FormFleet = Fleet.ReadFrom(FleetFilePath);
+					if(FormFleet == null)
 						return;
-					}
 					// 読み込んだデータを画面に反映する
 					file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
 					HQLevelTextBox.Text = FormFleet.lv.ToString();
@@ -174,12 +169,11 @@ namespace KCS_GUI {
 						return;
 					MapFilePath = ofd.FileName;
 					// ファイルを詠みこみ、マップデータのJSONとして解釈する
-					Tuple<MapData, bool> setMapData = ReadMapFile(MapFilePath);
-					if (!setMapData.Item2)
+					FormMapData = MapData.ReadFrom(MapFilePath);
+					if (FormMapData == null)
 						return;
 					// 読み込んだデータを画面に反映する
 					file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
-					FormMapData = setMapData.Item1;
 					MapPositionListBox.Items.Clear();
 					foreach (var position in FormMapData.position) {
 						MapPositionListBox.Items.Add(position.name);
@@ -211,9 +205,6 @@ namespace KCS_GUI {
 			file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
 		}
 		private bool CreateMapFile() {
-			// セーブデータを作成する
-			string saveData = FormMapData.ToJson();
-			// 作成したデータを保存する
 			var sfd = new SaveFileDialog();
 			sfd.ShowHelp = true;//http://stackoverflow.com/questions/17163784/default-name-with-openfiledialog-c
 			sfd.FileName = this.file[1].name;
@@ -229,21 +220,17 @@ namespace KCS_GUI {
 				MessageBox.Show("パターンをマスに1つ以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return;
 			}
-			if (FormMapData.position[0].fleet.Count == 0) {
+			if (FormMapData.position[0].pattern.Count == 0) {
 				MessageBox.Show("艦隊をパターンに1つ以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return;
 			}
-			if (FormMapData.position[0].fleet[0].unit[0].Count == 0) {
+			if (FormMapData.position[0].pattern[0].fleets.Count == 0) {
 				MessageBox.Show("艦娘を艦隊に1隻以上登録してください.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return;
 			}
 			if ((MapFilePath == null || MapFilePath == "" || force_create) && !CreateMapFile()) return;
-			// セーブデータを作成する
-			string saveData = FormMapData.ToJson();
 			// 作成したデータを保存する
-			var sw = new StreamWriter(MapFilePath, false, Encoding.GetEncoding("shift-jis"));
-			sw.Write(saveData);
-			sw.Close();
+			FormMapData.WriteTo(MapFilePath);
 			file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
 		}
 		private void SaveSFileMenuItem_Click(object sender, EventArgs e) {
@@ -632,13 +619,10 @@ namespace KCS_GUI {
 					// 拡張子で判別する
 					if (Path.GetExtension(FleetFilePath) != ".json")
 						return;
-					try {
-						// ファイルを詠みこみ、JSONとして解釈する
-						FormFleet = Fleet.ReadFrom(FleetFilePath);
-					}
-					catch {
+					// ファイルを詠みこみ、JSONとして解釈する
+					FormFleet = Fleet.ReadFrom(FleetFilePath);
+					if(FormFleet == null)
 						return;
-					}
 					// 読み込んだデータを画面に反映する
 					file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
 					HQLevelTextBox.Text = FormFleet.lv.ToString();
@@ -657,12 +641,11 @@ namespace KCS_GUI {
 					if (Path.GetExtension(MapFilePath) != ".map")
 						return;
 					// ファイルを詠みこみ、JSONとして解釈する
-					Tuple<MapData, bool> setMapData = ReadMapFile(MapFilePath);
-					if (!setMapData.Item2)
+					FormMapData = MapData.ReadFrom(MapFilePath);
+					if (FormMapData == null)
 						return;
 					// 読み込んだデータを画面に反映する
 					file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
-					FormMapData = setMapData.Item1;
 					MapPositionListBox.Items.Clear();
 					foreach (var position in FormMapData.position) {
 						MapPositionListBox.Items.Add(position.name);
@@ -718,12 +701,10 @@ namespace KCS_GUI {
 				return;
 			// 艦隊を追加
 			var selectPosition = FormMapData.position[MapPositionListBox.SelectedIndex];
-			var setFleet = new Fleet();
-			selectPosition.fleet.Add(setFleet);
-			selectPosition.formation.Add(MapPatternFormationComboBox.SelectedIndex);
+			selectPosition.pattern.Add(new Pattern { form = MapPatternFormationComboBox.SelectedIndex });
 			// 画面上に反映
-			int selectPositionCount = selectPosition.fleet.Count;
-			MapPatternListBox.Items.Add(selectPositionCount.ToString() + " : " + selectPosition.fleet[selectPositionCount - 1].unit[0].Count.ToString() + "隻");
+			int selectPositionCount = selectPosition.pattern.Count;
+			MapPatternListBox.Items.Add(selectPositionCount.ToString() + " : " + selectPosition.pattern[selectPositionCount - 1].fleets.Count.ToString() + "隻");
 			MapPatternListBox.Refresh();
 			file_state_modified(FileState.modified);
 		}
@@ -732,7 +713,7 @@ namespace KCS_GUI {
 			|| MapPatternFormationComboBox.SelectedIndex == -1
 			|| MapPatternListBox.SelectedIndex == -1)
 				return;
-			FormMapData.position[MapPositionListBox.SelectedIndex].formation[MapPatternListBox.SelectedIndex] = MapPatternFormationComboBox.SelectedIndex;
+			FormMapData.position[MapPositionListBox.SelectedIndex].pattern[MapPatternListBox.SelectedIndex].form = MapPatternFormationComboBox.SelectedIndex;
 			file_state_modified(FileState.modified);
 		}
 		private void DeleteMapPatternButton_Click(object sender, EventArgs e) {
@@ -740,11 +721,10 @@ namespace KCS_GUI {
 			|| MapPatternListBox.SelectedIndex == -1)
 				return;
 			var selectPosition = FormMapData.position[MapPositionListBox.SelectedIndex];
-			selectPosition.fleet.RemoveAt(MapPatternListBox.SelectedIndex);
-			selectPosition.formation.RemoveAt(MapPatternListBox.SelectedIndex);
+			selectPosition.pattern.RemoveAt(MapPatternListBox.SelectedIndex);
 			MapPatternListBox.Items.Clear();
-			for(int fi = 0; fi < selectPosition.fleet.Count; ++fi) {
-				MapPatternListBox.Items.Add((fi + 1).ToString() + " : " + selectPosition.fleet[fi].unit[0].Count.ToString());
+			for(int fi = 0; fi < selectPosition.pattern.Count; ++fi) {
+				MapPatternListBox.Items.Add((fi + 1).ToString() + " : " + selectPosition.pattern[fi].fleets.Count.ToString());
 			}
 			MapPatternListBox.Refresh();
 			file_state_modified(FileState.modified);
@@ -755,19 +735,19 @@ namespace KCS_GUI {
 			|| MapKammusuTypeComboBox.SelectedIndex == -1
 			|| MapKammusuNameComboBox.SelectedIndex == -1)
 				return;
-			if(FormMapData.position[MapPositionListBox.SelectedIndex].fleet[MapPatternListBox.SelectedIndex].unit[0].Count >= MaxUnitSize)
+			if(FormMapData.position[MapPositionListBox.SelectedIndex].pattern[MapPatternListBox.SelectedIndex].fleets.Count >= MaxUnitSize)
 				return;
 			// 艦娘データを作成
 			int index = KammusuTypeToIndexList[MapKammusuTypeComboBox.SelectedIndex][MapKammusuNameComboBox.SelectedIndex];
 			var setKammusu = new Kammusu(data.Ships[index].艦船ID);
 			// 艦娘データを追加
 			var selectPosition = FormMapData.position[MapPositionListBox.SelectedIndex];
-			var selectFleet = selectPosition.fleet[MapPatternListBox.SelectedIndex];
-			int selectPositionCount = selectPosition.fleet.Count;
-			selectFleet.unit[0].Add(setKammusu);
+			var selectFleet = selectPosition.pattern[MapPatternListBox.SelectedIndex];
+			int selectPositionCount = selectPosition.pattern.Count;
+			selectFleet.fleets.Add(setKammusu);
 			MapKammusuListBox.Items.Add(setKammusu.艦名);
 			MapKammusuListBox.Refresh();
-			MapPatternListBox.Items[MapPatternListBox.SelectedIndex] = selectPositionCount.ToString() + " : " + selectFleet.unit[0].Count.ToString() + "隻";
+			MapPatternListBox.Items[MapPatternListBox.SelectedIndex] = selectPositionCount.ToString() + " : " + selectFleet.fleets.Count.ToString() + "隻";
 			RedrawMapAntiAirScore();
 			file_state_modified(FileState.modified);
 		}
@@ -782,8 +762,8 @@ namespace KCS_GUI {
 			int index = KammusuTypeToIndexList[MapKammusuTypeComboBox.SelectedIndex][MapKammusuNameComboBox.SelectedIndex];
 			var setKammusu = new Kammusu(data.Ships[index].艦船ID);
 			// 艦娘データを追加
-			var selectFleet = FormMapData.position[MapPositionListBox.SelectedIndex].fleet[MapPatternListBox.SelectedIndex];
-			selectFleet.unit[0][MapKammusuListBox.SelectedIndex] = setKammusu;
+			var selectFleet = FormMapData.position[MapPositionListBox.SelectedIndex].pattern[MapPatternListBox.SelectedIndex];
+			selectFleet.fleets[MapKammusuListBox.SelectedIndex] = setKammusu;
 			MapKammusuListBox.Items[MapKammusuListBox.SelectedIndex] = data.Ships.Single(s => s.艦船ID == setKammusu.id).艦名;
 			MapKammusuListBox.Refresh();
 			RedrawMapAntiAirScore();
@@ -794,12 +774,12 @@ namespace KCS_GUI {
 			|| MapPatternListBox.SelectedIndex == -1
 			|| MapKammusuListBox.SelectedIndex == -1)
 				return;
-			FormMapData.position[MapPositionListBox.SelectedIndex].fleet[MapPatternListBox.SelectedIndex].unit[0].RemoveAt(MapKammusuListBox.SelectedIndex);
+			FormMapData.position[MapPositionListBox.SelectedIndex].pattern[MapPatternListBox.SelectedIndex].fleets.RemoveAt(MapKammusuListBox.SelectedIndex);
 			MapKammusuListBox.Items.RemoveAt(MapKammusuListBox.SelectedIndex);
 			var selectPosition = FormMapData.position[MapPositionListBox.SelectedIndex];
-			var selectFleet = selectPosition.fleet[MapPatternListBox.SelectedIndex];
-			int selectPositionCount = selectPosition.fleet.Count;
-			MapPatternListBox.Items[MapPatternListBox.SelectedIndex] = selectPositionCount.ToString() + " : " + selectFleet.unit[0].Count.ToString() + "隻";
+			var selectFleet = selectPosition.pattern[MapPatternListBox.SelectedIndex];
+			int selectPositionCount = selectPosition.pattern.Count;
+			MapPatternListBox.Items[MapPatternListBox.SelectedIndex] = selectPositionCount.ToString() + " : " + selectFleet.fleets.Count.ToString() + "隻";
 			RedrawMapAntiAirScore();
 			file_state_modified(FileState.modified);
 		}
@@ -816,8 +796,8 @@ namespace KCS_GUI {
 			MapPositionBattleModeComboBox.Refresh();
 			// 選択したマスについて、それに含まれるパターンに関する情報
 			MapPatternListBox.Items.Clear();
-			for(int pi = 0; pi < selectPosition.fleet.Count; ++pi) {
-				MapPatternListBox.Items.Add((pi + 1).ToString() + " : " + selectPosition.fleet[pi].unit[0].Count.ToString() + "隻");
+			for(int pi = 0; pi < selectPosition.pattern.Count; ++pi) {
+				MapPatternListBox.Items.Add((pi + 1).ToString() + " : " + selectPosition.pattern[pi].fleets.Count.ToString() + "隻");
 			}
 			MapPatternListBox.Refresh();
 		}
@@ -827,11 +807,11 @@ namespace KCS_GUI {
 				return;
 			var selectPosition = FormMapData.position[MapPositionListBox.SelectedIndex];
 			// 選択したパターンについて、その陣形に関する情報
-			MapPatternFormationComboBox.SelectedIndex = selectPosition.formation[MapPatternListBox.SelectedIndex];
+			MapPatternFormationComboBox.SelectedIndex = selectPosition.pattern[MapPatternListBox.SelectedIndex].form;
 			MapPatternFormationComboBox.Refresh();
 			// 選択したパターンについて、それに含まれる艦娘に関する情報
 			MapKammusuListBox.Items.Clear();
-			var selectFleet = selectPosition.fleet[MapPatternListBox.SelectedIndex].unit[0];
+			var selectFleet = selectPosition.pattern[MapPatternListBox.SelectedIndex].fleets;
 			foreach(var kammusu in selectFleet) {
 				MapKammusuListBox.Items.Add(data.Ships.Single(s => s.艦船ID == kammusu.id).艦名);
 			}
@@ -844,7 +824,7 @@ namespace KCS_GUI {
 			|| MapKammusuListBox.SelectedIndex == -1)
 				return;
 			// 表示する艦娘を切り替える
-			Kammusu kammusu = FormMapData.position[MapPositionListBox.SelectedIndex].fleet[MapPatternListBox.SelectedIndex].unit[0][MapKammusuListBox.SelectedIndex];
+			Kammusu kammusu = FormMapData.position[MapPositionListBox.SelectedIndex].pattern[MapPatternListBox.SelectedIndex].fleets[MapKammusuListBox.SelectedIndex];
 			var showKammusu = data.Ships.Single(s => s.艦船ID == kammusu.id);
 			int showKammusuType = showKammusu.艦種 - 1;
 			MapKammusuTypeComboBox.SelectedIndex = showKammusuType;
@@ -1029,31 +1009,6 @@ namespace KCS_GUI {
 		static public int limit(int n, int min_n, int max_n) {
 			return (n < min_n) ? min_n : (max_n < n) ? max_n : n;
 		}
-		private Tuple<MapData, bool> ReadMapFile(string mapFileName) {
-			var setMapData = new MapData();
-			// テキストを読み込んでJSONにパースする
-			System.IO.StreamReader sr = new System.IO.StreamReader(mapFileName, System.Text.Encoding.GetEncoding("utf-8"));
-			string jsonString = sr.ReadToEnd();
-			sr.Close();
-			JObject json = JObject.Parse(jsonString);
-			// 順番に読み込んでいく
-			foreach(JObject jsonPosition in json["position"]) {
-				// 各マス
-				var position = new Position();
-				position.name = (string)jsonPosition["name"];
-				position.mode = int.Parse((string)jsonPosition["mode"]);
-				foreach(JObject jsonPattern in jsonPosition["pattern"]) {
-					var fleet = new Fleet();
-					foreach(string jsonFleet in jsonPattern["fleets"]) {
-						fleet.unit[0].Add(new Kammusu(int.Parse(jsonFleet)));
-					}
-					position.fleet.Add(fleet);
-					position.formation.Add(int.Parse((string)jsonPattern["form"]));
-				}
-				setMapData.position.Add(position);
-			}
-			return new Tuple<MapData, bool>(setMapData, true);
-		}
 		// 制空値を計算して表示する(艦隊エディタ)
 		private void RedrawAntiAirScore() {
 			AllAntiAirTextBox.Text = CalcAntiAirScore(FormFleet.unit[0]).ToString();
@@ -1070,7 +1025,7 @@ namespace KCS_GUI {
 			if(MapPositionListBox.SelectedIndex == -1
 			|| MapPatternListBox.SelectedIndex == -1)
 				return;
-			int antiAirScore = CalcAntiAirScore(FormMapData.position[MapPositionListBox.SelectedIndex].fleet[MapPatternListBox.SelectedIndex].unit[0]);
+			int antiAirScore = CalcAntiAirScore(FormMapData.position[MapPositionListBox.SelectedIndex].pattern[MapPatternListBox.SelectedIndex].fleets);
 			MapPatternAllAntiAirTextBox.Text = antiAirScore.ToString();
 		}
 		// 制空値計算
@@ -1212,61 +1167,6 @@ namespace KCS_GUI {
 			// 小数第2位を四捨五入
 			return 0.1 * Math.Round(10.0 * searchPower);
 		}
-		/* サブクラス */
-		// マスデータ
-		private class Position {
-			// マスにおける戦闘モード
-			public int mode;
-			// マスの名称
-			public string name;
-			// 各パターンにおける陣形
-			public List<int> formation;
-			// 各パターン
-			public List<Fleet> fleet;
-			// コンストラクタ
-			public Position() {
-				formation = new List<int>();
-				fleet = new List<Fleet>();
-			}
-		}
-		// マップデータ
-		private class MapData {
-			// マス
-			public List<Position> position;
-			// コンストラクタ
-			public MapData() {
-				position = new List<Position>();
-			}
-			// JSON書き出し
-			public string ToJson() {
-				JObject o = new JObject();
-				o["version"] = "map";
-				var jsonPositions = new JArray();
-				// マップデータを書き出していく
-				foreach(var pos in position) {
-					var jsonPosition = new JObject();
-					jsonPosition["name"] = pos.name;
-					jsonPosition["mode"] = pos.mode;
-					var jsonPatterns = new JArray();
-					for(int pi = 0; pi < pos.fleet.Count; ++pi) {
-						var jsonPattern = new JObject();
-						jsonPattern["form"] = pos.formation[pi];
-						var jsonFleets = new JArray();
-						foreach(var kammusu in pos.fleet[pi].unit[0]) {
-							jsonFleets.Add(kammusu.id);
-						}
-						jsonPattern["fleets"] = jsonFleets;
-						jsonPatterns.Add(jsonPattern);
-					}
-					jsonPosition["pattern"] = jsonPatterns;
-					jsonPositions.Add(jsonPosition);
-				}
-				o["position"] = jsonPositions;
-				// 最後にデシリアライズしておしまい
-				return o.ToString();
-			}
-		}
-
 		private string GetFilePath(int MainTabIndex) {
 			if (!IsInRange(MainTabIndex, 0, 1)) throw new ArgumentOutOfRangeException("MainTabIndex");
 			return (0 == MainTabIndex) ? MapFilePath : FleetFilePath;

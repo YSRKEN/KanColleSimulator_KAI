@@ -222,6 +222,39 @@ namespace KCS_GUI {
 			File.WriteAllText(path, JsonConvert.SerializeObject(this));
 		}
 	}
+	class Pattern {
+		public int form;
+		[JsonProperty(ItemConverterType = typeof(KammusuIdJsonConverter))]
+		public IList<Kammusu> fleets = new List<Kammusu>();
+	}
+	// マスデータ
+	class Position {
+		// マスにおける戦闘モード
+		public int mode;
+		// マスの名称
+		public string name;
+		// 各パターン
+		public IList<Pattern> pattern = new List<Pattern>();
+	}
+	// マップデータ
+	class MapData {
+		public string version = "map";
+		// マス
+		public IList<Position> position = new List<Position>();
+
+		public static MapData ReadFrom(string path) {
+			try {
+				return JsonConvert.DeserializeObject<MapData>(File.ReadAllText(path));
+			}
+			catch {
+				return null;
+			}
+		}
+		// JSON書き出し
+		public void WriteTo(string path) {
+			File.WriteAllText(path, JsonConvert.SerializeObject(this));
+		}
+	}
 	public class ListJsonConverter<T> : JsonConverter {
 		readonly string prefix;
 
@@ -247,6 +280,19 @@ namespace KCS_GUI {
 
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) {
 			serializer.Serialize(writer, ((IList<T>)value)?.Select((t, i) => new { k = $"{prefix}{i + 1}", t })?.ToDictionary(a => a.k, a => a.t));
+		}
+	}
+	public class KammusuIdJsonConverter : JsonConverter {
+		public override bool CanConvert(Type objectType) {
+			return objectType == typeof(Kammusu);
+		}
+
+		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) {
+			return new Kammusu(serializer.Deserialize<int>(reader));
+		}
+
+		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) {
+			serializer.Serialize(writer, ((Kammusu)value).id);
 		}
 	}
 }
