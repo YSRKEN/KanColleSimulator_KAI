@@ -133,12 +133,15 @@
 			this.ExitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.ヘルプHToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.VersionInfoMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+			this.filename_echo = new System.Windows.Forms.ToolStripStatusLabel();
 			this.ShowHelpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.MainTabControl.SuspendLayout();
 			this.tabPage1.SuspendLayout();
 			this.tabPage2.SuspendLayout();
 			this.tabPage3.SuspendLayout();
 			this.menuStrip1.SuspendLayout();
+			this.statusStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// MainTabControl
@@ -151,6 +154,7 @@
 			this.MainTabControl.SelectedIndex = 0;
 			this.MainTabControl.Size = new System.Drawing.Size(460, 282);
 			this.MainTabControl.TabIndex = 0;
+			this.MainTabControl.SelectedIndexChanged += new System.EventHandler(this.MainTAbControl_SelectedIndexChanged);
 			// 
 			// tabPage1
 			// 
@@ -1407,7 +1411,7 @@
             this.ヘルプHToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(484, 24);
+			this.menuStrip1.Size = new System.Drawing.Size(484, 26);
 			this.menuStrip1.TabIndex = 1;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
@@ -1420,41 +1424,47 @@
             this.SaveAFileMenuItem,
             this.ExitMenuItem});
 			this.ファイルFToolStripMenuItem.Name = "ファイルFToolStripMenuItem";
-			this.ファイルFToolStripMenuItem.Size = new System.Drawing.Size(66, 20);
+			this.ファイルFToolStripMenuItem.Size = new System.Drawing.Size(85, 22);
 			this.ファイルFToolStripMenuItem.Text = "ファイル(&F)";
 			// 
 			// NewFileMenuItem
 			// 
 			this.NewFileMenuItem.Name = "NewFileMenuItem";
-			this.NewFileMenuItem.Size = new System.Drawing.Size(186, 22);
+			this.NewFileMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
+			this.NewFileMenuItem.Size = new System.Drawing.Size(286, 22);
 			this.NewFileMenuItem.Text = "新規(&N)";
 			this.NewFileMenuItem.Click += new System.EventHandler(this.NewFileMenuItem_Click);
 			// 
 			// OpenFileMenuItem
 			// 
 			this.OpenFileMenuItem.Name = "OpenFileMenuItem";
-			this.OpenFileMenuItem.Size = new System.Drawing.Size(186, 22);
+			this.OpenFileMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
+			this.OpenFileMenuItem.Size = new System.Drawing.Size(286, 22);
 			this.OpenFileMenuItem.Text = "開く(&O)...";
 			this.OpenFileMenuItem.Click += new System.EventHandler(this.OpenFileMenuItem_Click);
 			// 
 			// SaveSFileMenuItem
 			// 
 			this.SaveSFileMenuItem.Name = "SaveSFileMenuItem";
-			this.SaveSFileMenuItem.Size = new System.Drawing.Size(186, 22);
+			this.SaveSFileMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
+			this.SaveSFileMenuItem.Size = new System.Drawing.Size(286, 22);
 			this.SaveSFileMenuItem.Text = "上書き保存(&S)";
 			this.SaveSFileMenuItem.Click += new System.EventHandler(this.SaveSFileMenuItem_Click);
 			// 
 			// SaveAFileMenuItem
 			// 
 			this.SaveAFileMenuItem.Name = "SaveAFileMenuItem";
-			this.SaveAFileMenuItem.Size = new System.Drawing.Size(186, 22);
+			this.SaveAFileMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.S)));
+			this.SaveAFileMenuItem.Size = new System.Drawing.Size(286, 22);
 			this.SaveAFileMenuItem.Text = "名前を付けて保存(&A)...";
 			this.SaveAFileMenuItem.Click += new System.EventHandler(this.SaveAFileMenuItem_Click);
 			// 
 			// ExitMenuItem
 			// 
 			this.ExitMenuItem.Name = "ExitMenuItem";
-			this.ExitMenuItem.Size = new System.Drawing.Size(186, 22);
+			this.ExitMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
+			this.ExitMenuItem.Size = new System.Drawing.Size(286, 22);
 			this.ExitMenuItem.Text = "終了(&X)";
 			this.ExitMenuItem.Click += new System.EventHandler(this.ExitMenuItem_Click);
 			// 
@@ -1464,16 +1474,33 @@
             this.ShowHelpToolStripMenuItem,
             this.VersionInfoMenuItem});
 			this.ヘルプHToolStripMenuItem.Name = "ヘルプHToolStripMenuItem";
-			this.ヘルプHToolStripMenuItem.Size = new System.Drawing.Size(65, 20);
+			this.ヘルプHToolStripMenuItem.Size = new System.Drawing.Size(75, 22);
 			this.ヘルプHToolStripMenuItem.Text = "ヘルプ(&H)";
 			// 
 			// VersionInfoMenuItem
 			// 
 			this.VersionInfoMenuItem.Name = "VersionInfoMenuItem";
-			this.VersionInfoMenuItem.Size = new System.Drawing.Size(158, 22);
+			this.VersionInfoMenuItem.Size = new System.Drawing.Size(178, 22);
 			this.VersionInfoMenuItem.Text = "バージョン情報(&A)";
 			this.VersionInfoMenuItem.Click += new System.EventHandler(this.VersionInfoMenuItem_Click);
 			// 
+			// statusStrip1
+			// 
+			this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.filename_echo});
+			this.statusStrip1.Location = new System.Drawing.Point(0, 314);
+			this.statusStrip1.Name = "statusStrip1";
+			this.statusStrip1.Size = new System.Drawing.Size(484, 23);
+			this.statusStrip1.TabIndex = 2;
+			this.statusStrip1.Text = "statusStrip1";
+			// 
+			// filename_echo
+			// 
+			this.filename_echo.BackColor = System.Drawing.SystemColors.Control;
+			this.filename_echo.ForeColor = System.Drawing.SystemColors.GradientInactiveCaption;
+			this.filename_echo.Name = "filename_echo";
+			this.filename_echo.Size = new System.Drawing.Size(70, 18);
+			this.filename_echo.Text = "filename...";
 			// ShowHelpToolStripMenuItem
 			// 
 			this.ShowHelpToolStripMenuItem.Name = "ShowHelpToolStripMenuItem";
@@ -1486,7 +1513,8 @@
 			this.AllowDrop = true;
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(484, 321);
+			this.ClientSize = new System.Drawing.Size(484, 337);
+			this.Controls.Add(this.statusStrip1);
 			this.Controls.Add(this.MainTabControl);
 			this.Controls.Add(this.menuStrip1);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -1494,6 +1522,7 @@
 			this.MaximizeBox = false;
 			this.Name = "MainForm";
 			this.Text = "KanColleSimulator";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
 			this.DragDrop += new System.Windows.Forms.DragEventHandler(this.MainForm_DragDrop);
 			this.DragEnter += new System.Windows.Forms.DragEventHandler(this.MainForm_DragEnter);
 			this.MainTabControl.ResumeLayout(false);
@@ -1505,6 +1534,8 @@
 			this.tabPage3.PerformLayout();
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
+			this.statusStrip1.ResumeLayout(false);
+			this.statusStrip1.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -1617,6 +1648,8 @@
 		private System.Windows.Forms.Button ChangeMapPatternButton;
 		private System.Windows.Forms.Button ChangeMapKammusuButton;
 		private System.Windows.Forms.Label label36;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel filename_echo;
 		private System.Windows.Forms.ToolStripMenuItem ShowHelpToolStripMenuItem;
 	}
 }
