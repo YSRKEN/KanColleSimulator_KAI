@@ -625,6 +625,7 @@
 			// 
 			// WeaponSelectListBox
 			// 
+			this.WeaponSelectListBox.DisplayMember = "装備名";
 			this.WeaponSelectListBox.FormattingEnabled = true;
 			this.WeaponSelectListBox.ItemHeight = 12;
 			this.WeaponSelectListBox.Location = new System.Drawing.Point(65, 165);
