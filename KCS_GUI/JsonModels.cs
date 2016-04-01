@@ -153,12 +153,14 @@ namespace KCS_GUI {
 		}
 
 		public Kammusu(int id) : this(id, 1, -1) {
-			items = row.初期装備
-				.Split('/')
-				.Select(Int32.Parse)
-				.Where(weaponID => 0 < weaponID)
-				.Select(weaponID => new Weapon(weaponID))
-				.ToList();
+			items = new BindingList<Weapon>(
+				row.初期装備
+					.Split('/')
+					.Select(Int32.Parse)
+					.Where(weaponID => 0 < weaponID)
+					.Select(weaponID => new Weapon(weaponID))
+					.ToList()
+			);
 		}
 	}
 	// 艦隊
@@ -184,7 +186,7 @@ namespace KCS_GUI {
 		}
 		// 艦娘
 		[JsonIgnore]
-		public IList<IList<Kammusu>> unit = Enumerable.Range(0, MaxFleetSize).Select(_ => (IList<Kammusu>)new List<Kammusu>()).ToList();
+		public IList<IList<Kammusu>> unit = new BindingList<IList<Kammusu>>(Enumerable.Range(0, MaxFleetSize).Select(_ => (IList<Kammusu>)new List<Kammusu>()).ToList());
 
 		[JsonExtensionData]
 		IDictionary<string, JToken> additionalData = new Dictionary<string, JToken>();
@@ -226,7 +228,7 @@ namespace KCS_GUI {
 	class Pattern {
 		public int form;
 		[JsonProperty(ItemConverterType = typeof(KammusuIdJsonConverter))]
-		public IList<Kammusu> fleets = new List<Kammusu>();
+		public IList<Kammusu> fleets = new BindingList<Kammusu>();
 	}
 	// マスデータ
 	class Position {
@@ -235,13 +237,13 @@ namespace KCS_GUI {
 		// マスの名称
 		public string name;
 		// 各パターン
-		public IList<Pattern> pattern = new List<Pattern>();
+		public IList<Pattern> pattern = new BindingList<Pattern>();
 	}
 	// マップデータ
 	class MapData {
 		public string version = "map";
 		// マス
-		public IList<Position> position = new List<Position>();
+		public IList<Position> position = new BindingList<Position>();
 
 		public static MapData ReadFrom(string path) {
 			try {
@@ -269,7 +271,7 @@ namespace KCS_GUI {
 
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) {
 			var dictionary = serializer.Deserialize<Dictionary<string, T>>(reader);
-			var list = (serializer.ObjectCreationHandling != ObjectCreationHandling.Replace ? existingValue as IList<T> : null) ?? new List<T>();
+			var list = (serializer.ObjectCreationHandling != ObjectCreationHandling.Replace ? existingValue as IList<T> : null) ?? new BindingList<T>();
 			for (var i = 1; ; i++) {
 				T t;
 				if (!dictionary.TryGetValue(prefix + i, out t))
