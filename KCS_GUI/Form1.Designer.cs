@@ -808,6 +808,7 @@
 			// 
 			// KammusuSelectListBox
 			// 
+			this.KammusuSelectListBox.DisplayMember = "艦名";
 			this.KammusuSelectListBox.FormattingEnabled = true;
 			this.KammusuSelectListBox.ItemHeight = 12;
 			this.KammusuSelectListBox.Location = new System.Drawing.Point(65, 83);
