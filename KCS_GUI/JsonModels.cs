@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Newtonsoft.Json;
@@ -94,6 +95,94 @@ namespace KCS_GUI {
 		// 内部熟練度を外部熟練度に変換する
 		public static int FromDetail(int rf_detail) {
 			return ((rf_detail + 5) / 15).limit(0, 7);
+		}
+	}
+	// 艦娘
+	class Kammusu {
+		[JsonIgnore]
+		public readonly CsvDataSet.ShipsRow row;
+		int lv_;
+		int luck_;
+		int cond_;
+
+		// 艦船ID
+		public int id { get { return row.艦船ID; } }
+
+		[JsonIgnore]
+		public string 艦名 { get { return row.艦名; } }
+
+		// レベル
+		public int lv {
+			get { return lv_; }
+			set { lv_ = value.limit(1, 155); }
+		}
+
+		// 運
+		// デッキビルダーの仕様上、"-1"もOK
+		public int luck {
+			get { return luck_; }
+			set { luck_ = value.limit(-1, 100); }
+		}
+
+		// cond値
+		[JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore), DefaultValue(49)]
+		public int cond {
+			get { return cond_; }
+			set { cond_ = value.limit(0, 100); }
+		}
+
+		// 装備
+		[JsonConverter(typeof(ListJsonConverter<Weapon>), "i")]
+		public IList<Weapon> items { get; set; }
+
+		// 最大スロット数
+		[JsonIgnore]
+		public int maxSlots { get { return row.スロット数; } }
+
+		[JsonConstructor]
+		public Kammusu(int id, int lv, int luck, int cond = 49) {
+			row = data.Ships.SingleOrDefault(s => s.艦船ID == id);
+			if (row == null)
+				throw new ArgumentOutOfRangeException("id");
+			this.lv = lv;
+			this.luck = luck;
+			this.cond = cond;
+		}
+
+		public Kammusu(int id) : this(id, 1, -1) {
+			items = row.初期装備
+				.Split('/')
+				.Select(Int32.Parse)
+				.Where(weaponID => 0 < weaponID)
+				.Select(weaponID => new Weapon(weaponID))
+				.ToList();
+		}
+	}
+	public class ListJsonConverter<T> : JsonConverter {
+		readonly string prefix;
+
+		public ListJsonConverter(string prefix) {
+			this.prefix = prefix;
+		}
+
+		public override bool CanConvert(Type objectType) {
+			return typeof(IList<T>).IsAssignableFrom(objectType);
+		}
+
+		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) {
+			var dictionary = serializer.Deserialize<Dictionary<string, T>>(reader);
+			var list = (serializer.ObjectCreationHandling != ObjectCreationHandling.Replace ? existingValue as IList<T> : null) ?? new List<T>();
+			for (var i = 1; ; i++) {
+				T t;
+				if (!dictionary.TryGetValue(prefix + i, out t))
+					break;
+				list.Add(t);
+			}
+			return list;
+		}
+
+		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) {
+			serializer.Serialize(writer, ((IList<T>)value)?.Select((t, i) => new { k = $"{prefix}{i + 1}", t })?.ToDictionary(a => a.k, a => a.t));
 		}
 	}
 }
