@@ -177,6 +177,7 @@ namespace KCS_GUI {
 			set { lv_ = value.limit(1, 120); }
 		}
 		// 艦隊形式
+		[JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
 		public int type {
 			get { return type_; }
 			set { type_ = value.limit(0, 3); }
