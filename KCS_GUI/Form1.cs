@@ -18,8 +18,6 @@ namespace KCS_GUI {
 		// 定数群
 		//ソフト名
 		const string SoftName = "KanColleSimulator";
-		//艦隊数の最大
-		const int MaxFleetSize = 2;
 		//艦隊における艦船数の最大
 		const int MaxUnitSize = 6;
 		//制空計算用(艦戦ボーナスと艦爆ボーナス)
@@ -126,7 +124,7 @@ namespace KCS_GUI {
 			if (SaveChangeBreforeNewCreate()) {
 				if (MainTabControl.SelectedIndex == 0) {
 					FormFleet = new Fleet();
-					HQLevelTextBox.Text = FormFleet.level.ToString();
+					HQLevelTextBox.Text = FormFleet.lv.ToString();
 					FleetTypeComboBox.SelectedIndex = FormFleet.type;
 					FleetSelectComboBox_SelectedIndexChanged(sender, e);
 					RedrawAntiAirScore();
@@ -154,13 +152,15 @@ namespace KCS_GUI {
 						return;
 					FleetFilePath = ofd.FileName;
 					// ファイルを詠みこみ、JSONとして解釈する
-					Tuple<Fleet, bool> setFleet = ReadJsonFile(FleetFilePath);
-					if (!setFleet.Item2)
+					try {
+						FormFleet = Fleet.ReadFrom(FleetFilePath);
+					}
+					catch {
 						return;
+					}
 					// 読み込んだデータを画面に反映する
 					file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
-					FormFleet = setFleet.Item1;
-					HQLevelTextBox.Text = FormFleet.level.ToString();
+					HQLevelTextBox.Text = FormFleet.lv.ToString();
 					FleetTypeComboBox.SelectedIndex = FormFleet.type;
 					FleetSelectComboBox_SelectedIndexChanged(sender, e);
 					RedrawAntiAirScore();
@@ -190,9 +190,6 @@ namespace KCS_GUI {
 			}
 		}
 		private bool CreateFleetFile() {
-			// セーブデータを作成する
-			string saveData = FormFleet.ToJson();
-			// 作成したデータを保存する
 			var sfd = new SaveFileDialog();
 			sfd.ShowHelp = true;//http://stackoverflow.com/questions/17163784/default-name-with-openfiledialog-c
 			sfd.FileName = this.file[0].name;
@@ -209,12 +206,8 @@ namespace KCS_GUI {
 				return;
 			}
 			if ((FleetFilePath == null || FleetFilePath == "" || force_create) && !CreateFleetFile()) return;
-			// セーブデータを作成する
-			string saveData = FormFleet.ToJson();
 			// 作成したデータを保存する
-			var sw = new StreamWriter(FleetFilePath, false, Encoding.GetEncoding("shift-jis"));
-			sw.Write(saveData);
-			sw.Close();
+			FormFleet.WriteTo(FleetFilePath);
 			file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
 		}
 		private bool CreateMapFile() {
@@ -540,7 +533,7 @@ namespace KCS_GUI {
 		}
 		private void HQLevelTextBox_TextChanged(object sender, EventArgs e) {
 			// 司令部レベルが書き換わった際は反映する
-			FormFleet.level = HQLevelTextBox.Text.ParseInt().limit(1, 120);
+			FormFleet.lv = HQLevelTextBox.Text.ParseInt();
 			RedrawSearchPower();
 			file_state_modified(FileState.modified);
 		}
@@ -639,14 +632,16 @@ namespace KCS_GUI {
 					// 拡張子で判別する
 					if (Path.GetExtension(FleetFilePath) != ".json")
 						return;
-					// ファイルを詠みこみ、JSONとして解釈する
-					Tuple<Fleet, bool> setFleet = ReadJsonFile(FleetFilePath);
-					if (!setFleet.Item2)
+					try {
+						// ファイルを詠みこみ、JSONとして解釈する
+						FormFleet = Fleet.ReadFrom(FleetFilePath);
+					}
+					catch {
 						return;
+					}
 					// 読み込んだデータを画面に反映する
 					file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
-					FormFleet = setFleet.Item1;
-					HQLevelTextBox.Text = FormFleet.level.ToString();
+					HQLevelTextBox.Text = FormFleet.lv.ToString();
 					FleetTypeComboBox.SelectedIndex = FormFleet.type;
 					FleetSelectComboBox_SelectedIndexChanged(sender, e);
 					RedrawAntiAirScore();
@@ -724,8 +719,6 @@ namespace KCS_GUI {
 			// 艦隊を追加
 			var selectPosition = FormMapData.position[MapPositionListBox.SelectedIndex];
 			var setFleet = new Fleet();
-			setFleet.level = 120;
-			setFleet.type = 0;
 			selectPosition.fleet.Add(setFleet);
 			selectPosition.formation.Add(MapPatternFormationComboBox.SelectedIndex);
 			// 画面上に反映
@@ -1036,46 +1029,6 @@ namespace KCS_GUI {
 		static public int limit(int n, int min_n, int max_n) {
 			return (n < min_n) ? min_n : (max_n < n) ? max_n : n;
 		}
-		private Tuple<Fleet, bool> ReadJsonFile(string jsonFileName) {
-			Fleet setFleet = new Fleet();
-			// テキストを読み込んでJSONにパースする
-			System.IO.StreamReader sr = new System.IO.StreamReader(jsonFileName, System.Text.Encoding.GetEncoding("utf-8"));
-			string jsonString = sr.ReadToEnd();
-			sr.Close();
-			JObject json = JObject.Parse(jsonString);
-			// 司令部レベルを読み込む
-			if(json["lv"] != null) {
-				setFleet.level = limit(int.Parse((string)json["lv"]), 1, 120);
-			} else {
-				setFleet.level = 120;
-			}
-			// 艦隊形式を読み込む
-			if(json["type"] != null) {
-				setFleet.type = limit(int.Parse((string)json["type"]), 0, 3);
-			} else {
-				setFleet.type = 0;
-			}
-			// 艦隊を読み込む
-			for(int fi = 1; fi <= MaxFleetSize; ++fi) {
-				if(json["f" + fi.ToString()] == null)
-					break;
-				var jsonFleet = (JObject)json["f" + fi.ToString()];
-				// 艦娘を読み込む
-				for(int si = 1; si <= MaxUnitSize; ++si) {
-					// JSONデータとしての判定
-					var jsonKammusu = jsonFleet["s" + si];
-					if(jsonKammusu == null)
-						break;
-					try {
-						setFleet.unit[fi - 1].Add(jsonKammusu.ToObject<Kammusu>());
-					}
-					catch {
-						return new Tuple<Fleet, bool>(setFleet, false);
-					}
-				}
-			}
-			return new Tuple<Fleet, bool>(setFleet, true);
-		}
 		private Tuple<MapData, bool> ReadMapFile(string mapFileName) {
 			var setMapData = new MapData();
 			// テキストを読み込んでJSONにパースする
@@ -1091,8 +1044,6 @@ namespace KCS_GUI {
 				position.mode = int.Parse((string)jsonPosition["mode"]);
 				foreach(JObject jsonPattern in jsonPosition["pattern"]) {
 					var fleet = new Fleet();
-					fleet.level = 120;
-					fleet.type = 0;
 					foreach(string jsonFleet in jsonPattern["fleets"]) {
 						fleet.unit[0].Add(new Kammusu(int.Parse(jsonFleet)));
 					}
@@ -1109,8 +1060,8 @@ namespace KCS_GUI {
 		}
 		// 索敵値を計算して表示する(艦隊エディタ)
 		private void RedrawSearchPower() {
-			double searchPower25A = CalcSearchPower25A(FormFleet.level, FormFleet.unit[0]);
-			double searchPower33 = CalcSearchPower33(FormFleet.level, FormFleet.unit[0]);
+			double searchPower25A = CalcSearchPower25A(FormFleet.lv, FormFleet.unit[0]);
+			double searchPower33 = CalcSearchPower33(FormFleet.lv, FormFleet.unit[0]);
 			SearchPower25TextBox.Text = searchPower25A.ToString();
 			SearchPower33TextBox.Text = searchPower33.ToString();
 		}
@@ -1262,50 +1213,6 @@ namespace KCS_GUI {
 			return 0.1 * Math.Round(10.0 * searchPower);
 		}
 		/* サブクラス */
-		// 艦隊
-		private class Fleet {
-			// 司令部レベル
-			public int level;
-			// 艦隊形式
-			public int type;
-			// 艦娘
-			public List<List<Kammusu>> unit;
-			// コンストラクタ
-			public Fleet() {
-				level = 120;
-				type = 0;
-				unit = new List<List<Kammusu>>();
-				for(int i = 0; i < MaxFleetSize; ++i) {
-					unit.Add(new List<Kammusu>());
-				}
-			}
-			// JSON書き出し
-			public string ToJson() {
-				JObject o = new JObject();
-				o["version"] = 3;
-				o["lv"] = level;
-				o["type"] = type;
-				// 書き出す艦隊数は艦隊形式によって制御する
-				int writeFleets;
-				if(type != 0) {
-					writeFleets = 2;
-				} else {
-					writeFleets = 1;
-				}
-				// 艦隊を順に書き出していく
-				for(int fi = 0; fi < writeFleets; ++fi) {
-					// 艦隊
-					JObject setFleet = new JObject();
-					for(int si = 0; si < unit[fi].Count; ++si) {
-						// 艦娘
-						setFleet[$"s{si + 1}"] = JObject.FromObject(unit[fi][si]);
-					}
-					o["f" + (fi + 1).ToString()] = setFleet;
-				}
-				// 最後にデシリアライズしておしまい
-				return o.ToString();
-			}
-		}
 		// マスデータ
 		private class Position {
 			// マスにおける戦闘モード

@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using static KCS_GUI.CsvDataSet;
 
 namespace KCS_GUI {
@@ -156,6 +159,67 @@ namespace KCS_GUI {
 				.Where(weaponID => 0 < weaponID)
 				.Select(weaponID => new Weapon(weaponID))
 				.ToList();
+		}
+	}
+	// 艦隊
+	class Fleet {
+		//艦隊数の最大
+		const int MaxFleetSize = 2;
+		static JsonSerializer serailzer = new JsonSerializer { Converters = { new ListJsonConverter<Kammusu>("s") } };
+
+		int lv_ = 120;
+		int type_ = 0;
+
+		public int version { get; set; } = 3;
+		// 司令部レベル
+		public int lv {
+			get { return lv_; }
+			set { lv_ = value.limit(1, 120); }
+		}
+		// 艦隊形式
+		public int type {
+			get { return type_; }
+			set { type_ = value.limit(0, 3); }
+		}
+		// 艦娘
+		[JsonIgnore]
+		public IList<IList<Kammusu>> unit = Enumerable.Range(0, MaxFleetSize).Select(_ => (IList<Kammusu>)new List<Kammusu>()).ToList();
+
+		[JsonExtensionData]
+		IDictionary<string, JToken> additionalData = new Dictionary<string, JToken>();
+		[OnDeserialized]
+		void OnDeserialized(StreamingContext context) {
+			for (int i = 0; i < MaxFleetSize; ++i) {
+				JToken token;
+				if (!additionalData.TryGetValue($"f{i + 1}", out token))
+					break;
+				unit[i] = token.ToObject<IList<Kammusu>>(serailzer);
+			}
+			additionalData.Clear();
+		}
+		[OnSerializing]
+		void OnSerializing(StreamingContext context) {
+			additionalData.Clear();
+			// 書き出す艦隊数は艦隊形式によって制御する
+			int writeFleets = type == 0 ? 1 : 2;
+			for (int fi = 0; fi < writeFleets; ++fi) {
+				// 艦隊
+				additionalData[$"f{fi + 1}"] = JToken.FromObject(unit[fi], serailzer);
+			}
+		}
+
+		public static Fleet ReadFrom(string path) {
+			try {
+				return JsonConvert.DeserializeObject<Fleet>(File.ReadAllText(path));
+			}
+			catch {
+				return null;
+			}
+		}
+
+		// JSON書き出し
+		public void WriteTo(string path) {
+			File.WriteAllText(path, JsonConvert.SerializeObject(this));
 		}
 	}
 	public class ListJsonConverter<T> : JsonConverter {
