@@ -232,6 +232,7 @@
 			// 
 			// WeaponNameComboBox
 			// 
+			this.WeaponNameComboBox.DisplayMember = "装備名";
 			this.WeaponNameComboBox.FormattingEnabled = true;
 			this.WeaponNameComboBox.Location = new System.Drawing.Point(188, 187);
 			this.WeaponNameComboBox.Name = "WeaponNameComboBox";
@@ -573,45 +574,13 @@
 			// 
 			// WeaponTypeComboBox
 			// 
+			this.WeaponTypeComboBox.DisplayMember = "Key";
 			this.WeaponTypeComboBox.FormattingEnabled = true;
-			this.WeaponTypeComboBox.Items.AddRange(new object[] {
-            "主砲",
-            "対艦強化弾",
-            "副砲",
-            "魚雷",
-            "特殊潜航艇",
-            "艦上戦闘機",
-            "艦上爆撃機",
-            "艦上爆撃機(爆戦)",
-            "水上爆撃機",
-            "艦上攻撃機",
-            "艦上偵察機",
-            "艦上偵察機(彩雲)",
-            "大型飛行艇",
-            "水上偵察機",
-            "水上偵察機(夜偵)",
-            "対潜哨戒機",
-            "オートジャイロ",
-            "小型電探",
-            "大型電探",
-            "対空機銃",
-            "対空強化弾",
-            "高射装置",
-            "爆雷",
-            "ソナー",
-            "応急修理要員",
-            "探照灯",
-            "照明弾",
-            "艦隊司令部施設",
-            "水上艦要員",
-            "戦闘糧食",
-            "洋上補給",
-            "水上戦闘機",
-            "その他"});
 			this.WeaponTypeComboBox.Location = new System.Drawing.Point(188, 162);
 			this.WeaponTypeComboBox.Name = "WeaponTypeComboBox";
 			this.WeaponTypeComboBox.Size = new System.Drawing.Size(120, 20);
 			this.WeaponTypeComboBox.TabIndex = 21;
+			this.WeaponTypeComboBox.ValueMember = "Value";
 			this.WeaponTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.WeaponTypeComboBox_SelectedIndexChanged);
 			// 
 			// label11

@@ -22,8 +22,6 @@ namespace KCS_GUI {
 		static List<double> bonusPF = new List<double> { 0.0, 0.0, 2.0, 5.0, 9.0, 14.0, 14.0, 22.0 };
 		static List<double> bonusWB = new List<double> { 0.0, 0.0, 1.0, 1.0, 1.0, 3.0, 3.0, 6.0 };
 
-		//種別番号→インデックスのリスト変換
-		Dictionary<int, List<int>> WeaponTypeToIndexList;
 		//艦種番号→インデックスのリスト変換
 		Dictionary<int, List<int>> KammusuTypeToIndexList;
 		// 画面表示用データ
@@ -45,7 +43,10 @@ namespace KCS_GUI {
 		public MainForm() {
 			InitializeComponent();
 			try {
-				ReadWeaponData();
+				WeaponTypeComboBox.DataSource = data.Weapons
+					.GroupBy(w => WeaponTypeToNumber.ContainsKey(w.種別) ? w.種別 : "その他", (t, g) => new { Key = t, Value = g.ToArray() })
+					.OrderBy(a => WeaponTypeToNumber[a.Key])
+					.ToArray();
 				ReadKammusuData();
 				RedrawWeaponNameList();
 				RedrawKammusuNameList();
@@ -396,16 +397,14 @@ namespace KCS_GUI {
 		}
 		private void AddWeaponButton_Click(object sender, EventArgs e) {
 			var kammusu = (Kammusu)KammusuSelectListBox.SelectedItem;
-			if(kammusu == null
-			|| WeaponTypeComboBox.SelectedIndex == -1
-			|| WeaponNameComboBox.SelectedIndex == -1)
+			var weapon = (CsvDataSet.WeaponsRow)WeaponNameComboBox.SelectedItem;
+			if (kammusu == null || weapon == null)
 				return;
 			// 4つ以上の装備は持てない
 			if(kammusu.items.Count == kammusu.maxSlots)
 				return;
 			// 装備データを作成する
-			int index = WeaponTypeToIndexList[WeaponTypeComboBox.SelectedIndex][WeaponNameComboBox.SelectedIndex];
-			var id = data.Weapons[index].装備ID;
+			var id = weapon.装備ID;
 			var level = WeaponLevelComboBox.SelectedIndex;
 			var rf = WeaponRfComboBox.SelectedIndex;
 			var detailRf = WeaponDetailRfComboBox.SelectedIndex;
@@ -439,14 +438,12 @@ namespace KCS_GUI {
 		}
 		private void ChangeWeaponButton_Click(object sender, EventArgs e) {
 			var kammusu = (Kammusu)KammusuSelectListBox.SelectedItem;
-			if(kammusu == null
-			|| WeaponTypeComboBox.SelectedIndex == -1
-			|| WeaponNameComboBox.SelectedIndex == -1
+			var weapon = (CsvDataSet.WeaponsRow)WeaponNameComboBox.SelectedItem;
+			if(kammusu == null || weapon==null
 			|| WeaponSelectListBox.SelectedIndex == -1)
 				return;
 			// 装備データを作成する
-			int index = WeaponTypeToIndexList[WeaponTypeComboBox.SelectedIndex][WeaponNameComboBox.SelectedIndex];
-			var id = data.Weapons[index].装備ID;
+			var id = weapon.装備ID;
 			var level = WeaponLevelComboBox.SelectedIndex.limit(0, 10);
 			var rf = WeaponRfComboBox.SelectedIndex.limit(0, 7);
 			var detailRf = WeaponDetailRfComboBox.SelectedIndex.limit(0, 120);
@@ -517,8 +514,7 @@ namespace KCS_GUI {
 			if (!WeaponTypeToNumber.TryGetValue(weapon.row.種別, out showWeaponType))
 				showWeaponType = WeaponTypeToNumber["その他"];
 			WeaponTypeComboBox.SelectedIndex = showWeaponType;
-			WeaponTypeComboBox.Refresh();
-			WeaponNameComboBox.Text = weapon.装備名;
+			WeaponNameComboBox.SelectedItem = weapon.row;
 			RedrawWeaponNameList();
 			WeaponLevelComboBox.SelectedIndex = weapon.level;
 			WeaponLevelComboBox.Refresh();
@@ -863,23 +859,6 @@ namespace KCS_GUI {
 		}
 
 		/* サブルーチン */
-		// 装備データを読み込み
-		private void ReadWeaponData() {
-			// 読み込んだデータからインデックスを張る
-			WeaponTypeToIndexList = new Dictionary<int, List<int>>();
-			DataRow[] dr = data.Weapons.Select();
-			for(int i = 0; i < dr.Length; ++i) {
-				// 種類→インデックスは例外を考慮する
-				int type = WeaponTypeToNumber["その他"];
-				if(WeaponTypeToNumber.ContainsKey(dr[i]["種別"].ToString())) {
-					type = WeaponTypeToNumber[dr[i]["種別"].ToString()];
-				}
-				if(!WeaponTypeToIndexList.ContainsKey(type)) {
-					WeaponTypeToIndexList.Add(type, new List<int>());
-				}
-				WeaponTypeToIndexList[type].Add(i);
-			}
-		}
 		// 艦娘データを読み込み
 		private void ReadKammusuData() {
 			// 読み込んだデータからインデックスを張る
@@ -896,14 +875,11 @@ namespace KCS_GUI {
 		}
 		// 装備データをGUIに反映
 		private void RedrawWeaponNameList() {
-			WeaponNameComboBox.Items.Clear();
 			// 選択した種別に従って、リストを生成する
-			if(WeaponTypeComboBox.SelectedIndex < 0)
+			var weapons = WeaponTypeComboBox.SelectedValue;
+			if (weapons == null)
 				return;
-			foreach(int index in WeaponTypeToIndexList[WeaponTypeComboBox.SelectedIndex]) {
-				WeaponNameComboBox.Items.Add(data.Weapons[index].装備名);
-			}
-			WeaponNameComboBox.Refresh();
+			WeaponNameComboBox.DataSource = weapons;
 			// 改修度および熟練度の選択を切り替える
 			if(RfWeaponTypeList.Contains(WeaponTypeComboBox.SelectedIndex)) {
 				// 熟練度
