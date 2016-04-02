@@ -143,17 +143,14 @@ namespace KCS_GUI {
 		public int maxSlots { get { return row.スロット数; } }
 
 		[JsonConstructor]
-		public Kammusu(int id, int lv, int luck, int cond = 49) {
+		public Kammusu(int id, int lv = 1, int luck = -1, int cond = 49, [JsonConverter(typeof(ListJsonConverter<Weapon>), "i")] IList<Weapon> items = null) {
 			row = data.Ships.SingleOrDefault(s => s.艦船ID == id);
 			if (row == null)
 				throw new ArgumentOutOfRangeException("id");
 			this.lv = lv;
 			this.luck = luck;
 			this.cond = cond;
-		}
-
-		public Kammusu(int id) : this(id, 1, -1) {
-			items = new BindingList<Weapon>(
+			this.items = items ?? new BindingList<Weapon>(
 				row.初期装備
 					.Split('/')
 					.Select(Int32.Parse)

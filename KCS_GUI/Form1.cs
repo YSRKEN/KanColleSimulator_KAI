@@ -43,6 +43,11 @@ namespace KCS_GUI {
 		public MainForm() {
 			InitializeComponent();
 			try {
+				KammusuTypeComboBox.DataSource = data.Ships
+					.Where(s => s.艦種 < shipTypes.Length)
+					.OrderBy(s => s.艦種)
+					.GroupBy(s => s.艦種, (t, g) => new { Key = shipTypes[t], Value = g.ToArray() })
+					.ToArray();
 				WeaponTypeComboBox.DataSource = data.Weapons
 					.GroupBy(w => WeaponTypeToNumber.ContainsKey(w.種別) ? w.種別 : "その他", (t, g) => new { Key = t, Value = g.ToArray() })
 					.OrderBy(a => WeaponTypeToNumber[a.Key])
@@ -273,16 +278,14 @@ namespace KCS_GUI {
 
 		// 艦娘エディタタブ
 		private void AddKammusuButton_Click(object sender, EventArgs e) {
-			if(KammusuTypeComboBox.SelectedIndex == -1
-			|| KammusuNameComboBox.SelectedIndex == -1
-			|| FleetSelectComboBox.SelectedIndex == -1)
+			var kammusu = (CsvDataSet.ShipsRow)KammusuNameComboBox.SelectedItem;
+			if (kammusu == null || FleetSelectComboBox.SelectedIndex == -1)
 				return;
 			// 1艦隊には6隻まで
 			if(FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count == MaxUnitSize)
 				return;
 			// 艦娘データを作成する
-			int index = KammusuTypeToIndexList[KammusuTypeComboBox.SelectedIndex][KammusuNameComboBox.SelectedIndex];
-			var id = data.Ships[index].艦船ID;
+			var id = kammusu.艦船ID;
 			var level = KammusuLevelTextBox.Text.ParseInt();
 			var luck = KammusuLuckTextBox.Text.ParseInt();
 			var cond = KammusuCondTextBox.Text.ParseInt();
@@ -367,14 +370,13 @@ namespace KCS_GUI {
 			}
 		}
 		private void ChangeKammusuButton_Click(object sender, EventArgs e) {
-			if(KammusuTypeComboBox.SelectedIndex == -1
-			|| KammusuNameComboBox.SelectedIndex == -1
+			var kammusu = (CsvDataSet.ShipsRow)KammusuNameComboBox.SelectedItem;
+			if(kammusu == null
 			|| FleetSelectComboBox.SelectedIndex == -1
 			|| KammusuSelectListBox.SelectedIndex == -1)
 				return;
 			// 艦娘データを作成する
-			int index = KammusuTypeToIndexList[KammusuTypeComboBox.SelectedIndex][KammusuNameComboBox.SelectedIndex];
-			var id = data.Ships[index].艦船ID;
+			var id = kammusu.艦船ID;
 			var level = KammusuLevelTextBox.Text.ParseInt();
 			var luck = KammusuLuckTextBox.Text.ParseInt();
 			var cond = KammusuCondTextBox.Text.ParseInt();
@@ -490,8 +492,7 @@ namespace KCS_GUI {
 			// 表示する艦娘を切り替える
 			int showKammusuType = kammusu.row.艦種 - 1;
 			KammusuTypeComboBox.SelectedIndex = showKammusuType;
-			KammusuTypeComboBox.Refresh();
-			KammusuNameComboBox.Text = kammusu.艦名;
+			KammusuNameComboBox.SelectedItem = kammusu;
 			RedrawKammusuNameList();
 			KammusuLevelTextBox.Text = kammusu.lv.ToString();
 			KammusuLuckTextBox.Text = kammusu.luck.ToString();
@@ -895,14 +896,8 @@ namespace KCS_GUI {
 		}
 		// 艦娘データをGUIに反映
 		private void RedrawKammusuNameList() {
-			KammusuNameComboBox.Items.Clear();
 			// 選択した種別に従って、リストを生成する
-			if(KammusuTypeComboBox.SelectedIndex < 0)
-				return;
-			foreach(int index in KammusuTypeToIndexList[KammusuTypeComboBox.SelectedIndex]) {
-				KammusuNameComboBox.Items.Add(data.Ships[index].艦名);
-			}
-			KammusuNameComboBox.Refresh();
+			KammusuNameComboBox.DataSource = KammusuTypeComboBox.SelectedValue;
 		}
 		private void RedrawMapKammusuNameList() {
 			MapKammusuNameComboBox.Items.Clear();

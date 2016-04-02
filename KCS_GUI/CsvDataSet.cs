@@ -4,6 +4,32 @@ namespace KCS_GUI {
 	partial class CsvDataSet {
 		// 装備・艦娘データ
 		internal static readonly CsvDataSet data = new CsvDataSet();
+
+		internal static readonly string[] shipTypes = {
+			"魚雷艇",
+			"駆逐艦",
+			"軽巡洋艦",
+			"重雷装巡洋艦",
+			"重巡洋艦",
+			"航空巡洋艦",
+			"軽空母",
+			"巡洋戦艦",
+			"戦艦",
+			"航空戦艦",
+			"正規空母",
+			"陸上型",
+			"潜水艦",
+			"潜水空母",
+			"輸送艦",
+			"水上機母艦",
+			"揚陸艦",
+			"装甲空母",
+			"工作艦",
+			"潜水母艦",
+			"練習巡洋艦",
+			"給油艦",
+		};
+
 		//種別→種別番号変換
 		internal static readonly Dictionary<string, int> WeaponTypeToNumber = new Dictionary<string, int> {
 			{"主砲",0},
