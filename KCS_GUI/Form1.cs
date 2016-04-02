@@ -671,8 +671,6 @@ namespace KCS_GUI {
 			var selectFleet = selectPosition.pattern[MapPatternListBox.SelectedIndex];
 			int selectPositionCount = selectPosition.pattern.Count;
 			selectFleet.fleets.Add(setKammusu);
-			MapKammusuListBox.Items.Add(setKammusu.艦名);
-			MapKammusuListBox.Refresh();
 			MapPatternListBox.Items[MapPatternListBox.SelectedIndex] = selectPositionCount.ToString() + " : " + selectFleet.fleets.Count.ToString() + "隻";
 			RedrawMapAntiAirScore();
 			file_state_modified(FileState.modified);
@@ -689,8 +687,6 @@ namespace KCS_GUI {
 			// 艦娘データを追加
 			var selectFleet = FormMapData.position[MapPositionListBox.SelectedIndex].pattern[MapPatternListBox.SelectedIndex];
 			selectFleet.fleets[MapKammusuListBox.SelectedIndex] = setKammusu;
-			MapKammusuListBox.Items[MapKammusuListBox.SelectedIndex] = data.Ships.Single(s => s.艦船ID == setKammusu.id).艦名;
-			MapKammusuListBox.Refresh();
 			RedrawMapAntiAirScore();
 			file_state_modified(FileState.modified);
 		}
@@ -700,7 +696,6 @@ namespace KCS_GUI {
 			|| MapKammusuListBox.SelectedIndex == -1)
 				return;
 			FormMapData.position[MapPositionListBox.SelectedIndex].pattern[MapPatternListBox.SelectedIndex].fleets.RemoveAt(MapKammusuListBox.SelectedIndex);
-			MapKammusuListBox.Items.RemoveAt(MapKammusuListBox.SelectedIndex);
 			var selectPosition = FormMapData.position[MapPositionListBox.SelectedIndex];
 			var selectFleet = selectPosition.pattern[MapPatternListBox.SelectedIndex];
 			int selectPositionCount = selectPosition.pattern.Count;
@@ -735,24 +730,16 @@ namespace KCS_GUI {
 			MapPatternFormationComboBox.SelectedIndex = selectPosition.pattern[MapPatternListBox.SelectedIndex].form;
 			MapPatternFormationComboBox.Refresh();
 			// 選択したパターンについて、それに含まれる艦娘に関する情報
-			MapKammusuListBox.Items.Clear();
-			var selectFleet = selectPosition.pattern[MapPatternListBox.SelectedIndex].fleets;
-			foreach(var kammusu in selectFleet) {
-				MapKammusuListBox.Items.Add(data.Ships.Single(s => s.艦船ID == kammusu.id).艦名);
-			}
-			MapKammusuListBox.Refresh();
+			MapKammusuListBox.DataSource = selectPosition.pattern[MapPatternListBox.SelectedIndex].fleets;
 			RedrawMapAntiAirScore();
 		}
 		private void MapKammusuListBox_SelectedIndexChanged(object sender, EventArgs e) {
-			if(MapPositionListBox.SelectedIndex == -1
-			|| MapPatternListBox.SelectedIndex == -1
-			|| MapKammusuListBox.SelectedIndex == -1)
+			var kammusu = (Kammusu)MapKammusuListBox.SelectedItem;
+			if (kammusu == null)
 				return;
 			// 表示する艦娘を切り替える
-			Kammusu kammusu = FormMapData.position[MapPositionListBox.SelectedIndex].pattern[MapPatternListBox.SelectedIndex].fleets[MapKammusuListBox.SelectedIndex];
-			var showKammusu = data.Ships.Single(s => s.艦船ID == kammusu.id);
-			MapKammusuTypeComboBox.SelectedIndex = showKammusu.艦種 - 1;
-			MapKammusuNameComboBox.Text = showKammusu.艦名;
+			MapKammusuTypeComboBox.SelectedIndex = kammusu.row.艦種 - 1;
+			MapKammusuNameComboBox.SelectedItem = kammusu.row;
 			RedrawMapKammusuNameList();
 		}
 

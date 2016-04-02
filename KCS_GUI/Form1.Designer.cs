@@ -926,6 +926,7 @@
 			// 
 			// MapKammusuListBox
 			// 
+			this.MapKammusuListBox.DisplayMember = "艦名";
 			this.MapKammusuListBox.FormattingEnabled = true;
 			this.MapKammusuListBox.ItemHeight = 12;
 			this.MapKammusuListBox.Location = new System.Drawing.Point(78, 173);
