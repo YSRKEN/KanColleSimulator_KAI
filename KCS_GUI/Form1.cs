@@ -1535,16 +1535,16 @@ namespace KCS_GUI {
 							searchPower += 1.0 * searchValueW;
 							break;
 						case "水上偵察機":
-							searchPower += 1.2 * searchValueW + 1.2 * Math.Sqrt(weapon.level);
+							searchPower += 1.2 * (searchValueW + 1.2 * Math.Sqrt(weapon.level));
 							break;
 						case "水上偵察機(夜偵)":
-							searchPower += 1.2 * searchValueW + 1.2 * Math.Sqrt(weapon.level);
+							searchPower += 1.2 * (searchValueW + 1.2 * Math.Sqrt(weapon.level));
 							break;
 						case "小型電探":
-							searchPower += 0.6 * searchValueW + 1.25 * Math.Sqrt(weapon.level);
+							searchPower += 0.6 * (searchValueW + 1.25 * Math.Sqrt(weapon.level));
 							break;
 						case "大型電探":
-							searchPower += 0.6 * searchValueW + 1.25 * Math.Sqrt(weapon.level);
+							searchPower += 0.6 * (searchValueW + 1.25 * Math.Sqrt(weapon.level));
 							break;
 						default:
 							searchPower += 0.6 * searchValueW;
