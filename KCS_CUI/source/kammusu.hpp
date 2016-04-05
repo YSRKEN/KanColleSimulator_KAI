@@ -91,6 +91,12 @@ inline std::wstring to_wstring(const ShipClass& sc) {
 	return itor->first.c_str();
 }
 
+namespace detail {
+	template<class F, class C, std::enable_if_t<!std::is_member_function_pointer<F>::value, nullptr_t> = nullptr>
+	auto invoke(F f, C c) { return f(c); }
+	template<class F, class C, std::enable_if_t<std::is_member_function_pointer<F>::value, nullptr_t> = nullptr>
+	auto invoke(F f, C c) { return (c.*f)(); }
+}
 
 // 速力
 enum Speed { kSpeedNone, kSpeedLow, kSpeedHigh };
@@ -229,18 +235,10 @@ public:
 	// 引数に指定された条件を満たすか判定する。引数はShipId型のID、ShipClass型の種別、std::wstring型の名前のいずれでも指定できる。名前は完全一致で比較する。
 	template<class Head, class... Rest>
 	bool AnyOf(Head head, Rest... rest) const noexcept { return AnyOf(head) || AnyOf(rest...); }
-	template<class F, std::enable_if_t<std::is_member_function_pointer<F>::value>* = nullptr>
+	template<class F>
 	auto SumWeapons(F f) const {
 		std::result_of_t<F(const Weapon&)> sum{};
-		for (const auto& it_w : weapons_)
-			sum += (it_w.*f)();
-		return sum;
-	}
-	template<class F, std::enable_if_t<!std::is_member_function_pointer<F>::value>* = nullptr>
-	auto SumWeapons(F f) const {
-		std::result_of_t<F(const Weapon&)> sum{};
-		for (const auto& it_w : weapons_)
-			sum += f(it_w);
+		for (const auto& it_w : weapons_) sum += detail::invoke(f, it_w);
 		return sum;
 	}
 	friend std::ostream& operator<<(std::ostream& os, const Kammusu& conf);
