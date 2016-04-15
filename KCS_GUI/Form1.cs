@@ -454,8 +454,7 @@ namespace KCS_GUI {
 				file_state_modified(FileState.modified);
 			}
 		}
-
-		private void KammusuNameComboBox_SelectedIndexChanged(object sender, EventArgs e) {
+		private void KammusuNameComboBox_Leave(object sender, EventArgs e) {
 			kammusu_choose_list_modified = true;
 		}
 		private void ChangeKammusuButton_Click(object sender, EventArgs e) {
