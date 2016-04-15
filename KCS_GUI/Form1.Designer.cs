@@ -641,6 +641,7 @@
 			this.KammusuCondTextBox.TabIndex = 18;
 			this.KammusuCondTextBox.Text = "49";
 			this.KammusuCondTextBox.Leave += new System.EventHandler(this.KammusuCondTextBox_Leave);
+			this.KammusuCondTextBox.Validating += this.KammusuCondTextBox_Validating;
 			// 
 			// KammusuLuckTextBox
 			// 
@@ -650,6 +651,7 @@
 			this.KammusuLuckTextBox.TabIndex = 17;
 			this.KammusuLuckTextBox.Text = "-1";
 			this.KammusuLuckTextBox.Leave += new System.EventHandler(this.KammusuLuckTextBox_Leave);
+			this.KammusuLuckTextBox.Validating += this.KammusuLuckTextBox_Validating;
 			// 
 			// KammusuLevelTextBox
 			// 
@@ -659,6 +661,7 @@
 			this.KammusuLevelTextBox.TabIndex = 16;
 			this.KammusuLevelTextBox.Text = "1";
 			this.KammusuLevelTextBox.Leave += new System.EventHandler(this.KammusuLevelTextBox_Leave);
+			this.KammusuLevelTextBox.Validating += this.KammusuLevelTextBox_Validating;
 			// 
 			// label10
 			// 
