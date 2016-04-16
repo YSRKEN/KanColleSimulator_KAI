@@ -179,7 +179,7 @@ namespace KCS_GUI {
 				if (MainTabControl.SelectedIndex == 0) {
 					FormFleet = new Fleet();
 					HQLevelTextBox.Text = FormFleet.level.ToString();
-					FleetTypeComboBox.SelectedIndex = FormFleet.type;
+					FleetTypeComboBox.SelectedIndex = FormFleet.type - 1;
 					FleetSelectComboBox_SelectedIndexChanged(sender, e);
 					RedrawAntiAirScore();
 					RedrawSearchPower();
@@ -213,7 +213,7 @@ namespace KCS_GUI {
 					file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
 					FormFleet = setFleet.Item1;
 					HQLevelTextBox.Text = FormFleet.level.ToString();
-					FleetTypeComboBox.SelectedIndex = FormFleet.type;
+					FleetTypeComboBox.SelectedIndex = FormFleet.type - 1;
 					FleetSelectComboBox_SelectedIndexChanged(sender, e);
 					RedrawAntiAirScore();
 					RedrawSearchPower();
@@ -624,7 +624,7 @@ namespace KCS_GUI {
 			if(FleetTypeComboBox.SelectedIndex == -1)
 				return;
 			// 艦隊形式が書き換わった際は反映する
-			FormFleet.type = FleetTypeComboBox.SelectedIndex;
+			FormFleet.type = FleetTypeComboBox.SelectedIndex + 1;
 			file_state_modified(FileState.modified);
 		}
 		private void FleetSelectComboBox_SelectedIndexChanged(object sender, EventArgs e) {
@@ -725,7 +725,7 @@ namespace KCS_GUI {
 					file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
 					FormFleet = setFleet.Item1;
 					HQLevelTextBox.Text = FormFleet.level.ToString();
-					FleetTypeComboBox.SelectedIndex = FormFleet.type;
+					FleetTypeComboBox.SelectedIndex = FormFleet.type - 1;
 					FleetSelectComboBox_SelectedIndexChanged(sender, e);
 					RedrawAntiAirScore();
 					RedrawSearchPower();
@@ -803,7 +803,7 @@ namespace KCS_GUI {
 			var selectPosition = FormMapData.position[MapPositionListBox.SelectedIndex];
 			var setFleet = new Fleet();
 			setFleet.level = 120;
-			setFleet.type = 0;
+			setFleet.type = 1;
 			selectPosition.fleet.Add(setFleet);
 			selectPosition.formation.Add(MapPatternFormationComboBox.SelectedIndex);
 			// 画面上に反映
@@ -1186,9 +1186,9 @@ namespace KCS_GUI {
 			}
 			// 艦隊形式を読み込む
 			if(json["type"] != null) {
-				setFleet.type = limit(int.Parse((string)json["type"]), 0, 3);
+				setFleet.type = limit(int.Parse((string)json["type"]), 1, 4);
 			} else {
-				setFleet.type = 0;
+				setFleet.type = 1;
 			}
 			// 艦隊を読み込む
 			for(int fi = 1; fi <= MaxFleetSize; ++fi) {
