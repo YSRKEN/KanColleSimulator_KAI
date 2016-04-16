@@ -61,6 +61,9 @@ namespace KCS_GUI {
 		}
 		public MainForm() {
 			InitializeComponent();
+			if(!System.IO.File.Exists(@System.IO.Directory.GetCurrentDirectory() + @"\Newtonsoft.Json.dll")) {
+				this.Close();
+			}
 			try {
 				WeaponTypeToNumber = new Dictionary<string, int>() {
 					{"主砲",0},
