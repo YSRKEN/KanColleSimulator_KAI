@@ -296,15 +296,11 @@ double Fleet::SearchValue_33() const noexcept
 					break;
 				case WC("水上偵察機"):	//水偵
 				case WC("水上偵察機(夜偵)"):	//夜偵
-					search_sum += it_w.GetSearch() * 1.2;
-					//熟練度が改修値と混同されるため、とりあえずコメントアウト
-					//JSONのフォーマット自体を変えないと解決しません
-					//search_sum += sqrt(it_w.GetLevel()) * 1.2;
+					search_sum += (it_w.GetSearch() + sqrt(it_w.GetLevel()) * 1.2) * 1.2;
 					break;
 				case WC("小型電探"):	//小型電探
 				case WC("大型電探"):	//大型電探
-					search_sum += it_w.GetSearch() * 0.6;
-					search_sum += sqrt(it_w.GetLevel()) * 1.25;
+					search_sum += (it_w.GetSearch() + sqrt(it_w.GetLevel()) * 1.25) * 0.6;
 					break;
 				default:	//その他装備は係数0.6、改修効果は乗らないとする
 					search_sum += it_w.GetSearch() * 0.6;

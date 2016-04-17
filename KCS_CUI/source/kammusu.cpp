@@ -194,6 +194,7 @@ Kammusu Kammusu::Reset(bool load_first_weapons) {
 	fuel_ = 100;
 	if(load_first_weapons)
 		for (size_t i = 0; i < slots_; ++i) {
+			if (first_weapons_.get()[i] < 0) break;
 			weapons_[i] = Weapon::Get(first_weapons_.get()[i]);
 			weapons_[i].SetAir(max_airs_.get()[i]);
 		}

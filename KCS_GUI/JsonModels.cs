@@ -176,14 +176,20 @@ namespace KCS_GUI {
 			get { return lv_; }
 			set { lv_ = value.limit(1, 120); }
 		}
-		// 艦隊形式
-		[JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-		public int type {
+        // 艦隊形式、プログラム内では0～3の値を取る
+        [JsonIgnore]
+        public int type {
 			get { return type_; }
 			set { type_ = value.limit(0, 3); }
 		}
-		// 艦娘
-		[JsonIgnore]
+        // 艦隊形式、JSON表現では+1して1～4の値を取る
+        [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.Ignore), DefaultValue(1), EditorBrowsable(EditorBrowsableState.Never)]
+        public int json_type {
+            get { return type + 1; }
+            set { type = value - 1; }
+        }
+        // 艦娘
+        [JsonIgnore]
 		public IList<IList<Kammusu>> unit = Enumerable.Range(0, MaxFleetSize).Select(_ => (IList<Kammusu>)new List<Kammusu>()).ToList();
 
 		[JsonExtensionData]

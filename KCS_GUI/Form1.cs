@@ -37,6 +37,8 @@ namespace KCS_GUI {
 		string MapFilePath;
 		//ファイルの状態
 		OpenFileInfo[] file;
+		//艦娘エディタ画面で艦娘が変更された時
+		bool kammusu_choose_list_modified = false;
 		//ErrorProvider
 		private System.Windows.Forms.ErrorProvider error_provider_level;
 		private System.Windows.Forms.ErrorProvider error_provider_luck;
@@ -44,6 +46,9 @@ namespace KCS_GUI {
 		/* コンストラクタ */
 		public MainForm() {
 			InitializeComponent();
+			if(!System.IO.File.Exists(@System.IO.Directory.GetCurrentDirectory() + @"\Newtonsoft.Json.dll")) {
+				this.Close();
+			}
 			try {
 				ReadWeaponData();
 				ReadKammusuData();
@@ -54,9 +59,12 @@ namespace KCS_GUI {
 				FormMapData = new MapData();
 				file = new OpenFileInfo[2]
 				{
-					new OpenFileInfo(),
-					new OpenFileInfo()
+					new OpenFileInfo("untitled.json", FileState.new_created),
+					new OpenFileInfo("untitled.map", FileState.new_created)
 				};
+				if (IsInRange(MainTabControl.SelectedIndex, 0, 1)) {
+					OpenFileInfoToStatusBar(this.file[MainTabControl.SelectedIndex]);
+				}
 				error_provider_level = new System.Windows.Forms.ErrorProvider();
 				error_provider_luck = new System.Windows.Forms.ErrorProvider();
 				error_provider_cond = new System.Windows.Forms.ErrorProvider();
@@ -67,28 +75,15 @@ namespace KCS_GUI {
 		}
 
 		/* 各イベント毎の処理 */
+		private void OpenFileInfoToStatusBar(OpenFileInfo info) {
+			this.filename_echo.ForeColor = (FileState.none != info.state) ? SystemColors.ControlText : SystemColors.GradientInactiveCaption;
+			this.filename_echo.BackColor = info.bg_color;
+			this.filename_echo.Text = info.name;
+		}
 		private void file_state_modified(FileState new_state) {
 			if (IsInRange(MainTabControl.SelectedIndex, 0, 1)) {
-				this.file[MainTabControl.SelectedIndex].state = new_state;
-				this.filename_echo.ForeColor = (FileState.none != new_state) ? SystemColors.ControlText : SystemColors.GradientInactiveCaption;
-				switch (new_state) {
-				case FileState.none:
-					this.filename_echo.BackColor = SystemColors.Control;
-					this.file[MainTabControl.SelectedIndex].name = this.filename_echo.Text = "filename...";
-					break;
-				case FileState.new_created:
-					this.filename_echo.BackColor = SystemColors.Info;
-					break;
-				case FileState.modified:
-					this.filename_echo.BackColor = Color.FromArgb(253, 239, 242);
-					break;
-				case FileState.saved:
-					this.filename_echo.BackColor = Color.FromArgb(235, 246, 247);
-					break;
-				default:
-					break;
-				}
-				this.file[MainTabControl.SelectedIndex].bg_color = this.filename_echo.BackColor;
+				this.file[MainTabControl.SelectedIndex].UpdateState(new_state);
+				OpenFileInfoToStatusBar(this.file[MainTabControl.SelectedIndex]);
 			}
 		}
 		private void file_state_modified(string filename, FileState new_state) {
@@ -290,8 +285,10 @@ namespace KCS_GUI {
 			FormFleet.unit[FleetSelectComboBox.SelectedIndex].Add(setKammusu);
 			KammusuSelectListBox.Items.Add(setKammusu.艦名);
 			KammusuSelectListBox.Refresh();
+			KammusuSelectListBox.SelectedIndex = KammusuSelectListBox.Items.Count - 1;
 			RedrawAntiAirScore();
 			RedrawSearchPower();
+			kammusu_choose_list_modified = false;
 			file_state_modified(FileState.modified);
 		}
 		static private bool IsInRange(int val, int min, int max) {
@@ -317,11 +314,13 @@ namespace KCS_GUI {
 			}
 		}
 		private void KammusuLevelTextBox_Leave(object sender, EventArgs e) {
-			if(//Range Check
-				IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
+			if (//Range Check
+				!kammusu_choose_list_modified && IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
 				&& IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
-			)
-				FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].lv = int.Parse(KammusuLevelTextBox.Text);
+			) {
+				FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].lv = KammusuLevelTextBox.Text.ParseInt();
+				file_state_modified(FileState.modified);
+			}
 		}
 		private void KammusuLuckTextBox_Validating(object sender, CancelEventArgs e) {
 			try {
@@ -341,7 +340,7 @@ namespace KCS_GUI {
 		}
 		private void KammusuLuckTextBox_Leave(object sender, EventArgs e) {
 			if (//Range Check
-				IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
+				!kammusu_choose_list_modified && IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
 				&& IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
 			) {
 				FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].luck = KammusuLuckTextBox.Text.ParseInt();
@@ -366,12 +365,15 @@ namespace KCS_GUI {
 		}
 		private void KammusuCondTextBox_Leave(object sender, EventArgs e) {
 			if (//Range Check
-				IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
+				!kammusu_choose_list_modified && IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
 				&& IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
 			) {
 				FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].cond = KammusuCondTextBox.Text.ParseInt();
 				file_state_modified(FileState.modified);
 			}
+		}
+		private void KammusuNameComboBox_Leave(object sender, EventArgs e) {
+			kammusu_choose_list_modified = true;
 		}
 		private void ChangeKammusuButton_Click(object sender, EventArgs e) {
 			if(KammusuTypeComboBox.SelectedIndex == -1
@@ -392,6 +394,7 @@ namespace KCS_GUI {
 			KammusuSelectListBox.Refresh();
 			RedrawAntiAirScore();
 			RedrawSearchPower();
+			kammusu_choose_list_modified = false;
 			file_state_modified(FileState.modified);
 		}
 		private void DeleteKammusuButton_Click(object sender, EventArgs e) {
@@ -541,6 +544,7 @@ namespace KCS_GUI {
 				KammusuSelectListBox.Items.Add(data.Ships.Single(s => s.艦船ID == kammusu.id).艦名);
 			}
 			KammusuSelectListBox.Refresh();
+			kammusu_choose_list_modified = false;
 		}
 		private void KammusuSelectListBox_SelectedIndexChanged(object sender, EventArgs e) {
 			if(FleetSelectComboBox.SelectedIndex == -1
@@ -563,6 +567,7 @@ namespace KCS_GUI {
 				WeaponSelectListBox.Items.Add(data.Weapons.Single(w => w.装備ID == weapon.id).装備名);
 			}
 			WeaponSelectListBox.Refresh();
+			kammusu_choose_list_modified = false;
 		}
 		private void KammusuTypeComboBox_SelectedIndexChanged(object sender, EventArgs e) {
 			RedrawKammusuNameList();
@@ -1145,16 +1150,16 @@ namespace KCS_GUI {
 							searchPower += 1.0 * searchValueW;
 							break;
 						case "水上偵察機":
-							searchPower += 1.2 * searchValueW + 1.2 * Math.Sqrt(weapon.level);
+							searchPower += 1.2 * (searchValueW + 1.2 * Math.Sqrt(weapon.level));
 							break;
 						case "水上偵察機(夜偵)":
-							searchPower += 1.2 * searchValueW + 1.2 * Math.Sqrt(weapon.level);
+							searchPower += 1.2 * (searchValueW + 1.2 * Math.Sqrt(weapon.level));
 							break;
 						case "小型電探":
-							searchPower += 0.6 * searchValueW + 1.25 * Math.Sqrt(weapon.level);
+							searchPower += 0.6 * (searchValueW + 1.25 * Math.Sqrt(weapon.level));
 							break;
 						case "大型電探":
-							searchPower += 0.6 * searchValueW + 1.25 * Math.Sqrt(weapon.level);
+							searchPower += 0.6 * (searchValueW + 1.25 * Math.Sqrt(weapon.level));
 							break;
 						default:
 							searchPower += 0.6 * searchValueW;
@@ -1217,8 +1222,28 @@ namespace KCS_GUI {
 			this.bg_color = SystemColors.Control;
 		}
 		public OpenFileInfo(string name_, FileState state_) {
+			this.UpdateState(state_);
 			this.name = name_;
-			this.state = state_;
+		}
+		public void UpdateState(FileState new_state) {
+			this.state = new_state;
+			switch (new_state) {
+			case FileState.none:
+				this.bg_color = SystemColors.Control;
+				this.name = "filename...";
+				break;
+			case FileState.new_created:
+				this.bg_color = SystemColors.Info;
+				break;
+			case FileState.modified:
+				this.bg_color = Color.FromArgb(253, 239, 242);
+				break;
+			case FileState.saved:
+				this.bg_color = Color.FromArgb(235, 246, 247);
+				break;
+			default:
+				break;
+			}
 		}
 		public string name;
 		public FileState state;
