@@ -1001,7 +1001,11 @@ namespace KCS_GUI {
 			|| (PutJSONCheckBox.Checked && OutputPathTextBox.Text == ""))
 				return;
 			ProcessStartInfo psInfo = new ProcessStartInfo();
-			psInfo.FileName = @System.IO.Directory.GetCurrentDirectory() + @"\KCS_CUI.exe"; //実行するファイル
+			if (System.Environment.Is64BitOperatingSystem) {
+				psInfo.FileName = @System.IO.Directory.GetCurrentDirectory() + @"\x64\KCS_CUI.exe"; //実行するファイル
+			} else {
+				psInfo.FileName = @System.IO.Directory.GetCurrentDirectory() + @"\x86\KCS_CUI.exe"; //実行するファイル
+			}
 			if(!System.IO.File.Exists(psInfo.FileName)) {
 				this.Text = SoftName;
 				return;
