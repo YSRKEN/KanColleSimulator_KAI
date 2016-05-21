@@ -227,7 +227,7 @@ void Kammusu::AacType_() noexcept {
 			++sum_aad;
 			break;
 		case WC("対空機銃"):
-			if (it_w.AnyOf(WID("25mm三連装機銃 集中配備"))) {
+			if (it_w.AnyOf(WID("25mm三連装機銃 集中配備"), WID("Bofors 40mm四連装機関砲"))) {
 				++sum_aagX;
 			}
 			else {
@@ -879,7 +879,8 @@ bool Kammusu::IsFireTorpedo(const TorpedoTurn &torpedo_turn) const noexcept {
 			if (IsSubmarine() && AnyOf(SID("潜水カ級elite"), SID("潜水ヨ級elite"), SID("潜水カ級flagship"), SID("潜水ヨ級flagship"), SID("潜水ソ級elite"), SID("潜水ソ級flagship"))) return true;
 			// エリレ級と水母棲姫と駆逐水鬼(甲作戦最終形態,艦船ID=649)と
 			// 重巡棲姫(最終形態,艦船ID=660,662,664)は無条件で撃てる
-			if (AnyOf(SID("戦艦レ級elite"), L"水母棲姫"s, ShipId::ID649, ShipId::ID660, ShipId::ID662, ShipId::ID664)) return true;
+			//if (AnyOf(SID("戦艦レ級elite"), L"水母棲姫"s, ShipId::ID649, ShipId::ID660, ShipId::ID662, ShipId::ID664)) return true;
+			if (AnyOf(SID("戦艦レ級elite"), L"水母棲姫"s)) return true;
 		}
 		return false;
 		break;
