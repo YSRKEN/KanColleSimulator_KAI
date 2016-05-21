@@ -62,6 +62,7 @@ namespace KCS_GUI {
 		public MainForm() {
 			InitializeComponent();
 			if(!System.IO.File.Exists(@System.IO.Directory.GetCurrentDirectory() + @"\Newtonsoft.Json.dll")) {
+				MessageBox.Show("Newtonsoft.Json.dllが存在しません.\nソフトを終了します.", SoftName, MessageBoxButtons.OK, MessageBoxIcon.Error);
 				this.Close();
 			}
 			try {
