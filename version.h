@@ -1,4 +1,4 @@
-﻿#ifndef KCS_VERSION_H_
+#ifndef KCS_VERSION_H_
 #define KCS_VERSION_H_
 #define KCS_VERSION  2,1,1
 #define KCS_VERSION_STR "2.1.1"
