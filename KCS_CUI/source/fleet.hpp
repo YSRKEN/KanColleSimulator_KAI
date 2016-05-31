@@ -1,7 +1,7 @@
 ﻿#ifndef KCS_KAI_INC_FLEET_HPP_
 #define KCS_KAI_INC_FLEET_HPP_
 
-#include "picojson.h"
+#include "../../3rdparty/picojson/picojson.h"
 #include "weapon.hpp"
 #include "kammusu.hpp"
 #include "other.hpp"
