@@ -91,6 +91,12 @@ inline std::wstring to_wstring(const ShipClass& sc) {
 	return itor->first.c_str();
 }
 
+namespace detail {
+	template<class F, class C, std::enable_if_t<!std::is_member_function_pointer<F>::value, nullptr_t> = nullptr>
+	auto invoke(F f, C c) { return f(c); }
+	template<class F, class C, std::enable_if_t<std::is_member_function_pointer<F>::value, nullptr_t> = nullptr>
+	auto invoke(F f, C c) { return (c.*f)(); }
+}
 
 // 速力
 enum Speed { kSpeedNone, kSpeedLow, kSpeedHigh };
@@ -230,7 +236,11 @@ public:
 	template<class Head, class... Rest>
 	bool AnyOf(Head head, Rest... rest) const noexcept { return AnyOf(head) || AnyOf(rest...); }
 	template<class F>
-	auto SumWeapons(F f) const { return std::accumulate(std::cbegin(weapons_), std::cend(weapons_), std::result_of_t<F(const Weapon&)>{}, [&](const auto& sum, const auto& it_w) { return sum + std::invoke(f, it_w); }); }
+	auto SumWeapons(F f) const {
+		std::result_of_t<F(const Weapon&)> sum{};
+		for (const auto& it_w : weapons_) sum += detail::invoke(f, it_w);
+		return sum;
+	}
 	friend std::ostream& operator<<(std::ostream& os, const Kammusu& conf);
 	friend std::wostream& operator<<(std::wostream& os, const Kammusu& conf);
 };
