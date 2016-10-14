@@ -291,7 +291,7 @@ namespace KCS_GUI {
 		}
 		private void KammusuLevelTextBox_Validating(object sender, CancelEventArgs e) {
 			try {
-				int level = int.Parse(KammusuLevelTextBox.Text);
+				int level = KammusuLevelTextBox.Text.ParseInt();
 				if (level < 1 || 155 < level) {
 					e.Cancel = true;
 					error_provider_level.SetError(KammusuLevelTextBox, "1-255の値を入力してください");//range error
@@ -308,11 +308,11 @@ namespace KCS_GUI {
 		private void KammusuLevelTextBox_Leave(object sender, EventArgs e) {
 			var kammusu = (Kammusu)KammusuSelectListBox.SelectedItem;
 			if (kammusu != null)
-				kammusu.lv = int.Parse(KammusuLevelTextBox.Text);
+				kammusu.lv = KammusuLevelTextBox.Text.ParseInt();
 		}
 		private void KammusuLuckTextBox_Validating(object sender, CancelEventArgs e) {
 			try {
-				int luck = int.Parse(KammusuLuckTextBox.Text);
+				int luck = KammusuLuckTextBox.Text.ParseInt();
 				if (luck < -1 || 100 < luck) {
 					e.Cancel = true;
 					error_provider_luck.SetError(KammusuLuckTextBox, "-1～100の値を入力してください");//range error
@@ -335,7 +335,7 @@ namespace KCS_GUI {
 		}
 		private void KammusuCondTextBox_Validating(object sender, CancelEventArgs e) {
 			try {
-				int cond = int.Parse(KammusuCondTextBox.Text);
+				int cond = KammusuCondTextBox.Text.ParseInt();
 				if (cond < 0 || 100 < cond) {
 					e.Cancel = true;
 					error_provider_cond.SetError(KammusuCondTextBox, "0-100の値を入力してください");//range error
