@@ -183,7 +183,7 @@ namespace KCS_GUI {
 		}
 		// 艦娘
 		[JsonIgnore]
-		public IList<IList<Kammusu>> unit = new BindingList<IList<Kammusu>>(Enumerable.Range(0, MaxFleetSize).Select(_ => (IList<Kammusu>)new List<Kammusu>()).ToList());
+		public IList<BindingList<Kammusu>> unit = Enumerable.Range(0, MaxFleetSize).Select(_ => new BindingList<Kammusu>()).ToList();
 
 		[JsonExtensionData]
 		IDictionary<string, JToken> additionalData = new Dictionary<string, JToken>();
@@ -193,7 +193,7 @@ namespace KCS_GUI {
 				JToken token;
 				if (!additionalData.TryGetValue($"f{i + 1}", out token))
 					break;
-				unit[i] = token.ToObject<IList<Kammusu>>(serailzer);
+				unit[i] = token.ToObject<BindingList<Kammusu>>(serailzer);
 			}
 			additionalData.Clear();
 		}
