@@ -62,18 +62,22 @@ tuple<Result, vector<Fleet>> Simulator::Calc() {
 	cout << endl;
 #endif
 	if (simulate_mode_ != kSimulateModeN) {
+
+		// 交戦形態の決定
+		BattlePositionOracle();
+#ifdef _DEBUG
+		cout << "交戦形態：" << battle_position_ << "\n" << endl;
+#endif
+
+		// 開幕対潜フェイズ
+		FitstAntiSubPhase();
+
 		// 航空戦フェイズ(連合艦隊では第一艦隊のみ関わるが、第二艦隊も開幕爆撃の被害対象になる)
 		AirWarPhase();
 		if (IsBattleTerminate()) goto SimulatorCalcExit;
 #ifdef _DEBUG
 		cout << "制空状態・自艦隊倍率・敵艦隊倍率：\n";
 		cout << std::get<condition>(air_war_result_) << " " << std::get<magnification>(air_war_result_)[0] << " " << std::get<magnification>(air_war_result_)[1] << "\n" << endl;
-#endif
-
-		// 交戦形態の決定
-		BattlePositionOracle();
-#ifdef _DEBUG
-		cout << "交戦形態：" << battle_position_ << "\n" << endl;
 #endif
 
 		// 支援艦隊攻撃フェイズ(未実装)
@@ -166,6 +170,45 @@ void Simulator::SearchPhase() {
 	for (size_t i = 0; i < kBattleSize; ++i) {
 		auto search_value = fleet_[i].SearchValue();
 		search_result_[i] = (search_value > 0.0 || fleet_[i].HasAir());
+	}
+}
+
+// 開幕対潜フェイズ
+void Simulator::FitstAntiSubPhase() {
+	// 攻撃順を決定する
+	const auto attack_list = DetermineAttackOrder(kFireFirst, 1);
+	// 決定した巡目に基づいて攻撃を行う
+	for (size_t ui = 0; ui < kMaxUnitSize; ++ui) {
+		// 基本的に、敵と味方が交互に砲撃を行う
+		for (size_t bi = 0; bi < kBattleSize; ++bi) {
+			auto other_side = kBattleSize - bi - 1;
+			// 一覧の範囲外なら飛ばす
+			if (attack_list[bi].size() <= ui) continue;
+			// 担当する艦娘が攻撃参加できない場合は飛ばす
+			const auto &friend_index = attack_list[bi][ui].first;
+			const auto &hunter_kammusu = fleet_[bi].GetUnit()[friend_index.fleet_no][friend_index.fleet_i];
+			if (!hunter_kammusu.IsFireGun(fleet_[other_side].HasAF())) continue;
+			// 攻撃対象を選択する
+			tuple<bool, KammusuIndex> target(false, { 0, 0 });
+			if (hunter_kammusu.IsAntiSubDay()) {
+				target = fleet_[other_side].RandomKammusuSS(1);
+			}
+			if (!std::get<is_attackable>(target)) continue;
+			// 攻撃対象の種類によって、攻撃の種類を選ぶ
+			auto &enemy_index = std::get<selected>(target);
+			const auto &target_kammusu = fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i];
+			auto fire_type = JudgeDayFireType(bi, friend_index, enemy_index);
+			// 攻撃の種類によって、基本攻撃力および倍率を算出する
+			int base_attack = hunter_kammusu.DayAttack(fire_type, target_kammusu.AnyOf(SC("陸上型")), fleet_[bi].GetFleetType(), friend_index.fleet_no);
+			bool special_attack_flg = false;
+			double multiple = 1.0;
+			// 与えるダメージを計算し、処理を行う
+			auto all_attack_plus = vector<double>{ 1.0, 1.0 };
+			auto damage = CalcDamage(kBattlePhaseGun, bi, friend_index, enemy_index, base_attack, 
+				all_attack_plus, battle_position_, special_attack_flg, multiple);
+			result_.AddDamage(bi, friend_index.fleet_no, friend_index.fleet_i, damage);
+			fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].MinusHP(damage, stopper_[other_side][enemy_index.fleet_no][enemy_index.fleet_i]);
+		}
 	}
 }
 
@@ -445,12 +488,12 @@ vector<vector<std::pair<KammusuIndex, Range>>> Simulator::DetermineAttackOrder(F
 	for (size_t bi = 0; bi < kBattleSize; ++bi) {
 		auto &unit = this->fleet_[bi].GetUnit();
 		// 行動可能な艦娘一覧を作成する
-		if (bi == kFriendSide) fleet_index = 0;
-		auto &unit2 = unit[fleet_index];
+		size_t fleet_index_ = this->fleet_[bi].SecondIndex();
+		auto &unit2 = unit[fleet_index_];
 		attack_list[bi].reserve(unit2.size());//unit2.size()はたかが1桁程度の値だから気にせずallocateする
 		for (size_t ui = 0; ui < unit2.size(); ++ui) {
 			if (!unit2[ui].IsMoveGun(false)) continue;
-			attack_list[bi].push_back({ { fleet_index, ui }, unit2[ui].MaxRange() });
+			attack_list[bi].push_back({ { fleet_index_, ui }, unit2[ui].MaxRange() });
 		}
 		if (fire_turn == kFireFirst) {
 			// 一覧をシャッフルする
