@@ -132,10 +132,10 @@
 			this.SaveAFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.ExitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.ヘルプHToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.ShowHelpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.VersionInfoMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
 			this.filename_echo = new System.Windows.Forms.ToolStripStatusLabel();
-			this.ShowHelpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.MainTabControl.SuspendLayout();
 			this.tabPage1.SuspendLayout();
 			this.tabPage2.SuspendLayout();
@@ -612,6 +612,7 @@
 			this.KammusuCondTextBox.TabIndex = 18;
 			this.KammusuCondTextBox.Text = "49";
 			this.KammusuCondTextBox.Leave += new System.EventHandler(this.KammusuCondTextBox_Leave);
+			this.KammusuCondTextBox.Validating += this.KammusuCondTextBox_Validating;
 			// 
 			// KammusuLuckTextBox
 			// 
@@ -621,6 +622,7 @@
 			this.KammusuLuckTextBox.TabIndex = 17;
 			this.KammusuLuckTextBox.Text = "-1";
 			this.KammusuLuckTextBox.Leave += new System.EventHandler(this.KammusuLuckTextBox_Leave);
+			this.KammusuLuckTextBox.Validating += this.KammusuLuckTextBox_Validating;
 			// 
 			// KammusuLevelTextBox
 			// 
@@ -630,6 +632,7 @@
 			this.KammusuLevelTextBox.TabIndex = 16;
 			this.KammusuLevelTextBox.Text = "1";
 			this.KammusuLevelTextBox.Leave += new System.EventHandler(this.KammusuLevelTextBox_Leave);
+			this.KammusuLevelTextBox.Validating += this.KammusuLevelTextBox_Validating;
 			// 
 			// label10
 			// 
@@ -1364,7 +1367,7 @@
 			this.NewFileMenuItem.Name = "NewFileMenuItem";
 			this.NewFileMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
 			this.NewFileMenuItem.Size = new System.Drawing.Size(286, 22);
-			this.NewFileMenuItem.Text = "新規(&N)";
+			this.NewFileMenuItem.Text = "リセット(&N)";
 			this.NewFileMenuItem.Click += new System.EventHandler(this.NewFileMenuItem_Click);
 			// 
 			// OpenFileMenuItem
@@ -1409,6 +1412,13 @@
 			this.ヘルプHToolStripMenuItem.Size = new System.Drawing.Size(75, 22);
 			this.ヘルプHToolStripMenuItem.Text = "ヘルプ(&H)";
 			// 
+			// ShowHelpToolStripMenuItem
+			// 
+			this.ShowHelpToolStripMenuItem.Name = "ShowHelpToolStripMenuItem";
+			this.ShowHelpToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
+			this.ShowHelpToolStripMenuItem.Text = "ヘルプの表示(&V)";
+			this.ShowHelpToolStripMenuItem.Click += new System.EventHandler(this.ShowHelpToolStripMenuItem_Click);
+			// 
 			// VersionInfoMenuItem
 			// 
 			this.VersionInfoMenuItem.Name = "VersionInfoMenuItem";
@@ -1433,12 +1443,6 @@
 			this.filename_echo.Name = "filename_echo";
 			this.filename_echo.Size = new System.Drawing.Size(70, 18);
 			this.filename_echo.Text = "filename...";
-			// ShowHelpToolStripMenuItem
-			// 
-			this.ShowHelpToolStripMenuItem.Name = "ShowHelpToolStripMenuItem";
-			this.ShowHelpToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
-			this.ShowHelpToolStripMenuItem.Text = "ヘルプの表示(&V)";
-			this.ShowHelpToolStripMenuItem.Click += new System.EventHandler(this.ShowHelpToolStripMenuItem_Click);
 			// 
 			// MainForm
 			// 
