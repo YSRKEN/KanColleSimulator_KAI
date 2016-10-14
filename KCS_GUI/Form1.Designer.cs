@@ -296,6 +296,7 @@
 			this.KammusuNameComboBox.Name = "KammusuNameComboBox";
 			this.KammusuNameComboBox.Size = new System.Drawing.Size(100, 20);
 			this.KammusuNameComboBox.TabIndex = 37;
+			this.KammusuNameComboBox.Leave += new System.EventHandler(this.KammusuNameComboBox_Leave);
 			// 
 			// WeaponDetailRfComboBox
 			// 

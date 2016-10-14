@@ -33,6 +33,7 @@ namespace KCS_GUI {
 		string MapFilePath;
 		//ファイルの状態
 		OpenFileInfo[] file;
+		//艦娘エディタ画面で艦娘が変更された時
 		//ErrorProvider
 		private System.Windows.Forms.ErrorProvider error_provider_level;
 		private System.Windows.Forms.ErrorProvider error_provider_luck;
