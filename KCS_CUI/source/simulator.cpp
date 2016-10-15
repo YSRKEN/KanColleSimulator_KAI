@@ -658,7 +658,7 @@ void Simulator::NightPhase() {
 				// 砲撃時にのみ適用される
 				if (fire_type != kNightFireGun) return;
 				// 発動可能な弾着の種類を判断する
-				auto special_attack = JudgeNightSpecialAttack(bi, friend_index, target_kammusu.AnyOf(SC("陸上型")));
+				auto special_attack = JudgeNightSpecialAttack(bi, friend_index, target_kammusu.AnyOf(SC("陸上型")), target_kammusu.GetLuck());
 				if (std::get<condition>(special_attack) == 1.0) return;
 				// 弾着観測射撃による補正
 				double_flg = std::get<condition>(special_attack);
@@ -1213,7 +1213,7 @@ NightFireType Simulator::JudgeNightFireType(const size_t turn_player, const Kamm
 }
 
 // 夜戦での特殊攻撃を判断する
-tuple<bool, double> Simulator::JudgeNightSpecialAttack(const size_t turn_player, const KammusuIndex &attack_index, const bool af_flg) const {
+tuple<bool, double> Simulator::JudgeNightSpecialAttack(const size_t turn_player, const KammusuIndex &attack_index, const bool af_flg, const int enemy_luck) const {
 	// 主砲・副砲・魚雷の数を数える
 	const auto &hunter_kammusu = fleet_[turn_player].GetUnit()[attack_index.fleet_no][attack_index.fleet_i];
 	size_t sum_gun = 0, sum_subgun = 0, sum_torpedo = 0;
@@ -1269,25 +1269,24 @@ tuple<bool, double> Simulator::JudgeNightSpecialAttack(const size_t turn_player,
 		for (auto &it_w : hunter_kammusu.GetWeapon())
 			if (it_w.AnyOf(WC("水上艦要員"))) return true;
 		return false; };
-	// 運による発動率上昇は、運キャップによる上限がある
-	switch (attack_type) {
-	case 1:
-		oracle += sqrt(70.0 * std::max(hunter_kammusu.GetLuck() + (has_ssp() ? 5 : 0), 60)) / 100;
-		break;
-	case 2:
-		oracle += sqrt(50.0 * std::max(hunter_kammusu.GetLuck() + (has_ssp() ? 5 : 0), 55)) / 100;
-		break;
-	case 3:
-		oracle += sqrt(50.0 * std::max(hunter_kammusu.GetLuck() + (has_ssp() ? 5 : 0), 55)) / 100;
-		break;
-	case 4:
-		oracle += sqrt(70.0 * std::max(hunter_kammusu.GetLuck() + (has_ssp() ? 5 : 0), 75)) / 100;
-		break;
-	default:
-		break;
+	// 発動率計算式は、次の記事を参考にした
+	// 「haruのブロマガ 艦これ　カットイン発生率の推定式」
+	// http://ch.nicovideo.jp/HSG/blomaga/ar1019144
+	if (attack_type == 1) {
+		oracle += 0.14;
 	}
+	oracle += 1.0 * hunter_kammusu.GetLevel() / 2000;
+	size_t luck_temp = hunter_kammusu.GetLuck() + (has_ssp() ? 5 : 0);
+	if (luck_temp <= 50) {
+		oracle += 0.0085 * luck_temp;
+	}
+	else {
+		double temp = 1.0 * (luck_temp - 50) / 12;
+		oracle += 0.425 + temp * temp / 100;
+	}
+	oracle -= 1.0 * enemy_luck / 1000;
 	// 配置補正
-	if (attack_index.fleet_i == 0) oracle += 0.125;
+	if (attack_index.fleet_i == 0) oracle += 0.12;
 	// 損傷補正
 	if (hunter_kammusu.Status() == kStatusMiddleDamage) oracle += 0.2;
 	// 探照灯・照明弾補正
