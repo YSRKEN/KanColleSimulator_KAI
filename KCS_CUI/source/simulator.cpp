@@ -190,7 +190,7 @@ void Simulator::FitstAntiSubPhase() {
 			if (!hunter_kammusu.IsFireGun(fleet_[other_side].HasAF())) continue;
 			// 攻撃対象を選択する
 			tuple<bool, KammusuIndex> target(false, { 0, 0 });
-			if (hunter_kammusu.IsAntiSubDay()) {
+			if (hunter_kammusu.IsFirstAntiSub()) {
 				target = fleet_[other_side].RandomKammusuSS(1);
 			}
 			if (!std::get<is_attackable>(target)) continue;

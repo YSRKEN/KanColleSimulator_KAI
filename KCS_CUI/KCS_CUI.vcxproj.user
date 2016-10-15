@@ -6,7 +6,7 @@
     <LocalDebuggerWorkingDirectory>$(ProjectDir)../</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LocalDebuggerCommandArguments>-i sample\sample2.json sample\sample1.json -f 0 0 -n 100000 -t 4 -o output.json &gt; log.txt</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-i sample\1-5.json "sample\1-5 high.map" -f 0 0 -n 100000 -t 4 -o output.json &gt; log.txt</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>$(ProjectDir)../</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
