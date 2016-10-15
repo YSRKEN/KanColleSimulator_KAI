@@ -167,7 +167,7 @@ namespace KCS_GUI {
 		static JsonSerializer serailzer = new JsonSerializer { Converters = { new ListJsonConverter<Kammusu>("s") } };
 
 		int lv_ = 120;
-		int type_ = 0;
+		int type_ = 1;
 
 		public int version { get; set; } = 3;
 		// 司令部レベル
@@ -179,7 +179,7 @@ namespace KCS_GUI {
 		[JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
 		public int type {
 			get { return type_; }
-			set { type_ = value.limit(0, 3); }
+			set { type_ = value.limit(1, 4); }
 		}
 		// 艦娘
 		[JsonIgnore]

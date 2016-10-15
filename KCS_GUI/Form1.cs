@@ -120,7 +120,7 @@ namespace KCS_GUI {
 				if (MainTabControl.SelectedIndex == 0) {
 					FormFleet = new Fleet();
 					HQLevelTextBox.Text = FormFleet.lv.ToString();
-					FleetTypeComboBox.SelectedIndex = FormFleet.type;
+					FleetTypeComboBox.SelectedIndex = FormFleet.type - 1;
 					FleetSelectComboBox_SelectedIndexChanged(sender, e);
 					RedrawAntiAirScore();
 					RedrawSearchPower();
@@ -153,7 +153,7 @@ namespace KCS_GUI {
 					// 読み込んだデータを画面に反映する
 					file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
 					HQLevelTextBox.Text = FormFleet.lv.ToString();
-					FleetTypeComboBox.SelectedIndex = FormFleet.type;
+					FleetTypeComboBox.SelectedIndex = FormFleet.type - 1;
 					FleetSelectComboBox_SelectedIndexChanged(sender, e);
 					RedrawAntiAirScore();
 					RedrawSearchPower();
@@ -467,7 +467,7 @@ namespace KCS_GUI {
 			if(FleetTypeComboBox.SelectedIndex == -1)
 				return;
 			// 艦隊形式が書き換わった際は反映する
-			FormFleet.type = FleetTypeComboBox.SelectedIndex;
+			FormFleet.type = FleetTypeComboBox.SelectedIndex + 1;
 			file_state_modified(FileState.modified);
 		}
 		private void FleetSelectComboBox_SelectedIndexChanged(object sender, EventArgs e) {
@@ -547,7 +547,7 @@ namespace KCS_GUI {
 					// 読み込んだデータを画面に反映する
 					file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
 					HQLevelTextBox.Text = FormFleet.lv.ToString();
-					FleetTypeComboBox.SelectedIndex = FormFleet.type;
+					FleetTypeComboBox.SelectedIndex = FormFleet.type - 1;
 					FleetSelectComboBox_SelectedIndexChanged(sender, e);
 					RedrawAntiAirScore();
 					RedrawSearchPower();
