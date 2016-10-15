@@ -116,20 +116,20 @@ namespace atithmetic_cvt {
 		};
 		template<typename T>
 		struct from_str_helper<char16_t, T> {
-			T operator()(const std::string& s) {
+			T operator()(const std::u16string& s) {
 				if (sizeof(wchar_t) == 2) {
 					std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> wcvt;
-					return stl_wrap::stox<T>(u16tou8(u8u16cvt.to_bytes(s)));
+					return stl_wrap::stox<T>(wcvt.from_bytes(u16tou8(s)));
 				}
 				else {
 					std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> wcvt;
-					return stl_wrap::stox<T>(u16tou8(u8u16cvt.to_bytes(s)));
+					return stl_wrap::stox<T>(wcvt.from_bytes(u16tou8(s)));
 				}
 			}
 		};
 		template<typename T>
 		struct from_str_helper<char32_t, T> {
-			T operator()(const std::string& s) {
+			T operator()(const std::u32string& s) {
 				if (sizeof(wchar_t) == 2) {
 					std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> wcvt;
 					return stl_wrap::stox<T>(wcvt.from_bytes(u32tou8(s)));
