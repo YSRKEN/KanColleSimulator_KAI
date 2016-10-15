@@ -45,7 +45,7 @@ namespace KCS_GUI {
 				KammusuTypeComboBox.DataSource = MapKammusuTypeComboBox.DataSource = data.Ships
 					.Where(s => s.艦種 < shipTypes.Length)
 					.OrderBy(s => s.艦種)
-					.GroupBy(s => s.艦種, (t, g) => new { Key = shipTypes[t], Value = g.ToArray() })
+					.GroupBy(s => s.艦種, (t, g) => new { Key = shipTypes[t - 1], Value = g.ToArray() })
 					.ToArray();
 				WeaponTypeComboBox.DataSource = data.Weapons
 					.GroupBy(w => WeaponTypeToNumber.ContainsKey(w.種別) ? w.種別 : "その他", (t, g) => new { Key = t, Value = g.ToArray() })
