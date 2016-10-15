@@ -60,8 +60,8 @@ class Simulator {
 	//与えるダメージ量を計算する
 	int CalcDamage(
 		const BattlePhase&, const size_t, const KammusuIndex&, KammusuIndex&, const int&,
-		const vector<double>&, const BattlePosition&, const bool&, const double&) const;
-	int CalcDamage(const BattlePhase&, const size_t, const KammusuIndex&, KammusuIndex&, const int&, const bool&, const double&);
+		const vector<double>&, const BattlePosition&, const bool&, const double&, const bool wsn_flg = false) const;
+	int CalcDamage(const BattlePhase&, const size_t, const KammusuIndex&, KammusuIndex&, const int&, const bool&, const double&, const bool wsn_flg = false);
 	//「かばい」を確率的に発生させる
 	void ProtectOracle(const size_t, KammusuIndex&) const;
 	//命中率を計算する

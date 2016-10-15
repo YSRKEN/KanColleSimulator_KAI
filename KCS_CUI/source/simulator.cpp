@@ -670,7 +670,7 @@ void Simulator::NightPhase() {
 			wcout << hunter_kammusu.GetName() << L"(" << (bi == kFriendSide ? L"自" : L"敵") << L")が" << target_kammusu.GetName() << L"に攻撃！ " << endl;
 			cout << "基礎攻撃力：" << base_attack << " 夜間特殊攻撃：" << special_attack_flg << " 連撃：" << double_flg << "倍率：" << multiple << endl;
 #endif
-			auto damage = CalcDamage(kBattlePhaseNight, bi, friend_index, enemy_index, base_attack, special_attack_flg, multiple);
+			auto damage = CalcDamage(kBattlePhaseNight, bi, friend_index, enemy_index, base_attack, special_attack_flg, multiple, wsn_flg);
 #ifdef _DEBUG
 			cout << damage << "ダメージ！" << endl;
 #endif
@@ -731,7 +731,7 @@ AirWarStatus Simulator::JudgeAirWarStatus(const vector<int> &anti_air_score) {
 int Simulator::CalcDamage(
 	const BattlePhase &battle_phase, const size_t turn_player, const KammusuIndex &friend_index, KammusuIndex &enemy_index,
 	const int &base_attack, const vector<double> &all_attack_plus, const BattlePosition &battle_position,
-	const bool &is_special_attack, const double &multiple
+	const bool &is_special_attack, const double &multiple, const bool wsn_flg
 ) const {
 	auto other_side = kBattleSize - turn_player - 1;
 	// 旗艦相手への攻撃に限り、「かばい」が確率的に発生する
@@ -742,6 +742,9 @@ int Simulator::CalcDamage(
 	const auto &target_kammusu = enemy_side.GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i];
 	// 攻撃の命中率を計算する
 	double hit_prob = CalcHitProb(friend_side.GetFormation(), enemy_side.GetFormation(), hunter_kammusu, target_kammusu, battle_phase, turn_player, friend_index.fleet_no);
+	//夜偵発動時に命中率を10％底上げ(暫定的対応)
+	if (wsn_flg)
+		hit_prob = std::min(hit_prob + 0.1, 0.97);
 	// 対潜攻撃かどうかを判断する
 	auto is_target_submarine = target_kammusu.IsSubmarine();
 	if (is_target_submarine && battle_phase != kBattlePhaseGun
@@ -916,8 +919,8 @@ int Simulator::CalcDamage(
 }
 int Simulator::CalcDamage(
 	const BattlePhase &battle_phase, const size_t turn_player, const KammusuIndex &friend_index, KammusuIndex &enemy_index,
-	const int &base_attack, const bool &is_special_attack, const double &multiple) {
-	return CalcDamage(battle_phase, turn_player, friend_index, enemy_index, base_attack, std::get<magnification>(air_war_result_), battle_position_, is_special_attack, multiple);
+	const int &base_attack, const bool &is_special_attack, const double &multiple, const bool wsn_flg) {
+	return CalcDamage(battle_phase, turn_player, friend_index, enemy_index, base_attack, std::get<magnification>(air_war_result_), battle_position_, is_special_attack, multiple, wsn_flg);
 	}
 
 // 「かばい」を確率的に発生させる
