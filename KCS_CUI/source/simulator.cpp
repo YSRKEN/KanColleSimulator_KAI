@@ -1037,43 +1037,48 @@ double Simulator::CalcHitProb(
 		{
 			// 雷撃戦命中率
 			//命中側
-			double hit_value = 0.91587;	//命中項
+			double hit_value_a = 0.9480;
+			hit_value_a += 0.02 * sqrt(hunter_kammusu.GetLevel() - 1);
+			hit_value_a += hunter_kammusu.SumWeapons([](const auto& it_w) {
+				return it_w.AnyOf(WC("魚雷")) ? 0.007506 * it_w.GetLevel() : 0;
+			});
+			double hit_value_b = 0.9228;
 			double T = 1.0;
 			switch (battle_position_) {
 			case kBattlePositionSame:
 				T = 1.0;
 				break;
 			case kBattlePositionReverse:
-				T = 0.8242;
+				T = 0.8170;
 				break;
 			case kBattlePositionGoodT:
-				T = 1.191;
+				T = 1.203;
 				break;
 			case kBattlePositionBadT:
-				T = 0.6046;
+				T = 0.5962;
 				break;
 			}
-			hit_value += 0.02188 * sqrt(hunter_kammusu.GetLevel() - 1);
-			hit_value += T * int(0.001426 * hunter_kammusu.AllTorpedo(false) + 0.000836 * hunter_kammusu.GetTorpedo());
-			hit_value += 0.01009 * hunter_kammusu.AllHit();
-			hit_value += hunter_kammusu.SumWeapons([](const auto& it_w) {
-				return it_w.AnyOf(WC("魚雷")) ? 0.02104 * sqrt(it_w.GetLevel()) : 0;
-			});
-			hit_value += 0.001482 * hunter_kammusu.GetLuck();
+			hit_value_b += 0.001893 * hunter_kammusu.AllTorpedo(false) * T;
+			for (const auto &it_w : hunter_kammusu.GetWeapon()) {
+				hit_value_b += 0.01142 * std::sqrt(T * it_w.GetTorpedo());
+			}
+			double hit_value = hit_value_a * hit_value_b;
+			hit_value += 0.01013 * hunter_kammusu.AllHit();
+			hit_value += 0.001522 * std::sqrt(hunter_kammusu.GetLuck());
 			//回避側
 			double a;
 			switch (enemy_formation) {
 			case kFormationTrail:
-				a = 38.63;
+				a = 41.01;
 				break;
 			case kFormationSubTrail:
-				a = 38.4;
+				a = 41.00;
 				break;
 			case kFormationCircle:
-				a = 33.69;
+				a = 36.26;
 				break;
 			default:
-				a = 38.63;
+				a = 39.42;
 				break;
 			}
 			double evade_sum = target_kammusu.AllEvade();
