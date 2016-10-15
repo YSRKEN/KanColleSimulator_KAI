@@ -939,6 +939,43 @@ bool Kammusu::IsFireGun(const bool af_flg) const noexcept {
 	return true;
 }
 
+// 開幕対潜可能な艦ならtrue
+bool Kammusu::IsFirstAntiSub() const noexcept {
+	// 五十鈴改二なら無条件にOK
+	if (AnyOf(SID("五十鈴改二")))
+		return true;
+	// ソナーを持っていなければ無条件にアウト
+	bool sonar_flg = false;
+	for (auto &it_w : weapons_) {
+		if (it_w.GetWeaponClass() == WeaponClass::Sonar) {
+			sonar_flg = true;
+			break;
+		}
+	}
+	if (!sonar_flg)
+		return false;
+	// 合計対潜値が100を超えてないと合うと
+	int all_anti_sub = anti_sub_;
+	for (auto &it_w : weapons_) {
+		all_anti_sub += it_w.GetAntiSub();
+	}
+	if (all_anti_sub < 100)
+		return false;
+	// 空母型対潜攻撃
+	if (AnyOf(SC("軽空母") | SC("陸上型")))
+		return IsAntiSubDayPlane();
+	// 航戦型対潜攻撃
+	if (AnyOf(SC("航空戦艦") | SC("水上機母艦") | SC("航空巡洋艦")))
+		return IsAntiSubDayWater();
+	// 水雷型対潜攻撃
+	if (AnyOf(SC("軽巡洋艦") | SC("重雷装巡洋艦") | SC("駆逐艦") | SC("練習巡洋艦")))
+		return anti_sub_ > 0;
+	// 上記3種類が合わさった速吸改は頭おかしい(褒め言葉)
+	if (AnyOf(SC("給油艦")))
+		return (IsAntiSubDayPlane() || IsAntiSubDayWater() || (anti_sub_ > 0));
+	return false;
+}
+
 // 昼戦で対潜可能な艦ならtrue
 bool Kammusu::IsAntiSubDay() const noexcept {
 		// 空母型対潜攻撃

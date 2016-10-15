@@ -46,6 +46,7 @@ class Simulator {
 	bool is_calculated;
 	// 各フェーズ
 	void SearchPhase();
+	void FitstAntiSubPhase();
 	void AirWarPhase();
 	void BattlePositionOracle() noexcept;
 	void TorpedoPhase(const TorpedoTurn&);
