@@ -41,6 +41,9 @@ namespace KCS_GUI {
 		/* コンストラクタ */
 		public MainForm() {
 			InitializeComponent();
+			if(!System.IO.File.Exists(@System.IO.Directory.GetCurrentDirectory() + @"\Newtonsoft.Json.dll")) {
+				this.Close();
+			}
 			try {
 				KammusuTypeComboBox.DataSource = MapKammusuTypeComboBox.DataSource = data.Ships
 					.Where(s => s.艦種 < shipTypes.Length)
