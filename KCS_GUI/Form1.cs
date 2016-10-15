@@ -121,7 +121,7 @@ namespace KCS_GUI {
 				if (MainTabControl.SelectedIndex == 0) {
 					FormFleet = new Fleet();
 					HQLevelTextBox.Text = FormFleet.lv.ToString();
-					FleetTypeComboBox.SelectedIndex = FormFleet.type - 1;
+					FleetTypeComboBox.SelectedIndex = FormFleet.type;
 					FleetSelectComboBox_SelectedIndexChanged(sender, e);
 					RedrawAntiAirScore();
 					RedrawSearchPower();
@@ -154,7 +154,7 @@ namespace KCS_GUI {
 					// 読み込んだデータを画面に反映する
 					file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
 					HQLevelTextBox.Text = FormFleet.lv.ToString();
-					FleetTypeComboBox.SelectedIndex = FormFleet.type - 1;
+					FleetTypeComboBox.SelectedIndex = FormFleet.type;
 					FleetSelectComboBox_SelectedIndexChanged(sender, e);
 					RedrawAntiAirScore();
 					RedrawSearchPower();
@@ -312,8 +312,10 @@ namespace KCS_GUI {
 		}
 		private void KammusuLevelTextBox_Leave(object sender, EventArgs e) {
 			var kammusu = (Kammusu)KammusuSelectListBox.SelectedItem;
-			if (kammusu != null)
+			if (kammusu != null) {
 				kammusu.lv = KammusuLevelTextBox.Text.ParseInt();
+				file_state_modified(FileState.modified);
+			}
 		}
 		private void KammusuLuckTextBox_Validating(object sender, CancelEventArgs e) {
 			try {
@@ -548,7 +550,7 @@ namespace KCS_GUI {
 					// 読み込んだデータを画面に反映する
 					file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
 					HQLevelTextBox.Text = FormFleet.lv.ToString();
-					FleetTypeComboBox.SelectedIndex = FormFleet.type - 1;
+					FleetTypeComboBox.SelectedIndex = FormFleet.type;
 					FleetSelectComboBox_SelectedIndexChanged(sender, e);
 					RedrawAntiAirScore();
 					RedrawSearchPower();
