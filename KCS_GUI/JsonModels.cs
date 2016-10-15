@@ -143,22 +143,21 @@ namespace KCS_GUI {
 		public int maxSlots { get { return row.スロット数; } }
 
 		[JsonConstructor]
-		public Kammusu(int id, int lv, int luck, int cond = 49) {
+		public Kammusu(int id, int lv = 1, int luck = -1, int cond = 49, [JsonConverter(typeof(ListJsonConverter<Weapon>), "i")] IList<Weapon> items = null) {
 			row = data.Ships.SingleOrDefault(s => s.艦船ID == id);
 			if (row == null)
 				throw new ArgumentOutOfRangeException("id");
 			this.lv = lv;
 			this.luck = luck;
 			this.cond = cond;
-		}
-
-		public Kammusu(int id) : this(id, 1, -1) {
-			items = row.初期装備
-				.Split('/')
-				.Select(Int32.Parse)
-				.Where(weaponID => 0 < weaponID)
-				.Select(weaponID => new Weapon(weaponID))
-				.ToList();
+			this.items = items ?? new BindingList<Weapon>(
+				row.初期装備
+					.Split('/')
+					.Select(Int32.Parse)
+					.Where(weaponID => 0 < weaponID)
+					.Select(weaponID => new Weapon(weaponID))
+					.ToList()
+			);
 		}
 	}
 	// 艦隊
@@ -190,7 +189,7 @@ namespace KCS_GUI {
         }
         // 艦娘
         [JsonIgnore]
-		public IList<IList<Kammusu>> unit = Enumerable.Range(0, MaxFleetSize).Select(_ => (IList<Kammusu>)new List<Kammusu>()).ToList();
+		public IList<BindingList<Kammusu>> unit = Enumerable.Range(0, MaxFleetSize).Select(_ => new BindingList<Kammusu>()).ToList();
 
 		[JsonExtensionData]
 		IDictionary<string, JToken> additionalData = new Dictionary<string, JToken>();
@@ -200,7 +199,7 @@ namespace KCS_GUI {
 				JToken token;
 				if (!additionalData.TryGetValue($"f{i + 1}", out token))
 					break;
-				unit[i] = token.ToObject<IList<Kammusu>>(serailzer);
+				unit[i] = token.ToObject<BindingList<Kammusu>>(serailzer);
 			}
 			additionalData.Clear();
 		}
@@ -232,7 +231,7 @@ namespace KCS_GUI {
 	class Pattern {
 		public int form;
 		[JsonProperty(ItemConverterType = typeof(KammusuIdJsonConverter))]
-		public IList<Kammusu> fleets = new List<Kammusu>();
+		public IList<Kammusu> fleets = new BindingList<Kammusu>();
 	}
 	// マスデータ
 	class Position {
@@ -241,13 +240,13 @@ namespace KCS_GUI {
 		// マスの名称
 		public string name;
 		// 各パターン
-		public IList<Pattern> pattern = new List<Pattern>();
+		public IList<Pattern> pattern = new BindingList<Pattern>();
 	}
 	// マップデータ
 	class MapData {
 		public string version = "map";
 		// マス
-		public IList<Position> position = new List<Position>();
+		public IList<Position> position = new BindingList<Position>();
 
 		public static MapData ReadFrom(string path) {
 			try {
@@ -275,7 +274,7 @@ namespace KCS_GUI {
 
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) {
 			var dictionary = serializer.Deserialize<Dictionary<string, T>>(reader);
-			var list = (serializer.ObjectCreationHandling != ObjectCreationHandling.Replace ? existingValue as IList<T> : null) ?? new List<T>();
+			var list = (serializer.ObjectCreationHandling != ObjectCreationHandling.Replace ? existingValue as IList<T> : null) ?? new BindingList<T>();
 			for (var i = 1; ; i++) {
 				T t;
 				if (!dictionary.TryGetValue(prefix + i, out t))
