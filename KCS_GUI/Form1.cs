@@ -467,7 +467,7 @@ namespace KCS_GUI {
 			if(FleetTypeComboBox.SelectedIndex == -1)
 				return;
 			// 艦隊形式が書き換わった際は反映する
-			FormFleet.type = FleetTypeComboBox.SelectedIndex + 1;
+			FormFleet.type = FleetTypeComboBox.SelectedIndex;
 			file_state_modified(FileState.modified);
 		}
 		private void FleetSelectComboBox_SelectedIndexChanged(object sender, EventArgs e) {
