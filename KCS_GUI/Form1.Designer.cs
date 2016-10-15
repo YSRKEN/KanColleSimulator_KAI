@@ -232,6 +232,7 @@
 			// 
 			// WeaponNameComboBox
 			// 
+			this.WeaponNameComboBox.DisplayMember = "装備名";
 			this.WeaponNameComboBox.FormattingEnabled = true;
 			this.WeaponNameComboBox.Location = new System.Drawing.Point(188, 187);
 			this.WeaponNameComboBox.Name = "WeaponNameComboBox";
@@ -289,12 +290,12 @@
 			// 
 			// KammusuNameComboBox
 			// 
+			this.KammusuNameComboBox.DisplayMember = "艦名";
 			this.KammusuNameComboBox.FormattingEnabled = true;
 			this.KammusuNameComboBox.Location = new System.Drawing.Point(186, 105);
 			this.KammusuNameComboBox.Name = "KammusuNameComboBox";
 			this.KammusuNameComboBox.Size = new System.Drawing.Size(100, 20);
 			this.KammusuNameComboBox.TabIndex = 37;
-			this.KammusuNameComboBox.Leave += new System.EventHandler(this.KammusuNameComboBox_Leave);
 			// 
 			// WeaponDetailRfComboBox
 			// 
@@ -574,45 +575,13 @@
 			// 
 			// WeaponTypeComboBox
 			// 
+			this.WeaponTypeComboBox.DisplayMember = "Key";
 			this.WeaponTypeComboBox.FormattingEnabled = true;
-			this.WeaponTypeComboBox.Items.AddRange(new object[] {
-            "主砲",
-            "対艦強化弾",
-            "副砲",
-            "魚雷",
-            "特殊潜航艇",
-            "艦上戦闘機",
-            "艦上爆撃機",
-            "艦上爆撃機(爆戦)",
-            "水上爆撃機",
-            "艦上攻撃機",
-            "艦上偵察機",
-            "艦上偵察機(彩雲)",
-            "大型飛行艇",
-            "水上偵察機",
-            "水上偵察機(夜偵)",
-            "対潜哨戒機",
-            "オートジャイロ",
-            "小型電探",
-            "大型電探",
-            "対空機銃",
-            "対空強化弾",
-            "高射装置",
-            "爆雷",
-            "ソナー",
-            "応急修理要員",
-            "探照灯",
-            "照明弾",
-            "艦隊司令部施設",
-            "水上艦要員",
-            "戦闘糧食",
-            "洋上補給",
-            "水上戦闘機",
-            "その他"});
 			this.WeaponTypeComboBox.Location = new System.Drawing.Point(188, 162);
 			this.WeaponTypeComboBox.Name = "WeaponTypeComboBox";
 			this.WeaponTypeComboBox.Size = new System.Drawing.Size(120, 20);
 			this.WeaponTypeComboBox.TabIndex = 21;
+			this.WeaponTypeComboBox.ValueMember = "Value";
 			this.WeaponTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.WeaponTypeComboBox_SelectedIndexChanged);
 			// 
 			// label11
@@ -626,6 +595,7 @@
 			// 
 			// WeaponSelectListBox
 			// 
+			this.WeaponSelectListBox.DisplayMember = "装備名";
 			this.WeaponSelectListBox.FormattingEnabled = true;
 			this.WeaponSelectListBox.ItemHeight = 12;
 			this.WeaponSelectListBox.Location = new System.Drawing.Point(65, 165);
@@ -690,34 +660,13 @@
 			// 
 			// KammusuTypeComboBox
 			// 
+			this.KammusuTypeComboBox.DisplayMember = "Key";
 			this.KammusuTypeComboBox.FormattingEnabled = true;
-			this.KammusuTypeComboBox.Items.AddRange(new object[] {
-            "魚雷艇",
-            "駆逐艦",
-            "軽巡洋艦",
-            "重雷装巡洋艦",
-            "重巡洋艦",
-            "航空巡洋艦",
-            "軽空母",
-            "巡洋戦艦",
-            "戦艦",
-            "航空戦艦",
-            "正規空母",
-            "陸上型",
-            "潜水艦",
-            "潜水空母",
-            "輸送艦",
-            "水上機母艦",
-            "揚陸艦",
-            "装甲空母",
-            "工作艦",
-            "潜水母艦",
-            "練習巡洋艦",
-            "給油艦"});
 			this.KammusuTypeComboBox.Location = new System.Drawing.Point(186, 80);
 			this.KammusuTypeComboBox.Name = "KammusuTypeComboBox";
 			this.KammusuTypeComboBox.Size = new System.Drawing.Size(100, 20);
 			this.KammusuTypeComboBox.TabIndex = 11;
+			this.KammusuTypeComboBox.ValueMember = "Value";
 			this.KammusuTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.KammusuTypeComboBox_SelectedIndexChanged);
 			// 
 			// label7
@@ -808,6 +757,7 @@
 			// 
 			// KammusuSelectListBox
 			// 
+			this.KammusuSelectListBox.DisplayMember = "艦名";
 			this.KammusuSelectListBox.FormattingEnabled = true;
 			this.KammusuSelectListBox.ItemHeight = 12;
 			this.KammusuSelectListBox.Location = new System.Drawing.Point(65, 83);
@@ -966,6 +916,7 @@
 			// 
 			// MapKammusuNameComboBox
 			// 
+			this.MapKammusuNameComboBox.DisplayMember = "艦名";
 			this.MapKammusuNameComboBox.FormattingEnabled = true;
 			this.MapKammusuNameComboBox.Location = new System.Drawing.Point(239, 195);
 			this.MapKammusuNameComboBox.Name = "MapKammusuNameComboBox";
@@ -975,6 +926,7 @@
 			// 
 			// MapKammusuListBox
 			// 
+			this.MapKammusuListBox.DisplayMember = "艦名";
 			this.MapKammusuListBox.FormattingEnabled = true;
 			this.MapKammusuListBox.ItemHeight = 12;
 			this.MapKammusuListBox.Location = new System.Drawing.Point(78, 173);
@@ -1026,35 +978,14 @@
 			// 
 			// MapKammusuTypeComboBox
 			// 
+			this.MapKammusuTypeComboBox.DisplayMember = "Key";
 			this.MapKammusuTypeComboBox.FormattingEnabled = true;
-			this.MapKammusuTypeComboBox.Items.AddRange(new object[] {
-            "魚雷艇",
-            "駆逐艦",
-            "軽巡洋艦",
-            "重雷装巡洋艦",
-            "重巡洋艦",
-            "航空巡洋艦",
-            "軽空母",
-            "巡洋戦艦",
-            "戦艦",
-            "航空戦艦",
-            "正規空母",
-            "陸上型",
-            "潜水艦",
-            "潜水空母",
-            "輸送艦",
-            "水上機母艦",
-            "揚陸艦",
-            "装甲空母",
-            "工作艦",
-            "潜水母艦",
-            "練習巡洋艦",
-            "給油艦"});
 			this.MapKammusuTypeComboBox.Location = new System.Drawing.Point(239, 169);
 			this.MapKammusuTypeComboBox.Name = "MapKammusuTypeComboBox";
 			this.MapKammusuTypeComboBox.Size = new System.Drawing.Size(100, 20);
 			this.MapKammusuTypeComboBox.TabIndex = 32;
 			this.MapKammusuTypeComboBox.Text = "駆逐艦";
+			this.MapKammusuTypeComboBox.ValueMember = "Value";
 			this.MapKammusuTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.MapKammusuTypeComboBox_SelectedIndexChanged);
 			// 
 			// label25
