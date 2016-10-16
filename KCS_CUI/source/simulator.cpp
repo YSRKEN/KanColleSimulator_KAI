@@ -482,7 +482,7 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 #endif
 }
 
-vector<vector<std::pair<KammusuIndex, Range>>> Simulator::DetermineAttackOrder(FireTurn fire_turn, size_t fleet_index) const
+vector<vector<std::pair<KammusuIndex, Range>>> Simulator::DetermineAttackOrder(FireTurn fire_turn, size_t /*fleet_index*/) const
 {
 	vector<vector<std::pair<KammusuIndex, Range>>> attack_list(kBattleSize);
 	for (size_t bi = 0; bi < kBattleSize; ++bi) {
