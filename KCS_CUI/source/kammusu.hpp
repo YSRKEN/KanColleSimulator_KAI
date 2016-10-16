@@ -7,6 +7,7 @@
 #include <numeric>
 #include <type_traits>
 #include "random.hpp"
+#include "std_future.hpp"
 class WeaponDB;
 enum class FleetType : std::uint8_t;
 enum TorpedoTurn : std::uint8_t;
@@ -232,7 +233,7 @@ public:
 	bool AnyOf(const ShipClass& sc) const noexcept { return (static_cast<std::underlying_type_t<ShipClass>>(ship_class_) & static_cast<std::underlying_type_t<ShipClass>>(sc)) != 0; }
 	// 指定の名前か判定する。名前は完全一致で比較する。
 	template<class String, class = std::enable_if_t<std::is_same<String, std::wstring>::value>>		// 暗黙の型キャストにより非効率とならないようstd::wstringのみを受け付ける。
-	bool AnyOf(const String& test) const noexcept { return std::size(GetName()) == std::size(test) && GetName() == test; }	// 長さが一致した場合に限り文字列比較を行う。
+	bool AnyOf(const String& test) const noexcept { return std_future::size(GetName()) == std_future::size(test) && GetName() == test; }	// 長さが一致した場合に限り文字列比較を行う。
 	// 引数に指定された条件を満たすか判定する。引数はShipId型のID、ShipClass型の種別、std::wstring型の名前のいずれでも指定できる。名前は完全一致で比較する。
 	template<class Head, class... Rest>
 	bool AnyOf(Head head, Rest... rest) const noexcept { return AnyOf(head) || AnyOf(rest...); }

@@ -23,7 +23,7 @@ namespace atithmetic_cvt {
 			std::codecvt_utf8_utf16<wchar_t>,
 			std::codecvt_utf8<wchar_t>
 		>, wchar_t>;
-		wcvt_t& wcvt(){
+		static inline wcvt_t& wcvt(){
 			static wcvt_t cvt;
 			return cvt;
 		}

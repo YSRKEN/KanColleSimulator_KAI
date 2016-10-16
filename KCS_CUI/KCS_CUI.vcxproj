@@ -294,6 +294,7 @@
     <ClInclude Include="source\simulator.hpp" />
     <ClInclude Include="source\utf8bomskip.hpp" />
     <ClInclude Include="source\weapon.hpp" />
+    <ClInclude Include="source\std_future.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="source\ships.csv" />

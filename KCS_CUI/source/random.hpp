@@ -1,7 +1,7 @@
 ﻿#ifndef KCS_KAI_INC_RANDOM_HPP_
 #define KCS_KAI_INC_RANDOM_HPP_
 #include <random>
-
+#include "std_future.hpp"
 class SharedRand {
 private:
 	static thread_local std::mt19937 generator_;
@@ -33,7 +33,7 @@ public:
 	}
 	template<typename T>
 	static const auto& select_random_in_range(const T& v) {
-		return select_random_in_range(v, std::size(v));
+		return select_random_in_range(v, std_future::size(v));
 	}
 };
 #endif //KCS_KAI_INC_RANDOM_HPP_
