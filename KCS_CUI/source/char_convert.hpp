@@ -12,6 +12,10 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif //NOMINMAX
+//To avoid compile error
+//C:\Program Files (x86)\Windows Kits\8.1\Include\um\combaseapi.h(229,21): error : unknown type name 'IUnknown'
+//          static_cast<IUnknown*>(*pp);    // make sure everyone derives from IUnknown
+struct IUnknown;
 #include <windows.h>
 #include <cstring>
 namespace char_cvt {
