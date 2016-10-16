@@ -1046,9 +1046,9 @@ std::ostream & operator<<(std::ostream & os, const Kammusu & conf)
 {
 	os 
 		<< "艦船ID：" << conf.id_ << endl
-		<< "　艦名：" << char_cvt::utf_16_to_shift_jis(conf.GetName()) << "　艦種：" << char_cvt::utf_16_to_shift_jis(to_wstring(conf.ship_class_)) << endl
+		<< "　艦名：" << char_cvt::wstring2string(conf.GetName()) << "　艦種：" << char_cvt::wstring2string(to_wstring(conf.ship_class_)) << endl
 		<< "　最大耐久：" << conf.max_hp_ << "　装甲：" << conf.defense_ << "　火力：" << conf.attack_ << "　雷撃：" << conf.torpedo_ << endl
-		<< "　対空：" << conf.anti_air_ << "　運：" << conf.luck_ << "　速力：" << char_cvt::utf_16_to_shift_jis(kSpeedStr[conf.speed_]) << "　射程：" << char_cvt::utf_16_to_shift_jis(kRangeStr[conf.range_]) << endl
+		<< "　対空：" << conf.anti_air_ << "　運：" << conf.luck_ << "　速力：" << char_cvt::wstring2string(kSpeedStr[conf.speed_]) << "　射程：" << char_cvt::wstring2string(kRangeStr[conf.range_]) << endl
 		<< "　スロット数：" << conf.slots_ << "　最大搭載数：";
 	for (size_t i = 0; i < conf.slots_; ++i) {
 		if (i != 0) os << ",";
@@ -1060,7 +1060,7 @@ std::ostream & operator<<(std::ostream & os, const Kammusu & conf)
 		<< "　装備：";
 	for (size_t i = 0; i < conf.slots_; ++i) {
 		if (i != 0) os << ",";
-		os << char_cvt::utf_16_to_shift_jis(conf.weapons_[i].GetName()) << "(" << conf.weapons_[i].GetAir() << ")";
+		os << char_cvt::wstring2string(conf.weapons_[i].GetName()) << "(" << conf.weapons_[i].GetAir() << ")";
 	}
 	os 
 		<< endl

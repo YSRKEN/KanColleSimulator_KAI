@@ -598,11 +598,11 @@ bool Fleet::HasAF() const noexcept {
 
 std::ostream & operator<<(std::ostream & os, const Fleet & conf)
 {
-	os << "陣形：" << char_cvt::utf_16_to_shift_jis(kFormationStr[conf.formation_]) << "　司令部レベル：" << conf.level_ << "　形式：" << char_cvt::utf_16_to_shift_jis(kFleetTypeStr[int(conf.fleet_type_) - 1]) << endl;
+	os << "陣形：" << char_cvt::wstring2string(kFormationStr[conf.formation_]) << "　司令部レベル：" << conf.level_ << "　形式：" << char_cvt::wstring2string(kFleetTypeStr[int(conf.fleet_type_) - 1]) << endl;
 	for (size_t fi = 0; fi < conf.unit_.size(); ++fi) {
 		os << "　第" << (fi + 1) << "艦隊：" << endl;
 		for (auto &it_k : conf.unit_[fi]) {
-			os << "　　" << char_cvt::utf_16_to_shift_jis(it_k.GetNameLv()) << " " << it_k.GetHP() << "/" << it_k.GetMaxHP() <<  endl;
+			os << "　　" << char_cvt::wstring2string(it_k.GetNameLv()) << " " << it_k.GetHP() << "/" << it_k.GetMaxHP() <<  endl;
 		}
 	}
 	os << endl;
