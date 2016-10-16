@@ -191,9 +191,9 @@ public:
 	int AacType() const noexcept;					//対空カットインの種類を判別する
 	double AacProb(const int&) const noexcept;		//対空カットインの発動確率を計算する
 	double AllAntiAir() const noexcept;				//加重対空値を計算する
-	Status Status() const noexcept;					//ステータスを返す
+	enum Status Status() const noexcept;					//ステータスを返す
 	int AllEvade() const noexcept;					//総回避を返す
-	Mood Mood() const noexcept;						//疲労度を返す
+	enum Mood Mood() const noexcept;						//疲労度を返す
 	int AllHit() const noexcept;					//総命中を返す
 	double FitGunHitPlus() const noexcept;			//フィット砲補正
 	int AllTorpedo(const bool&) const noexcept;		//総雷装を返す
