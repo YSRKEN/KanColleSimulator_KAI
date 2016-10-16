@@ -36,6 +36,7 @@
     <File Name="source/weapon.hpp"/>
     <File Name="../version.h"/>
     <File Name="source/char_convert.hpp"/>
+    <File Name="source/std_future.hpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="resources">
     <File Name="CMakeLists.txt"/>
