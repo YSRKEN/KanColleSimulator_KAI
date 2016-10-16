@@ -89,7 +89,8 @@ namespace detail {
 		return (val < info.min) ? info.min : (info.max < val) ? info.max : val;
 	}
 }
-inline detail::to_i_helper<int> to_i() noexcept { return{}; }
+template<typename T = int, std::enable_if_t<std::is_arithmetic<T>::value, std::nullptr_t> = nullptr>
+inline detail::to_i_helper<T> to_i() noexcept { return{}; }
 inline detail::to_i_helper<size_t> to_sz() noexcept { return{}; }
 
 template<typename T>

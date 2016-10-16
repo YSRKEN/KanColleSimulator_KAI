@@ -10,13 +10,23 @@ namespace detail {
 		const T& min;
 		const T& max;
 	};
-	template<typename T>
+
+	//SFINAEしないと`std::underlying_type_t<some arithmetic type>``のインスタンス化が要求されるのでstd::conditional_tは使えない
+
+	template<typename T, std::enable_if_t<std::is_arithmetic<T>::value, std::nullptr_t> = nullptr>//arithmetic version
 	inline T operator|(const std::string& str, const to_i_limit_helper<T>& info) {
-		const int val = str | to_i();
-		return (val < info.min) ? info.min : (info.max < val) ? info.max : static_cast<T>(val);
+		const auto val = str | to_i<T>();
+		return (val < info.min) ? info.min : (info.max < val) ? info.max : val;
+	}
+	template<typename T, std::enable_if_t<std::is_enum<T>::value, std::nullptr_t> = nullptr>//enum version
+	inline T operator|(const std::string& str, const to_i_limit_helper<T>& info) {
+		using BaseType = std::underlying_type_t<T>;//基底型の取得
+		const auto val = str | to_i<BaseType>();
+		//enum classにoperator<を要求しないためにキャストが必要
+		return (val < static_cast<BaseType>(info.min)) ? info.min : (static_cast<BaseType>(info.max) < val) ? info.max : static_cast<T>(val);
 	}
 }
-template<typename T>
+template<typename T, std::enable_if_t<std::is_integral<T>::value || std::is_enum<T>::value, std::nullptr_t> = nullptr>
 inline constexpr detail::to_i_limit_helper<T> to_i_limit(const T &val_min, const T &val_max) noexcept { return{ val_min, val_max }; }
 namespace detail {
 	template<typename ResultType> struct picojson_object_get_with_limit_or_default {
@@ -46,7 +56,7 @@ void Fleet::LoadJson(std::istream & file, char_cvt::char_enc fileenc)
 	//司令部レベル
 	level_ = o | GetWithLimitOrDefault("lv", 1, 120, 120);
 	//艦隊の形式
-	fleet_type_ = FleetType(o | GetWithLimitOrDefault("type", int(FleetType::Normal), int(FleetType::CombinedDrum), int(FleetType::Normal)));
+	fleet_type_ = o | GetWithLimitOrDefault("type", FleetType::Normal, FleetType::CombinedDrum, FleetType::Normal);
 	if (fleet_type_ != FleetType::Normal && formation_ == kFormationEchelon) {
 		// 連合艦隊に梯形陣は存在しないので、とりあえず単横陣(第一警戒航行序列)に変更しておく
 		formation_ = kFormationAbreast;
