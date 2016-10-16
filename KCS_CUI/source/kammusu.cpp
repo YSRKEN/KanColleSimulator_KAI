@@ -464,16 +464,75 @@ double Kammusu::FitGunHitPlus() const noexcept {
 			++sum_46X;
 	}
 	// 種類により減衰量を決定する
-	if (AnyOf(SID("扶桑"), SID("山城"), SID("伊勢"), SID("日向")))                              return                                                     fit[sum_41]         + unfit_large[sum_46] + unfit_large[sum_46X];		// 伊勢・扶桑型戦艦
-	if (AnyOf(SID("伊勢改"), SID("日向改"), SID("扶桑改"), SID("山城改")))                       return fit[sum_356] + fit[sum_38] + fit[sum_381]                               + unfit_large[sum_46] + unfit_small[sum_46X];		// 伊勢型・扶桑型航戦
-	if (AnyOf(SID("扶桑改二"), SID("山城改二")))                                                return fit[sum_356] + fit[sum_38] + fit[sum_381]         + fit[sum_41]         + unfit_large[sum_46] + unfit_small[sum_46X];		// 扶桑型航戦改二
+	if (AnyOf(SID("扶桑"), SID("山城"), SID("伊勢"), SID("日向"))) {
+		// 伊勢・扶桑型戦艦
+		if (level_ < 100) {
+			return fit[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];
+		}
+		else {
+			return fit[sum_356] + fit[sum_38] + fit[sum_381] + fit[sum_41] + unfit_small[sum_46] + unfit_small[sum_46X];
+		}
+	}
+	if (AnyOf(SID("伊勢改"), SID("日向改"), SID("扶桑改"), SID("山城改"))) {
+		// 伊勢型・扶桑型航戦
+		if (level_ < 100) {
+			return fit[sum_356] + fit[sum_38] + fit[sum_381] + unfit_large[sum_46] + unfit_small[sum_46X];
+		}
+		else {
+			return fit[sum_356] + fit[sum_38] + fit[sum_381] + fit[sum_41] + unfit_small[sum_46];
+		}
+	}
+	if (AnyOf(SID("扶桑改二"), SID("山城改二"))) {
+		// 扶桑型航戦改二
+		if (level_ < 100) {
+			return fit[sum_356] + fit[sum_38] + fit[sum_381] + fit[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];
+		}
+		else {
+			return fit[sum_356] + fit[sum_38] + fit[sum_381] + fit[sum_41] + unfit_small[sum_46];
+		}
+	}
 	if (AnyOf(SID("金剛"), SID("榛名"), SID("霧島"), SID("比叡"),
 		SID("金剛改"), SID("比叡改"), SID("榛名改"), SID("霧島改"),
-		SID("金剛改二"), SID("比叡改二"), SID("榛名改二"), SID("霧島改二")))                     return fit[sum_356] + fit[sum_38]                        + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];		// 金剛型改二
-	if (AnyOf(SID("Bismarck"), SID("Bismarck改"), SID("Bismarck zwei"), SID("Bismarck drei"))) return fit[sum_356] + fit[sum_38] - unfit_small[sum_381] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];		// Bismarck型
-	if (AnyOf(SID("Littorio"), SID("Roma"), SID("Italia"), SID("Roma改")))                     return fit[sum_356]               + fit[sum_381]         + unfit_small[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];		// イタリア艦
-	if (AnyOf(SID("長門"), SID("陸奥"), SID("長門改"), SID("陸奥改")))                          return fit[sum_356]               + fit[sum_381]         + fit[sum_41]         + unfit_small[sum_46] + unfit_small[sum_46X];		// 長門型
-	if (AnyOf(SID("大和"), SID("大和改"), SID("武蔵"), SID("武蔵改")))                          return                                                     fit[sum_41];															// 大和型
+		SID("金剛改二"), SID("比叡改二"), SID("榛名改二"), SID("霧島改二"))) {
+		// 金剛型改二
+		if (level_ < 100) {
+			return fit[sum_356] + fit[sum_38] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];
+		}
+		else {
+			return fit[sum_356] + fit[sum_38] + fit[sum_381] + unfit_small[sum_46];
+		}
+	}
+	if (AnyOf(SID("Bismarck"), SID("Bismarck改"), SID("Bismarck zwei"), SID("Bismarck drei"))) {
+		// Bismarck型
+		if (level_ < 100) {
+			return fit[sum_356] + fit[sum_38] + unfit_small[sum_381] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];
+		}
+		else {
+			return fit[sum_356] + fit[sum_38] + unfit_small[sum_46];
+		}
+	}
+	if (AnyOf(SID("Littorio"), SID("Roma"), SID("Italia"), SID("Roma改"))) {
+		// イタリア艦
+		if (level_ < 100) {
+			return fit[sum_356] + fit[sum_381] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];
+		}
+		else {
+			return fit[sum_356] + fit[sum_38] + fit[sum_381] + unfit_small[sum_46] + unfit_small[sum_46X];
+		}
+	}
+	if (AnyOf(SID("長門"), SID("陸奥"), SID("長門改"), SID("陸奥改"))) {
+		// 長門型
+		if (level_ < 100) {
+			return fit[sum_356] + fit[sum_38] + fit[sum_381] + fit[sum_41] + unfit_small[sum_46] + unfit_small[sum_46X];
+		}
+		else {
+			return fit[sum_356] + fit[sum_38] + fit[sum_381] + fit[sum_41];
+		}
+	}
+	if (AnyOf(SID("大和"), SID("大和改"), SID("武蔵"), SID("武蔵改"))) {
+		// 大和型
+		return fit[sum_41];
+	}
 	return 0.0;
 }
 
