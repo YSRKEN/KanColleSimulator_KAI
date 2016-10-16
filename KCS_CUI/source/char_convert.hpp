@@ -8,13 +8,17 @@ Distributed under the Boost Software License, Version 1.0.
 #define CHAR_CONVERT_INC_ARITHMETIC_CHAR_CONVERT_HPP_
 #include <codecvt>
 #include <string>
+#include <locale>
 #ifdef _WIN32
 #	ifndef NOMINMAX
 #		define NOMINMAX
 #	endif //NOMINMAX
+//To avoid compile error
+//C:\Program Files (x86)\Windows Kits\8.1\Include\um\combaseapi.h(229,21): error : unknown type name 'IUnknown'
+//          static_cast<IUnknown*>(*pp);    // make sure everyone derives from IUnknown
+struct IUnknown;
 #	include <windows.h>
 #	include <cstring>
-#	include <locale>
 namespace char_cvt {
 	inline std::wstring shift_jis_to_utf_16(const std::string& str)
 	{
