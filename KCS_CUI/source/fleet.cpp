@@ -135,7 +135,10 @@ Fleet::Fleet(const string &file_name, const Formation &formation, char_cvt::char
 	// ファイルを読み込む
 	ifstream fin(file_name);
 	FILE_THROW_WITH_MESSAGE_IF(!fin.is_open(), "艦隊データが正常に読み込めませんでした.")
-	if(char_cvt::char_enc::shift_jis != fileenc) skip_utf8_bom(fin, fileenc);
+#ifdef _WIN32
+	if(char_cvt::char_enc::shift_jis != fileenc)
+#endif //_WIN32
+		skip_utf8_bom(fin, fileenc);
 	this->LoadJson(fin, fileenc);
 }
 
