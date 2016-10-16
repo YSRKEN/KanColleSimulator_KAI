@@ -101,6 +101,9 @@
     <ClInclude Include="source\lookup.hpp">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="source\std_future.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
     <ClInclude Include="..\version.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
