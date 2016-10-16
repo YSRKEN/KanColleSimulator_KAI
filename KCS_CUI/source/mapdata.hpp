@@ -1,13 +1,13 @@
-#ifndef KCS_KAI_MAPDATA_H_
+ï»¿#ifndef KCS_KAI_MAPDATA_H_
 #define KCS_KAI_MAPDATA_H_
 #include "char_convert.hpp"
 
 class MapData {
-	vector<vector<Fleet>> fleet_;				//Šeƒ}ƒX‚²‚Æ‚ÌŠÍ‘àƒf[ƒ^
-	vector<SimulateMode> simulate_mode_;		//Šeƒ}ƒX‚²‚Æ‚Ìí“¬Œ`®
-	vector<wstring> point_name_;				//Šeƒ}ƒX‚Ì–¼‘O
+	vector<vector<Fleet>> fleet_;				//å„ãƒã‚¹ã”ã¨ã®è‰¦éšŠãƒ‡ãƒ¼ã‚¿
+	vector<SimulateMode> simulate_mode_;		//å„ãƒã‚¹ã”ã¨ã®æˆ¦é—˜å½¢å¼
+	vector<wstring> point_name_;				//å„ãƒã‚¹ã®åå‰
 public:
-	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	MapData(const string &file_name, char_cvt::char_enc fileenc = char_cvt::char_enc::utf8);
 	// getter
 	size_t GetSize() const noexcept;
@@ -15,8 +15,8 @@ public:
 	Fleet GetFleet(const size_t, const size_t) const noexcept;
 	SimulateMode GetSimulateMode(const size_t) const noexcept;
 	wstring GetPointName(const size_t) const noexcept;
-	// ‚»‚Ì‘¼
-	void Put() const;	//“à—e‚ğ•\¦‚·‚é
+	// ãã®ä»–
+	void Put() const;	//å†…å®¹ã‚’è¡¨ç¤ºã™ã‚‹
 };
 
 #endif
