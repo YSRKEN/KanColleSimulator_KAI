@@ -5,6 +5,8 @@
 #include <iostream>
 #include <type_traits>
 #include <utility>
+#include <string>
+#include <functional>
 #include "cstring.hpp"
 #include "lookup.hpp"
 // 装備ID
