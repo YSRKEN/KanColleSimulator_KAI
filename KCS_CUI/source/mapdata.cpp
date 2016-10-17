@@ -8,7 +8,10 @@ MapData::MapData(const string &file_name, char_cvt::char_enc fileenc) {
 	// ファイルを読み込む
 	ifstream fin(file_name);
 	FILE_THROW_WITH_MESSAGE_IF(!fin.is_open(), "マップデータが正常に読み込めませんでした.")
-	if (char_cvt::char_enc::shift_jis != fileenc) skip_utf8_bom(fin, fileenc);
+#ifdef _WIN32
+	if (char_cvt::char_enc::shift_jis != fileenc)
+#endif //_WIN32
+		skip_utf8_bom(fin, fileenc);
 	using picojson::object;
 	using picojson::array;
 	using picojson::value;

@@ -190,6 +190,22 @@ GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
 
+# Visual Studio Code
+.vscode/
+
+# Code Lite
+.codelite/
+*.batch_build
+*.tags
+compile_commands.json
+
+# Cmake
+CMakeFiles/
+cmake_install.cmake
+CMakeCache.txt
+Makefile
+
+
 #other
 Log.txt
 *.VC.opendb
@@ -207,3 +223,4 @@ zip/
 KCS_CUI/My Amplifier XE Results - KCS_CUI/
 進捗.txt
 *.res
+KCS_CUI/source/KCS_CUI

@@ -152,7 +152,15 @@ namespace char_cvt {
 		template<> struct stringwstring_cvt<2U> : std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> {};
 		template<> struct stringwstring_cvt<4U> : std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> {};
 	}
-	inline std::wstring string2wstring(const std::string& s, char_enc type) {
+	inline std::wstring string2wstring(
+		const std::string& s, 
+		char_enc type
+#ifdef _WIN32
+		= char_enc::shift_jis
+#else
+		= char_enc::utf8
+#endif
+	) {
 		static detail::stringwstring_cvt<sizeof(wchar_t)> cvt;
 		switch (type) {
 		case char_enc::utf8:
@@ -165,7 +173,15 @@ namespace char_cvt {
 			throw std::runtime_error("unknown encode.");
 		}
 	}
-	inline std::string wstring2string(const std::wstring& s, char_enc type) {
+	inline std::string wstring2string(
+		const std::wstring& s, 
+		char_enc type
+#ifdef _WIN32
+		= char_enc::shift_jis
+#else
+		= char_enc::utf8
+#endif
+	) {
 		static detail::stringwstring_cvt<sizeof(wchar_t)> cvt;
 		switch (type) {
 		case char_enc::utf8:
@@ -179,17 +195,10 @@ namespace char_cvt {
 		}
 	}
 	inline std::string to_string(const std::wstring& s, char_enc type) { return wstring2string(s, type); }
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4100 )//warning C4100: 'type': 引数は関数の本体部で 1 度も参照されません。
-#endif
 	inline std::string to_string(const std::string& s) { return s; }
 	inline std::string to_string(const std::string& s, char_enc) { return s; }
 	inline std::wstring to_wstring(const std::wstring& s) { return s; }
 	inline std::wstring to_wstring(const std::wstring& s, char_enc) { return s; }
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
 	inline std::wstring to_wstring(const std::string& s, char_enc type) { return string2wstring(s, type); }
 }
 #endif //CHAR_CONVERT_INC_ARITHMETIC_CHAR_CONVERT_HPP_
