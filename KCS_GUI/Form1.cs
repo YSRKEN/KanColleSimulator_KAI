@@ -135,9 +135,6 @@ namespace KCS_GUI {
 				}
 			}
 		}
-		private string filepath_to_name(string path) {
-			return path.Substring(path.LastIndexOf('\\') + 1);
-		}
 		private void OpenFileMenuItem_Click(object sender, EventArgs e) {
 			if (SaveChangeBreforeNewCreate()) {
 				if (MainTabControl.SelectedIndex == 0) {
@@ -152,7 +149,7 @@ namespace KCS_GUI {
 					if(FormFleet == null)
 						return;
 					// 読み込んだデータを画面に反映する
-					file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
+					file_state_modified(Path.GetFileName(this.FleetFilePath), FileState.saved);
 					HQLevelTextBox.Text = FormFleet.lv.ToString();
 					FleetTypeComboBox.SelectedIndex = FormFleet.type;
 					FleetSelectComboBox_SelectedIndexChanged(sender, e);
@@ -171,7 +168,7 @@ namespace KCS_GUI {
 					if (FormMapData == null)
 						return;
 					// 読み込んだデータを画面に反映する
-					file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
+					file_state_modified(Path.GetFileName(this.MapFilePath), FileState.saved);
 					MapPositionListBox.Items.Clear();
 					foreach (var position in FormMapData.position) {
 						MapPositionListBox.Items.Add(position.name);
@@ -200,7 +197,7 @@ namespace KCS_GUI {
 			if ((FleetFilePath == null || FleetFilePath == "" || force_create) && !CreateFleetFile()) return;
 			// 作成したデータを保存する
 			FormFleet.WriteTo(FleetFilePath);
-			file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
+			file_state_modified(Path.GetFileName(this.FleetFilePath), FileState.saved);
 		}
 		private bool CreateMapFile() {
 			var sfd = new SaveFileDialog();
@@ -229,7 +226,7 @@ namespace KCS_GUI {
 			if ((MapFilePath == null || MapFilePath == "" || force_create) && !CreateMapFile()) return;
 			// 作成したデータを保存する
 			FormMapData.WriteTo(MapFilePath);
-			file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
+			file_state_modified(Path.GetFileName(this.MapFilePath), FileState.saved);
 		}
 		private void SaveSFileMenuItem_Click(object sender, EventArgs e) {
 			if(MainTabControl.SelectedIndex == 0) {
@@ -548,7 +545,7 @@ namespace KCS_GUI {
 					if(FormFleet == null)
 						return;
 					// 読み込んだデータを画面に反映する
-					file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
+					file_state_modified(Path.GetFileName(this.FleetFilePath), FileState.saved);
 					HQLevelTextBox.Text = FormFleet.lv.ToString();
 					FleetTypeComboBox.SelectedIndex = FormFleet.type;
 					FleetSelectComboBox_SelectedIndexChanged(sender, e);
@@ -569,7 +566,7 @@ namespace KCS_GUI {
 					if (FormMapData == null)
 						return;
 					// 読み込んだデータを画面に反映する
-					file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
+					file_state_modified(Path.GetFileName(this.MapFilePath), FileState.saved);
 					MapPositionListBox.Items.Clear();
 					foreach (var position in FormMapData.position) {
 						MapPositionListBox.Items.Add(position.name);
