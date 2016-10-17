@@ -71,7 +71,7 @@ namespace char_cvt {
 	}
 }
 #endif //_WIN32
-#if defined(_MSC_FULL_VER) && _MSC_FULL_VER <= 190023506
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER <= 190023506 && !defined(__c2__)
 #include <algorithm>
 namespace char_cvt {
 	namespace detail {
@@ -105,7 +105,7 @@ namespace char_cvt {
 
 namespace char_cvt {
 	inline std::string u32tou8(const std::u32string& s) {
-#if defined(_MSC_FULL_VER) && _MSC_FULL_VER <= 190023506
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER <= 190023506 && !defined(__c2__)
 		static std::wstring_convert<std::codecvt_utf8<__int32>, __int32> u8u32cvt;
 		return u8u32cvt.to_bytes(detail::u32_to_int32_string(s));
 #else
@@ -114,7 +114,7 @@ namespace char_cvt {
 #endif
 	}
 	inline std::u32string u8tou32(const std::string& s) {
-#if defined(_MSC_FULL_VER) && _MSC_FULL_VER <= 190023506
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER <= 190023506 && !defined(__c2__)
 		static std::wstring_convert<std::codecvt_utf8<__int32>, __int32> u8u32cvt;
 		return detail::int32_to_u32_string(u8u32cvt.from_bytes(s));
 #else
@@ -123,7 +123,7 @@ namespace char_cvt {
 #endif
 	}
 	inline std::string u16tou8(const std::u16string& s) {
-#if defined(_MSC_FULL_VER) && _MSC_FULL_VER <= 190023506
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER <= 190023506 && !defined(__c2__)
 		static td::wstring_convert<std::codecvt_utf8_utf16<__int16>, __int16> u8u16cvt;
 		return u8u16cvt.to_bytes(detail::u16_to_int16_string(s));
 #else
@@ -132,7 +132,7 @@ namespace char_cvt {
 #endif
 	}
 	inline std::u16string u8tou16(const std::string& s) {
-#if defined(_MSC_FULL_VER) && _MSC_FULL_VER <= 190023506
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER <= 190023506 && !defined(__c2__)
 		static std::wstring_convert<std::codecvt_utf8_utf16<__int16>, __int16> u8u16cvt;
 		return detail::int16_to_u16_string(u8u16cvt.from_bytes(s));
 #else
