@@ -1,13 +1,12 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.1)
+enable_language(CXX)
 set(CMAKE_CXX_STANDARD 14) # C++11...
 set(CMAKE_CXX_STANDARD_REQUIRED ON) #...is required...
 set(CMAKE_CXX_EXTENSIONS OFF) #...without compiler extensions like gnu++11
-
-## Use the variable PROJECT_NAME for changing the target name
-set( PROJECT_NAME "KCS_CUI" )
+find_package(Threads REQUIRED)
 
 ## Set our project name
-project(${PROJECT_NAME})
+project(KCS_CUI)
 
 set(kcs_kai_src 
 	config.cpp
@@ -24,4 +23,5 @@ set(kcs_kai_src
 )
 
 ## Define the executable
-add_executable(${PROJECT_NAME} ${kcs_kai_src})
+add_executable(KCS_CUI ${kcs_kai_src})
+target_link_libraries(KCS_CUI Threads::Threads)

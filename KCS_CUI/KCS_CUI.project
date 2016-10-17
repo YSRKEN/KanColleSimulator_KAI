@@ -39,7 +39,7 @@
     <File Name="source/std_future.hpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="resources">
-    <File Name="CMakeLists.txt"/>
+    <File Name="source/CMakeLists.txt"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -62,7 +62,7 @@
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
-      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="source/KCS_CUI" IsExtended="no">
         <DebuggerSearchPaths/>
         <PostConnectCommands/>
         <StartupCommands/>
@@ -71,9 +71,10 @@
       <PostBuild/>
       <CustomBuild Enabled="yes">
         <Target Name="cmake">cmake . -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1</Target>
+        <Target Name="Build_VERBOSE">make -j4  VERBOSE=1 2&gt;&amp;1</Target>
         <RebuildCommand>make clean &amp;&amp; make -j4</RebuildCommand>
         <CleanCommand>make clean</CleanCommand>
-        <BuildCommand>make -j4  VERBOSE=1 2&gt;&amp;1</BuildCommand>
+        <BuildCommand>make -j4</BuildCommand>
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
@@ -158,7 +159,7 @@
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
         <ThirdPartyToolName>None</ThirdPartyToolName>
-        <WorkingDirectory>$(WorkspacePath)/build-release</WorkingDirectory>
+        <WorkingDirectory>$(WorkspacePath)/KCS_CUI/source</WorkingDirectory>
       </CustomBuild>
       <AdditionalRules>
         <CustomPostBuild/>
