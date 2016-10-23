@@ -224,3 +224,8 @@ KCS_CUI/My Amplifier XE Results - KCS_CUI/
 進捗.txt
 *.res
 KCS_CUI/source/KCS_CUI
+KCS_CUI/source/hsptmp
+sample/avaris.json
+sample/ロリコン.json
+sample/ロリコン2.json
+ship_temp.csv
