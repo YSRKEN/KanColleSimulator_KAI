@@ -33,6 +33,7 @@ public:
 	}
 	template<typename T>
 	static const auto& select_random_in_range(const T& v) {
+		INVAID_ARGUMENT_THROW_WITH_MESSAGE_IF(std_future::size(v) < 1, "range is empty.");
 		return select_random_in_range(v, std_future::size(v));
 	}
 };

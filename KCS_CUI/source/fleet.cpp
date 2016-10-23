@@ -152,6 +152,8 @@ Fleet::Fleet(std::istream & file, const Formation & formation, char_cvt::char_en
 // setter
 void Fleet::SetFormation(const Formation formation) { formation_ = formation; }
 
+void Fleet::ResizeUnit(size_t size) { unit_.resize(size); }
+
 // getter
 Formation Fleet::GetFormation() const noexcept { return formation_; }
 vector<vector<Kammusu>>& Fleet::GetUnit() noexcept { return unit_; }
@@ -501,25 +503,16 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const T
 
 // 潜水の生存艦から艦娘をランダムに指定する
 tuple<bool, KammusuIndex> Fleet::RandomKammusuSS(const size_t fleet_index) const {
+	INVAID_ARGUMENT_THROW_WITH_MESSAGE_IF(1 < fleet_index, "fleet_index is iregal");
 	// 攻撃する艦隊の対象を選択する
-	vector<size_t> list;
-	switch (fleet_index) {
-	case 0:
-		list = { FirstIndex() };
-		break;
-	case 1:
-		list = { SecondIndex() };
-		break;
-	}
+	const size_t fi = (0 == fleet_index) ? FirstIndex() : SecondIndex();
 	//生存する潜水艦をリストアップ
 	vector<KammusuIndex> alived_list;
-	for (auto &fi : list) {
-		for (size_t ui = 0; ui < GetUnit()[fi].size(); ++ui) {
-			const auto &it_k = GetUnit()[fi][ui];
-			if (it_k.Status() == kStatusLost) continue;
-			if (!it_k.IsSubmarine()) continue;
-			alived_list.push_back({ fi, ui });
-		}
+	for (size_t ui = 0; ui < GetUnit()[fi].size(); ++ui) {
+		const auto &it_k = GetUnit()[fi][ui];
+		if (it_k.Status() == kStatusLost) continue;
+		if (!it_k.IsSubmarine()) continue;
+		alived_list.push_back({ fi, ui });
 	}
 	if (alived_list.size() == 0) return tuple<bool, KammusuIndex>(false, { 0 , 0 });
 	return tuple<bool, KammusuIndex>(true, SharedRand::select_random_in_range(alived_list));
@@ -552,7 +545,7 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuAF(const size_t fleet_index) const
 }
 
 template<typename CondFunc>
-bool any_of(const std::vector<std::vector<Kammusu>>& unit, CondFunc cond) noexcept {
+bool any_of(const std::vector<std::vector<Kammusu>>& unit, CondFunc&& cond) noexcept {
 	for (auto &it_u : unit) {
 		for (auto &it_k : it_u) {
 			if (it_k.Status() == kStatusLost) continue;
@@ -599,7 +592,7 @@ bool Fleet::HasAF() const noexcept {
 std::ostream & operator<<(std::ostream & os, const Fleet & conf)
 {
 	os << "陣形：" << char_cvt::wstring2string(kFormationStr[conf.formation_]) << "　司令部レベル：" << conf.level_ << "　形式：" << char_cvt::wstring2string(kFleetTypeStr[int(conf.fleet_type_) - 1]) << endl;
-	for (size_t fi = 0; fi < conf.unit_.size(); ++fi) {
+	for (size_t fi = 0; fi < conf.FleetSize(); ++fi) {
 		os << "　第" << (fi + 1) << "艦隊：" << endl;
 		for (auto &it_k : conf.unit_[fi]) {
 			os << "　　" << char_cvt::wstring2string(it_k.GetNameLv()) << " " << it_k.GetHP() << "/" << it_k.GetMaxHP() <<  endl;
@@ -612,7 +605,7 @@ std::ostream & operator<<(std::ostream & os, const Fleet & conf)
 std::wostream & operator<<(std::wostream & os, const Fleet & conf)
 {
 	os << L"陣形：" << kFormationStr[conf.formation_] << L"　司令部レベル：" << conf.level_ << L"　形式：" << kFleetTypeStr[int(conf.fleet_type_) - 1] << endl;
-	for (size_t fi = 0; fi < conf.unit_.size(); ++fi) {
+	for (size_t fi = 0; fi < conf.FleetSize(); ++fi) {
 		os << L"　第" << (fi + 1) << L"艦隊：" << endl;
 		for (auto &it_k : conf.unit_[fi]) {
 			os << L"　　" << it_k.GetNameLv() << L" " << it_k.GetHP() << L"/" << it_k.GetMaxHP() << endl;
