@@ -988,47 +988,85 @@ double Simulator::CalcHitProb(
 			// 回避側
 			//まずは回避値を出す
 			double evade_sum = target_kammusu.AllEvade();
-			if (enemy_formation == kFormationEchelon || enemy_formation == kFormationAbreast) evade_sum *= 1.2;
-			if (target_kammusu.Mood() == kMoodHappy) evade_sum *= 1.8;
-			//そこから回避項を求める
-			double evade_value;
-			if (evade_sum <= 40) {
-				evade_value = 0.03 + evade_sum / 80;
-			}
-			else {
-				evade_value = 0.03 + evade_sum / (evade_sum + 40);
-			}
-			// 命中側
-			//練度による命中率補正
-			double hit_value = 1.0 + sqrt(hunter_kammusu.GetLevel() - 1) / 50;
-			//装備による明示的な命中率補正
-			hit_value += hunter_kammusu.AllHit() / 100;
-			//赤疲労状態だと命中率が激減する
-			if (hunter_kammusu.Mood() == kMoodRed) hit_value /= 1.9;
-			//命中率の運補正
-			hit_value += hunter_kammusu.GetLuck() * 0.0015;
-			//フィット砲補正
-			hit_value += hunter_kammusu.FitGunHitPlus();
-			//命中率の陣形補正
-			switch (friend_formation) {
-			case kFormationSubTrail:
-				if (enemy_formation != kFormationAbreast) hit_value += 0.2;
-				break;
-			case kFormationEchelon:
-				if (enemy_formation != kFormationSubTrail) hit_value += 0.2;
+			//次に回避項を求める
+			double evade_value = (evade_sum + 0.15 * target_kammusu.GetLuck()) * (7.0 / 6) / 100;
+			switch (enemy_formation) {	//陣形補正
+			case kFormationCircle:
+				evade_value *= 1.15;
 				break;
 			case kFormationAbreast:
-				if (enemy_formation != kFormationTrail) hit_value += 0.2;
+				if (friend_formation == kFormationAbreast
+				|| friend_formation == kFormationEchelon) {
+					evade_value *= 1.45;
+				}
+				else {
+					evade_value *= 1.25;
+				}
+				break;
+			case kFormationEchelon:
+				if (friend_formation == kFormationEchelon
+				|| friend_formation == kFormationSubTrail) {
+					evade_value *= 1.45;
+				}
+				else {
+					evade_value *= 1.25;
+				}
 				break;
 			default:
 				break;
 			}
-			//夜戦時の重巡による命中率補正
-			hit_value += hunter_kammusu.FitNightHitPlus();
+			switch (target_kammusu.Mood()) {	//疲労キラ補正
+			case kMoodHappy:
+				evade_value *= 1.8;
+				break;
+			case kMoodOrange:
+				evade_value *= 0.75;
+				break;
+			case kMoodRed:
+				evade_value *= 0.5;
+				break;
+			default:
+				break;
+			}
+			if (evade_value > 0.5) {
+				evade_value = evade_value / (evade_value + 0.5);
+			}
+			// 命中側
+			double hit_value_temp = 0.9 + sqrt(hunter_kammusu.GetLevel() - 1) / 50;
+			hit_value_temp += 1.0 * hunter_kammusu.AllHit() / 100 + hunter_kammusu.FitGunHitPlus() + hunter_kammusu.FitNightHitPlus();
+			hit_value_temp += 1.5 * sqrt(hunter_kammusu.GetLuck()) / 100;
+			//命中率の陣形補正
+			switch (friend_formation) {
+			case kFormationSubTrail:
+				if (enemy_formation != kFormationAbreast) hit_value_temp *= 1.2;
+				break;
+			case kFormationEchelon:
+				if (enemy_formation != kFormationTrail) hit_value_temp *= 1.2;
+				break;
+			case kFormationAbreast:
+				if (enemy_formation != kFormationEchelon) hit_value_temp *= 1.2;
+				break;
+			default:
+				break;
+			}
+			switch (hunter_kammusu.Mood()) {	//疲労キラ補正
+			case kMoodHappy:
+				hit_value_temp *= 1.2;
+				break;
+			case kMoodOrange:
+				hit_value_temp *= 0.75;
+				break;
+			case kMoodRed:
+				hit_value_temp *= 0.5;
+				break;
+			default:
+				break;
+			}
+			double hit_value = 0.03 + hit_value_temp;
 			//引き算により命中率を決定する(上限あり)
 			hit_prob = hit_value - evade_value;
 			// 残燃料による回避補正
-			hit_prob *= 3.73127 - 3.53991 * std::min(target_kammusu.GetFuel(), 80) / 100;
+			//hit_prob *= 3.73127 - 3.53991 * std::min(target_kammusu.GetFuel(), 80) / 100;
 			hit_prob = std::min(hit_prob, 0.97);
 		}
 	break;
