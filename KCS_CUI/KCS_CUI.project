@@ -70,7 +70,8 @@
       <PreBuild/>
       <PostBuild/>
       <CustomBuild Enabled="yes">
-        <Target Name="cmake">cmake . -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1</Target>
+        <Target Name="cmake gcc">rm -rf CMakeFiles &amp;&amp; rm -f CMakeCache.txt &amp;&amp; cmake . -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1</Target>
+        <Target Name="cmake clang">rm -rf CMakeFiles &amp;&amp; rm -f CMakeCache.txt &amp;&amp; cmake . -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1  -DCMAKE_CXX_COMPILER=clang++</Target>
         <Target Name="Build_VERBOSE">make -j4  VERBOSE=1 2&gt;&amp;1</Target>
         <RebuildCommand>make clean &amp;&amp; make -j4</RebuildCommand>
         <CleanCommand>make clean</CleanCommand>
@@ -151,7 +152,8 @@
       <PreBuild/>
       <PostBuild/>
       <CustomBuild Enabled="yes">
-        <Target Name="cmake">cmake . -DCMAKE_EXPORT_COMPILE_COMMANDS=1</Target>
+        <Target Name="cmake gcc">rm -rf CMakeFiles &amp;&amp; rm -f CMakeCache.txt &amp;&amp; cmake . -DCMAKE_EXPORT_COMPILE_COMMANDS=1</Target>
+        <Target Name="cmake clang">rm -rf CMakeFiles &amp;&amp; rm -f CMakeCache.txt &amp;&amp; cmake . -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_CXX_COMPILER=clang++</Target>
         <RebuildCommand>make clean &amp;&amp; make -j4</RebuildCommand>
         <CleanCommand>make clean</CleanCommand>
         <BuildCommand>make -j4</BuildCommand>

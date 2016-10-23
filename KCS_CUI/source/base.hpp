@@ -19,7 +19,10 @@
 #include <type_traits>
 #include "exception.hpp"
 #include "arithmetic_convert.hpp"
+
+#ifdef _MSC_VER
 #pragma warning( disable : 4592)
+#endif
 
 using std::cout;
 using std::bitset;

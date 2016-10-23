@@ -93,6 +93,7 @@ inline std::wstring to_wstring(const ShipClass& sc) {
 }
 
 namespace detail {
+	using std::nullptr_t;
 	template<class F, class C, std::enable_if_t<!std::is_member_function_pointer<F>::value, nullptr_t> = nullptr>
 	auto invoke(F f, C c) { return f(c); }
 	template<class F, class C, std::enable_if_t<std::is_member_function_pointer<F>::value, nullptr_t> = nullptr>
