@@ -29,6 +29,7 @@ public:
 	Fleet(std::istream &file, const Formation &formation, char_cvt::char_enc fileenc = char_cvt::char_enc::utf8);
 	// setter
 	void SetFormation(const Formation);
+	void ResizeUnit(size_t size);
 	// getter
 	Formation GetFormation() const noexcept;
 	vector<vector<Kammusu>>& GetUnit() noexcept;

@@ -32,7 +32,7 @@ MapData::MapData(const string &file_name, char_cvt::char_enc fileenc) {
 			auto formation_ = Formation(stoi(o5.at("form").to_str())) | limit(kFormationTrail, kFormationAbreast);
 			temp.SetFormation(formation_);
 			auto &o6 = o5.at("fleets").get<picojson::array>();
-			temp.GetUnit().resize(1);
+			temp.ResizeUnit(1);
 			for (auto &it3 : o6) {
 				auto id = stoi(it3.to_str());
 				auto kammusu = Kammusu::Get(id, 1).Reset(true);

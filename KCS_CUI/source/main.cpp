@@ -98,7 +98,7 @@ public:
 				}
 				// シミュレートを行う
 				Simulator simulator(fleet, map_data_this_thread.GetSimulateMode(p));
-				vector<Fleet> fleet_;
+				std::array<Fleet, kBattleSize> fleet_;
 				Result result_;
 				std::tie(result_, fleet_) = simulator.Calc();
 				// 結果を元の配列に書き戻す

@@ -216,7 +216,8 @@ void Simulator::FitstAntiSubPhase() {
 void Simulator::AirWarPhase() {
 	// 制空状態の決定
 	//制空値を計算する
-	vector<int> anti_air_score(2);
+	std::array<int, kBattleSize> anti_air_score = { {} };
+	static_assert(2 == kBattleSize, "kBattleSize should be 2.");
 	for (size_t i = 0; i < kBattleSize; ++i) {
 		anti_air_score[i] = fleet_[i].AntiAirScore();
 	}
@@ -336,7 +337,7 @@ void Simulator::AirWarPhase() {
 
 	// 開幕爆撃
 	//ダメージ計算
-	vector<vector<vector<int>>> all_damage(kBattleSize, vector<vector<int>>(kMaxFleetSize, vector<int>(kMaxUnitSize, 0)));
+	std::array<std::array<std::array<int, kMaxUnitSize>, kMaxFleetSize>, kBattleSize> all_damage = { {} };
 	for (size_t bi = 0; bi < kBattleSize; ++bi) {
 		auto other_side = kBattleSize - bi - 1;
 		auto &friend_unit = fleet_[bi].GetUnit().front();
@@ -438,9 +439,9 @@ void Simulator::BattlePositionOracle() noexcept {
 // (開幕)雷撃フェイズ
 void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 	// ダメージ計算
-	vector<vector<int>> all_damage(kBattleSize, vector<int>(kMaxUnitSize, 0));
+	std::array<std::array<int, kMaxUnitSize>, kBattleSize> all_damage = { {} };
 	for (size_t bi = 0; bi < kBattleSize; ++bi) {
-		auto other_side = kBattleSize - bi - 1;
+		const auto other_side = kBattleSize - 1 - bi;
 		auto &friend_unit = fleet_[bi].GetUnit().back();
 		for (size_t ui = 0; ui < friend_unit.size(); ++ui) {
 			auto &hunter_kammusu = friend_unit[ui];
@@ -482,9 +483,9 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 #endif
 }
 
-vector<vector<std::pair<KammusuIndex, Range>>> Simulator::DetermineAttackOrder(FireTurn fire_turn, size_t /*fleet_index*/) const
+std::array<vector<std::pair<KammusuIndex, Range>>, kBattleSize> Simulator::DetermineAttackOrder(FireTurn fire_turn, size_t /*fleet_index*/) const
 {
-	vector<vector<std::pair<KammusuIndex, Range>>> attack_list(kBattleSize);
+	std::array<vector<std::pair<KammusuIndex, Range>>, kBattleSize> attack_list = { {} };
 	for (size_t bi = 0; bi < kBattleSize; ++bi) {
 		auto &unit = this->fleet_[bi].GetUnit();
 		// 行動可能な艦娘一覧を作成する
@@ -696,7 +697,7 @@ void Simulator::NightPhase() {
 }
 
 // 制空状態を判断する
-AirWarStatus Simulator::JudgeAirWarStatus(const vector<int> &anti_air_score) {
+AirWarStatus Simulator::JudgeAirWarStatus(const std::array<int, kBattleSize> &anti_air_score) {
 	// どちらも航空戦に参加する艦載機を持っていなかった場合は航空均衡
 	if (!fleet_[kFriendSide].HasAirFight() && !fleet_[kEnemySide].HasAirFight()) {
 		return kAirWarStatusNormal;
