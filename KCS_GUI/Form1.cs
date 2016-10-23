@@ -933,7 +933,7 @@ namespace KCS_GUI {
 			foreach(var kammusu in unit) {
 				// 艦娘の索敵値は練度依存
 				var searchValueSet = data.Ships.Single(s => s.艦船ID == kammusu.id).索敵.Split('/');
-				var searchValueK = searchValueSet[1].ParseInt();
+				var searchValueK = (int)(1.0 * (searchValueSet[1].ParseInt() - searchValueSet[0].ParseInt()) * kammusu.lv / 99 + searchValueSet[0].ParseInt());
 				searchPower += Math.Sqrt(searchValueK) * 1.6841056;
 				foreach(var weapon in kammusu.items) {
 					// 装備の索敵値は種別によって係数が異なる
@@ -988,7 +988,7 @@ namespace KCS_GUI {
 			foreach(var kammusu in unit) {
 				// 艦娘の索敵値は練度依存
 				var searchValueSet = data.Ships.Single(s => s.艦船ID == kammusu.id).索敵.Split('/');
-				var searchValueK = searchValueSet[1].ParseInt();
+				var searchValueK = (int)(1.0 * (searchValueSet[1].ParseInt() - searchValueSet[0].ParseInt()) * kammusu.lv / 99 + searchValueSet[0].ParseInt());
 				searchPower += Math.Sqrt(searchValueK);
 				foreach(var weapon in kammusu.items) {
 					// 装備の索敵値は種別によって係数が異なる
