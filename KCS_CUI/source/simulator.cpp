@@ -1034,7 +1034,7 @@ double Simulator::CalcHitProb(
 			// 命中側
 			double hit_value_temp = 0.9 + sqrt(hunter_kammusu.GetLevel() - 1) / 50;
 			hit_value_temp += 1.0 * hunter_kammusu.AllHit() / 100 + hunter_kammusu.FitGunHitPlus() + hunter_kammusu.FitNightHitPlus();
-			hit_value_temp += 1.5 * hunter_kammusu.GetLuck() / 100;
+			hit_value_temp += 1.5 * sqrt(hunter_kammusu.GetLuck()) / 100;
 			//命中率の陣形補正
 			switch (friend_formation) {
 			case kFormationSubTrail:
