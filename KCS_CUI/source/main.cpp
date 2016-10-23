@@ -122,10 +122,10 @@ public:
 		for (size_t p = 0; p < map_Data.GetSize(); ++p) {
 			wcout << map_Data.GetPointName(p) << L"マス到達率：" << (100.0 * point_count[p] / config.GetTimes()) << L"％" << endl;
 			if (p != map_Data.GetSize() - 1) {
-				cout << "道中撤退率：" << (100.0 * (point_count[p] - point_count[p + 1]) / point_count[p]) << "％\n" << endl;
+				wcout << L"道中撤退率：" << (100.0 * (point_count[p] - point_count[p + 1]) / point_count[p]) << L"％\n" << endl;
 			}
 			else {
-				cout << "\nボスマスにおける統計：" << endl;
+				wcout << L"\nボスマスにおける統計：" << endl;
 			}
 		}
 		vector<Fleet> fleet(kBattleSize);
@@ -148,7 +148,7 @@ template<class Mode>
 void run(const time_point<high_resolution_clock>& preprocess_begin_time, Config& config) {
 	Mode mode{ config };
 	const auto preprocess_end_time = high_resolution_clock::now();
-	cout << "preprocess:" << duration_cast<nanoseconds>(preprocess_end_time - preprocess_begin_time).count() << "[ns]\n" << endl;
+	wcout << L"preprocess:" << duration_cast<nanoseconds>(preprocess_end_time - preprocess_begin_time).count() << L"[ns]\n" << endl;
 	const auto process_begin_time = high_resolution_clock::now();
 	if (1 < config.GetThreads()) {
 		std::vector<std::thread> threads;
@@ -160,7 +160,7 @@ void run(const time_point<high_resolution_clock>& preprocess_begin_time, Config&
 	} else
 		mode.work();
 	const auto process_end_time = high_resolution_clock::now();
-	cout << "処理時間：" << duration_cast<milliseconds>(process_end_time - process_begin_time).count() << "[ms]\n" << endl;
+	wcout << L"処理時間：" << duration_cast<milliseconds>(process_end_time - process_begin_time).count() << L"[ms]\n" << endl;
 	mode.show_result();
 }
 
