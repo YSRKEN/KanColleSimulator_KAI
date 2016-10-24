@@ -1,0 +1,8 @@
+rvm:
+  - 1.9.2
+cache: true
+# parallelized_test: true
+language: ruby
+# write the rspec tests to the output dir
+script:
+  - rspec
