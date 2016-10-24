@@ -3,6 +3,12 @@ rvm:
 cache: true
 # parallelized_test: true
 language: ruby
+env:
+  - CI_REPORTS=shippable/testresults
+# write the rspec tests to the output dir
+# ensure the test output and coverage dirs are created
+before_script:
+  - mkdir -p shippable/testresults
 # write the rspec tests to the output dir
 script:
-  - rspec
+  - rspec -f JUnit -o shippable/testresults/results.xml
