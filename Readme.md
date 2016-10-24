@@ -1,5 +1,8 @@
 ﻿# KanColleSimulator
 
+[master](https://github.com/YSRKEN/KanColleSimulator_KAI) : [![Run Status](https://api.shippable.com/projects/577cc61f3be4f4faa56be960/badge?branch=master)](https://app.shippable.com/projects/577cc61f3be4f4faa56be960)
+[develop](https://github.com/YSRKEN/KanColleSimulator_KAI/tree/develop): [![Run Status](https://api.shippable.com/projects/577cc61f3be4f4faa56be960/badge?branch=develop)](https://app.shippable.com/projects/577cc61f3be4f4faa56be960)
+
 ## 概要
 艦これの戦闘をシミュレートします。
 ※CUI版のexeファイル(KCS_CUI.exe)は、x64フォルダにある64bit版と、x86フォルダにある32bit版とがあります。
