@@ -8,8 +8,8 @@ env:
 # write the rspec tests to the output dir
 # ensure the test output and coverage dirs are created
 install:
-  - gem install rspec
-  - gem install rspec_junit_formatter
+  - gem install rspec --no-ri --no-rdoc
+  - gem install rspec_junit_formatter --no-ri --no-rdoc
 before_script:
   - mkdir -p shippable/testresults
 # write the rspec tests to the output dir
