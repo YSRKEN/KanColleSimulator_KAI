@@ -481,7 +481,7 @@ namespace KCS_GUI {
 			if (kammusu == null)
 				return;
 			// 表示する艦娘を切り替える
-			int showKammusuType = kammusu.row.艦種 - 2;//どういうわけか-1だとSystem.ArgumentOutOfRangeExceptionが飛ぶ(#141)
+			int showKammusuType = kammusu.row.艦種 - 1;
 			KammusuTypeComboBox.SelectedIndex = showKammusuType;
 			KammusuNameComboBox.SelectedIndex = KammusuNameComboBox.FindStringExact(kammusu.艦名);
 			RedrawKammusuNameList();
