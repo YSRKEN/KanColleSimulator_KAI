@@ -1,4 +1,5 @@
 require "spec_helper"
+require 'kconv'
 def check_csv_format(loaded_csv, regex)
   fail_count = 0
   loaded_csv.each_with_index{|line, i|
@@ -7,7 +8,7 @@ def check_csv_format(loaded_csv, regex)
       if 0 == fail_count
         puts 'fail line :'
       end
-      puts line
+      puts line.toutf8
       fail_count += 1
     end
   }
