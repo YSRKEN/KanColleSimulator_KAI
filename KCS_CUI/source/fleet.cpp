@@ -273,6 +273,7 @@ double Fleet::SearchValue() const noexcept {
 					search_sum += it_w.GetSearch() * 0.9906638;
 					break;
 				case WC("探照灯"):	//探照灯
+				case WC("大型探照灯"):	//大型探照灯
 					search_sum += it_w.GetSearch() * 0.9067950;
 					break;
 				default:
@@ -477,15 +478,12 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const T
 			// http://ch.nicovideo.jp/HSG/blomaga/ar1015220
 			if (has_sl) {
 				for (const auto &it_w : it_k.GetWeapon()) {
-					if (!it_w.AnyOf(WC("探照灯"))) {
-						continue;
-					}
-					if(it_w.GetName() == L"探照灯"){
+					if (it_w.AnyOf(WC("探照灯"))) {
 						// こちらの「0.04」は推測結果
 						alived_list_weight[alived_list_size] += 1.0 + 0.04 * it_w.GetLevel();
 						break;
 					}
-					if (it_w.GetName() == L"96式150cm探照灯") {
+					if (it_w.AnyOf(WC("大型探照灯"))) {
 						// こちらの「0.04」は推測ですらない(探照灯に倣っただけ)
 						alived_list_weight[alived_list_size] += 3.6 + 0.04 * it_w.GetLevel();
 						break;
