@@ -936,15 +936,19 @@ void Simulator::ProtectOracle(const size_t defense_side, KammusuIndex &defense_i
 	std::array<size_t, kMaxUnitSize> block_list;
 	size_t block_list_size = 0;
 	for (size_t ui = 1; ui < attendants.size(); ++ui) {
-		if (attendants[ui].IsSubmarine() == is_submarine && attendants[ui].Status() < kStatusLightDamage) {
+		if (attendants[ui].IsSubmarine() == is_submarine) {
 			block_list[block_list_size] = ui;
 			++block_list_size;
 		}
 	}
 	if (block_list_size == 0) return;
 	// かばいは確率的に発生し、どの艦がかばうかも確率的に決まる
-	if (SharedRand::RandBool(0.4)) {	//とりあえず4割に設定している
-		defense_index.fleet_i = SharedRand::select_random_in_range(block_list, block_list_size);
+	// また、かばい対象艦が小破以上ならかばいは失敗する
+	if (SharedRand::RandBool(0.5)) {	//とりあえず5割に設定している
+		auto protect_oracle = SharedRand::select_random_in_range(block_list, block_list_size);
+		if (attendants[protect_oracle].Status() < kStatusLightDamage) {
+			defense_index.fleet_i = protect_oracle;
+		}
 	}
 	return;
 }
