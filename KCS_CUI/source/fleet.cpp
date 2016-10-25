@@ -458,47 +458,56 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const T
 	}
 	//生存する水上艦をリストアップ
 	std::array<KammusuIndex, kMaxFleetSize * kMaxUnitSize> alived_list;
+	std::array<double, kMaxFleetSize * kMaxUnitSize> alived_list_weight;
 	size_t alived_list_size = 0;
 	for (auto &fi : list) {
 		for (size_t ui = 0; ui < GetUnit()[fi].size(); ++ui) {
+			// 艦を選択
 			const auto &it_k = GetUnit()[fi][ui];
+			// 撃沈されていたら選択できない
 			if (it_k.Status() == kStatusLost) continue;
+			// 潜水艦なら選択できない
 			if (it_k.IsSubmarine()) continue;
+			// 対地攻撃絡み
 			if (has_bomb && it_k.AnyOf(SC("陸上型"))) continue;
+			// 1隻追加
 			alived_list[alived_list_size] = { fi, ui };
+			alived_list_weight[alived_list_size] = 1.0;
+			// 夜戦探照灯補正
+			// http://ch.nicovideo.jp/HSG/blomaga/ar1015220
+			if (has_sl) {
+				for (const auto &it_w : it_k.GetWeapon()) {
+					if (it_w.AnyOf(WC("探照灯"))) {
+						// こちらの「0.04」は推測結果
+						alived_list_weight[alived_list_size] += 1.0 + 0.04 * it_w.GetLevel();
+						break;
+					}
+					if (it_w.AnyOf(WC("96式150cm探照灯"))) {
+						// こちらの「0.04」は推測ですらない(探照灯に倣っただけ)
+						alived_list_weight[alived_list_size] += 3.6 + 0.04 * it_w.GetLevel();
+						break;
+					}
+				}
+			}
 			++alived_list_size;
 		}
 	}
 	// 対象が存在しない場合はfalseを返す
 	if (alived_list_size == 0) return tuple<bool, KammusuIndex>(false, { 0 , 0 });
-	// 夜戦だと探照灯を考慮しなければならない
-	if (has_sl) {
-		// 探照灯の位置を探す
-		constexpr size_t sz_max = std::numeric_limits<size_t>::max();
-		size_t large_sl_index = sz_max;
-		size_t small_sl_index = sz_max;
-		for (size_t i = 0; i < alived_list_size; ++i) {
-			const auto &it_k = GetUnit()[alived_list[i].fleet_no][alived_list[i].fleet_i];
-			for (const auto &it_w : it_k.GetWeapon()) {
-				if (!it_w.AnyOf(WC("探照灯"))) continue;
-				if (it_w.AnyOf(WID("96式150cm探照灯"))) {
-					if (SharedRand::RandBool(0.3 + 0.01 * it_w.GetLevel())) large_sl_index = i;
-				}
-				else {
-					if (SharedRand::RandBool(0.2 + 0.01 * it_w.GetLevel())) small_sl_index = i;
-				}
-				break;
-			}
-		}
-		// 発動した場合、そちらに攻撃が誘引される
-		if (large_sl_index != sz_max) {
-			return tuple<bool, KammusuIndex>(true, alived_list[large_sl_index]);
-		}
-		else if (small_sl_index != sz_max) {
-			return tuple<bool, KammusuIndex>(true, alived_list[small_sl_index]);
-		}
+	// 攻撃対象をルーレット選択
+	double roulette_size = 0.0;
+	for (size_t k = 0; k < alived_list_size; ++k) {
+		roulette_size += alived_list_weight[k];
 	}
-	return tuple<bool, KammusuIndex>(true, SharedRand::select_random_in_range(alived_list, alived_list_size));
+	double roulette_oracle = SharedRand::RandReal(0.0, roulette_size);
+	auto roulette_index = alived_list[0];
+	for (size_t k = 0; k < alived_list_size; ++k) {
+		if (alived_list_weight[k] > roulette_oracle) {
+			roulette_index = alived_list[k];
+		}
+		roulette_oracle -= alived_list_weight[k];
+	}
+	return tuple<bool, KammusuIndex>(true, roulette_index);
 }
 
 // 潜水の生存艦から艦娘をランダムに指定する
