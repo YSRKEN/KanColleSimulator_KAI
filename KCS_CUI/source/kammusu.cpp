@@ -691,6 +691,7 @@ int Kammusu::DayAttack(const DayFireType fire_type, const bool af_flg, const Fle
 			case WC("対空機銃"):
 			case WC("高射装置"):
 			case WC("探照灯"):
+			case WC("大型探照灯"):
 				base_attack += sqrt(it_w.GetLevel());
 			case WC("ソナー"):
 			case WC("爆雷"):
@@ -790,6 +791,7 @@ int Kammusu::NightAttack(const NightFireType fire_type, const bool af_flg) const
 			case WC("対空機銃"):
 			case WC("高射装置"):
 			case WC("探照灯"):
+			case WC("大型探照灯"):
 				base_attack += sqrt(it_w.GetLevel());
 			case WC("ソナー"):
 			case WC("爆雷"):
@@ -1096,7 +1098,7 @@ bool Kammusu::IsAntiSubNight() const noexcept {
 // 探照灯や照明弾を保有していた場合はtrue
 bool Kammusu::HasLights() const noexcept {
 	for (auto &it_w : weapons_) {
-		if (it_w.AnyOf(WC("探照灯") | WC("照明弾"))) return true;
+		if (it_w.AnyOf(WC("探照灯") | WC("大型探照灯") | WC("照明弾"))) return true;
 	}
 	return false;
 }
