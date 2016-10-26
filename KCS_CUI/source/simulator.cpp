@@ -858,7 +858,7 @@ int Simulator::CalcDamage(
 	damage = int(damage);	//※この切り捨ては仕様です
 	{
 		// WG42 vs 集積地棲姫補正
-		if (target_kammusu.AnyOf(WID("集積地棲姫")) | target_kammusu.AnyOf(WID("集積地棲姫-壊")) {
+		if (target_kammusu.AnyOf(L"集積地棲姫"s) | target_kammusu.AnyOf(L"集積地棲姫-壊"s)) {
 			auto wg_count = 0;
 			for (auto &it_w : hunter_kammusu.GetWeapon()) {
 				if (it_w.AnyOf(WID("WG42 (Wurfgerat 42)"))) ++wg_count;
@@ -892,7 +892,7 @@ int Simulator::CalcDamage(
 		// 弾着観測射撃補正
 		if (battle_phase == kBattlePhaseGun && is_special_attack) damage *= multiple;
 		// PT子鬼群補正
-		if (target_kammusu.AnyOf(WID("PT小鬼群"))) damage *= hunter_kammusu.SpecialEffectPtPlus();
+		if (target_kammusu.AnyOf(L"PT小鬼群"s)) damage *= hunter_kammusu.SpecialEffectPtPlus();
 	}
 	// 装甲乱数の分だけダメージを減少させる
 	damage -= 0.7 * target_kammusu.AllDefense() + 0.6 * SharedRand::RandInt(target_kammusu.AllDefense());
