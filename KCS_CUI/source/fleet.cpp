@@ -446,22 +446,27 @@ tuple<bool, size_t> Fleet::RandomKammusu() const {
 tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const TargetType target_type, const bool has_sl) const {
 	// 攻撃する艦隊の対象を選択する
 	std::array<size_t, kMaxFleetSize> list;
+	size_t list_fleets;
 	switch (target_type) {
 	case kTargetTypeFirst:
 		list = {{ FirstIndex(), FirstIndex() }};
+		list_fleets = 1;
 		break;
 	case kTargetTypeSecond:
 		list = {{ SecondIndex(), SecondIndex() }};
+		list_fleets = 1;
 		break;
 	case kTargetTypeAll:
 		list = {{ FirstIndex(), SecondIndex() }};
+		list_fleets = 2;
 		break;
 	}
 	//生存する水上艦をリストアップ
 	std::array<KammusuIndex, kMaxFleetSize * kMaxUnitSize> alived_list;
 	std::array<double, kMaxFleetSize * kMaxUnitSize> alived_list_weight;
 	size_t alived_list_size = 0;
-	for (auto &fi : list) {
+	for (size_t li = 0; li < list_fleets; ++li) {
+		size_t fi = list[li];
 		for (size_t ui = 0; ui < GetUnit()[fi].size(); ++ui) {
 			// 艦を選択
 			const auto &it_k = GetUnit()[fi][ui];
@@ -495,6 +500,8 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const T
 	}
 	// 対象が存在しない場合はfalseを返す
 	if (alived_list_size == 0) return tuple<bool, KammusuIndex>(false, { 0 , 0 });
+	// 選びようがない場合
+	if (alived_list_size == 1) return tuple<bool, KammusuIndex>(true, alived_list[0]);
 	// 攻撃対象をルーレット選択
 	double roulette_size = 0.0;
 	for (size_t k = 0; k < alived_list_size; ++k) {
@@ -502,11 +509,13 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const T
 	}
 	double roulette_oracle = SharedRand::RandReal(0.0, roulette_size);
 	auto roulette_index = alived_list[0];
-	for (size_t k = 0; k < alived_list_size; ++k) {
-		if (alived_list_weight[k] > roulette_oracle) {
+	double roulette_sum = alived_list_weight[0];
+	for (size_t k = 1; k < alived_list_size; ++k) {
+		if (roulette_sum > roulette_oracle) {
 			roulette_index = alived_list[k];
+			break;
 		}
-		roulette_oracle -= alived_list_weight[k];
+		roulette_sum += alived_list_weight[k];
 	}
 	return tuple<bool, KammusuIndex>(true, roulette_index);
 }
