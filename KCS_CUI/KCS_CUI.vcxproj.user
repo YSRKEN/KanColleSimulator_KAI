@@ -36,7 +36,7 @@
     <LocalDebuggerWorkingDirectory>$(ProjectDir)../</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>-i sample\3-5.json "sample\3-5 high.map" -f 0 0 -n 1 -t 1 -o output.json &gt; log.txt</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-i "sample\6-4 秋津洲編成.json" "sample\6-4 ACN Light.map" -f 0 0 -n 1 -t 1 -o output.json &gt; log.txt</LocalDebuggerCommandArguments>
     <LocalDebuggerWorkingDirectory>$(ProjectDir)../</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
