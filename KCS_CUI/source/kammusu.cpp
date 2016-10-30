@@ -1014,7 +1014,7 @@ bool Kammusu::IsFirstAntiSub() const noexcept {
 	}
 	if (!sonar_flg)
 		return false;
-	// 合計対潜値が100を超えてないと合うと
+	// 合計対潜値が100を超えてないとアウト
 	int all_anti_sub = anti_sub_;
 	for (auto &it_w : weapons_) {
 		all_anti_sub += it_w.GetAntiSub();
