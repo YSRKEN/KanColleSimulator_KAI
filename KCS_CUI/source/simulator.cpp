@@ -750,18 +750,98 @@ int Simulator::CalcDamage(
 	auto is_target_submarine = target_kammusu.IsSubmarine();
 	if (is_target_submarine && battle_phase != kBattlePhaseGun
 		&& battle_phase != kBattlePhaseNight) return 0;		//砲撃戦および夜戦以外ではそもそも対潜攻撃を行わない
-	// 三式弾・WG42による対地上施設特効
+	// 基本攻撃力を出す
 	double damage = base_attack;
+	// 陸上特効
 	if (target_kammusu.AnyOf(SC("陸上型"))) {
-		bool has_aaa = false;
-		auto wg_count = 0;
-		for (auto &it_w : hunter_kammusu.GetWeapon()) {
-			if (it_w.AnyOf(WC("対空強化弾"))) has_aaa = true;
-			if (it_w.AnyOf(WID("WG42 (Wurfgerat 42)"))) ++wg_count;
+		// 三式弾特効
+		if ([&target_kammusu] {
+			for (auto &it_w : target_kammusu.GetWeapon()) {
+				if (it_w.AnyOf(WC("対空強化弾"))) return true;
+			}
+		}()) {
+			damage *= 2.5;
 		}
-		if (has_aaa) damage *= 2.5;
+	}
+	else if (target_kammusu.AnyOf(L"砲台小鬼"s)) {
+		// 砲台小鬼特効
+		//カウント
+		size_t count_dh1 = 0, count_dh2 = 0, count_dh3 = 0;	//大発シリーズ
+		size_t count_wg = 0, count_wbws = 0, count_ammo = 0;	//WG42・水爆水戦・徹甲弾
+		size_t sum_star_dh12 = 0, sum_star_dh3 = 0;
+		for (auto &it_w : hunter_kammusu.GetWeapon()) {
+			if (it_w.AnyOf(WID("大発動艇"))) {
+				++count_dh1;
+				sum_star_dh12 += it_w.GetLevel();
+			}
+			if (it_w.AnyOf(WID("大発動艇(八九式中戦車＆陸戦隊)"))) {
+				++count_dh2;
+				sum_star_dh12 += it_w.GetLevel();
+			}
+			if (it_w.AnyOf(WID("特二式内火艇"))) {
+				++count_dh3;
+				sum_star_dh3 += it_w.GetLevel();
+			}
+			if (it_w.AnyOf(WID("WG42 (Wurfgerat 42)"))) ++count_wg;
+			if (it_w.AnyOf(WC("水上爆撃機"))) ++count_wbws;
+			if (it_w.AnyOf(WC("水上戦闘機"))) ++count_wbws;
+			if (it_w.AnyOf(WC("対艦強化弾"))) ++count_ammo;
+		}
+		//掛け算
+		if (count_dh2 > 0) {
+			static const double dh_plus[] = { 1.0, 1.80, 1.80, 1.80, 1.80 };
+			damage *= dh_plus[count_dh2];
+			damage *= (1.0 + 1.0 * sum_star_dh12 / (count_dh1 + count_dh2) / 50);
+		}
+		else if(count_dh1 > 0){
+			static const double dh_plus[] = { 1.0, 2.15, 3.0, 3.0, 3.0 };
+			damage *= dh_plus[count_dh1];
+			damage *= (1.0 + 1.0 * sum_star_dh12 / (count_dh1 + count_dh2) / 50);
+		}
+		if (count_dh3 > 0) {
+			static const double dh_plus[] = { 1.0, 2.40, 3.20, 3.20, 3.20 };
+			damage *= dh_plus[count_dh3];
+			damage *= (1.0 + 1.0 * sum_star_dh3 / count_dh3 / 30);
+		}
+		{
+			static const double wg_plus[] = { 1.0, 1.60, 2.72, 2.72, 2.72 };
+			damage *= wg_plus[count_wg];
+		}
+		{
+			static const double wbws_plus[] = { 1.0, 1.50, 1.50, 1.50, 1.50 };
+			damage *= wbws_plus[count_wbws];
+		}
+		{
+			static const double ammo_plus[] = { 1.0, 1.85, 1.85, 1.85, 1.85 };
+			damage *= ammo_plus[count_ammo];
+		}
+	}
+	else if (target_kammusu.AnyOf(L"離島棲姫"s)) {
+		// 離島棲姫特効
+		//カウント
+		size_t count_wg = 0;
+		bool has_aaa = false;
+		for (auto &it_w : hunter_kammusu.GetWeapon()) {
+			if (it_w.AnyOf(WID("WG42 (Wurfgerat 42)"))) ++count_wg;
+			if (it_w.AnyOf(WC("対空強化弾"))) has_aaa = true;
+		}
+		//掛け算
+		{
+			static const double wg_plus[] = { 1.0, 1.40, 2.10, 2.10, 2.10 };
+			damage *= wg_plus[count_wg];
+		}
+		if(has_aaa) damage *= 1.75;
+	}
+	// WG42加算特効
+	if(target_kammusu.AnyOf(SC("陸上型"))
+	|| target_kammusu.AnyOf(L"砲台小鬼"s)
+	|| target_kammusu.AnyOf(L"離島棲姫"s)) {
+		size_t count_wg = 0;
+		for (auto &it_w : hunter_kammusu.GetWeapon()) {
+			if (it_w.AnyOf(WID("WG42 (Wurfgerat 42)"))) ++count_wg;
+		}
 		static const double wg_plus[] = { 0, 75, 109, 142, 162 };
-		damage += wg_plus[wg_count];
+		damage += wg_plus[count_wg];
 	}
 	// キャップ前補正
 	if (battle_phase != kBattlePhaseAir) {
@@ -858,15 +938,38 @@ int Simulator::CalcDamage(
 	damage = int(damage);	//※この切り捨ては仕様です
 	{
 		// WG42 vs 集積地棲姫補正
-		// なお集積地棲姫を実装できないので（ｒｙ
-		/*if (target_kammusu.AnyOf(WID("集積地棲姫")) | target_kammusu.AnyOf(WID("集積地棲姫-壊")) {
-			auto wg_count = 0;
+		if (target_kammusu.AnyOf(L"集積地棲姫"s) | target_kammusu.AnyOf(L"集積地棲姫-壊"s)) {
+			//カウント
+			size_t count_dh2 = 0, count_dh3 = 0, count_wg = 0;	//大発シリーズ・WG42の個数
+			size_t sum_star_dh2 = 0, sum_star_dh3 = 0;
 			for (auto &it_w : hunter_kammusu.GetWeapon()) {
-				if (it_w.AnyOf(WID("WG42 (Wurfgerat 42)"))) ++wg_count;
+				if (it_w.AnyOf(WID("大発動艇(八九式中戦車＆陸戦隊)"))) {
+					++count_dh2;
+					sum_star_dh2 += it_w.GetLevel();
+				}
+				if (it_w.AnyOf(WID("特二式内火艇"))) {
+					++count_dh3;
+					sum_star_dh3 += it_w.GetLevel();
+				}
+				if (it_w.AnyOf(WID("WG42 (Wurfgerat 42)"))) ++count_wg;
 			}
-			static const double wg_plus2[] = { 1.0, 1.25, 1.62, 1.62, 1.62 };
-			damage *= int(wg_plus2[wg_count]);	//※この切り捨ては仕様です
-		}*/
+			//掛け算
+			if (count_wg > 0) {
+				static const double wg_plus[] = { 1.0, 1.25, 1.625, 1.625, 1.625 };
+				damage *= wg_plus[count_wg];
+			}
+			if (count_dh2 > 0) {
+				static const double dh_plus[] = { 1.0, 1.30, 2.08, 2.08, 2.08 };
+				damage *= dh_plus[count_dh2];
+				damage *= (1.0 + 1.0 * sum_star_dh2 / count_dh2 / 50);
+			}
+			if (count_dh3 > 0) {
+				static const double dh_plus[] = { 1.0, 1.70, 2.50, 2.50, 2.50 };
+				damage *= dh_plus[count_dh3];
+				damage *= (1.0 + 1.0 * sum_star_dh3 / count_dh3 / 30);
+			}
+			damage *= int(damage);	//※この切り捨ては仕様です
+		}
 		// 徹甲弾補正
 		if (target_kammusu.IsSpecialEffectAP()) {
 			damage *= int(hunter_kammusu.SpecialEffectApPlus());	//※この切り捨ては仕様です
@@ -893,8 +996,7 @@ int Simulator::CalcDamage(
 		// 弾着観測射撃補正
 		if (battle_phase == kBattlePhaseGun && is_special_attack) damage *= multiple;
 		// PT子鬼群補正
-		// なおPT子鬼群を実装できないので（ｒｙ
-		/*if (target_kammusu.AnyOf(WID("PT小鬼群"))) damage *= hunter_kammusu.SpecialEffectPtPlus();*/
+		if (target_kammusu.AnyOf(L"PT小鬼群"s)) damage *= hunter_kammusu.SpecialEffectPtPlus();
 	}
 	// 装甲乱数の分だけダメージを減少させる
 	damage -= 0.7 * target_kammusu.AllDefense() + 0.6 * SharedRand::RandInt(target_kammusu.AllDefense());
