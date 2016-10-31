@@ -62,18 +62,22 @@ tuple<Result, vector<Fleet>> Simulator::Calc() {
 	cout << endl;
 #endif
 	if (simulate_mode_ != kSimulateModeN) {
+
+		// 交戦形態の決定
+		BattlePositionOracle();
+#ifdef _DEBUG
+		cout << "交戦形態：" << battle_position_ << "\n" << endl;
+#endif
+
+		// 開幕対潜フェイズ
+		FitstAntiSubPhase();
+
 		// 航空戦フェイズ(連合艦隊では第一艦隊のみ関わるが、第二艦隊も開幕爆撃の被害対象になる)
 		AirWarPhase();
 		if (IsBattleTerminate()) goto SimulatorCalcExit;
 #ifdef _DEBUG
 		cout << "制空状態・自艦隊倍率・敵艦隊倍率：\n";
 		cout << std::get<condition>(air_war_result_) << " " << std::get<magnification>(air_war_result_)[0] << " " << std::get<magnification>(air_war_result_)[1] << "\n" << endl;
-#endif
-
-		// 交戦形態の決定
-		BattlePositionOracle();
-#ifdef _DEBUG
-		cout << "交戦形態：" << battle_position_ << "\n" << endl;
 #endif
 
 		// 支援艦隊攻撃フェイズ(未実装)
@@ -169,11 +173,51 @@ void Simulator::SearchPhase() {
 	}
 }
 
+// 開幕対潜フェイズ
+void Simulator::FitstAntiSubPhase() {
+	// 攻撃順を決定する
+	const auto attack_list = DetermineAttackOrder(kFireFirst, 1);
+	// 決定した巡目に基づいて攻撃を行う
+	for (size_t ui = 0; ui < kMaxUnitSize; ++ui) {
+		// 基本的に、敵と味方が交互に砲撃を行う
+		for (size_t bi = 0; bi < kBattleSize; ++bi) {
+			auto other_side = kBattleSize - bi - 1;
+			// 一覧の範囲外なら飛ばす
+			if (attack_list[bi].size() <= ui) continue;
+			// 担当する艦娘が攻撃参加できない場合は飛ばす
+			const auto &friend_index = attack_list[bi][ui].first;
+			const auto &hunter_kammusu = fleet_[bi].GetUnit()[friend_index.fleet_no][friend_index.fleet_i];
+			if (!hunter_kammusu.IsFireGun(fleet_[other_side].HasAF())) continue;
+			// 攻撃対象を選択する
+			tuple<bool, KammusuIndex> target(false, { 0, 0 });
+			if (hunter_kammusu.IsFirstAntiSub()) {
+				target = fleet_[other_side].RandomKammusuSS(1);
+			}
+			if (!std::get<is_attackable>(target)) continue;
+			// 攻撃対象の種類によって、攻撃の種類を選ぶ
+			auto &enemy_index = std::get<selected>(target);
+			const auto &target_kammusu = fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i];
+			auto fire_type = JudgeDayFireType(bi, friend_index, enemy_index);
+			// 攻撃の種類によって、基本攻撃力および倍率を算出する
+			int base_attack = hunter_kammusu.DayAttack(fire_type, target_kammusu.AnyOf(SC("陸上型")), fleet_[bi].GetFleetType(), friend_index.fleet_no);
+			bool special_attack_flg = false;
+			double multiple = 1.0;
+			// 与えるダメージを計算し、処理を行う
+			auto all_attack_plus = vector<double>{ 1.0, 1.0 };
+			auto damage = CalcDamage(kBattlePhaseGun, bi, friend_index, enemy_index, base_attack, 
+				all_attack_plus, battle_position_, special_attack_flg, multiple);
+			result_.AddDamage(bi, friend_index.fleet_no, friend_index.fleet_i, damage);
+			fleet_[other_side].GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i].MinusHP(damage, stopper_[other_side][enemy_index.fleet_no][enemy_index.fleet_i]);
+		}
+	}
+}
+
 // 航空戦フェイズ
 void Simulator::AirWarPhase() {
 	// 制空状態の決定
 	//制空値を計算する
-	vector<int> anti_air_score(2);
+	std::array<int, kBattleSize> anti_air_score = { {} };
+	static_assert(2 == kBattleSize, "kBattleSize should be 2.");
 	for (size_t i = 0; i < kBattleSize; ++i) {
 		anti_air_score[i] = fleet_[i].AntiAirScore();
 	}
@@ -293,7 +337,7 @@ void Simulator::AirWarPhase() {
 
 	// 開幕爆撃
 	//ダメージ計算
-	vector<vector<vector<int>>> all_damage(kBattleSize, vector<vector<int>>(kMaxFleetSize, vector<int>(kMaxUnitSize, 0)));
+	std::array<std::array<std::array<int, kMaxUnitSize>, kMaxFleetSize>, kBattleSize> all_damage = { {} };
 	for (size_t bi = 0; bi < kBattleSize; ++bi) {
 		auto other_side = kBattleSize - bi - 1;
 		auto &friend_unit = fleet_[bi].GetUnit().front();
@@ -395,9 +439,9 @@ void Simulator::BattlePositionOracle() noexcept {
 // (開幕)雷撃フェイズ
 void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 	// ダメージ計算
-	vector<vector<int>> all_damage(kBattleSize, vector<int>(kMaxUnitSize, 0));
+	std::array<std::array<int, kMaxUnitSize>, kBattleSize> all_damage = { {} };
 	for (size_t bi = 0; bi < kBattleSize; ++bi) {
-		auto other_side = kBattleSize - bi - 1;
+		const auto other_side = kBattleSize - 1 - bi;
 		auto &friend_unit = fleet_[bi].GetUnit().back();
 		for (size_t ui = 0; ui < friend_unit.size(); ++ui) {
 			auto &hunter_kammusu = friend_unit[ui];
@@ -439,18 +483,18 @@ void Simulator::TorpedoPhase(const TorpedoTurn &torpedo_turn) {
 #endif
 }
 
-vector<vector<std::pair<KammusuIndex, Range>>> Simulator::DetermineAttackOrder(FireTurn fire_turn, size_t fleet_index) const
+std::array<vector<std::pair<KammusuIndex, Range>>, kBattleSize> Simulator::DetermineAttackOrder(FireTurn fire_turn, size_t /*fleet_index*/) const
 {
-	vector<vector<std::pair<KammusuIndex, Range>>> attack_list(kBattleSize);
+	std::array<vector<std::pair<KammusuIndex, Range>>, kBattleSize> attack_list = { {} };
 	for (size_t bi = 0; bi < kBattleSize; ++bi) {
 		auto &unit = this->fleet_[bi].GetUnit();
 		// 行動可能な艦娘一覧を作成する
-		if (bi == kFriendSide) fleet_index = 0;
-		auto &unit2 = unit[fleet_index];
+		size_t fleet_index_ = this->fleet_[bi].SecondIndex();
+		auto &unit2 = unit[fleet_index_];
 		attack_list[bi].reserve(unit2.size());//unit2.size()はたかが1桁程度の値だから気にせずallocateする
 		for (size_t ui = 0; ui < unit2.size(); ++ui) {
 			if (!unit2[ui].IsMoveGun(false)) continue;
-			attack_list[bi].push_back({ { fleet_index, ui }, unit2[ui].MaxRange() });
+			attack_list[bi].push_back({ { fleet_index_, ui }, unit2[ui].MaxRange() });
 		}
 		if (fire_turn == kFireFirst) {
 			// 一覧をシャッフルする
@@ -615,7 +659,7 @@ void Simulator::NightPhase() {
 				// 砲撃時にのみ適用される
 				if (fire_type != kNightFireGun) return;
 				// 発動可能な弾着の種類を判断する
-				auto special_attack = JudgeNightSpecialAttack(bi, friend_index, target_kammusu.AnyOf(SC("陸上型")));
+				auto special_attack = JudgeNightSpecialAttack(bi, friend_index, target_kammusu.AnyOf(SC("陸上型")), target_kammusu.GetLuck());
 				if (std::get<condition>(special_attack) == 1.0) return;
 				// 弾着観測射撃による補正
 				double_flg = std::get<condition>(special_attack);
@@ -627,7 +671,7 @@ void Simulator::NightPhase() {
 			wcout << hunter_kammusu.GetName() << L"(" << (bi == kFriendSide ? L"自" : L"敵") << L")が" << target_kammusu.GetName() << L"に攻撃！ " << endl;
 			cout << "基礎攻撃力：" << base_attack << " 夜間特殊攻撃：" << special_attack_flg << " 連撃：" << double_flg << "倍率：" << multiple << endl;
 #endif
-			auto damage = CalcDamage(kBattlePhaseNight, bi, friend_index, enemy_index, base_attack, special_attack_flg, multiple);
+			auto damage = CalcDamage(kBattlePhaseNight, bi, friend_index, enemy_index, base_attack, special_attack_flg, multiple, wsn_flg);
 #ifdef _DEBUG
 			cout << damage << "ダメージ！" << endl;
 #endif
@@ -653,7 +697,7 @@ void Simulator::NightPhase() {
 }
 
 // 制空状態を判断する
-AirWarStatus Simulator::JudgeAirWarStatus(const vector<int> &anti_air_score) {
+AirWarStatus Simulator::JudgeAirWarStatus(const std::array<int, kBattleSize> &anti_air_score) {
 	// どちらも航空戦に参加する艦載機を持っていなかった場合は航空均衡
 	if (!fleet_[kFriendSide].HasAirFight() && !fleet_[kEnemySide].HasAirFight()) {
 		return kAirWarStatusNormal;
@@ -688,7 +732,7 @@ AirWarStatus Simulator::JudgeAirWarStatus(const vector<int> &anti_air_score) {
 int Simulator::CalcDamage(
 	const BattlePhase &battle_phase, const size_t turn_player, const KammusuIndex &friend_index, KammusuIndex &enemy_index,
 	const int &base_attack, const vector<double> &all_attack_plus, const BattlePosition &battle_position,
-	const bool &is_special_attack, const double &multiple
+	const bool &is_special_attack, const double &multiple, const bool wsn_flg
 ) const {
 	auto other_side = kBattleSize - turn_player - 1;
 	// 旗艦相手への攻撃に限り、「かばい」が確率的に発生する
@@ -699,22 +743,106 @@ int Simulator::CalcDamage(
 	const auto &target_kammusu = enemy_side.GetUnit()[enemy_index.fleet_no][enemy_index.fleet_i];
 	// 攻撃の命中率を計算する
 	double hit_prob = CalcHitProb(friend_side.GetFormation(), enemy_side.GetFormation(), hunter_kammusu, target_kammusu, battle_phase, turn_player, friend_index.fleet_no);
+	//夜偵発動時に命中率を10％底上げ(暫定的対応)
+	if (wsn_flg)
+		hit_prob = std::min(hit_prob + 0.1, 0.97);
 	// 対潜攻撃かどうかを判断する
 	auto is_target_submarine = target_kammusu.IsSubmarine();
 	if (is_target_submarine && battle_phase != kBattlePhaseGun
 		&& battle_phase != kBattlePhaseNight) return 0;		//砲撃戦および夜戦以外ではそもそも対潜攻撃を行わない
-	// 三式弾・WG42による対地上施設特効
+	// 基本攻撃力を出す
 	double damage = base_attack;
+	// 陸上特効
 	if (target_kammusu.AnyOf(SC("陸上型"))) {
-		bool has_aaa = false;
-		auto wg_count = 0;
-		for (auto &it_w : hunter_kammusu.GetWeapon()) {
-			if (it_w.AnyOf(WC("対空強化弾"))) has_aaa = true;
-			if (it_w.AnyOf(WID("WG42 (Wurfgerat 42)"))) ++wg_count;
+		// 三式弾特効
+		if ([&target_kammusu] {
+			for (auto &it_w : target_kammusu.GetWeapon()) {
+				if (it_w.AnyOf(WC("対空強化弾"))) return true;
+			}
+			return false;
+		}()) {
+			damage *= 2.5;
 		}
-		if (has_aaa) damage *= 2.5;
+	}
+	else if (target_kammusu.AnyOf(L"砲台小鬼"s)) {
+		// 砲台小鬼特効
+		//カウント
+		size_t count_dh1 = 0, count_dh2 = 0, count_dh3 = 0;	//大発シリーズ
+		size_t count_wg = 0, count_wbws = 0, count_ammo = 0;	//WG42・水爆水戦・徹甲弾
+		size_t sum_star_dh12 = 0, sum_star_dh3 = 0;
+		for (auto &it_w : hunter_kammusu.GetWeapon()) {
+			if (it_w.AnyOf(WID("大発動艇"))) {
+				++count_dh1;
+				sum_star_dh12 += it_w.GetLevel();
+			}
+			if (it_w.AnyOf(WID("大発動艇(八九式中戦車＆陸戦隊)"))) {
+				++count_dh2;
+				sum_star_dh12 += it_w.GetLevel();
+			}
+			if (it_w.AnyOf(WID("特二式内火艇"))) {
+				++count_dh3;
+				sum_star_dh3 += it_w.GetLevel();
+			}
+			if (it_w.AnyOf(WID("WG42 (Wurfgerat 42)"))) ++count_wg;
+			if (it_w.AnyOf(WC("水上爆撃機"))) ++count_wbws;
+			if (it_w.AnyOf(WC("水上戦闘機"))) ++count_wbws;
+			if (it_w.AnyOf(WC("対艦強化弾"))) ++count_ammo;
+		}
+		//掛け算
+		if (count_dh2 > 0) {
+			static const double dh_plus[] = { 1.0, 1.80, 1.80, 1.80, 1.80 };
+			damage *= dh_plus[count_dh2];
+			damage *= (1.0 + 1.0 * sum_star_dh12 / (count_dh1 + count_dh2) / 50);
+		}
+		else if(count_dh1 > 0){
+			static const double dh_plus[] = { 1.0, 2.15, 3.0, 3.0, 3.0 };
+			damage *= dh_plus[count_dh1];
+			damage *= (1.0 + 1.0 * sum_star_dh12 / (count_dh1 + count_dh2) / 50);
+		}
+		if (count_dh3 > 0) {
+			static const double dh_plus[] = { 1.0, 2.40, 3.20, 3.20, 3.20 };
+			damage *= dh_plus[count_dh3];
+			damage *= (1.0 + 1.0 * sum_star_dh3 / count_dh3 / 30);
+		}
+		{
+			static const double wg_plus[] = { 1.0, 1.60, 2.72, 2.72, 2.72 };
+			damage *= wg_plus[count_wg];
+		}
+		{
+			static const double wbws_plus[] = { 1.0, 1.50, 1.50, 1.50, 1.50 };
+			damage *= wbws_plus[count_wbws];
+		}
+		{
+			static const double ammo_plus[] = { 1.0, 1.85, 1.85, 1.85, 1.85 };
+			damage *= ammo_plus[count_ammo];
+		}
+	}
+	else if (target_kammusu.AnyOf(L"離島棲姫"s)) {
+		// 離島棲姫特効
+		//カウント
+		size_t count_wg = 0;
+		bool has_aaa = false;
+		for (auto &it_w : hunter_kammusu.GetWeapon()) {
+			if (it_w.AnyOf(WID("WG42 (Wurfgerat 42)"))) ++count_wg;
+			if (it_w.AnyOf(WC("対空強化弾"))) has_aaa = true;
+		}
+		//掛け算
+		{
+			static const double wg_plus[] = { 1.0, 1.40, 2.10, 2.10, 2.10 };
+			damage *= wg_plus[count_wg];
+		}
+		if(has_aaa) damage *= 1.75;
+	}
+	// WG42加算特効
+	if(target_kammusu.AnyOf(SC("陸上型"))
+	|| target_kammusu.AnyOf(L"砲台小鬼"s)
+	|| target_kammusu.AnyOf(L"離島棲姫"s)) {
+		size_t count_wg = 0;
+		for (auto &it_w : hunter_kammusu.GetWeapon()) {
+			if (it_w.AnyOf(WID("WG42 (Wurfgerat 42)"))) ++count_wg;
+		}
 		static const double wg_plus[] = { 0, 75, 109, 142, 162 };
-		damage += wg_plus[wg_count];
+		damage += wg_plus[count_wg];
 	}
 	// キャップ前補正
 	if (battle_phase != kBattlePhaseAir) {
@@ -811,15 +939,38 @@ int Simulator::CalcDamage(
 	damage = int(damage);	//※この切り捨ては仕様です
 	{
 		// WG42 vs 集積地棲姫補正
-		// なお集積地棲姫を実装できないので（ｒｙ
-		/*if (target_kammusu.AnyOf(WID("集積地棲姫")) | target_kammusu.AnyOf(WID("集積地棲姫-壊")) {
-			auto wg_count = 0;
+		if (target_kammusu.AnyOf(L"集積地棲姫"s) | target_kammusu.AnyOf(L"集積地棲姫-壊"s)) {
+			//カウント
+			size_t count_dh2 = 0, count_dh3 = 0, count_wg = 0;	//大発シリーズ・WG42の個数
+			size_t sum_star_dh2 = 0, sum_star_dh3 = 0;
 			for (auto &it_w : hunter_kammusu.GetWeapon()) {
-				if (it_w.AnyOf(WID("WG42 (Wurfgerat 42)"))) ++wg_count;
+				if (it_w.AnyOf(WID("大発動艇(八九式中戦車＆陸戦隊)"))) {
+					++count_dh2;
+					sum_star_dh2 += it_w.GetLevel();
+				}
+				if (it_w.AnyOf(WID("特二式内火艇"))) {
+					++count_dh3;
+					sum_star_dh3 += it_w.GetLevel();
+				}
+				if (it_w.AnyOf(WID("WG42 (Wurfgerat 42)"))) ++count_wg;
 			}
-			static const double wg_plus2[] = { 1.0, 1.25, 1.62, 1.62, 1.62 };
-			damage *= int(wg_plus2[wg_count]);	//※この切り捨ては仕様です
-		}*/
+			//掛け算
+			if (count_wg > 0) {
+				static const double wg_plus[] = { 1.0, 1.25, 1.625, 1.625, 1.625 };
+				damage *= wg_plus[count_wg];
+			}
+			if (count_dh2 > 0) {
+				static const double dh_plus[] = { 1.0, 1.30, 2.08, 2.08, 2.08 };
+				damage *= dh_plus[count_dh2];
+				damage *= (1.0 + 1.0 * sum_star_dh2 / count_dh2 / 50);
+			}
+			if (count_dh3 > 0) {
+				static const double dh_plus[] = { 1.0, 1.70, 2.50, 2.50, 2.50 };
+				damage *= dh_plus[count_dh3];
+				damage *= (1.0 + 1.0 * sum_star_dh3 / count_dh3 / 30);
+			}
+			damage *= int(damage);	//※この切り捨ては仕様です
+		}
 		// 徹甲弾補正
 		if (target_kammusu.IsSpecialEffectAP()) {
 			damage *= int(hunter_kammusu.SpecialEffectApPlus());	//※この切り捨ては仕様です
@@ -846,8 +997,7 @@ int Simulator::CalcDamage(
 		// 弾着観測射撃補正
 		if (battle_phase == kBattlePhaseGun && is_special_attack) damage *= multiple;
 		// PT子鬼群補正
-		// なおPT子鬼群を実装できないので（ｒｙ
-		/*if (target_kammusu.AnyOf(WID("PT小鬼群"))) damage *= hunter_kammusu.SpecialEffectPtPlus();*/
+		if (target_kammusu.AnyOf(L"PT小鬼群"s)) damage *= hunter_kammusu.SpecialEffectPtPlus();
 	}
 	// 装甲乱数の分だけダメージを減少させる
 	damage -= 0.7 * target_kammusu.AllDefense() + 0.6 * SharedRand::RandInt(target_kammusu.AllDefense());
@@ -873,8 +1023,8 @@ int Simulator::CalcDamage(
 }
 int Simulator::CalcDamage(
 	const BattlePhase &battle_phase, const size_t turn_player, const KammusuIndex &friend_index, KammusuIndex &enemy_index,
-	const int &base_attack, const bool &is_special_attack, const double &multiple) {
-	return CalcDamage(battle_phase, turn_player, friend_index, enemy_index, base_attack, std::get<magnification>(air_war_result_), battle_position_, is_special_attack, multiple);
+	const int &base_attack, const bool &is_special_attack, const double &multiple, const bool wsn_flg) {
+	return CalcDamage(battle_phase, turn_player, friend_index, enemy_index, base_attack, std::get<magnification>(air_war_result_), battle_position_, is_special_attack, multiple, wsn_flg);
 	}
 
 // 「かばい」を確率的に発生させる
@@ -889,15 +1039,19 @@ void Simulator::ProtectOracle(const size_t defense_side, KammusuIndex &defense_i
 	std::array<size_t, kMaxUnitSize> block_list;
 	size_t block_list_size = 0;
 	for (size_t ui = 1; ui < attendants.size(); ++ui) {
-		if (attendants[ui].IsSubmarine() == is_submarine && attendants[ui].Status() < kStatusLightDamage) {
+		if (attendants[ui].IsSubmarine() == is_submarine) {
 			block_list[block_list_size] = ui;
 			++block_list_size;
 		}
 	}
 	if (block_list_size == 0) return;
 	// かばいは確率的に発生し、どの艦がかばうかも確率的に決まる
-	if (SharedRand::RandBool(0.4)) {	//とりあえず4割に設定している
-		defense_index.fleet_i = SharedRand::select_random_in_range(block_list, block_list_size);
+	// また、かばい対象艦が小破以上ならかばいは失敗する
+	if (SharedRand::RandBool(0.5)) {	//とりあえず5割に設定している
+		auto protect_oracle = SharedRand::select_random_in_range(block_list, block_list_size);
+		if (attendants[protect_oracle].Status() < kStatusLightDamage) {
+			defense_index.fleet_i = protect_oracle;
+		}
 	}
 	return;
 }
@@ -942,47 +1096,85 @@ double Simulator::CalcHitProb(
 			// 回避側
 			//まずは回避値を出す
 			double evade_sum = target_kammusu.AllEvade();
-			if (enemy_formation == kFormationEchelon || enemy_formation == kFormationAbreast) evade_sum *= 1.2;
-			if (target_kammusu.Mood() == kMoodHappy) evade_sum *= 1.8;
-			//そこから回避項を求める
-			double evade_value;
-			if (evade_sum <= 40) {
-				evade_value = 0.03 + evade_sum / 80;
-			}
-			else {
-				evade_value = 0.03 + evade_sum / (evade_sum + 40);
-			}
-			// 命中側
-			//練度による命中率補正
-			double hit_value = 1.0 + sqrt(hunter_kammusu.GetLevel() - 1) / 50;
-			//装備による明示的な命中率補正
-			hit_value += hunter_kammusu.AllHit() / 100;
-			//赤疲労状態だと命中率が激減する
-			if (hunter_kammusu.Mood() == kMoodRed) hit_value /= 1.9;
-			//命中率の運補正
-			hit_value += hunter_kammusu.GetLuck() * 0.0015;
-			//フィット砲補正
-			hit_value += hunter_kammusu.FitGunHitPlus();
-			//命中率の陣形補正
-			switch (friend_formation) {
-			case kFormationSubTrail:
-				if (enemy_formation != kFormationAbreast) hit_value += 0.2;
-				break;
-			case kFormationEchelon:
-				if (enemy_formation != kFormationSubTrail) hit_value += 0.2;
+			//次に回避項を求める
+			double evade_value = (evade_sum + 0.15 * target_kammusu.GetLuck()) * (7.0 / 6) / 100;
+			switch (enemy_formation) {	//陣形補正
+			case kFormationCircle:
+				evade_value *= 1.15;
 				break;
 			case kFormationAbreast:
-				if (enemy_formation != kFormationTrail) hit_value += 0.2;
+				if (friend_formation == kFormationAbreast
+				|| friend_formation == kFormationEchelon) {
+					evade_value *= 1.45;
+				}
+				else {
+					evade_value *= 1.25;
+				}
+				break;
+			case kFormationEchelon:
+				if (friend_formation == kFormationEchelon
+				|| friend_formation == kFormationSubTrail) {
+					evade_value *= 1.45;
+				}
+				else {
+					evade_value *= 1.25;
+				}
 				break;
 			default:
 				break;
 			}
-			//夜戦時の重巡による命中率補正
-			hit_value += hunter_kammusu.FitNightHitPlus();
+			switch (target_kammusu.Mood()) {	//疲労キラ補正
+			case kMoodHappy:
+				evade_value *= 1.8;
+				break;
+			case kMoodOrange:
+				evade_value *= 0.75;
+				break;
+			case kMoodRed:
+				evade_value *= 0.5;
+				break;
+			default:
+				break;
+			}
+			if (evade_value > 0.5) {
+				evade_value = evade_value / (evade_value + 0.5);
+			}
+			// 命中側
+			double hit_value_temp = 0.9 + sqrt(hunter_kammusu.GetLevel() - 1) / 50;
+			hit_value_temp += 1.0 * hunter_kammusu.AllHit() / 100 + hunter_kammusu.FitGunHitPlus() + hunter_kammusu.FitNightHitPlus();
+			hit_value_temp += 1.5 * sqrt(hunter_kammusu.GetLuck()) / 100;
+			//命中率の陣形補正
+			switch (friend_formation) {
+			case kFormationSubTrail:
+				if (enemy_formation != kFormationAbreast) hit_value_temp *= 1.2;
+				break;
+			case kFormationEchelon:
+				if (enemy_formation != kFormationTrail) hit_value_temp *= 1.2;
+				break;
+			case kFormationAbreast:
+				if (enemy_formation != kFormationEchelon) hit_value_temp *= 1.2;
+				break;
+			default:
+				break;
+			}
+			switch (hunter_kammusu.Mood()) {	//疲労キラ補正
+			case kMoodHappy:
+				hit_value_temp *= 1.2;
+				break;
+			case kMoodOrange:
+				hit_value_temp *= 0.75;
+				break;
+			case kMoodRed:
+				hit_value_temp *= 0.5;
+				break;
+			default:
+				break;
+			}
+			double hit_value = 0.03 + hit_value_temp;
 			//引き算により命中率を決定する(上限あり)
 			hit_prob = hit_value - evade_value;
 			// 残燃料による回避補正
-			hit_prob *= 3.73127 - 3.53991 * std::min(target_kammusu.GetFuel(), 80) / 100;
+			//hit_prob *= 3.73127 - 3.53991 * std::min(target_kammusu.GetFuel(), 80) / 100;
 			hit_prob = std::min(hit_prob, 0.97);
 		}
 	break;
@@ -991,43 +1183,48 @@ double Simulator::CalcHitProb(
 		{
 			// 雷撃戦命中率
 			//命中側
-			double hit_value = 0.91587;	//命中項
+			double hit_value_a = 0.9480;
+			hit_value_a += 0.02 * sqrt(hunter_kammusu.GetLevel() - 1);
+			hit_value_a += hunter_kammusu.SumWeapons([](const auto& it_w) {
+				return it_w.AnyOf(WC("魚雷")) ? 0.007506 * it_w.GetLevel() : 0;
+			});
+			double hit_value_b = 0.9228;
 			double T = 1.0;
 			switch (battle_position_) {
 			case kBattlePositionSame:
 				T = 1.0;
 				break;
 			case kBattlePositionReverse:
-				T = 0.8242;
+				T = 0.8170;
 				break;
 			case kBattlePositionGoodT:
-				T = 1.191;
+				T = 1.203;
 				break;
 			case kBattlePositionBadT:
-				T = 0.6046;
+				T = 0.5962;
 				break;
 			}
-			hit_value += 0.02188 * sqrt(hunter_kammusu.GetLevel() - 1);
-			hit_value += T * int(0.001426 * hunter_kammusu.AllTorpedo(false) + 0.000836 * hunter_kammusu.GetTorpedo());
-			hit_value += 0.01009 * hunter_kammusu.AllHit();
-			hit_value += hunter_kammusu.SumWeapons([](const auto& it_w) {
-				return it_w.AnyOf(WC("魚雷")) ? 0.02104 * sqrt(it_w.GetLevel()) : 0;
-			});
-			hit_value += 0.001482 * hunter_kammusu.GetLuck();
+			hit_value_b += 0.001893 * hunter_kammusu.AllTorpedo(false) * T;
+			for (const auto &it_w : hunter_kammusu.GetWeapon()) {
+				hit_value_b += 0.01142 * std::sqrt(T * it_w.GetTorpedo());
+			}
+			double hit_value = hit_value_a * hit_value_b;
+			hit_value += 0.01013 * hunter_kammusu.AllHit();
+			hit_value += 0.001522 * std::sqrt(hunter_kammusu.GetLuck());
 			//回避側
 			double a;
 			switch (enemy_formation) {
 			case kFormationTrail:
-				a = 38.63;
+				a = 41.01;
 				break;
 			case kFormationSubTrail:
-				a = 38.4;
+				a = 41.00;
 				break;
 			case kFormationCircle:
-				a = 33.69;
+				a = 36.26;
 				break;
 			default:
-				a = 38.63;
+				a = 39.42;
 				break;
 			}
 			double evade_sum = target_kammusu.AllEvade();
@@ -1167,7 +1364,7 @@ NightFireType Simulator::JudgeNightFireType(const size_t turn_player, const Kamm
 }
 
 // 夜戦での特殊攻撃を判断する
-tuple<bool, double> Simulator::JudgeNightSpecialAttack(const size_t turn_player, const KammusuIndex &attack_index, const bool af_flg) const {
+tuple<bool, double> Simulator::JudgeNightSpecialAttack(const size_t turn_player, const KammusuIndex &attack_index, const bool af_flg, const int enemy_luck) const {
 	// 主砲・副砲・魚雷の数を数える
 	const auto &hunter_kammusu = fleet_[turn_player].GetUnit()[attack_index.fleet_no][attack_index.fleet_i];
 	size_t sum_gun = 0, sum_subgun = 0, sum_torpedo = 0;
@@ -1223,25 +1420,24 @@ tuple<bool, double> Simulator::JudgeNightSpecialAttack(const size_t turn_player,
 		for (auto &it_w : hunter_kammusu.GetWeapon())
 			if (it_w.AnyOf(WC("水上艦要員"))) return true;
 		return false; };
-	// 運による発動率上昇は、運キャップによる上限がある
-	switch (attack_type) {
-	case 1:
-		oracle += sqrt(70.0 * std::max(hunter_kammusu.GetLuck() + (has_ssp() ? 5 : 0), 60)) / 100;
-		break;
-	case 2:
-		oracle += sqrt(50.0 * std::max(hunter_kammusu.GetLuck() + (has_ssp() ? 5 : 0), 55)) / 100;
-		break;
-	case 3:
-		oracle += sqrt(50.0 * std::max(hunter_kammusu.GetLuck() + (has_ssp() ? 5 : 0), 55)) / 100;
-		break;
-	case 4:
-		oracle += sqrt(70.0 * std::max(hunter_kammusu.GetLuck() + (has_ssp() ? 5 : 0), 75)) / 100;
-		break;
-	default:
-		break;
+	// 発動率計算式は、次の記事を参考にした
+	// 「haruのブロマガ 艦これ　カットイン発生率の推定式」
+	// http://ch.nicovideo.jp/HSG/blomaga/ar1019144
+	if (attack_type == 1) {
+		oracle += 0.14;
 	}
+	oracle += 1.0 * hunter_kammusu.GetLevel() / 2000;
+	size_t luck_temp = hunter_kammusu.GetLuck() + (has_ssp() ? 5 : 0);
+	if (luck_temp <= 50) {
+		oracle += 0.0085 * luck_temp;
+	}
+	else {
+		double temp = 1.0 * (luck_temp - 50) / 12;
+		oracle += 0.425 + temp * temp / 100;
+	}
+	oracle -= 1.0 * enemy_luck / 1000;
 	// 配置補正
-	if (attack_index.fleet_i == 0) oracle += 0.125;
+	if (attack_index.fleet_i == 0) oracle += 0.12;
 	// 損傷補正
 	if (hunter_kammusu.Status() == kStatusMiddleDamage) oracle += 0.2;
 	// 探照灯・照明弾補正

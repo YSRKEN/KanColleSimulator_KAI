@@ -7,6 +7,7 @@
 #include <numeric>
 #include <type_traits>
 #include "random.hpp"
+#include "std_future.hpp"
 class WeaponDB;
 enum class FleetType : std::uint8_t;
 enum TorpedoTurn : std::uint8_t;
@@ -92,6 +93,7 @@ inline std::wstring to_wstring(const ShipClass& sc) {
 }
 
 namespace detail {
+	using std::nullptr_t;
 	template<class F, class C, std::enable_if_t<!std::is_member_function_pointer<F>::value, nullptr_t> = nullptr>
 	auto invoke(F f, C c) { return f(c); }
 	template<class F, class C, std::enable_if_t<std::is_member_function_pointer<F>::value, nullptr_t> = nullptr>
@@ -190,9 +192,9 @@ public:
 	int AacType() const noexcept;					//対空カットインの種類を判別する
 	double AacProb(const int&) const noexcept;		//対空カットインの発動確率を計算する
 	double AllAntiAir() const noexcept;				//加重対空値を計算する
-	Status Status() const noexcept;					//ステータスを返す
+	enum Status Status() const noexcept;					//ステータスを返す
 	int AllEvade() const noexcept;					//総回避を返す
-	Mood Mood() const noexcept;						//疲労度を返す
+	enum Mood Mood() const noexcept;						//疲労度を返す
 	int AllHit() const noexcept;					//総命中を返す
 	double FitGunHitPlus() const noexcept;			//フィット砲補正
 	int AllTorpedo(const bool&) const noexcept;		//総雷装を返す
@@ -220,6 +222,7 @@ public:
 	bool IsFireTorpedo(const TorpedoTurn&) const noexcept;	//魚雷を発射できればtrue
 	bool IsMoveGun(const bool) const noexcept;				//砲撃戦で行動可能な艦ならtrue
 	bool IsFireGun(const bool) const noexcept;				//砲撃戦で攻撃可能な艦ならtrue
+	bool IsFirstAntiSub() const noexcept;					//開幕対潜可能な艦ならtrue
 	bool IsAntiSubDay() const noexcept;						//昼戦で対潜可能な艦ならtrue
 	bool IsFireGunPlane() const noexcept;					//空撃可能ならtrue
 	bool IsFireNight() const noexcept;						//夜戦で攻撃可能な艦ならtrue
@@ -231,7 +234,7 @@ public:
 	bool AnyOf(const ShipClass& sc) const noexcept { return (static_cast<std::underlying_type_t<ShipClass>>(ship_class_) & static_cast<std::underlying_type_t<ShipClass>>(sc)) != 0; }
 	// 指定の名前か判定する。名前は完全一致で比較する。
 	template<class String, class = std::enable_if_t<std::is_same<String, std::wstring>::value>>		// 暗黙の型キャストにより非効率とならないようstd::wstringのみを受け付ける。
-	bool AnyOf(const String& test) const noexcept { return std::size(GetName()) == std::size(test) && GetName() == test; }	// 長さが一致した場合に限り文字列比較を行う。
+	bool AnyOf(const String& test) const noexcept { return std_future::size(GetName()) == std_future::size(test) && GetName() == test; }	// 長さが一致した場合に限り文字列比較を行う。
 	// 引数に指定された条件を満たすか判定する。引数はShipId型のID、ShipClass型の種別、std::wstring型の名前のいずれでも指定できる。名前は完全一致で比較する。
 	template<class Head, class... Rest>
 	bool AnyOf(Head head, Rest... rest) const noexcept { return AnyOf(head) || AnyOf(rest...); }

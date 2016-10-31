@@ -215,7 +215,7 @@
 			this.ChangeWeaponButton.Location = new System.Drawing.Point(197, 213);
 			this.ChangeWeaponButton.Name = "ChangeWeaponButton";
 			this.ChangeWeaponButton.Size = new System.Drawing.Size(40, 23);
-			this.ChangeWeaponButton.TabIndex = 45;
+			this.ChangeWeaponButton.TabIndex = 20;
 			this.ChangeWeaponButton.Text = "変更";
 			this.ChangeWeaponButton.UseVisualStyleBackColor = true;
 			this.ChangeWeaponButton.Click += new System.EventHandler(this.ChangeWeaponButton_Click);
@@ -225,25 +225,26 @@
 			this.ChangeKammusuButton.Location = new System.Drawing.Point(197, 131);
 			this.ChangeKammusuButton.Name = "ChangeKammusuButton";
 			this.ChangeKammusuButton.Size = new System.Drawing.Size(40, 23);
-			this.ChangeKammusuButton.TabIndex = 44;
+			this.ChangeKammusuButton.TabIndex = 12;
 			this.ChangeKammusuButton.Text = "変更";
 			this.ChangeKammusuButton.UseVisualStyleBackColor = true;
 			this.ChangeKammusuButton.Click += new System.EventHandler(this.ChangeKammusuButton_Click);
 			// 
 			// WeaponNameComboBox
 			// 
+			this.WeaponNameComboBox.DisplayMember = "装備名";
 			this.WeaponNameComboBox.FormattingEnabled = true;
 			this.WeaponNameComboBox.Location = new System.Drawing.Point(188, 187);
 			this.WeaponNameComboBox.Name = "WeaponNameComboBox";
 			this.WeaponNameComboBox.Size = new System.Drawing.Size(120, 20);
-			this.WeaponNameComboBox.TabIndex = 43;
+			this.WeaponNameComboBox.TabIndex = 15;
 			// 
 			// DeleteWeaponButton
 			// 
 			this.DeleteWeaponButton.Location = new System.Drawing.Point(243, 213);
 			this.DeleteWeaponButton.Name = "DeleteWeaponButton";
 			this.DeleteWeaponButton.Size = new System.Drawing.Size(40, 23);
-			this.DeleteWeaponButton.TabIndex = 42;
+			this.DeleteWeaponButton.TabIndex = 21;
 			this.DeleteWeaponButton.Text = "削除";
 			this.DeleteWeaponButton.UseVisualStyleBackColor = true;
 			this.DeleteWeaponButton.Click += new System.EventHandler(this.DeleteWeaponButton_Click);
@@ -253,7 +254,7 @@
 			this.AddWeaponButton.Location = new System.Drawing.Point(151, 213);
 			this.AddWeaponButton.Name = "AddWeaponButton";
 			this.AddWeaponButton.Size = new System.Drawing.Size(40, 23);
-			this.AddWeaponButton.TabIndex = 41;
+			this.AddWeaponButton.TabIndex = 19;
 			this.AddWeaponButton.Text = "追加";
 			this.AddWeaponButton.UseVisualStyleBackColor = true;
 			this.AddWeaponButton.Click += new System.EventHandler(this.AddWeaponButton_Click);
@@ -263,7 +264,7 @@
 			this.DeleteKammusuButton.Location = new System.Drawing.Point(243, 131);
 			this.DeleteKammusuButton.Name = "DeleteKammusuButton";
 			this.DeleteKammusuButton.Size = new System.Drawing.Size(40, 23);
-			this.DeleteKammusuButton.TabIndex = 40;
+			this.DeleteKammusuButton.TabIndex = 13;
 			this.DeleteKammusuButton.Text = "削除";
 			this.DeleteKammusuButton.UseVisualStyleBackColor = true;
 			this.DeleteKammusuButton.Click += new System.EventHandler(this.DeleteKammusuButton_Click);
@@ -273,7 +274,7 @@
 			this.AddKammusuButton.Location = new System.Drawing.Point(151, 131);
 			this.AddKammusuButton.Name = "AddKammusuButton";
 			this.AddKammusuButton.Size = new System.Drawing.Size(40, 23);
-			this.AddKammusuButton.TabIndex = 39;
+			this.AddKammusuButton.TabIndex = 11;
 			this.AddKammusuButton.Text = "追加";
 			this.AddKammusuButton.UseVisualStyleBackColor = true;
 			this.AddKammusuButton.Click += new System.EventHandler(this.AddKammusuButton_Click);
@@ -289,12 +290,12 @@
 			// 
 			// KammusuNameComboBox
 			// 
+			this.KammusuNameComboBox.DisplayMember = "艦名";
 			this.KammusuNameComboBox.FormattingEnabled = true;
 			this.KammusuNameComboBox.Location = new System.Drawing.Point(186, 105);
 			this.KammusuNameComboBox.Name = "KammusuNameComboBox";
 			this.KammusuNameComboBox.Size = new System.Drawing.Size(100, 20);
-			this.KammusuNameComboBox.TabIndex = 37;
-			this.KammusuNameComboBox.Leave += new System.EventHandler(this.KammusuNameComboBox_Leave);
+			this.KammusuNameComboBox.TabIndex = 7;
 			// 
 			// WeaponDetailRfComboBox
 			// 
@@ -425,7 +426,7 @@
 			this.WeaponDetailRfComboBox.Location = new System.Drawing.Point(385, 216);
 			this.WeaponDetailRfComboBox.Name = "WeaponDetailRfComboBox";
 			this.WeaponDetailRfComboBox.Size = new System.Drawing.Size(50, 20);
-			this.WeaponDetailRfComboBox.TabIndex = 36;
+			this.WeaponDetailRfComboBox.TabIndex = 18;
 			this.WeaponDetailRfComboBox.Text = "0";
 			this.WeaponDetailRfComboBox.SelectedIndexChanged += new System.EventHandler(this.WeaponDetailRfComboBox_SelectedIndexChanged);
 			this.WeaponDetailRfComboBox.Leave += new System.EventHandler(this.WeaponDetailRfComboBox_Leave);
@@ -449,7 +450,7 @@
 			this.WeaponRfComboBox.Location = new System.Drawing.Point(385, 188);
 			this.WeaponRfComboBox.Name = "WeaponRfComboBox";
 			this.WeaponRfComboBox.Size = new System.Drawing.Size(50, 20);
-			this.WeaponRfComboBox.TabIndex = 35;
+			this.WeaponRfComboBox.TabIndex = 17;
 			this.WeaponRfComboBox.Text = "0";
 			this.WeaponRfComboBox.SelectedIndexChanged += new System.EventHandler(this.WeaponRfComboBox_SelectedIndexChanged);
 			this.WeaponRfComboBox.Leave += new System.EventHandler(this.WeaponRfComboBox_Leave);
@@ -472,7 +473,7 @@
 			this.WeaponLevelComboBox.Location = new System.Drawing.Point(385, 162);
 			this.WeaponLevelComboBox.Name = "WeaponLevelComboBox";
 			this.WeaponLevelComboBox.Size = new System.Drawing.Size(50, 20);
-			this.WeaponLevelComboBox.TabIndex = 34;
+			this.WeaponLevelComboBox.TabIndex = 16;
 			this.WeaponLevelComboBox.Text = "0";
 			this.WeaponLevelComboBox.Leave += new System.EventHandler(this.WeaponLevelComboBox_Leave);
 			// 
@@ -518,7 +519,7 @@
 			this.SearchPower33TextBox.Location = new System.Drawing.Point(248, 56);
 			this.SearchPower33TextBox.Name = "SearchPower33TextBox";
 			this.SearchPower33TextBox.Size = new System.Drawing.Size(40, 19);
-			this.SearchPower33TextBox.TabIndex = 28;
+			this.SearchPower33TextBox.TabIndex = 24;
 			// 
 			// label15
 			// 
@@ -535,7 +536,7 @@
 			this.SearchPower25TextBox.Location = new System.Drawing.Point(248, 31);
 			this.SearchPower25TextBox.Name = "SearchPower25TextBox";
 			this.SearchPower25TextBox.Size = new System.Drawing.Size(40, 19);
-			this.SearchPower25TextBox.TabIndex = 26;
+			this.SearchPower25TextBox.TabIndex = 23;
 			// 
 			// AllAntiAirTextBox
 			// 
@@ -543,7 +544,7 @@
 			this.AllAntiAirTextBox.Location = new System.Drawing.Point(210, 6);
 			this.AllAntiAirTextBox.Name = "AllAntiAirTextBox";
 			this.AllAntiAirTextBox.Size = new System.Drawing.Size(40, 19);
-			this.AllAntiAirTextBox.TabIndex = 25;
+			this.AllAntiAirTextBox.TabIndex = 22;
 			// 
 			// label14
 			// 
@@ -574,45 +575,13 @@
 			// 
 			// WeaponTypeComboBox
 			// 
+			this.WeaponTypeComboBox.DisplayMember = "Key";
 			this.WeaponTypeComboBox.FormattingEnabled = true;
-			this.WeaponTypeComboBox.Items.AddRange(new object[] {
-            "主砲",
-            "対艦強化弾",
-            "副砲",
-            "魚雷",
-            "特殊潜航艇",
-            "艦上戦闘機",
-            "艦上爆撃機",
-            "艦上爆撃機(爆戦)",
-            "水上爆撃機",
-            "艦上攻撃機",
-            "艦上偵察機",
-            "艦上偵察機(彩雲)",
-            "大型飛行艇",
-            "水上偵察機",
-            "水上偵察機(夜偵)",
-            "対潜哨戒機",
-            "オートジャイロ",
-            "小型電探",
-            "大型電探",
-            "対空機銃",
-            "対空強化弾",
-            "高射装置",
-            "爆雷",
-            "ソナー",
-            "応急修理要員",
-            "探照灯",
-            "照明弾",
-            "艦隊司令部施設",
-            "水上艦要員",
-            "戦闘糧食",
-            "洋上補給",
-            "水上戦闘機",
-            "その他"});
 			this.WeaponTypeComboBox.Location = new System.Drawing.Point(188, 162);
 			this.WeaponTypeComboBox.Name = "WeaponTypeComboBox";
 			this.WeaponTypeComboBox.Size = new System.Drawing.Size(120, 20);
-			this.WeaponTypeComboBox.TabIndex = 21;
+			this.WeaponTypeComboBox.TabIndex = 14;
+			this.WeaponTypeComboBox.ValueMember = "Value";
 			this.WeaponTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.WeaponTypeComboBox_SelectedIndexChanged);
 			// 
 			// label11
@@ -626,12 +595,13 @@
 			// 
 			// WeaponSelectListBox
 			// 
+			this.WeaponSelectListBox.DisplayMember = "装備名";
 			this.WeaponSelectListBox.FormattingEnabled = true;
 			this.WeaponSelectListBox.ItemHeight = 12;
 			this.WeaponSelectListBox.Location = new System.Drawing.Point(65, 165);
 			this.WeaponSelectListBox.Name = "WeaponSelectListBox";
 			this.WeaponSelectListBox.Size = new System.Drawing.Size(80, 52);
-			this.WeaponSelectListBox.TabIndex = 19;
+			this.WeaponSelectListBox.TabIndex = 5;
 			this.WeaponSelectListBox.SelectedIndexChanged += new System.EventHandler(this.WeaponSelectListBox_SelectedIndexChanged);
 			// 
 			// KammusuCondTextBox
@@ -639,7 +609,7 @@
 			this.KammusuCondTextBox.Location = new System.Drawing.Point(332, 131);
 			this.KammusuCondTextBox.Name = "KammusuCondTextBox";
 			this.KammusuCondTextBox.Size = new System.Drawing.Size(40, 19);
-			this.KammusuCondTextBox.TabIndex = 18;
+			this.KammusuCondTextBox.TabIndex = 10;
 			this.KammusuCondTextBox.Text = "49";
 			this.KammusuCondTextBox.Leave += new System.EventHandler(this.KammusuCondTextBox_Leave);
 			// 
@@ -648,7 +618,7 @@
 			this.KammusuLuckTextBox.Location = new System.Drawing.Point(332, 106);
 			this.KammusuLuckTextBox.Name = "KammusuLuckTextBox";
 			this.KammusuLuckTextBox.Size = new System.Drawing.Size(40, 19);
-			this.KammusuLuckTextBox.TabIndex = 17;
+			this.KammusuLuckTextBox.TabIndex = 9;
 			this.KammusuLuckTextBox.Text = "-1";
 			this.KammusuLuckTextBox.Leave += new System.EventHandler(this.KammusuLuckTextBox_Leave);
 			// 
@@ -657,7 +627,7 @@
 			this.KammusuLevelTextBox.Location = new System.Drawing.Point(332, 80);
 			this.KammusuLevelTextBox.Name = "KammusuLevelTextBox";
 			this.KammusuLevelTextBox.Size = new System.Drawing.Size(40, 19);
-			this.KammusuLevelTextBox.TabIndex = 16;
+			this.KammusuLevelTextBox.TabIndex = 8;
 			this.KammusuLevelTextBox.Text = "1";
 			this.KammusuLevelTextBox.Leave += new System.EventHandler(this.KammusuLevelTextBox_Leave);
 			// 
@@ -690,34 +660,13 @@
 			// 
 			// KammusuTypeComboBox
 			// 
+			this.KammusuTypeComboBox.DisplayMember = "Key";
 			this.KammusuTypeComboBox.FormattingEnabled = true;
-			this.KammusuTypeComboBox.Items.AddRange(new object[] {
-            "魚雷艇",
-            "駆逐艦",
-            "軽巡洋艦",
-            "重雷装巡洋艦",
-            "重巡洋艦",
-            "航空巡洋艦",
-            "軽空母",
-            "巡洋戦艦",
-            "戦艦",
-            "航空戦艦",
-            "正規空母",
-            "陸上型",
-            "潜水艦",
-            "潜水空母",
-            "輸送艦",
-            "水上機母艦",
-            "揚陸艦",
-            "装甲空母",
-            "工作艦",
-            "潜水母艦",
-            "練習巡洋艦",
-            "給油艦"});
 			this.KammusuTypeComboBox.Location = new System.Drawing.Point(186, 80);
 			this.KammusuTypeComboBox.Name = "KammusuTypeComboBox";
 			this.KammusuTypeComboBox.Size = new System.Drawing.Size(100, 20);
-			this.KammusuTypeComboBox.TabIndex = 11;
+			this.KammusuTypeComboBox.TabIndex = 6;
+			this.KammusuTypeComboBox.ValueMember = "Value";
 			this.KammusuTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.KammusuTypeComboBox_SelectedIndexChanged);
 			// 
 			// label7
@@ -758,7 +707,7 @@
 			this.FleetTypeComboBox.Location = new System.Drawing.Point(65, 31);
 			this.FleetTypeComboBox.Name = "FleetTypeComboBox";
 			this.FleetTypeComboBox.Size = new System.Drawing.Size(80, 20);
-			this.FleetTypeComboBox.TabIndex = 7;
+			this.FleetTypeComboBox.TabIndex = 2;
 			this.FleetTypeComboBox.Text = "通常艦隊";
 			this.FleetTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.FleetTypeComboBox_SelectedIndexChanged);
 			// 
@@ -767,7 +716,7 @@
 			this.HQLevelTextBox.Location = new System.Drawing.Point(82, 6);
 			this.HQLevelTextBox.Name = "HQLevelTextBox";
 			this.HQLevelTextBox.Size = new System.Drawing.Size(40, 19);
-			this.HQLevelTextBox.TabIndex = 6;
+			this.HQLevelTextBox.TabIndex = 1;
 			this.HQLevelTextBox.Text = "120";
 			this.HQLevelTextBox.TextChanged += new System.EventHandler(this.HQLevelTextBox_TextChanged);
 			// 
@@ -808,12 +757,13 @@
 			// 
 			// KammusuSelectListBox
 			// 
+			this.KammusuSelectListBox.DisplayMember = "艦名";
 			this.KammusuSelectListBox.FormattingEnabled = true;
 			this.KammusuSelectListBox.ItemHeight = 12;
 			this.KammusuSelectListBox.Location = new System.Drawing.Point(65, 83);
 			this.KammusuSelectListBox.Name = "KammusuSelectListBox";
 			this.KammusuSelectListBox.Size = new System.Drawing.Size(80, 76);
-			this.KammusuSelectListBox.TabIndex = 1;
+			this.KammusuSelectListBox.TabIndex = 4;
 			this.KammusuSelectListBox.SelectedIndexChanged += new System.EventHandler(this.KammusuSelectListBox_SelectedIndexChanged);
 			// 
 			// FleetSelectComboBox
@@ -825,7 +775,7 @@
 			this.FleetSelectComboBox.Location = new System.Drawing.Point(65, 57);
 			this.FleetSelectComboBox.Name = "FleetSelectComboBox";
 			this.FleetSelectComboBox.Size = new System.Drawing.Size(80, 20);
-			this.FleetSelectComboBox.TabIndex = 0;
+			this.FleetSelectComboBox.TabIndex = 3;
 			this.FleetSelectComboBox.SelectedIndexChanged += new System.EventHandler(this.FleetSelectComboBox_SelectedIndexChanged);
 			// 
 			// tabPage2
@@ -879,7 +829,7 @@
 			this.ChangeMapKammusuButton.Location = new System.Drawing.Point(252, 221);
 			this.ChangeMapKammusuButton.Name = "ChangeMapKammusuButton";
 			this.ChangeMapKammusuButton.Size = new System.Drawing.Size(40, 23);
-			this.ChangeMapKammusuButton.TabIndex = 49;
+			this.ChangeMapKammusuButton.TabIndex = 41;
 			this.ChangeMapKammusuButton.Text = "変更";
 			this.ChangeMapKammusuButton.UseVisualStyleBackColor = true;
 			this.ChangeMapKammusuButton.Click += new System.EventHandler(this.ChangeMapKammusuButton_Click);
@@ -889,7 +839,7 @@
 			this.ChangeMapPatternButton.Location = new System.Drawing.Point(250, 140);
 			this.ChangeMapPatternButton.Name = "ChangeMapPatternButton";
 			this.ChangeMapPatternButton.Size = new System.Drawing.Size(40, 23);
-			this.ChangeMapPatternButton.TabIndex = 48;
+			this.ChangeMapPatternButton.TabIndex = 36;
 			this.ChangeMapPatternButton.Text = "変更";
 			this.ChangeMapPatternButton.UseVisualStyleBackColor = true;
 			this.ChangeMapPatternButton.Click += new System.EventHandler(this.ChangeMapPatternButton_Click);
@@ -899,7 +849,7 @@
 			this.ChangeMapPositionButton.Location = new System.Drawing.Point(250, 58);
 			this.ChangeMapPositionButton.Name = "ChangeMapPositionButton";
 			this.ChangeMapPositionButton.Size = new System.Drawing.Size(40, 23);
-			this.ChangeMapPositionButton.TabIndex = 47;
+			this.ChangeMapPositionButton.TabIndex = 31;
 			this.ChangeMapPositionButton.Text = "変更";
 			this.ChangeMapPositionButton.UseVisualStyleBackColor = true;
 			this.ChangeMapPositionButton.Click += new System.EventHandler(this.ChangeMapPositionButton_Click);
@@ -909,7 +859,7 @@
 			this.DeleteMapKammusuButton.Location = new System.Drawing.Point(298, 221);
 			this.DeleteMapKammusuButton.Name = "DeleteMapKammusuButton";
 			this.DeleteMapKammusuButton.Size = new System.Drawing.Size(40, 23);
-			this.DeleteMapKammusuButton.TabIndex = 46;
+			this.DeleteMapKammusuButton.TabIndex = 42;
 			this.DeleteMapKammusuButton.Text = "削除";
 			this.DeleteMapKammusuButton.UseVisualStyleBackColor = true;
 			this.DeleteMapKammusuButton.Click += new System.EventHandler(this.DeleteMapKammusuButton_Click);
@@ -919,7 +869,7 @@
 			this.AddMapKammusuButton.Location = new System.Drawing.Point(206, 221);
 			this.AddMapKammusuButton.Name = "AddMapKammusuButton";
 			this.AddMapKammusuButton.Size = new System.Drawing.Size(40, 23);
-			this.AddMapKammusuButton.TabIndex = 45;
+			this.AddMapKammusuButton.TabIndex = 40;
 			this.AddMapKammusuButton.Text = "追加";
 			this.AddMapKammusuButton.UseVisualStyleBackColor = true;
 			this.AddMapKammusuButton.Click += new System.EventHandler(this.AddMapKammusuButton_Click);
@@ -929,7 +879,7 @@
 			this.DeleteMapPatternButton.Location = new System.Drawing.Point(296, 140);
 			this.DeleteMapPatternButton.Name = "DeleteMapPatternButton";
 			this.DeleteMapPatternButton.Size = new System.Drawing.Size(40, 23);
-			this.DeleteMapPatternButton.TabIndex = 44;
+			this.DeleteMapPatternButton.TabIndex = 37;
 			this.DeleteMapPatternButton.Text = "削除";
 			this.DeleteMapPatternButton.UseVisualStyleBackColor = true;
 			this.DeleteMapPatternButton.Click += new System.EventHandler(this.DeleteMapPatternButton_Click);
@@ -939,7 +889,7 @@
 			this.AddMapPatternButton.Location = new System.Drawing.Point(204, 140);
 			this.AddMapPatternButton.Name = "AddMapPatternButton";
 			this.AddMapPatternButton.Size = new System.Drawing.Size(40, 23);
-			this.AddMapPatternButton.TabIndex = 43;
+			this.AddMapPatternButton.TabIndex = 35;
 			this.AddMapPatternButton.Text = "追加";
 			this.AddMapPatternButton.UseVisualStyleBackColor = true;
 			this.AddMapPatternButton.Click += new System.EventHandler(this.AddMapPatternButton_Click);
@@ -949,7 +899,7 @@
 			this.DeleteMapPositionButton.Location = new System.Drawing.Point(296, 58);
 			this.DeleteMapPositionButton.Name = "DeleteMapPositionButton";
 			this.DeleteMapPositionButton.Size = new System.Drawing.Size(40, 23);
-			this.DeleteMapPositionButton.TabIndex = 42;
+			this.DeleteMapPositionButton.TabIndex = 32;
 			this.DeleteMapPositionButton.Text = "削除";
 			this.DeleteMapPositionButton.UseVisualStyleBackColor = true;
 			this.DeleteMapPositionButton.Click += new System.EventHandler(this.DeleteMapPositionButton_Click);
@@ -959,13 +909,14 @@
 			this.AddMapPositionButton.Location = new System.Drawing.Point(204, 58);
 			this.AddMapPositionButton.Name = "AddMapPositionButton";
 			this.AddMapPositionButton.Size = new System.Drawing.Size(40, 23);
-			this.AddMapPositionButton.TabIndex = 41;
+			this.AddMapPositionButton.TabIndex = 30;
 			this.AddMapPositionButton.Text = "追加";
 			this.AddMapPositionButton.UseVisualStyleBackColor = true;
 			this.AddMapPositionButton.Click += new System.EventHandler(this.AddMapPositionButton_Click);
 			// 
 			// MapKammusuNameComboBox
 			// 
+			this.MapKammusuNameComboBox.DisplayMember = "艦名";
 			this.MapKammusuNameComboBox.FormattingEnabled = true;
 			this.MapKammusuNameComboBox.Location = new System.Drawing.Point(239, 195);
 			this.MapKammusuNameComboBox.Name = "MapKammusuNameComboBox";
@@ -975,12 +926,13 @@
 			// 
 			// MapKammusuListBox
 			// 
+			this.MapKammusuListBox.DisplayMember = "艦名";
 			this.MapKammusuListBox.FormattingEnabled = true;
 			this.MapKammusuListBox.ItemHeight = 12;
 			this.MapKammusuListBox.Location = new System.Drawing.Point(78, 173);
 			this.MapKammusuListBox.Name = "MapKammusuListBox";
 			this.MapKammusuListBox.Size = new System.Drawing.Size(120, 76);
-			this.MapKammusuListBox.TabIndex = 38;
+			this.MapKammusuListBox.TabIndex = 27;
 			this.MapKammusuListBox.SelectedIndexChanged += new System.EventHandler(this.MapKammusuListBox_SelectedIndexChanged);
 			// 
 			// MapPatternAllAntiAirTextBox
@@ -989,7 +941,7 @@
 			this.MapPatternAllAntiAirTextBox.Location = new System.Drawing.Point(263, 113);
 			this.MapPatternAllAntiAirTextBox.Name = "MapPatternAllAntiAirTextBox";
 			this.MapPatternAllAntiAirTextBox.Size = new System.Drawing.Size(40, 19);
-			this.MapPatternAllAntiAirTextBox.TabIndex = 37;
+			this.MapPatternAllAntiAirTextBox.TabIndex = 34;
 			// 
 			// label27
 			// 
@@ -1012,7 +964,7 @@
 			this.MapPatternFormationComboBox.Location = new System.Drawing.Point(239, 87);
 			this.MapPatternFormationComboBox.Name = "MapPatternFormationComboBox";
 			this.MapPatternFormationComboBox.Size = new System.Drawing.Size(80, 20);
-			this.MapPatternFormationComboBox.TabIndex = 35;
+			this.MapPatternFormationComboBox.TabIndex = 33;
 			this.MapPatternFormationComboBox.Text = "単縦陣";
 			// 
 			// label24
@@ -1026,35 +978,14 @@
 			// 
 			// MapKammusuTypeComboBox
 			// 
+			this.MapKammusuTypeComboBox.DisplayMember = "Key";
 			this.MapKammusuTypeComboBox.FormattingEnabled = true;
-			this.MapKammusuTypeComboBox.Items.AddRange(new object[] {
-            "魚雷艇",
-            "駆逐艦",
-            "軽巡洋艦",
-            "重雷装巡洋艦",
-            "重巡洋艦",
-            "航空巡洋艦",
-            "軽空母",
-            "巡洋戦艦",
-            "戦艦",
-            "航空戦艦",
-            "正規空母",
-            "陸上型",
-            "潜水艦",
-            "潜水空母",
-            "輸送艦",
-            "水上機母艦",
-            "揚陸艦",
-            "装甲空母",
-            "工作艦",
-            "潜水母艦",
-            "練習巡洋艦",
-            "給油艦"});
 			this.MapKammusuTypeComboBox.Location = new System.Drawing.Point(239, 169);
 			this.MapKammusuTypeComboBox.Name = "MapKammusuTypeComboBox";
 			this.MapKammusuTypeComboBox.Size = new System.Drawing.Size(100, 20);
-			this.MapKammusuTypeComboBox.TabIndex = 32;
+			this.MapKammusuTypeComboBox.TabIndex = 38;
 			this.MapKammusuTypeComboBox.Text = "駆逐艦";
+			this.MapKammusuTypeComboBox.ValueMember = "Value";
 			this.MapKammusuTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.MapKammusuTypeComboBox_SelectedIndexChanged);
 			// 
 			// label25
@@ -1102,7 +1033,7 @@
 			this.MapPositionNameTextBox.Location = new System.Drawing.Point(245, 5);
 			this.MapPositionNameTextBox.Name = "MapPositionNameTextBox";
 			this.MapPositionNameTextBox.Size = new System.Drawing.Size(40, 19);
-			this.MapPositionNameTextBox.TabIndex = 27;
+			this.MapPositionNameTextBox.TabIndex = 28;
 			this.MapPositionNameTextBox.Text = "A";
 			// 
 			// label22
@@ -1130,7 +1061,7 @@
 			this.MapPatternListBox.Location = new System.Drawing.Point(78, 91);
 			this.MapPatternListBox.Name = "MapPatternListBox";
 			this.MapPatternListBox.Size = new System.Drawing.Size(120, 76);
-			this.MapPatternListBox.TabIndex = 23;
+			this.MapPatternListBox.TabIndex = 26;
 			this.MapPatternListBox.SelectedIndexChanged += new System.EventHandler(this.MapPatternListBox_SelectedIndexChanged);
 			// 
 			// label21
@@ -1149,7 +1080,7 @@
 			this.MapPositionListBox.Location = new System.Drawing.Point(78, 9);
 			this.MapPositionListBox.Name = "MapPositionListBox";
 			this.MapPositionListBox.Size = new System.Drawing.Size(120, 76);
-			this.MapPositionListBox.TabIndex = 21;
+			this.MapPositionListBox.TabIndex = 25;
 			this.MapPositionListBox.SelectedIndexChanged += new System.EventHandler(this.MapPositionListBox_SelectedIndexChanged);
 			// 
 			// tabPage3
@@ -1187,7 +1118,7 @@
 			this.StartButton.Location = new System.Drawing.Point(371, 113);
 			this.StartButton.Name = "StartButton";
 			this.StartButton.Size = new System.Drawing.Size(75, 23);
-			this.StartButton.TabIndex = 51;
+			this.StartButton.TabIndex = 56;
 			this.StartButton.Text = "計算開始";
 			this.StartButton.UseVisualStyleBackColor = true;
 			this.StartButton.Click += new System.EventHandler(this.StartButton_Click);
@@ -1201,7 +1132,7 @@
 			this.ResultTextBox.ReadOnly = true;
 			this.ResultTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
 			this.ResultTextBox.Size = new System.Drawing.Size(438, 107);
-			this.ResultTextBox.TabIndex = 50;
+			this.ResultTextBox.TabIndex = 57;
 			// 
 			// PrettifyJSONCheckBox
 			// 
@@ -1209,7 +1140,7 @@
 			this.PrettifyJSONCheckBox.Location = new System.Drawing.Point(288, 117);
 			this.PrettifyJSONCheckBox.Name = "PrettifyJSONCheckBox";
 			this.PrettifyJSONCheckBox.Size = new System.Drawing.Size(78, 16);
-			this.PrettifyJSONCheckBox.TabIndex = 49;
+			this.PrettifyJSONCheckBox.TabIndex = 55;
 			this.PrettifyJSONCheckBox.Text = "JSON整形";
 			this.PrettifyJSONCheckBox.UseVisualStyleBackColor = true;
 			// 
@@ -1219,7 +1150,7 @@
 			this.PutJSONCheckBox.Location = new System.Drawing.Point(288, 95);
 			this.PutJSONCheckBox.Name = "PutJSONCheckBox";
 			this.PutJSONCheckBox.Size = new System.Drawing.Size(78, 16);
-			this.PutJSONCheckBox.TabIndex = 48;
+			this.PutJSONCheckBox.TabIndex = 54;
 			this.PutJSONCheckBox.Text = "JSON出力";
 			this.PutJSONCheckBox.UseVisualStyleBackColor = true;
 			// 
@@ -1228,7 +1159,7 @@
 			this.OutputBrowseButton.Location = new System.Drawing.Point(386, 64);
 			this.OutputBrowseButton.Name = "OutputBrowseButton";
 			this.OutputBrowseButton.Size = new System.Drawing.Size(60, 23);
-			this.OutputBrowseButton.TabIndex = 47;
+			this.OutputBrowseButton.TabIndex = 49;
 			this.OutputBrowseButton.Text = "参照...";
 			this.OutputBrowseButton.UseVisualStyleBackColor = true;
 			this.OutputBrowseButton.Click += new System.EventHandler(this.OutputBrowseButton_Click);
@@ -1247,7 +1178,7 @@
 			this.OutputPathTextBox.Location = new System.Drawing.Point(53, 66);
 			this.OutputPathTextBox.Name = "OutputPathTextBox";
 			this.OutputPathTextBox.Size = new System.Drawing.Size(327, 19);
-			this.OutputPathTextBox.TabIndex = 45;
+			this.OutputPathTextBox.TabIndex = 48;
 			// 
 			// ThreadsComboBox
 			// 
@@ -1261,7 +1192,7 @@
 			this.ThreadsComboBox.Location = new System.Drawing.Point(232, 117);
 			this.ThreadsComboBox.Name = "ThreadsComboBox";
 			this.ThreadsComboBox.Size = new System.Drawing.Size(50, 20);
-			this.ThreadsComboBox.TabIndex = 44;
+			this.ThreadsComboBox.TabIndex = 53;
 			this.ThreadsComboBox.Text = "4";
 			// 
 			// label34
@@ -1296,7 +1227,7 @@
 			this.TimesComboBox.Location = new System.Drawing.Point(65, 117);
 			this.TimesComboBox.Name = "TimesComboBox";
 			this.TimesComboBox.Size = new System.Drawing.Size(80, 20);
-			this.TimesComboBox.TabIndex = 41;
+			this.TimesComboBox.TabIndex = 52;
 			this.TimesComboBox.Text = "10000";
 			// 
 			// EnemyBrowseButton
@@ -1304,7 +1235,7 @@
 			this.EnemyBrowseButton.Location = new System.Drawing.Point(386, 35);
 			this.EnemyBrowseButton.Name = "EnemyBrowseButton";
 			this.EnemyBrowseButton.Size = new System.Drawing.Size(60, 23);
-			this.EnemyBrowseButton.TabIndex = 40;
+			this.EnemyBrowseButton.TabIndex = 46;
 			this.EnemyBrowseButton.Text = "参照...";
 			this.EnemyBrowseButton.UseVisualStyleBackColor = true;
 			this.EnemyBrowseButton.Click += new System.EventHandler(this.EnemyBrowseButton_Click);
@@ -1314,7 +1245,7 @@
 			this.FriendBrowseButton.Location = new System.Drawing.Point(386, 6);
 			this.FriendBrowseButton.Name = "FriendBrowseButton";
 			this.FriendBrowseButton.Size = new System.Drawing.Size(60, 23);
-			this.FriendBrowseButton.TabIndex = 39;
+			this.FriendBrowseButton.TabIndex = 44;
 			this.FriendBrowseButton.Text = "参照...";
 			this.FriendBrowseButton.UseVisualStyleBackColor = true;
 			this.FriendBrowseButton.Click += new System.EventHandler(this.FriendBrowseButton_Click);
@@ -1331,7 +1262,7 @@
 			this.EnemyFormationComboBox.Location = new System.Drawing.Point(186, 91);
 			this.EnemyFormationComboBox.Name = "EnemyFormationComboBox";
 			this.EnemyFormationComboBox.Size = new System.Drawing.Size(80, 20);
-			this.EnemyFormationComboBox.TabIndex = 38;
+			this.EnemyFormationComboBox.TabIndex = 51;
 			this.EnemyFormationComboBox.Text = "単縦陣";
 			// 
 			// label32
@@ -1355,7 +1286,7 @@
 			this.FriendFormationComboBox.Location = new System.Drawing.Point(53, 91);
 			this.FriendFormationComboBox.Name = "FriendFormationComboBox";
 			this.FriendFormationComboBox.Size = new System.Drawing.Size(80, 20);
-			this.FriendFormationComboBox.TabIndex = 36;
+			this.FriendFormationComboBox.TabIndex = 50;
 			this.FriendFormationComboBox.Text = "単縦陣";
 			// 
 			// label31
@@ -1382,7 +1313,7 @@
 			this.EnemyPathTextBox.Location = new System.Drawing.Point(53, 37);
 			this.EnemyPathTextBox.Name = "EnemyPathTextBox";
 			this.EnemyPathTextBox.Size = new System.Drawing.Size(327, 19);
-			this.EnemyPathTextBox.TabIndex = 8;
+			this.EnemyPathTextBox.TabIndex = 45;
 			this.EnemyPathTextBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.EnemyPathTextBox_DragDrop);
 			this.EnemyPathTextBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.EnemyPathTextBox_DragEnter);
 			// 
@@ -1392,7 +1323,7 @@
 			this.FriendPathTextBox.Location = new System.Drawing.Point(53, 10);
 			this.FriendPathTextBox.Name = "FriendPathTextBox";
 			this.FriendPathTextBox.Size = new System.Drawing.Size(327, 19);
-			this.FriendPathTextBox.TabIndex = 7;
+			this.FriendPathTextBox.TabIndex = 43;
 			this.FriendPathTextBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.FriendPathTextBox_DragDrop);
 			this.FriendPathTextBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.FriendPathTextBox_DragEnter);
 			// 
@@ -1412,7 +1343,7 @@
             this.ヘルプHToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(484, 26);
+			this.menuStrip1.Size = new System.Drawing.Size(484, 24);
 			this.menuStrip1.TabIndex = 1;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
@@ -1425,14 +1356,14 @@
             this.SaveAFileMenuItem,
             this.ExitMenuItem});
 			this.ファイルFToolStripMenuItem.Name = "ファイルFToolStripMenuItem";
-			this.ファイルFToolStripMenuItem.Size = new System.Drawing.Size(85, 22);
+			this.ファイルFToolStripMenuItem.Size = new System.Drawing.Size(66, 20);
 			this.ファイルFToolStripMenuItem.Text = "ファイル(&F)";
 			// 
 			// NewFileMenuItem
 			// 
 			this.NewFileMenuItem.Name = "NewFileMenuItem";
 			this.NewFileMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-			this.NewFileMenuItem.Size = new System.Drawing.Size(286, 22);
+			this.NewFileMenuItem.Size = new System.Drawing.Size(257, 22);
 			this.NewFileMenuItem.Text = "リセット(&N)";
 			this.NewFileMenuItem.Click += new System.EventHandler(this.NewFileMenuItem_Click);
 			// 
@@ -1440,7 +1371,7 @@
 			// 
 			this.OpenFileMenuItem.Name = "OpenFileMenuItem";
 			this.OpenFileMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-			this.OpenFileMenuItem.Size = new System.Drawing.Size(286, 22);
+			this.OpenFileMenuItem.Size = new System.Drawing.Size(257, 22);
 			this.OpenFileMenuItem.Text = "開く(&O)...";
 			this.OpenFileMenuItem.Click += new System.EventHandler(this.OpenFileMenuItem_Click);
 			// 
@@ -1448,7 +1379,7 @@
 			// 
 			this.SaveSFileMenuItem.Name = "SaveSFileMenuItem";
 			this.SaveSFileMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-			this.SaveSFileMenuItem.Size = new System.Drawing.Size(286, 22);
+			this.SaveSFileMenuItem.Size = new System.Drawing.Size(257, 22);
 			this.SaveSFileMenuItem.Text = "上書き保存(&S)";
 			this.SaveSFileMenuItem.Click += new System.EventHandler(this.SaveSFileMenuItem_Click);
 			// 
@@ -1457,7 +1388,7 @@
 			this.SaveAFileMenuItem.Name = "SaveAFileMenuItem";
 			this.SaveAFileMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.S)));
-			this.SaveAFileMenuItem.Size = new System.Drawing.Size(286, 22);
+			this.SaveAFileMenuItem.Size = new System.Drawing.Size(257, 22);
 			this.SaveAFileMenuItem.Text = "名前を付けて保存(&A)...";
 			this.SaveAFileMenuItem.Click += new System.EventHandler(this.SaveAFileMenuItem_Click);
 			// 
@@ -1465,7 +1396,7 @@
 			// 
 			this.ExitMenuItem.Name = "ExitMenuItem";
 			this.ExitMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-			this.ExitMenuItem.Size = new System.Drawing.Size(286, 22);
+			this.ExitMenuItem.Size = new System.Drawing.Size(257, 22);
 			this.ExitMenuItem.Text = "終了(&X)";
 			this.ExitMenuItem.Click += new System.EventHandler(this.ExitMenuItem_Click);
 			// 
@@ -1475,20 +1406,20 @@
             this.ShowHelpToolStripMenuItem,
             this.VersionInfoMenuItem});
 			this.ヘルプHToolStripMenuItem.Name = "ヘルプHToolStripMenuItem";
-			this.ヘルプHToolStripMenuItem.Size = new System.Drawing.Size(75, 22);
+			this.ヘルプHToolStripMenuItem.Size = new System.Drawing.Size(65, 20);
 			this.ヘルプHToolStripMenuItem.Text = "ヘルプ(&H)";
 			// 
 			// ShowHelpToolStripMenuItem
 			// 
 			this.ShowHelpToolStripMenuItem.Name = "ShowHelpToolStripMenuItem";
-			this.ShowHelpToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
+			this.ShowHelpToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
 			this.ShowHelpToolStripMenuItem.Text = "ヘルプの表示(&V)";
 			this.ShowHelpToolStripMenuItem.Click += new System.EventHandler(this.ShowHelpToolStripMenuItem_Click);
 			// 
 			// VersionInfoMenuItem
 			// 
 			this.VersionInfoMenuItem.Name = "VersionInfoMenuItem";
-			this.VersionInfoMenuItem.Size = new System.Drawing.Size(178, 22);
+			this.VersionInfoMenuItem.Size = new System.Drawing.Size(158, 22);
 			this.VersionInfoMenuItem.Text = "バージョン情報(&A)";
 			this.VersionInfoMenuItem.Click += new System.EventHandler(this.VersionInfoMenuItem_Click);
 			// 
@@ -1496,9 +1427,9 @@
 			// 
 			this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.filename_echo});
-			this.statusStrip1.Location = new System.Drawing.Point(0, 314);
+			this.statusStrip1.Location = new System.Drawing.Point(0, 315);
 			this.statusStrip1.Name = "statusStrip1";
-			this.statusStrip1.Size = new System.Drawing.Size(484, 23);
+			this.statusStrip1.Size = new System.Drawing.Size(484, 22);
 			this.statusStrip1.TabIndex = 2;
 			this.statusStrip1.Text = "statusStrip1";
 			// 
@@ -1507,7 +1438,7 @@
 			this.filename_echo.BackColor = System.Drawing.SystemColors.Control;
 			this.filename_echo.ForeColor = System.Drawing.SystemColors.GradientInactiveCaption;
 			this.filename_echo.Name = "filename_echo";
-			this.filename_echo.Size = new System.Drawing.Size(70, 18);
+			this.filename_echo.Size = new System.Drawing.Size(61, 17);
 			this.filename_echo.Text = "filename...";
 			// 
 			// MainForm

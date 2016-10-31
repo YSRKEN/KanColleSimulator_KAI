@@ -464,16 +464,75 @@ double Kammusu::FitGunHitPlus() const noexcept {
 			++sum_46X;
 	}
 	// 種類により減衰量を決定する
-	if (AnyOf(SID("扶桑"), SID("山城"), SID("伊勢"), SID("日向")))                              return                                                     fit[sum_41]         + unfit_large[sum_46] + unfit_large[sum_46X];		// 伊勢・扶桑型戦艦
-	if (AnyOf(SID("伊勢改"), SID("日向改"), SID("扶桑改"), SID("山城改")))                       return fit[sum_356] + fit[sum_38] + fit[sum_381]                               + unfit_large[sum_46] + unfit_small[sum_46X];		// 伊勢型・扶桑型航戦
-	if (AnyOf(SID("扶桑改二"), SID("山城改二")))                                                return fit[sum_356] + fit[sum_38] + fit[sum_381]         + fit[sum_41]         + unfit_large[sum_46] + unfit_small[sum_46X];		// 扶桑型航戦改二
+	if (AnyOf(SID("扶桑"), SID("山城"), SID("伊勢"), SID("日向"))) {
+		// 伊勢・扶桑型戦艦
+		if (level_ < 100) {
+			return fit[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];
+		}
+		else {
+			return fit[sum_356] + fit[sum_38] + fit[sum_381] + fit[sum_41] + unfit_small[sum_46] + unfit_small[sum_46X];
+		}
+	}
+	if (AnyOf(SID("伊勢改"), SID("日向改"), SID("扶桑改"), SID("山城改"))) {
+		// 伊勢型・扶桑型航戦
+		if (level_ < 100) {
+			return fit[sum_356] + fit[sum_38] + fit[sum_381] + unfit_large[sum_46] + unfit_small[sum_46X];
+		}
+		else {
+			return fit[sum_356] + fit[sum_38] + fit[sum_381] + fit[sum_41] + unfit_small[sum_46];
+		}
+	}
+	if (AnyOf(SID("扶桑改二"), SID("山城改二"))) {
+		// 扶桑型航戦改二
+		if (level_ < 100) {
+			return fit[sum_356] + fit[sum_38] + fit[sum_381] + fit[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];
+		}
+		else {
+			return fit[sum_356] + fit[sum_38] + fit[sum_381] + fit[sum_41] + unfit_small[sum_46];
+		}
+	}
 	if (AnyOf(SID("金剛"), SID("榛名"), SID("霧島"), SID("比叡"),
 		SID("金剛改"), SID("比叡改"), SID("榛名改"), SID("霧島改"),
-		SID("金剛改二"), SID("比叡改二"), SID("榛名改二"), SID("霧島改二")))                     return fit[sum_356] + fit[sum_38]                        + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];		// 金剛型改二
-	if (AnyOf(SID("Bismarck"), SID("Bismarck改"), SID("Bismarck zwei"), SID("Bismarck drei"))) return fit[sum_356] + fit[sum_38] - unfit_small[sum_381] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];		// Bismarck型
-	if (AnyOf(SID("Littorio"), SID("Roma"), SID("Italia"), SID("Roma改")))                     return fit[sum_356]               + fit[sum_381]         + unfit_small[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];		// イタリア艦
-	if (AnyOf(SID("長門"), SID("陸奥"), SID("長門改"), SID("陸奥改")))                          return fit[sum_356]               + fit[sum_381]         + fit[sum_41]         + unfit_small[sum_46] + unfit_small[sum_46X];		// 長門型
-	if (AnyOf(SID("大和"), SID("大和改"), SID("武蔵"), SID("武蔵改")))                          return                                                     fit[sum_41];															// 大和型
+		SID("金剛改二"), SID("比叡改二"), SID("榛名改二"), SID("霧島改二"))) {
+		// 金剛型改二
+		if (level_ < 100) {
+			return fit[sum_356] + fit[sum_38] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];
+		}
+		else {
+			return fit[sum_356] + fit[sum_38] + fit[sum_381] + unfit_small[sum_46];
+		}
+	}
+	if (AnyOf(SID("Bismarck"), SID("Bismarck改"), SID("Bismarck zwei"), SID("Bismarck drei"))) {
+		// Bismarck型
+		if (level_ < 100) {
+			return fit[sum_356] + fit[sum_38] + unfit_small[sum_381] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_small[sum_46X];
+		}
+		else {
+			return fit[sum_356] + fit[sum_38] + unfit_small[sum_46];
+		}
+	}
+	if (AnyOf(SID("Littorio"), SID("Roma"), SID("Italia"), SID("Roma改"))) {
+		// イタリア艦
+		if (level_ < 100) {
+			return fit[sum_356] + fit[sum_381] + unfit_small[sum_41] + unfit_large[sum_46] + unfit_large[sum_46X];
+		}
+		else {
+			return fit[sum_356] + fit[sum_38] + fit[sum_381] + unfit_small[sum_46] + unfit_small[sum_46X];
+		}
+	}
+	if (AnyOf(SID("長門"), SID("陸奥"), SID("長門改"), SID("陸奥改"))) {
+		// 長門型
+		if (level_ < 100) {
+			return fit[sum_356] + fit[sum_38] + fit[sum_381] + fit[sum_41] + unfit_small[sum_46] + unfit_small[sum_46X];
+		}
+		else {
+			return fit[sum_356] + fit[sum_38] + fit[sum_381] + fit[sum_41];
+		}
+	}
+	if (AnyOf(SID("大和"), SID("大和改"), SID("武蔵"), SID("武蔵改"))) {
+		// 大和型
+		return fit[sum_41];
+	}
 	return 0.0;
 }
 
@@ -632,6 +691,7 @@ int Kammusu::DayAttack(const DayFireType fire_type, const bool af_flg, const Fle
 			case WC("対空機銃"):
 			case WC("高射装置"):
 			case WC("探照灯"):
+			case WC("大型探照灯"):
 				base_attack += sqrt(it_w.GetLevel());
 			case WC("ソナー"):
 			case WC("爆雷"):
@@ -731,6 +791,7 @@ int Kammusu::NightAttack(const NightFireType fire_type, const bool af_flg) const
 			case WC("対空機銃"):
 			case WC("高射装置"):
 			case WC("探照灯"):
+			case WC("大型探照灯"):
 				base_attack += sqrt(it_w.GetLevel());
 			case WC("ソナー"):
 			case WC("爆雷"):
@@ -879,8 +940,7 @@ bool Kammusu::IsFireTorpedo(const TorpedoTurn &torpedo_turn) const noexcept {
 			if (IsSubmarine() && AnyOf(SID("潜水カ級elite"), SID("潜水ヨ級elite"), SID("潜水カ級flagship"), SID("潜水ヨ級flagship"), SID("潜水ソ級elite"), SID("潜水ソ級flagship"))) return true;
 			// エリレ級と水母棲姫と駆逐水鬼(甲作戦最終形態,艦船ID=649)と
 			// 重巡棲姫(最終形態,艦船ID=660,662,664)は無条件で撃てる
-			//if (AnyOf(SID("戦艦レ級elite"), L"水母棲姫"s, ShipId::ID649, ShipId::ID660, ShipId::ID662, ShipId::ID664)) return true;
-			if (AnyOf(SID("戦艦レ級elite"), L"水母棲姫"s)) return true;
+			if (AnyOf(SID("戦艦レ級elite"), L"水母棲姫"s, ShipId::ID649, ShipId::ID660, ShipId::ID662, ShipId::ID664)) return true;
 		}
 		return false;
 		break;
@@ -937,6 +997,43 @@ bool Kammusu::IsFireGun(const bool af_flg) const noexcept {
 	if (AnyOf(SC("装甲空母")))
 		return (HasAirAttack() && Status() != kStatusHeavyDamage);
 	return true;
+}
+
+// 開幕対潜可能な艦ならtrue
+bool Kammusu::IsFirstAntiSub() const noexcept {
+	// 五十鈴改二なら無条件にOK
+	if (AnyOf(SID("五十鈴改二")))
+		return true;
+	// ソナーを持っていなければ無条件にアウト
+	bool sonar_flg = false;
+	for (auto &it_w : weapons_) {
+		if (it_w.GetWeaponClass() == WeaponClass::Sonar) {
+			sonar_flg = true;
+			break;
+		}
+	}
+	if (!sonar_flg)
+		return false;
+	// 合計対潜値が100を超えてないとアウト
+	int all_anti_sub = anti_sub_;
+	for (auto &it_w : weapons_) {
+		all_anti_sub += it_w.GetAntiSub();
+	}
+	if (all_anti_sub < 100)
+		return false;
+	// 空母型対潜攻撃
+	if (AnyOf(SC("軽空母") | SC("陸上型")))
+		return IsAntiSubDayPlane();
+	// 航戦型対潜攻撃
+	if (AnyOf(SC("航空戦艦") | SC("水上機母艦") | SC("航空巡洋艦")))
+		return IsAntiSubDayWater();
+	// 水雷型対潜攻撃
+	if (AnyOf(SC("軽巡洋艦") | SC("重雷装巡洋艦") | SC("駆逐艦") | SC("練習巡洋艦")))
+		return anti_sub_ > 0;
+	// 上記3種類が合わさった速吸改は頭おかしい(褒め言葉)
+	if (AnyOf(SC("給油艦")))
+		return (IsAntiSubDayPlane() || IsAntiSubDayWater() || (anti_sub_ > 0));
+	return false;
 }
 
 // 昼戦で対潜可能な艦ならtrue
@@ -1000,7 +1097,7 @@ bool Kammusu::IsAntiSubNight() const noexcept {
 // 探照灯や照明弾を保有していた場合はtrue
 bool Kammusu::HasLights() const noexcept {
 	for (auto &it_w : weapons_) {
-		if (it_w.AnyOf(WC("探照灯") | WC("照明弾"))) return true;
+		if (it_w.AnyOf(WC("探照灯") | WC("大型探照灯") | WC("照明弾"))) return true;
 	}
 	return false;
 }
@@ -1009,9 +1106,9 @@ std::ostream & operator<<(std::ostream & os, const Kammusu & conf)
 {
 	os 
 		<< "艦船ID：" << conf.id_ << endl
-		<< "　艦名：" << char_cvt::utf_16_to_shift_jis(conf.GetName()) << "　艦種：" << char_cvt::utf_16_to_shift_jis(to_wstring(conf.ship_class_)) << endl
+		<< "　艦名：" << char_cvt::wstring2string(conf.GetName()) << "　艦種：" << char_cvt::wstring2string(to_wstring(conf.ship_class_)) << endl
 		<< "　最大耐久：" << conf.max_hp_ << "　装甲：" << conf.defense_ << "　火力：" << conf.attack_ << "　雷撃：" << conf.torpedo_ << endl
-		<< "　対空：" << conf.anti_air_ << "　運：" << conf.luck_ << "　速力：" << char_cvt::utf_16_to_shift_jis(kSpeedStr[conf.speed_]) << "　射程：" << char_cvt::utf_16_to_shift_jis(kRangeStr[conf.range_]) << endl
+		<< "　対空：" << conf.anti_air_ << "　運：" << conf.luck_ << "　速力：" << char_cvt::wstring2string(kSpeedStr[conf.speed_]) << "　射程：" << char_cvt::wstring2string(kRangeStr[conf.range_]) << endl
 		<< "　スロット数：" << conf.slots_ << "　最大搭載数：";
 	for (size_t i = 0; i < conf.slots_; ++i) {
 		if (i != 0) os << ",";
@@ -1023,7 +1120,7 @@ std::ostream & operator<<(std::ostream & os, const Kammusu & conf)
 		<< "　装備：";
 	for (size_t i = 0; i < conf.slots_; ++i) {
 		if (i != 0) os << ",";
-		os << char_cvt::utf_16_to_shift_jis(conf.weapons_[i].GetName()) << "(" << conf.weapons_[i].GetAir() << ")";
+		os << char_cvt::wstring2string(conf.weapons_[i].GetName()) << "(" << conf.weapons_[i].GetAir() << ")";
 	}
 	os 
 		<< endl

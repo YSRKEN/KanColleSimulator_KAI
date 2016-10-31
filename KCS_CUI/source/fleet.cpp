@@ -10,13 +10,23 @@ namespace detail {
 		const T& min;
 		const T& max;
 	};
-	template<typename T>
+
+	//SFINAEしないと`std::underlying_type_t<some arithmetic type>``のインスタンス化が要求されるのでstd::conditional_tは使えない
+
+	template<typename T, std::enable_if_t<std::is_arithmetic<T>::value, std::nullptr_t> = nullptr>//arithmetic version
 	inline T operator|(const std::string& str, const to_i_limit_helper<T>& info) {
-		const int val = str | to_i();
-		return (val < info.min) ? info.min : (info.max < val) ? info.max : static_cast<T>(val);
+		const auto val = str | to_i<T>();
+		return (val < info.min) ? info.min : (info.max < val) ? info.max : val;
+	}
+	template<typename T, std::enable_if_t<std::is_enum<T>::value, std::nullptr_t> = nullptr>//enum version
+	inline T operator|(const std::string& str, const to_i_limit_helper<T>& info) {
+		using BaseType = std::underlying_type_t<T>;//基底型の取得
+		const auto val = str | to_i<BaseType>();
+		//enum classにoperator<を要求しないためにキャストが必要
+		return (val < static_cast<BaseType>(info.min)) ? info.min : (static_cast<BaseType>(info.max) < val) ? info.max : static_cast<T>(val);
 	}
 }
-template<typename T>
+template<typename T, std::enable_if_t<std::is_integral<T>::value || std::is_enum<T>::value, std::nullptr_t> = nullptr>
 inline constexpr detail::to_i_limit_helper<T> to_i_limit(const T &val_min, const T &val_max) noexcept { return{ val_min, val_max }; }
 namespace detail {
 	template<typename ResultType> struct picojson_object_get_with_limit_or_default {
@@ -46,7 +56,7 @@ void Fleet::LoadJson(std::istream & file, char_cvt::char_enc fileenc)
 	//司令部レベル
 	level_ = o | GetWithLimitOrDefault("lv", 1, 120, 120);
 	//艦隊の形式
-	fleet_type_ = FleetType(o | GetWithLimitOrDefault("type", int(FleetType::Normal), int(FleetType::CombinedDrum), int(FleetType::Normal)));
+	fleet_type_ = o | GetWithLimitOrDefault("type", FleetType::Normal, FleetType::CombinedDrum, FleetType::Normal);
 	if (fleet_type_ != FleetType::Normal && formation_ == kFormationEchelon) {
 		// 連合艦隊に梯形陣は存在しないので、とりあえず単横陣(第一警戒航行序列)に変更しておく
 		formation_ = kFormationAbreast;
@@ -125,7 +135,10 @@ Fleet::Fleet(const string &file_name, const Formation &formation, char_cvt::char
 	// ファイルを読み込む
 	ifstream fin(file_name);
 	FILE_THROW_WITH_MESSAGE_IF(!fin.is_open(), "艦隊データが正常に読み込めませんでした.")
-	if(char_cvt::char_enc::shift_jis != fileenc) skip_utf8_bom(fin, fileenc);
+#ifdef _WIN32
+	if(char_cvt::char_enc::shift_jis != fileenc)
+#endif //_WIN32
+		skip_utf8_bom(fin, fileenc);
 	this->LoadJson(fin, fileenc);
 }
 
@@ -138,6 +151,8 @@ Fleet::Fleet(std::istream & file, const Formation & formation, char_cvt::char_en
 
 // setter
 void Fleet::SetFormation(const Formation formation) { formation_ = formation; }
+
+void Fleet::ResizeUnit(size_t size) { unit_.resize(size); }
 
 // getter
 Formation Fleet::GetFormation() const noexcept { return formation_; }
@@ -258,6 +273,7 @@ double Fleet::SearchValue() const noexcept {
 					search_sum += it_w.GetSearch() * 0.9906638;
 					break;
 				case WC("探照灯"):	//探照灯
+				case WC("大型探照灯"):	//大型探照灯
 					search_sum += it_w.GetSearch() * 0.9067950;
 					break;
 				default:
@@ -430,83 +446,92 @@ tuple<bool, size_t> Fleet::RandomKammusu() const {
 tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const TargetType target_type, const bool has_sl) const {
 	// 攻撃する艦隊の対象を選択する
 	std::array<size_t, kMaxFleetSize> list;
+	size_t list_fleets = 1;
 	switch (target_type) {
 	case kTargetTypeFirst:
 		list = {{ FirstIndex(), FirstIndex() }};
+		list_fleets = 1;
 		break;
 	case kTargetTypeSecond:
 		list = {{ SecondIndex(), SecondIndex() }};
+		list_fleets = 1;
 		break;
 	case kTargetTypeAll:
 		list = {{ FirstIndex(), SecondIndex() }};
+		list_fleets = 2;
 		break;
 	}
 	//生存する水上艦をリストアップ
 	std::array<KammusuIndex, kMaxFleetSize * kMaxUnitSize> alived_list;
+	std::array<double, kMaxFleetSize * kMaxUnitSize> alived_list_weight;
 	size_t alived_list_size = 0;
-	for (auto &fi : list) {
+	for (size_t li = 0; li < list_fleets; ++li) {
+		size_t fi = list[li];
 		for (size_t ui = 0; ui < GetUnit()[fi].size(); ++ui) {
+			// 艦を選択
 			const auto &it_k = GetUnit()[fi][ui];
+			// 撃沈されていたら選択できない
 			if (it_k.Status() == kStatusLost) continue;
+			// 潜水艦なら選択できない
 			if (it_k.IsSubmarine()) continue;
+			// 対地攻撃絡み
 			if (has_bomb && it_k.AnyOf(SC("陸上型"))) continue;
+			// 1隻追加
 			alived_list[alived_list_size] = { fi, ui };
+			alived_list_weight[alived_list_size] = 1.0;
+			// 夜戦探照灯補正
+			// http://ch.nicovideo.jp/HSG/blomaga/ar1015220
+			if (has_sl) {
+				for (const auto &it_w : it_k.GetWeapon()) {
+					if (it_w.AnyOf(WC("探照灯"))) {
+						// こちらの「0.04」は推測結果
+						alived_list_weight[alived_list_size] += 1.0 + 0.04 * it_w.GetLevel();
+						break;
+					}
+					if (it_w.AnyOf(WC("大型探照灯"))) {
+						// こちらの「0.04」は推測ですらない(探照灯に倣っただけ)
+						alived_list_weight[alived_list_size] += 3.6 + 0.04 * it_w.GetLevel();
+						break;
+					}
+				}
+			}
 			++alived_list_size;
 		}
 	}
 	// 対象が存在しない場合はfalseを返す
 	if (alived_list_size == 0) return tuple<bool, KammusuIndex>(false, { 0 , 0 });
-	// 夜戦だと探照灯を考慮しなければならない
-	if (has_sl) {
-		// 探照灯の位置を探す
-		constexpr size_t sz_max = std::numeric_limits<size_t>::max();
-		size_t large_sl_index = sz_max;
-		size_t small_sl_index = sz_max;
-		for (size_t i = 0; i < alived_list_size; ++i) {
-			const auto &it_k = GetUnit()[alived_list[i].fleet_no][alived_list[i].fleet_i];
-			for (const auto &it_w : it_k.GetWeapon()) {
-				if (!it_w.AnyOf(WC("探照灯"))) continue;
-				if (it_w.AnyOf(WID("96式150cm探照灯"))) {
-					if (SharedRand::RandBool(0.3 + 0.01 * it_w.GetLevel())) large_sl_index = i;
-				}
-				else {
-					if (SharedRand::RandBool(0.2 + 0.01 * it_w.GetLevel())) small_sl_index = i;
-				}
-				break;
-			}
-		}
-		// 発動した場合、そちらに攻撃が誘引される
-		if (large_sl_index != sz_max) {
-			return tuple<bool, KammusuIndex>(true, alived_list[large_sl_index]);
-		}
-		else if (small_sl_index != sz_max) {
-			return tuple<bool, KammusuIndex>(true, alived_list[small_sl_index]);
-		}
+	// 選びようがない場合
+	if (alived_list_size == 1) return tuple<bool, KammusuIndex>(true, alived_list[0]);
+	// 攻撃対象をルーレット選択
+	double roulette_size = 0.0;
+	for (size_t k = 0; k < alived_list_size; ++k) {
+		roulette_size += alived_list_weight[k];
 	}
-	return tuple<bool, KammusuIndex>(true, SharedRand::select_random_in_range(alived_list, alived_list_size));
+	double roulette_oracle = SharedRand::RandReal(0.0, roulette_size);
+	auto roulette_index = alived_list[0];
+	double roulette_sum = alived_list_weight[0];
+	for (size_t k = 1; k < alived_list_size; ++k) {
+		if (roulette_sum > roulette_oracle) {
+			roulette_index = alived_list[k];
+			break;
+		}
+		roulette_sum += alived_list_weight[k];
+	}
+	return tuple<bool, KammusuIndex>(true, roulette_index);
 }
 
 // 潜水の生存艦から艦娘をランダムに指定する
 tuple<bool, KammusuIndex> Fleet::RandomKammusuSS(const size_t fleet_index) const {
+	INVAID_ARGUMENT_THROW_WITH_MESSAGE_IF(1 < fleet_index, "fleet_index is iregal");
 	// 攻撃する艦隊の対象を選択する
-	vector<size_t> list;
-	switch (fleet_index) {
-	case 0:
-		list = { FirstIndex() };
-		break;
-	case 1:
-		list = { SecondIndex() };
-		break;
-	}
+	const size_t fi = (0 == fleet_index) ? FirstIndex() : SecondIndex();
 	//生存する潜水艦をリストアップ
 	vector<KammusuIndex> alived_list;
-	for (auto &fi : list) {
-		for (size_t ui = 0; ui < GetUnit()[fi].size(); ++ui) {
-			const auto &it_k = GetUnit()[fi][ui];
-			if (it_k.Status() == kStatusLost) continue;
-			if (!it_k.IsSubmarine()) continue;
-			alived_list.push_back({ fi, ui });
-		}
+	for (size_t ui = 0; ui < GetUnit()[fi].size(); ++ui) {
+		const auto &it_k = GetUnit()[fi][ui];
+		if (it_k.Status() == kStatusLost) continue;
+		if (!it_k.IsSubmarine()) continue;
+		alived_list.push_back({ fi, ui });
 	}
 	if (alived_list.size() == 0) return tuple<bool, KammusuIndex>(false, { 0 , 0 });
 	return tuple<bool, KammusuIndex>(true, SharedRand::select_random_in_range(alived_list));
@@ -539,7 +564,7 @@ tuple<bool, KammusuIndex> Fleet::RandomKammusuAF(const size_t fleet_index) const
 }
 
 template<typename CondFunc>
-bool any_of(const std::vector<std::vector<Kammusu>>& unit, CondFunc cond) noexcept {
+bool any_of(const std::vector<std::vector<Kammusu>>& unit, CondFunc&& cond) noexcept {
 	for (auto &it_u : unit) {
 		for (auto &it_k : it_u) {
 			if (it_k.Status() == kStatusLost) continue;
@@ -585,11 +610,11 @@ bool Fleet::HasAF() const noexcept {
 
 std::ostream & operator<<(std::ostream & os, const Fleet & conf)
 {
-	os << "陣形：" << char_cvt::utf_16_to_shift_jis(kFormationStr[conf.formation_]) << "　司令部レベル：" << conf.level_ << "　形式：" << char_cvt::utf_16_to_shift_jis(kFleetTypeStr[int(conf.fleet_type_) - 1]) << endl;
-	for (size_t fi = 0; fi < conf.unit_.size(); ++fi) {
+	os << "陣形：" << char_cvt::wstring2string(kFormationStr[conf.formation_]) << "　司令部レベル：" << conf.level_ << "　形式：" << char_cvt::wstring2string(kFleetTypeStr[int(conf.fleet_type_) - 1]) << endl;
+	for (size_t fi = 0; fi < conf.FleetSize(); ++fi) {
 		os << "　第" << (fi + 1) << "艦隊：" << endl;
 		for (auto &it_k : conf.unit_[fi]) {
-			os << "　　" << char_cvt::utf_16_to_shift_jis(it_k.GetNameLv()) << " " << it_k.GetHP() << "/" << it_k.GetMaxHP() <<  endl;
+			os << "　　" << char_cvt::wstring2string(it_k.GetNameLv()) << " " << it_k.GetHP() << "/" << it_k.GetMaxHP() <<  endl;
 		}
 	}
 	os << endl;
@@ -599,7 +624,7 @@ std::ostream & operator<<(std::ostream & os, const Fleet & conf)
 std::wostream & operator<<(std::wostream & os, const Fleet & conf)
 {
 	os << L"陣形：" << kFormationStr[conf.formation_] << L"　司令部レベル：" << conf.level_ << L"　形式：" << kFleetTypeStr[int(conf.fleet_type_) - 1] << endl;
-	for (size_t fi = 0; fi < conf.unit_.size(); ++fi) {
+	for (size_t fi = 0; fi < conf.FleetSize(); ++fi) {
 		os << L"　第" << (fi + 1) << L"艦隊：" << endl;
 		for (auto &it_k : conf.unit_[fi]) {
 			os << L"　　" << it_k.GetNameLv() << L" " << it_k.GetHP() << L"/" << it_k.GetMaxHP() << endl;

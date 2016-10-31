@@ -176,7 +176,7 @@ const string & Config::GetInputFilename(const size_t n) const noexcept { return 
 
 std::wstring Config::GetInputFilenameW(const int n) const
 {
-	return char_cvt::shift_jis_to_utf_16(this->pimpl->e.input_filename_[n]);
+	return char_cvt::string2wstring(this->pimpl->e.input_filename_[n]);
 }
 
 Formation Config::GetFormation(const size_t n) const noexcept { return this->pimpl->e.formation_[n]; }
@@ -195,7 +195,7 @@ std::ostream & operator<<(std::ostream & os, const Config & conf)
 		<< "入力ファイル名：" << conf.GetInputFilename(0) << ", " << conf.GetInputFilename(1) << endl
 		<< "陣形指定：" << endl;
 	for (auto &it : conf.pimpl->e.formation_) {
-		os << "　" << char_cvt::utf_16_to_shift_jis(kFormationStr[it]) << endl;
+		os << "　" << char_cvt::wstring2string(kFormationStr[it]) << endl;
 	}
 	os
 		<< "試行回数：" << conf.pimpl->e.times_ << endl
@@ -216,6 +216,6 @@ std::wostream & operator<<(std::wostream & os, const Config & conf)
 		<< L"試行回数：" << conf.pimpl->e.times_ << endl
 		<< L"スレッド数：" << conf.pimpl->e.threads_ << endl
 		<< L"出力ファイル名：" << endl
-		<< L"　" << (conf.pimpl->e.output_filename_ != "" ? char_cvt::shift_jis_to_utf_16(conf.pimpl->e.output_filename_) : L"<なし>") << endl;
+		<< L"　" << (conf.pimpl->e.output_filename_ != "" ? char_cvt::string2wstring(conf.pimpl->e.output_filename_) : L"<なし>") << endl;
 	return os;
 }

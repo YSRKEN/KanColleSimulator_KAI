@@ -8,12 +8,17 @@ Distributed under the Boost Software License, Version 1.0.
 #define CHAR_CONVERT_INC_ARITHMETIC_CHAR_CONVERT_HPP_
 #include <codecvt>
 #include <string>
+#include <locale>
 #ifdef _WIN32
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif //NOMINMAX
-#include <windows.h>
-#include <cstring>
+#	ifndef NOMINMAX
+#		define NOMINMAX
+#	endif //NOMINMAX
+//To avoid compile error
+//C:\Program Files (x86)\Windows Kits\8.1\Include\um\combaseapi.h(229,21): error : unknown type name 'IUnknown'
+//          static_cast<IUnknown*>(*pp);    // make sure everyone derives from IUnknown
+struct IUnknown;
+#	include <windows.h>
+#	include <cstring>
 namespace char_cvt {
 	inline std::wstring shift_jis_to_utf_16(const std::string& str)
 	{
@@ -65,8 +70,8 @@ namespace char_cvt {
 		return re;
 	}
 }
-#endif
-#if defined(_MSC_FULL_VER) && _MSC_FULL_VER <= 190023506
+#endif //_WIN32
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER <= 190023506 && !defined(__c2__)
 #include <algorithm>
 namespace char_cvt {
 	namespace detail {
@@ -100,85 +105,100 @@ namespace char_cvt {
 
 namespace char_cvt {
 	inline std::string u32tou8(const std::u32string& s) {
-#if defined(_MSC_FULL_VER) && _MSC_FULL_VER <= 190023506
-		std::wstring_convert<std::codecvt_utf8<__int32>, __int32> u8u32cvt;
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER <= 190023506 && !defined(__c2__)
+		static std::wstring_convert<std::codecvt_utf8<__int32>, __int32> u8u32cvt;
 		return u8u32cvt.to_bytes(detail::u32_to_int32_string(s));
 #else
-		std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> u8u32cvt;
+		static std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> u8u32cvt;
 		return u8u32cvt.to_bytes(s);
 #endif
 	}
 	inline std::u32string u8tou32(const std::string& s) {
-#if defined(_MSC_FULL_VER) && _MSC_FULL_VER <= 190023506
-		std::wstring_convert<std::codecvt_utf8<__int32>, __int32> u8u32cvt;
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER <= 190023506 && !defined(__c2__)
+		static std::wstring_convert<std::codecvt_utf8<__int32>, __int32> u8u32cvt;
 		return detail::int32_to_u32_string(u8u32cvt.from_bytes(s));
 #else
-		std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> u8u32cvt;
+		static std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> u8u32cvt;
 		return u8u32cvt.from_bytes(s);
 #endif
 	}
 	inline std::string u16tou8(const std::u16string& s) {
-#if defined(_MSC_FULL_VER) && _MSC_FULL_VER <= 190023506
-		std::wstring_convert<std::codecvt_utf8_utf16<__int16>, __int16> u8u16cvt;
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER <= 190023506 && !defined(__c2__)
+		static td::wstring_convert<std::codecvt_utf8_utf16<__int16>, __int16> u8u16cvt;
 		return u8u16cvt.to_bytes(detail::u16_to_int16_string(s));
 #else
-		std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> u8u16cvt;
+		static std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> u8u16cvt;
 		return u8u16cvt.to_bytes(s);
 #endif
 	}
 	inline std::u16string u8tou16(const std::string& s) {
-#if defined(_MSC_FULL_VER) && _MSC_FULL_VER <= 190023506
-		std::wstring_convert<std::codecvt_utf8_utf16<__int16>, __int16> u8u16cvt;
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER <= 190023506 && !defined(__c2__)
+		static std::wstring_convert<std::codecvt_utf8_utf16<__int16>, __int16> u8u16cvt;
 		return detail::int16_to_u16_string(u8u16cvt.from_bytes(s));
 #else
-		std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> u8u16cvt;
+		static std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> u8u16cvt;
 		return u8u16cvt.from_bytes(s);
 #endif
 	}
 	enum class char_enc : int {
 		unknown = 0,
 		utf8 = 1,
+#ifdef _WIN32
 		shift_jis = 2
+#endif
 	};
 	namespace detail {
 		template<std::size_t wchar_t_size>struct stringwstring_cvt;
 		template<> struct stringwstring_cvt<2U> : std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> {};
 		template<> struct stringwstring_cvt<4U> : std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> {};
 	}
-	inline std::wstring string2wstring(const std::string& s, char_enc type) {
-		detail::stringwstring_cvt<sizeof(wchar_t)> cvt;
+	inline std::wstring string2wstring(
+		const std::string& s, 
+		char_enc type
+#ifdef _WIN32
+		= char_enc::shift_jis
+#else
+		= char_enc::utf8
+#endif
+	) {
+		static detail::stringwstring_cvt<sizeof(wchar_t)> cvt;
 		switch (type) {
 		case char_enc::utf8:
 			return cvt.from_bytes(s);
+#ifdef _WIN32
 		case char_enc::shift_jis:
 			return shift_jis_to_utf_16(s);
+#endif
 		default:
 			throw std::runtime_error("unknown encode.");
 		}
 	}
-	inline std::string wstring2string(const std::wstring& s, char_enc type) {
-		detail::stringwstring_cvt<sizeof(wchar_t)> cvt;
+	inline std::string wstring2string(
+		const std::wstring& s, 
+		char_enc type
+#ifdef _WIN32
+		= char_enc::shift_jis
+#else
+		= char_enc::utf8
+#endif
+	) {
+		static detail::stringwstring_cvt<sizeof(wchar_t)> cvt;
 		switch (type) {
 		case char_enc::utf8:
 			return cvt.to_bytes(s);
+#ifdef _WIN32
 		case char_enc::shift_jis:
 			return utf_16_to_shift_jis(s);
+#endif
 		default:
 			throw std::runtime_error("unknown encode.");
 		}
 	}
 	inline std::string to_string(const std::wstring& s, char_enc type) { return wstring2string(s, type); }
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4100 )//warning C4100: 'type': 引数は関数の本体部で 1 度も参照されません。
-#endif
 	inline std::string to_string(const std::string& s) { return s; }
 	inline std::string to_string(const std::string& s, char_enc) { return s; }
 	inline std::wstring to_wstring(const std::wstring& s) { return s; }
 	inline std::wstring to_wstring(const std::wstring& s, char_enc) { return s; }
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
 	inline std::wstring to_wstring(const std::string& s, char_enc type) { return string2wstring(s, type); }
 }
 #endif //CHAR_CONVERT_INC_ARITHMETIC_CHAR_CONVERT_HPP_

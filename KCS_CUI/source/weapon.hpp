@@ -5,6 +5,8 @@
 #include <iostream>
 #include <type_traits>
 #include <utility>
+#include <string>
+#include <functional>
 #include "cstring.hpp"
 #include "lookup.hpp"
 // 装備ID
@@ -48,11 +50,13 @@ enum class WeaponClass : std::uint64_t {
 	CR         = 0x0000000020000000,	//戦闘糧食
 	OS         = 0x0000000040000000,	//洋上補給
 	WF         = 0x0000000080000000,	//水上戦闘機
+	SL_Large   = 0x0000000100000000,    //大型探照灯
 	Other      = 0x8000000000000000,	//その他
 	AirFight = PF | PBF | PB | WB | PA | WF,					//航空戦に参加する艦載機
 	AirTrailer = PA | PS | PSS | DaiteiChan | WS | WSN | WF,	//触接に参加する艦載機
 	AirBomb = PBF | PB | WB | PA,								//開幕爆撃に参加する艦載機
 	Air = (AirFight | AirTrailer) ^ (WS | WSN),					//(熟練度が存在する)艦載機
+	IsSLKindMask = SL | SL_Large,
 };
 constexpr inline auto operator|(const WeaponClass& l, const WeaponClass& r) { return static_cast<WeaponClass>(static_cast<std::underlying_type_t<WeaponClass>>(l) | static_cast<std::underlying_type_t<WeaponClass>>(r)); }
 template<class E, class T>
@@ -98,6 +102,7 @@ namespace detail {
 		{ L"戦闘糧食", WeaponClass::CR },
 		{ L"洋上補給", WeaponClass::OS },
 		{ L"水上戦闘機", WeaponClass::WF },
+		{ L"大型探照灯", WeaponClass::SL_Large },
 		{ L"その他", WeaponClass::Other },
 	};
 }

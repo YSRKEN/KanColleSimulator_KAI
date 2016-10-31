@@ -19,7 +19,10 @@
 #include <type_traits>
 #include "exception.hpp"
 #include "arithmetic_convert.hpp"
+
+#ifdef _MSC_VER
 #pragma warning( disable : 4592)
+#endif
 
 using std::cout;
 using std::bitset;
@@ -38,11 +41,11 @@ using std::vector;
 using std::wcout;
 using std::size_t;
 
-constexpr int kBattleSize = 2;		//戦闘で戦うのは敵と味方の「2つ」
-constexpr int kMaxFleetSize = 2;	//
+constexpr size_t kMaxFleetSize = 2;	//
 constexpr size_t kMaxUnitSize = 6;		//艦隊に含まれる最大艦数
-constexpr int kFriendSide = 0;
+constexpr size_t kFriendSide = 0;
 constexpr size_t kEnemySide = 1;	//味方および敵陣営の番号付け
+constexpr size_t kBattleSize = 2;		//戦闘で戦うのは敵と味方の「2つ」
 
 enum class WeaponClass : std::uint64_t;
 
@@ -89,7 +92,8 @@ namespace detail {
 		return (val < info.min) ? info.min : (info.max < val) ? info.max : val;
 	}
 }
-inline detail::to_i_helper<int> to_i() noexcept { return{}; }
+template<typename T = int, std::enable_if_t<std::is_arithmetic<T>::value, std::nullptr_t> = nullptr>
+inline detail::to_i_helper<T> to_i() noexcept { return{}; }
 inline detail::to_i_helper<size_t> to_sz() noexcept { return{}; }
 
 template<typename T>

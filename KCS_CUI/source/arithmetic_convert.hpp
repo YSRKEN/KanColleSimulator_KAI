@@ -12,12 +12,21 @@ Distributed under the Boost Software License, Version 1.0.
 #include <type_traits>
 #include "char_convert.hpp"
 namespace atithmetic_cvt {
+	using std::nullptr_t;
 	namespace detail {
 		using char_cvt::u16tou8;
 		using char_cvt::u32tou8;
 		using char_cvt::u8tou16;
 		using char_cvt::u8tou32;
-		using std::nullptr_t;
+		using wcvt_t = std::wstring_convert<std::conditional_t<
+			sizeof(wchar_t) == 2,
+			std::codecvt_utf8_utf16<wchar_t>,
+			std::codecvt_utf8<wchar_t>
+		>, wchar_t>;
+		static inline wcvt_t& wcvt(){
+			static wcvt_t cvt;
+			return cvt;
+		}
 		template<typename char_type, typename T>
 		struct to_str_helper;
 		template<typename T>
@@ -35,8 +44,7 @@ namespace atithmetic_cvt {
 					return static_cast<std::u16string>(std::to_wstring(n));
 				}
 				else {
-					std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> wcvt;
-					return u8tou16(wcvt.to_bytes(std::to_wstring(n)));
+					return u8tou16(wcvt().to_bytes(std::to_wstring(n)));
 				}
 			}
 		};
@@ -44,8 +52,7 @@ namespace atithmetic_cvt {
 		struct to_str_helper<char32_t, T> {
 			std::u32string operator()(T n) {
 				if (sizeof(wchar_t) == 2) {
-					std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> wcvt;
-					return u8tou32(wcvt.to_bytes(std::to_wstring(n)));
+					return u8tou32(wcvt().to_bytes(std::to_wstring(n)));
 				}
 				else {
 					return static_cast<std::u32string>(std::to_wstring(n));
@@ -116,28 +123,19 @@ namespace atithmetic_cvt {
 		};
 		template<typename T>
 		struct from_str_helper<char16_t, T> {
-			T operator()(const std::string& s) {
+			T operator()(const std::u16string& s) {
 				if (sizeof(wchar_t) == 2) {
-					std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> wcvt;
-					return stl_wrap::stox<T>(u16tou8(u8u16cvt.to_bytes(s)));
+					return stl_wrap::stox<T>(u16tou8(s));
 				}
 				else {
-					std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> wcvt;
-					return stl_wrap::stox<T>(u16tou8(u8u16cvt.to_bytes(s)));
+					return stl_wrap::stox<T>(u16tou8(s));
 				}
 			}
 		};
 		template<typename T>
 		struct from_str_helper<char32_t, T> {
-			T operator()(const std::string& s) {
-				if (sizeof(wchar_t) == 2) {
-					std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> wcvt;
-					return stl_wrap::stox<T>(wcvt.from_bytes(u32tou8(s)));
-				}
-				else {
-					std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> wcvt;
-					return stl_wrap::stox<T>(wcvt.from_bytes(u32tou8(s)));
-				}
+			T operator()(const std::u32string& s) {
+				return stl_wrap::stox<T>(u32tou8(s));
 			}
 		};
 	}

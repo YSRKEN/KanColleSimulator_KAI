@@ -22,10 +22,6 @@ namespace KCS_GUI {
 		static List<double> bonusPF = new List<double> { 0.0, 0.0, 2.0, 5.0, 9.0, 14.0, 14.0, 22.0 };
 		static List<double> bonusWB = new List<double> { 0.0, 0.0, 1.0, 1.0, 1.0, 3.0, 3.0, 6.0 };
 
-		//種別番号→インデックスのリスト変換
-		Dictionary<int, List<int>> WeaponTypeToIndexList;
-		//艦種番号→インデックスのリスト変換
-		Dictionary<int, List<int>> KammusuTypeToIndexList;
 		// 画面表示用データ
 		//艦隊タブ
 		Fleet FormFleet;
@@ -38,7 +34,6 @@ namespace KCS_GUI {
 		//ファイルの状態
 		OpenFileInfo[] file;
 		//艦娘エディタ画面で艦娘が変更された時
-		bool kammusu_choose_list_modified = false;
 		//ErrorProvider
 		private System.Windows.Forms.ErrorProvider error_provider_level;
 		private System.Windows.Forms.ErrorProvider error_provider_luck;
@@ -51,8 +46,15 @@ namespace KCS_GUI {
 				this.Close();
 			}
 			try {
-				ReadWeaponData();
-				ReadKammusuData();
+				KammusuTypeComboBox.DataSource = MapKammusuTypeComboBox.DataSource = data.Ships
+					.Where(s => s.艦種 < shipTypes.Length)
+					.OrderBy(s => s.艦種)
+					.GroupBy(s => s.艦種, (t, g) => new { Key = shipTypes[t - 1], Value = g.ToArray() })
+					.ToArray();
+				WeaponTypeComboBox.DataSource = data.Weapons
+					.GroupBy(w => WeaponTypeToNumber.ContainsKey(w.種別) ? w.種別 : "その他", (t, g) => new { Key = t, Value = g.ToArray() })
+					.OrderBy(a => WeaponTypeToNumber[a.Key])
+					.ToArray();
 				RedrawWeaponNameList();
 				RedrawKammusuNameList();
 				RedrawMapKammusuNameList();
@@ -133,9 +135,6 @@ namespace KCS_GUI {
 				}
 			}
 		}
-		private string filepath_to_name(string path) {
-			return path.Substring(path.LastIndexOf('\\') + 1);
-		}
 		private void OpenFileMenuItem_Click(object sender, EventArgs e) {
 			if (SaveChangeBreforeNewCreate()) {
 				if (MainTabControl.SelectedIndex == 0) {
@@ -150,7 +149,7 @@ namespace KCS_GUI {
 					if(FormFleet == null)
 						return;
 					// 読み込んだデータを画面に反映する
-					file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
+					file_state_modified(Path.GetFileName(this.FleetFilePath), FileState.saved);
 					HQLevelTextBox.Text = FormFleet.lv.ToString();
 					FleetTypeComboBox.SelectedIndex = FormFleet.type;
 					FleetSelectComboBox_SelectedIndexChanged(sender, e);
@@ -169,7 +168,7 @@ namespace KCS_GUI {
 					if (FormMapData == null)
 						return;
 					// 読み込んだデータを画面に反映する
-					file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
+					file_state_modified(Path.GetFileName(this.MapFilePath), FileState.saved);
 					MapPositionListBox.Items.Clear();
 					foreach (var position in FormMapData.position) {
 						MapPositionListBox.Items.Add(position.name);
@@ -198,7 +197,7 @@ namespace KCS_GUI {
 			if ((FleetFilePath == null || FleetFilePath == "" || force_create) && !CreateFleetFile()) return;
 			// 作成したデータを保存する
 			FormFleet.WriteTo(FleetFilePath);
-			file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
+			file_state_modified(Path.GetFileName(this.FleetFilePath), FileState.saved);
 		}
 		private bool CreateMapFile() {
 			var sfd = new SaveFileDialog();
@@ -227,7 +226,7 @@ namespace KCS_GUI {
 			if ((MapFilePath == null || MapFilePath == "" || force_create) && !CreateMapFile()) return;
 			// 作成したデータを保存する
 			FormMapData.WriteTo(MapFilePath);
-			file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
+			file_state_modified(Path.GetFileName(this.MapFilePath), FileState.saved);
 		}
 		private void SaveSFileMenuItem_Click(object sender, EventArgs e) {
 			if(MainTabControl.SelectedIndex == 0) {
@@ -268,28 +267,22 @@ namespace KCS_GUI {
 
 		// 艦娘エディタタブ
 		private void AddKammusuButton_Click(object sender, EventArgs e) {
-			if(KammusuTypeComboBox.SelectedIndex == -1
-			|| KammusuNameComboBox.SelectedIndex == -1
-			|| FleetSelectComboBox.SelectedIndex == -1)
+			var kammusu = (CsvDataSet.ShipsRow)KammusuNameComboBox.SelectedItem;
+			if (kammusu == null || FleetSelectComboBox.SelectedIndex == -1)
 				return;
 			// 1艦隊には6隻まで
 			if(FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count == MaxUnitSize)
 				return;
 			// 艦娘データを作成する
-			int index = KammusuTypeToIndexList[KammusuTypeComboBox.SelectedIndex][KammusuNameComboBox.SelectedIndex];
-			var id = data.Ships[index].艦船ID;
+			var id = kammusu.艦船ID;
 			var level = KammusuLevelTextBox.Text.ParseInt();
 			var luck = KammusuLuckTextBox.Text.ParseInt();
 			var cond = KammusuCondTextBox.Text.ParseInt();
 			var setKammusu = new Kammusu(id, level, luck, cond);
 			// 作成した艦娘データを追加する
 			FormFleet.unit[FleetSelectComboBox.SelectedIndex].Add(setKammusu);
-			KammusuSelectListBox.Items.Add(setKammusu.艦名);
-			KammusuSelectListBox.Refresh();
-			KammusuSelectListBox.SelectedIndex = KammusuSelectListBox.Items.Count - 1;
 			RedrawAntiAirScore();
 			RedrawSearchPower();
-			kammusu_choose_list_modified = false;
 			file_state_modified(FileState.modified);
 		}
 		static private bool IsInRange(int val, int min, int max) {
@@ -300,7 +293,7 @@ namespace KCS_GUI {
 		}
 		private void KammusuLevelTextBox_Validating(object sender, CancelEventArgs e) {
 			try {
-				int level = int.Parse(KammusuLevelTextBox.Text);
+				int level = KammusuLevelTextBox.Text.ParseInt();
 				if (level < 1 || 155 < level) {
 					e.Cancel = true;
 					error_provider_level.SetError(KammusuLevelTextBox, "1-255の値を入力してください");//range error
@@ -315,17 +308,15 @@ namespace KCS_GUI {
 			}
 		}
 		private void KammusuLevelTextBox_Leave(object sender, EventArgs e) {
-			if (//Range Check
-				!kammusu_choose_list_modified && IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
-				&& IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
-			) {
-				FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].lv = KammusuLevelTextBox.Text.ParseInt();
+			var kammusu = (Kammusu)KammusuSelectListBox.SelectedItem;
+			if (kammusu != null) {
+				kammusu.lv = KammusuLevelTextBox.Text.ParseInt();
 				file_state_modified(FileState.modified);
 			}
 		}
 		private void KammusuLuckTextBox_Validating(object sender, CancelEventArgs e) {
 			try {
-				int luck = int.Parse(KammusuLuckTextBox.Text);
+				int luck = KammusuLuckTextBox.Text.ParseInt();
 				if (luck < -1 || 100 < luck) {
 					e.Cancel = true;
 					error_provider_luck.SetError(KammusuLuckTextBox, "-1～100の値を入力してください");//range error
@@ -340,17 +331,15 @@ namespace KCS_GUI {
 			}
 		}
 		private void KammusuLuckTextBox_Leave(object sender, EventArgs e) {
-			if (//Range Check
-				!kammusu_choose_list_modified && IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
-				&& IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
-			) {
-				FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].luck = KammusuLuckTextBox.Text.ParseInt();
+			var kammusu = (Kammusu)KammusuSelectListBox.SelectedItem;
+			if (kammusu != null) {
+				kammusu.luck = KammusuLuckTextBox.Text.ParseInt();
 				file_state_modified(FileState.modified);
 			}
 		}
 		private void KammusuCondTextBox_Validating(object sender, CancelEventArgs e) {
 			try {
-				int cond = int.Parse(KammusuCondTextBox.Text);
+				int cond = KammusuCondTextBox.Text.ParseInt();
 				if (cond < 0 || 100 < cond) {
 					e.Cancel = true;
 					error_provider_cond.SetError(KammusuCondTextBox, "0-100の値を入力してください");//range error
@@ -365,37 +354,28 @@ namespace KCS_GUI {
 			}
 		}
 		private void KammusuCondTextBox_Leave(object sender, EventArgs e) {
-			if (//Range Check
-				!kammusu_choose_list_modified && IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
-				&& IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
-			) {
-				FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].cond = KammusuCondTextBox.Text.ParseInt();
+			var kammusu = (Kammusu)KammusuSelectListBox.SelectedItem;
+			if (kammusu != null) {
+				kammusu.cond = KammusuCondTextBox.Text.ParseInt();
 				file_state_modified(FileState.modified);
 			}
 		}
-		private void KammusuNameComboBox_Leave(object sender, EventArgs e) {
-			kammusu_choose_list_modified = true;
-		}
 		private void ChangeKammusuButton_Click(object sender, EventArgs e) {
-			if(KammusuTypeComboBox.SelectedIndex == -1
-			|| KammusuNameComboBox.SelectedIndex == -1
+			var kammusu = (CsvDataSet.ShipsRow)KammusuNameComboBox.SelectedItem;
+			if(kammusu == null
 			|| FleetSelectComboBox.SelectedIndex == -1
 			|| KammusuSelectListBox.SelectedIndex == -1)
 				return;
 			// 艦娘データを作成する
-			int index = KammusuTypeToIndexList[KammusuTypeComboBox.SelectedIndex][KammusuNameComboBox.SelectedIndex];
-			var id = data.Ships[index].艦船ID;
+			var id = kammusu.艦船ID;
 			var level = KammusuLevelTextBox.Text.ParseInt();
 			var luck = KammusuLuckTextBox.Text.ParseInt();
 			var cond = KammusuCondTextBox.Text.ParseInt();
 			var setKammusu = new Kammusu(id, level, luck, cond);
 			// 作成した艦娘データで上書きする
 			FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex] = setKammusu;
-			KammusuSelectListBox.Items[KammusuSelectListBox.SelectedIndex] = setKammusu.艦名;
-			KammusuSelectListBox.Refresh();
 			RedrawAntiAirScore();
 			RedrawSearchPower();
-			kammusu_choose_list_modified = false;
 			file_state_modified(FileState.modified);
 		}
 		private void DeleteKammusuButton_Click(object sender, EventArgs e) {
@@ -404,120 +384,75 @@ namespace KCS_GUI {
 				return;
 			// FormFleetから艦娘データを削除する
 			FormFleet.unit[FleetSelectComboBox.SelectedIndex].RemoveAt(KammusuSelectListBox.SelectedIndex);
-			KammusuSelectListBox.Items.RemoveAt(KammusuSelectListBox.SelectedIndex);
-			KammusuSelectListBox.Refresh();
 			RedrawAntiAirScore();
 			RedrawSearchPower();
 			file_state_modified(FileState.modified);
 		}
 		private void AddWeaponButton_Click(object sender, EventArgs e) {
-			if(FleetSelectComboBox.SelectedIndex == -1
-			|| KammusuSelectListBox.SelectedIndex == -1
-			|| WeaponTypeComboBox.SelectedIndex == -1
-			|| WeaponNameComboBox.SelectedIndex == -1)
+			var kammusu = (Kammusu)KammusuSelectListBox.SelectedItem;
+			var weapon = (CsvDataSet.WeaponsRow)WeaponNameComboBox.SelectedItem;
+			if (kammusu == null || weapon == null)
 				return;
 			// 4つ以上の装備は持てない
-			Kammusu selectedKammusu = FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex];
-			if(selectedKammusu.items.Count == selectedKammusu.maxSlots)
+			if(kammusu.items.Count == kammusu.maxSlots)
 				return;
 			// 装備データを作成する
-			int index = WeaponTypeToIndexList[WeaponTypeComboBox.SelectedIndex][WeaponNameComboBox.SelectedIndex];
-			var id = data.Weapons[index].装備ID;
+			var id = weapon.装備ID;
 			var level = WeaponLevelComboBox.SelectedIndex;
 			var rf = WeaponRfComboBox.SelectedIndex;
 			var detailRf = WeaponDetailRfComboBox.SelectedIndex;
 			var setWeapon = new Weapon(id, level, rf, detailRf);
 			// 作成した装備データを追加する
-			selectedKammusu.items.Add(setWeapon);
-			WeaponSelectListBox.Items.Add(setWeapon.装備名);
-			WeaponSelectListBox.Refresh();
+			kammusu.items.Add(setWeapon);
 			RedrawAntiAirScore();
 			RedrawSearchPower();
 			file_state_modified(FileState.modified);
 		}
 		private void WeaponLevelComboBox_Leave(object sender, EventArgs e) {
-			if (//Range Check
-				IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
-				&& IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
-				&& IsVaidIndex(
-					this.WeaponSelectListBox.SelectedIndex,
-					this.FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].items.Count
-				)
-			) {
-				this
-					.FormFleet
-					.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex]
-					.items[WeaponSelectListBox.SelectedIndex]
-					.level = WeaponLevelComboBox.SelectedIndex;
+			var weapon = (Weapon)WeaponSelectListBox.SelectedItem;
+			if (weapon != null) {
+				weapon.level = WeaponLevelComboBox.SelectedIndex;
 				file_state_modified(FileState.modified);
 			}
 		}
 		private void WeaponRfComboBox_Leave(object sender, EventArgs e) {
-			if(//Range Check
-				IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
-				&& IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
-				&& IsVaidIndex(
-					this.WeaponSelectListBox.SelectedIndex,
-					this.FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].items.Count
-				)
-			) {
-				this
-					.FormFleet
-					.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex]
-					.items[WeaponSelectListBox.SelectedIndex]
-					.rf = WeaponRfComboBox.SelectedIndex;
+			var weapon = (Weapon)WeaponSelectListBox.SelectedItem;
+			if (weapon != null) {
+				weapon.rf = WeaponRfComboBox.SelectedIndex;
 				file_state_modified(FileState.modified);
 			}
 		}
 		private void WeaponDetailRfComboBox_Leave(object sender, EventArgs e) {
-			if(//Range Check
-				IsVaidIndex(this.FleetSelectComboBox.SelectedIndex, this.FormFleet.unit.Count)
-				&& IsVaidIndex(this.KammusuSelectListBox.SelectedIndex, this.FormFleet.unit[FleetSelectComboBox.SelectedIndex].Count)
-				&& IsVaidIndex(
-					this.WeaponSelectListBox.SelectedIndex,
-					this.FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].items.Count
-				)
-			) {
-				this
-					.FormFleet
-					.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex]
-					.items[WeaponSelectListBox.SelectedIndex]
-					.rf_detail = WeaponDetailRfComboBox.SelectedIndex;
+			var weapon = (Weapon)WeaponSelectListBox.SelectedItem;
+			if (weapon != null) {
+				weapon.rf_detail = WeaponDetailRfComboBox.SelectedIndex;
 				file_state_modified(FileState.modified);
 			}
 		}
 		private void ChangeWeaponButton_Click(object sender, EventArgs e) {
-			if(FleetSelectComboBox.SelectedIndex == -1
-			|| KammusuSelectListBox.SelectedIndex == -1
-			|| WeaponTypeComboBox.SelectedIndex == -1
-			|| WeaponNameComboBox.SelectedIndex == -1
+			var kammusu = (Kammusu)KammusuSelectListBox.SelectedItem;
+			var weapon = (CsvDataSet.WeaponsRow)WeaponNameComboBox.SelectedItem;
+			if(kammusu == null || weapon==null
 			|| WeaponSelectListBox.SelectedIndex == -1)
 				return;
-			Kammusu selectedKammusu = FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex];
 			// 装備データを作成する
-			int index = WeaponTypeToIndexList[WeaponTypeComboBox.SelectedIndex][WeaponNameComboBox.SelectedIndex];
-			var id = data.Weapons[index].装備ID;
+			var id = weapon.装備ID;
 			var level = WeaponLevelComboBox.SelectedIndex.limit(0, 10);
 			var rf = WeaponRfComboBox.SelectedIndex.limit(0, 7);
 			var detailRf = WeaponDetailRfComboBox.SelectedIndex.limit(0, 120);
 			var setWeapon = new Weapon(id, level, rf, detailRf);
 			// 作成した装備データで上書きする
-			selectedKammusu.items[WeaponSelectListBox.SelectedIndex] = setWeapon;
-			WeaponSelectListBox.Items[WeaponSelectListBox.SelectedIndex] = setWeapon.装備名;
-			WeaponSelectListBox.Refresh();
+			kammusu.items[WeaponSelectListBox.SelectedIndex] = setWeapon;
 			RedrawAntiAirScore();
 			RedrawSearchPower();
 			file_state_modified(FileState.modified);
 		}
 		private void DeleteWeaponButton_Click(object sender, EventArgs e) {
-			if(FleetSelectComboBox.SelectedIndex == -1
-			|| KammusuSelectListBox.SelectedIndex == -1
-			|| WeaponSelectListBox.SelectedIndex == -1)
+			var kammusu = (Kammusu)KammusuSelectListBox.SelectedItem;
+			if (kammusu == null || WeaponSelectListBox.SelectedIndex == -1)
 				return;
 			// FormFleetから装備データを削除する
-			FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex].items.RemoveAt(WeaponSelectListBox.SelectedIndex);
-			WeaponSelectListBox.Items.RemoveAt(WeaponSelectListBox.SelectedIndex);
-			WeaponSelectListBox.Refresh();
+			kammusu.items.RemoveAt(WeaponSelectListBox.SelectedIndex);
 			RedrawAntiAirScore();
 			RedrawSearchPower();
 			file_state_modified(FileState.modified);
@@ -539,36 +474,22 @@ namespace KCS_GUI {
 			if(FleetSelectComboBox.SelectedIndex == -1)
 				return;
 			// 表示する艦隊を切り換える
-			KammusuSelectListBox.ClearSelected();
-			KammusuSelectListBox.Items.Clear();
-			foreach(Kammusu kammusu in FormFleet.unit[FleetSelectComboBox.SelectedIndex]) {
-				KammusuSelectListBox.Items.Add(data.Ships.Single(s => s.艦船ID == kammusu.id).艦名);
-			}
-			KammusuSelectListBox.Refresh();
-			kammusu_choose_list_modified = false;
+			KammusuSelectListBox.DataSource = FormFleet.unit[FleetSelectComboBox.SelectedIndex];
 		}
 		private void KammusuSelectListBox_SelectedIndexChanged(object sender, EventArgs e) {
-			if(FleetSelectComboBox.SelectedIndex == -1
-			|| KammusuSelectListBox.SelectedIndex == -1)
+			var kammusu = (Kammusu)KammusuSelectListBox.SelectedItem;
+			if (kammusu == null)
 				return;
 			// 表示する艦娘を切り替える
-			Kammusu kammusu = FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex];
-			var showKammusu = data.Ships.Single(s => s.艦船ID == kammusu.id);
-			int showKammusuType = showKammusu.艦種 - 1;
+			int showKammusuType = kammusu.row.艦種 - 1;
 			KammusuTypeComboBox.SelectedIndex = showKammusuType;
-			KammusuTypeComboBox.Refresh();
-			KammusuNameComboBox.Text = showKammusu.艦名;
+			KammusuNameComboBox.SelectedIndex = KammusuNameComboBox.FindStringExact(kammusu.艦名);
 			RedrawKammusuNameList();
 			KammusuLevelTextBox.Text = kammusu.lv.ToString();
 			KammusuLuckTextBox.Text = kammusu.luck.ToString();
 			KammusuCondTextBox.Text = kammusu.cond.ToString();
 			// 装備一覧を更新する
-			WeaponSelectListBox.Items.Clear();
-			foreach(var weapon in kammusu.items) {
-				WeaponSelectListBox.Items.Add(data.Weapons.Single(w => w.装備ID == weapon.id).装備名);
-			}
-			WeaponSelectListBox.Refresh();
-			kammusu_choose_list_modified = false;
+			WeaponSelectListBox.DataSource = kammusu.items;
 		}
 		private void KammusuTypeComboBox_SelectedIndexChanged(object sender, EventArgs e) {
 			RedrawKammusuNameList();
@@ -577,21 +498,15 @@ namespace KCS_GUI {
 			RedrawWeaponNameList();
 		}
 		private void WeaponSelectListBox_SelectedIndexChanged(object sender, EventArgs e) {
-			if(FleetSelectComboBox.SelectedIndex == -1
-			|| KammusuSelectListBox.SelectedIndex == -1
-			|| WeaponSelectListBox.SelectedIndex == -1)
+			var weapon = (Weapon)WeaponSelectListBox.SelectedItem;
+			if (weapon == null)
 				return;
 			// 表示する装備を切り替える
-			Kammusu kammusu = FormFleet.unit[FleetSelectComboBox.SelectedIndex][KammusuSelectListBox.SelectedIndex];
-			Weapon weapon = kammusu.items[WeaponSelectListBox.SelectedIndex];
-			var showWeapon = data.Weapons.Single(w => w.装備ID == weapon.id);
-			int showWeaponType = WeaponTypeToNumber["その他"];
-			if(WeaponTypeToNumber.ContainsKey(showWeapon.種別)) {
-				showWeaponType = WeaponTypeToNumber[showWeapon.種別];
-			}
+			int showWeaponType;
+			if (!WeaponTypeToNumber.TryGetValue(weapon.row.種別, out showWeaponType))
+				showWeaponType = WeaponTypeToNumber["その他"];
 			WeaponTypeComboBox.SelectedIndex = showWeaponType;
-			WeaponTypeComboBox.Refresh();
-			WeaponNameComboBox.Text = showWeapon.装備名;
+			WeaponNameComboBox.SelectedItem = weapon.row;
 			RedrawWeaponNameList();
 			WeaponLevelComboBox.SelectedIndex = weapon.level;
 			WeaponLevelComboBox.Refresh();
@@ -630,7 +545,7 @@ namespace KCS_GUI {
 					if(FormFleet == null)
 						return;
 					// 読み込んだデータを画面に反映する
-					file_state_modified(filepath_to_name(this.FleetFilePath), FileState.saved);
+					file_state_modified(Path.GetFileName(this.FleetFilePath), FileState.saved);
 					HQLevelTextBox.Text = FormFleet.lv.ToString();
 					FleetTypeComboBox.SelectedIndex = FormFleet.type;
 					FleetSelectComboBox_SelectedIndexChanged(sender, e);
@@ -651,7 +566,7 @@ namespace KCS_GUI {
 					if (FormMapData == null)
 						return;
 					// 読み込んだデータを画面に反映する
-					file_state_modified(filepath_to_name(this.MapFilePath), FileState.saved);
+					file_state_modified(Path.GetFileName(this.MapFilePath), FileState.saved);
 					MapPositionListBox.Items.Clear();
 					foreach (var position in FormMapData.position) {
 						MapPositionListBox.Items.Add(position.name);
@@ -736,42 +651,36 @@ namespace KCS_GUI {
 			file_state_modified(FileState.modified);
 		}
 		private void AddMapKammusuButton_Click(object sender, EventArgs e) {
-			if(MapPositionListBox.SelectedIndex == -1
-			|| MapPatternListBox.SelectedIndex == -1
-			|| MapKammusuTypeComboBox.SelectedIndex == -1
-			|| MapKammusuNameComboBox.SelectedIndex == -1)
+			var kammusu = (CsvDataSet.ShipsRow)MapKammusuNameComboBox.SelectedItem;
+			if(kammusu == null
+			|| MapPositionListBox.SelectedIndex == -1
+			|| MapPatternListBox.SelectedIndex == -1)
 				return;
 			if(FormMapData.position[MapPositionListBox.SelectedIndex].pattern[MapPatternListBox.SelectedIndex].fleets.Count >= MaxUnitSize)
 				return;
 			// 艦娘データを作成
-			int index = KammusuTypeToIndexList[MapKammusuTypeComboBox.SelectedIndex][MapKammusuNameComboBox.SelectedIndex];
-			var setKammusu = new Kammusu(data.Ships[index].艦船ID);
+			var setKammusu = new Kammusu(kammusu.艦船ID);
 			// 艦娘データを追加
 			var selectPosition = FormMapData.position[MapPositionListBox.SelectedIndex];
 			var selectFleet = selectPosition.pattern[MapPatternListBox.SelectedIndex];
 			int selectPositionCount = selectPosition.pattern.Count;
 			selectFleet.fleets.Add(setKammusu);
-			MapKammusuListBox.Items.Add(setKammusu.艦名);
-			MapKammusuListBox.Refresh();
 			MapPatternListBox.Items[MapPatternListBox.SelectedIndex] = selectPositionCount.ToString() + " : " + selectFleet.fleets.Count.ToString() + "隻";
 			RedrawMapAntiAirScore();
 			file_state_modified(FileState.modified);
 		}
 		private void ChangeMapKammusuButton_Click(object sender, EventArgs e) {
-			if(MapPositionListBox.SelectedIndex == -1
+			var kammusu = (CsvDataSet.ShipsRow)MapKammusuNameComboBox.SelectedItem;
+			if(kammusu == null
+			|| MapPositionListBox.SelectedIndex == -1
 			|| MapPatternListBox.SelectedIndex == -1
-			|| MapKammusuTypeComboBox.SelectedIndex == -1
-			|| MapKammusuNameComboBox.SelectedIndex == -1
 			|| MapKammusuListBox.SelectedIndex == -1)
 				return;
 			// 艦娘データを作成
-			int index = KammusuTypeToIndexList[MapKammusuTypeComboBox.SelectedIndex][MapKammusuNameComboBox.SelectedIndex];
-			var setKammusu = new Kammusu(data.Ships[index].艦船ID);
+			var setKammusu = new Kammusu(kammusu.艦船ID);
 			// 艦娘データを追加
 			var selectFleet = FormMapData.position[MapPositionListBox.SelectedIndex].pattern[MapPatternListBox.SelectedIndex];
 			selectFleet.fleets[MapKammusuListBox.SelectedIndex] = setKammusu;
-			MapKammusuListBox.Items[MapKammusuListBox.SelectedIndex] = data.Ships.Single(s => s.艦船ID == setKammusu.id).艦名;
-			MapKammusuListBox.Refresh();
 			RedrawMapAntiAirScore();
 			file_state_modified(FileState.modified);
 		}
@@ -781,7 +690,6 @@ namespace KCS_GUI {
 			|| MapKammusuListBox.SelectedIndex == -1)
 				return;
 			FormMapData.position[MapPositionListBox.SelectedIndex].pattern[MapPatternListBox.SelectedIndex].fleets.RemoveAt(MapKammusuListBox.SelectedIndex);
-			MapKammusuListBox.Items.RemoveAt(MapKammusuListBox.SelectedIndex);
 			var selectPosition = FormMapData.position[MapPositionListBox.SelectedIndex];
 			var selectFleet = selectPosition.pattern[MapPatternListBox.SelectedIndex];
 			int selectPositionCount = selectPosition.pattern.Count;
@@ -816,26 +724,16 @@ namespace KCS_GUI {
 			MapPatternFormationComboBox.SelectedIndex = selectPosition.pattern[MapPatternListBox.SelectedIndex].form;
 			MapPatternFormationComboBox.Refresh();
 			// 選択したパターンについて、それに含まれる艦娘に関する情報
-			MapKammusuListBox.Items.Clear();
-			var selectFleet = selectPosition.pattern[MapPatternListBox.SelectedIndex].fleets;
-			foreach(var kammusu in selectFleet) {
-				MapKammusuListBox.Items.Add(data.Ships.Single(s => s.艦船ID == kammusu.id).艦名);
-			}
-			MapKammusuListBox.Refresh();
+			MapKammusuListBox.DataSource = selectPosition.pattern[MapPatternListBox.SelectedIndex].fleets;
 			RedrawMapAntiAirScore();
 		}
 		private void MapKammusuListBox_SelectedIndexChanged(object sender, EventArgs e) {
-			if(MapPositionListBox.SelectedIndex == -1
-			|| MapPatternListBox.SelectedIndex == -1
-			|| MapKammusuListBox.SelectedIndex == -1)
+			var kammusu = (Kammusu)MapKammusuListBox.SelectedItem;
+			if (kammusu == null)
 				return;
 			// 表示する艦娘を切り替える
-			Kammusu kammusu = FormMapData.position[MapPositionListBox.SelectedIndex].pattern[MapPatternListBox.SelectedIndex].fleets[MapKammusuListBox.SelectedIndex];
-			var showKammusu = data.Ships.Single(s => s.艦船ID == kammusu.id);
-			int showKammusuType = showKammusu.艦種 - 1;
-			MapKammusuTypeComboBox.SelectedIndex = showKammusuType;
-			MapKammusuTypeComboBox.Refresh();
-			MapKammusuNameComboBox.Text = showKammusu.艦名;
+			MapKammusuTypeComboBox.SelectedIndex = kammusu.row.艦種 - 1;
+			MapKammusuNameComboBox.SelectedItem = kammusu.row;
 			RedrawMapKammusuNameList();
 		}
 
@@ -940,47 +838,13 @@ namespace KCS_GUI {
 		}
 
 		/* サブルーチン */
-		// 装備データを読み込み
-		private void ReadWeaponData() {
-			// 読み込んだデータからインデックスを張る
-			WeaponTypeToIndexList = new Dictionary<int, List<int>>();
-			DataRow[] dr = data.Weapons.Select();
-			for(int i = 0; i < dr.Length; ++i) {
-				// 種類→インデックスは例外を考慮する
-				int type = WeaponTypeToNumber["その他"];
-				if(WeaponTypeToNumber.ContainsKey(dr[i]["種別"].ToString())) {
-					type = WeaponTypeToNumber[dr[i]["種別"].ToString()];
-				}
-				if(!WeaponTypeToIndexList.ContainsKey(type)) {
-					WeaponTypeToIndexList.Add(type, new List<int>());
-				}
-				WeaponTypeToIndexList[type].Add(i);
-			}
-		}
-		// 艦娘データを読み込み
-		private void ReadKammusuData() {
-			// 読み込んだデータからインデックスを張る
-			KammusuTypeToIndexList = new Dictionary<int, List<int>>();
-			DataRow[] dr = data.Ships.Select();
-			for(int i = 0; i < dr.Length; ++i) {
-				// 種類→インデックスは例外を考慮する
-				int type = dr[i]["艦種"].ToString().ParseInt() - 1;   //1を引くのはインデックスとの対応のため
-				if(!KammusuTypeToIndexList.ContainsKey(type)) {
-					KammusuTypeToIndexList.Add(type, new List<int>());
-				}
-				KammusuTypeToIndexList[type].Add(i);
-			}
-		}
 		// 装備データをGUIに反映
 		private void RedrawWeaponNameList() {
-			WeaponNameComboBox.Items.Clear();
 			// 選択した種別に従って、リストを生成する
-			if(WeaponTypeComboBox.SelectedIndex < 0)
+			var weapons = WeaponTypeComboBox.SelectedValue;
+			if (weapons == null)
 				return;
-			foreach(int index in WeaponTypeToIndexList[WeaponTypeComboBox.SelectedIndex]) {
-				WeaponNameComboBox.Items.Add(data.Weapons[index].装備名);
-			}
-			WeaponNameComboBox.Refresh();
+			WeaponNameComboBox.DataSource = weapons;
 			// 改修度および熟練度の選択を切り替える
 			if(RfWeaponTypeList.Contains(WeaponTypeComboBox.SelectedIndex)) {
 				// 熟練度
@@ -996,24 +860,12 @@ namespace KCS_GUI {
 		}
 		// 艦娘データをGUIに反映
 		private void RedrawKammusuNameList() {
-			KammusuNameComboBox.Items.Clear();
 			// 選択した種別に従って、リストを生成する
-			if(KammusuTypeComboBox.SelectedIndex < 0)
-				return;
-			foreach(int index in KammusuTypeToIndexList[KammusuTypeComboBox.SelectedIndex]) {
-				KammusuNameComboBox.Items.Add(data.Ships[index].艦名);
-			}
-			KammusuNameComboBox.Refresh();
+			KammusuNameComboBox.DataSource = KammusuTypeComboBox.SelectedValue;
 		}
 		private void RedrawMapKammusuNameList() {
-			MapKammusuNameComboBox.Items.Clear();
 			// 選択した種別に従って、リストを生成する
-			if(MapKammusuTypeComboBox.SelectedIndex < 0)
-				return;
-			foreach(int index in KammusuTypeToIndexList[MapKammusuTypeComboBox.SelectedIndex]) {
-				MapKammusuNameComboBox.Items.Add(data.Ships[index].艦名);
-			}
-			MapKammusuNameComboBox.Refresh();
+			MapKammusuNameComboBox.DataSource = MapKammusuTypeComboBox.SelectedValue;
 		}
 		// 値を上下限で制限する
 		static public int limit(int n, int min_n, int max_n) {
@@ -1081,7 +933,7 @@ namespace KCS_GUI {
 			foreach(var kammusu in unit) {
 				// 艦娘の索敵値は練度依存
 				var searchValueSet = data.Ships.Single(s => s.艦船ID == kammusu.id).索敵.Split('/');
-				var searchValueK = searchValueSet[1].ParseInt();
+				var searchValueK = (int)(1.0 * (searchValueSet[1].ParseInt() - searchValueSet[0].ParseInt()) * kammusu.lv / 99 + searchValueSet[0].ParseInt());
 				searchPower += Math.Sqrt(searchValueK) * 1.6841056;
 				foreach(var weapon in kammusu.items) {
 					// 装備の索敵値は種別によって係数が異なる
@@ -1136,7 +988,7 @@ namespace KCS_GUI {
 			foreach(var kammusu in unit) {
 				// 艦娘の索敵値は練度依存
 				var searchValueSet = data.Ships.Single(s => s.艦船ID == kammusu.id).索敵.Split('/');
-				var searchValueK = searchValueSet[1].ParseInt();
+				var searchValueK = (int)(1.0 * (searchValueSet[1].ParseInt() - searchValueSet[0].ParseInt()) * kammusu.lv / 99 + searchValueSet[0].ParseInt());
 				searchPower += Math.Sqrt(searchValueK);
 				foreach(var weapon in kammusu.items) {
 					// 装備の索敵値は種別によって係数が異なる

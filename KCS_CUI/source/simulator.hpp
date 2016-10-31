@@ -46,21 +46,22 @@ class Simulator {
 	bool is_calculated;
 	// 各フェーズ
 	void SearchPhase();
+	void FitstAntiSubPhase();
 	void AirWarPhase();
 	void BattlePositionOracle() noexcept;
 	void TorpedoPhase(const TorpedoTurn&);
-	vector<vector<std::pair<KammusuIndex, Range>>> DetermineAttackOrder(FireTurn fire_turn, size_t fleet_index = 0) const;
+	std::array<vector<std::pair<KammusuIndex, Range>>, kBattleSize> DetermineAttackOrder(FireTurn fire_turn, size_t fleet_index = 0) const;
 	std::tuple<bool, bool, double> CalcLandingObservationShootingCorrection(DayFireType fire_type, size_t bi, const Kammusu & hunter_kammusu, size_t other_side, KammusuIndex friend_index) const;
 	void FirePhase(const FireTurn&, const size_t &fleet_index = 0);
 	void NightPhase();
 	// 計算用メソッド(内部)
 	//制空状態を判断する
-	AirWarStatus JudgeAirWarStatus(const vector<int>&);
+	AirWarStatus JudgeAirWarStatus(const std::array<int, kBattleSize>&);
 	//与えるダメージ量を計算する
 	int CalcDamage(
 		const BattlePhase&, const size_t, const KammusuIndex&, KammusuIndex&, const int&,
-		const vector<double>&, const BattlePosition&, const bool&, const double&) const;
-	int CalcDamage(const BattlePhase&, const size_t, const KammusuIndex&, KammusuIndex&, const int&, const bool&, const double&);
+		const vector<double>&, const BattlePosition&, const bool&, const double&, const bool wsn_flg = false) const;
+	int CalcDamage(const BattlePhase&, const size_t, const KammusuIndex&, KammusuIndex&, const int&, const bool&, const double&, const bool wsn_flg = false);
 	//「かばい」を確率的に発生させる
 	void ProtectOracle(const size_t, KammusuIndex&) const;
 	//命中率を計算する
@@ -74,7 +75,7 @@ class Simulator {
 	// 夜戦での攻撃種別を判断する
 	NightFireType JudgeNightFireType(const size_t, const KammusuIndex&) const noexcept;
 	// 夜戦での特殊攻撃を判断する
-	tuple<bool, double> JudgeNightSpecialAttack(const size_t turn_player, const KammusuIndex &attack_index, const bool) const;
+	tuple<bool, double> JudgeNightSpecialAttack(const size_t turn_player, const KammusuIndex &attack_index, const bool, const int) const;
 public:
 	// コンストラクタ
 	Simulator(){}

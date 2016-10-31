@@ -91,10 +91,10 @@ std::ostream & operator<<(std::ostream & os, const Weapon & conf)
 {
 	os
 		<< "装備ID：" << conf.id_ << endl
-		<< "　装備名：" << (conf.id_ == -1 ? "なし" : char_cvt::utf_16_to_shift_jis(conf.GetName())) << "　種別：" << conf.weapon_class_ << endl
+		<< "　装備名：" << (conf.id_ == -1 ? "なし" : char_cvt::wstring2string(conf.GetName())) << "　種別：" << conf.weapon_class_ << endl
 		<< "　装甲：" << conf.defense_ << "　火力：" << conf.attack_ << "　雷撃：" << conf.torpedo_ << "　爆装：" << conf.bomb_ << endl
 		<< "　対空：" << conf.anti_air_ << "　対潜：" << conf.anti_sub_ << "　命中：" << conf.hit_ << "　回避：" << conf.evade_ << endl
-		<< "　索敵：" << conf.search_ << "　射程：" << char_cvt::utf_16_to_shift_jis(kRangeStr[conf.range_]) << "　改修/熟練：" << conf.level_ << endl;
+		<< "　索敵：" << conf.search_ << "　射程：" << char_cvt::wstring2string(kRangeStr[conf.range_]) << "　改修/熟練：" << conf.level_ << endl;
 	return os;
 }
 

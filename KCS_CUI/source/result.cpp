@@ -61,7 +61,7 @@ WinReason Result::JudgeWinReason() const noexcept {
 		dead_count[bi] = alived_count_before[bi] - alived_count[bi];
 	}
 	// 戦果ゲージを算出する
-	vector<double> result_per(kBattleSize);				//戦果ゲージ(敵艦隊の撃沈割合であることに注意)
+	std::array<double, kBattleSize> result_per = { {} };				//戦果ゲージ(敵艦隊の撃沈割合であることに注意)
 	for (size_t bi = 0; bi < kBattleSize; ++bi) {
 		auto other_side = kBattleSize - bi - 1;
 		result_per[bi] = 1.0 * (hp_before_sum[other_side] - hp_sum[other_side]) / hp_before_sum[other_side];

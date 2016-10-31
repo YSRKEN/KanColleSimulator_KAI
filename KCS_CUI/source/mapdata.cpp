@@ -8,7 +8,10 @@ MapData::MapData(const string &file_name, char_cvt::char_enc fileenc) {
 	// ファイルを読み込む
 	ifstream fin(file_name);
 	FILE_THROW_WITH_MESSAGE_IF(!fin.is_open(), "マップデータが正常に読み込めませんでした.")
-	if (char_cvt::char_enc::shift_jis != fileenc) skip_utf8_bom(fin, fileenc);
+#ifdef _WIN32
+	if (char_cvt::char_enc::shift_jis != fileenc)
+#endif //_WIN32
+		skip_utf8_bom(fin, fileenc);
 	using picojson::object;
 	using picojson::array;
 	using picojson::value;
@@ -29,7 +32,7 @@ MapData::MapData(const string &file_name, char_cvt::char_enc fileenc) {
 			auto formation_ = Formation(stoi(o5.at("form").to_str())) | limit(kFormationTrail, kFormationAbreast);
 			temp.SetFormation(formation_);
 			auto &o6 = o5.at("fleets").get<picojson::array>();
-			temp.GetUnit().resize(1);
+			temp.ResizeUnit(1);
 			for (auto &it3 : o6) {
 				auto id = stoi(it3.to_str());
 				auto kammusu = Kammusu::Get(id, 1).Reset(true);
