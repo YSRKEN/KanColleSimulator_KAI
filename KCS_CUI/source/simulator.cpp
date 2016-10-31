@@ -759,6 +759,7 @@ int Simulator::CalcDamage(
 			for (auto &it_w : target_kammusu.GetWeapon()) {
 				if (it_w.AnyOf(WC("対空強化弾"))) return true;
 			}
+			return false;
 		}()) {
 			damage *= 2.5;
 		}

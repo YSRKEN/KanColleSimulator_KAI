@@ -446,7 +446,7 @@ tuple<bool, size_t> Fleet::RandomKammusu() const {
 tuple<bool, KammusuIndex> Fleet::RandomKammusuNonSS(const bool has_bomb, const TargetType target_type, const bool has_sl) const {
 	// 攻撃する艦隊の対象を選択する
 	std::array<size_t, kMaxFleetSize> list;
-	size_t list_fleets;
+	size_t list_fleets = 1;
 	switch (target_type) {
 	case kTargetTypeFirst:
 		list = {{ FirstIndex(), FirstIndex() }};
