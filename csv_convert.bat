@@ -18,6 +18,13 @@ for /f "delims=" %%s in (%1) do (
 )
 exit /b 0
 
+:error
+echo "invalid argument detect." 1> &2
+exit /b 1
+endlocal
+
+rem subroutine
+
 rem @brief convert line convert
 rem @param source_line_text source line text
 rem @param prefix C-Preprocesser-Macro-Function name
@@ -33,12 +40,15 @@ set out=%~3
 
 rem replace `/` to `.`
 set source_line_text=%source_line_text:/=.%
+rem replace space
+set source_line_text=%source_line_text: =__space__%
 
 rem get first element
-for /f "delims=, tokens=1" %%s in ("%source_line_text%") do set re=%%s
+for /f "tokens=1 delims=," %%s in ("%source_line_text%") do set re=%%s
 rem get second first element and concat
-for /f "delims=, tokens=2" %%s in ("%source_line_text%") do set re=%re%,"%%s",
+for /f "tokens=2 delims=," %%s in ("%source_line_text%") do set re=%re%,"%%s",
 
+rem calc 3rd element front pos in `source_line_text`
 call :strlen "third_elem_pos" "%re%"
 set /a third_elem_pos-=2
 
@@ -46,10 +56,15 @@ rem `)` should be escaped by `^`
 set postfix=,^)
 rem concat strings
 set re=%prefix%%re%!source_line_text:~%third_elem_pos%!%postfix%
+rem replace-back space
+set re=%re:__space__= %
 echo %re%>>%out%
 endlocal
 exit /b 0
 
+rem @brief computes the length of the string
+rem @param result_env_name[out] The variable name that is to store computed length.
+rem @param str input string
 :strlen
 setlocal enabledelayedexpansion
 set result_env_name=%~1
@@ -65,8 +80,3 @@ set /a count+=1
 goto strlen_loop
 :strlen_loop_break
 endlocal && set /a %result_env_name%=%count% && exit /b 0
-
-:error
-echo "invalid argument detect." 1> &2
-exit /b 1
-endlocal
