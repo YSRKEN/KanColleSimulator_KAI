@@ -19,16 +19,14 @@
                     $i = 0
                     $j = 0
                     foreach ($e in $elements) {
-                        [string]$elem = $e
-                        # Read-Host "続けるにはENTERキーを押して下さい"
                         if(($i -lt $need_double_quote_index.Length) -and ($need_double_quote_index[$i] -eq $j)){
-                            $sb2 = New-Object System.Text.StringBuilder
-                            $elem = $sb2.Append('"').Append($elem).Append('"').ToString()
+                            # ダブルクオートで囲う必要がある時
+                            $dst = $sb.Append('"').Append($e).Append('"').Append(',')
                             ++$i
                         }else {
-                            $elem = $elem -creplace '/', '.'
+                            $e = $e -creplace '/', '.'
+                            $dst = $sb.Append($e).Append(',')
                         }
-                        $dst = $sb.Append($elem).Append(',')
                         ++$j
                     }
                     # remove last `,`
