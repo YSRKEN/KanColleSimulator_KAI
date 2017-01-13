@@ -1,7 +1,43 @@
 @echo off
+
+call csv_convert ships.csv SHIP KCS_CUI/source/ships_test.csv
+call csv_convert slotitems.csv WEAPON KCS_CUI/source/slotitems_test.csv
+exit /b 0
+
+rem subroutine
+
+rem @brief impliment subroutine in `line_convert`
+:SHIP
+setlocal
+set result_env_name
+set source_line_text=%2
+rem get first element
+for /f "tokens=1 delims=," %%s in (%source_line_text%) do set re=%%s
+rem get second element and concat
+for /f "tokens=2 delims=," %%s in (%source_line_text%) do set re=%re%,"%%s",
+endlocal && set %result_env_name%=%re% && exit /b 0
+
+rem @brief impliment subroutine in `line_convert`
+:WEAPON
+setlocal
+set result_env_name
+set source_line_text=%2
+rem get first element
+for /f "tokens=1 delims=," %%s in (%source_line_text%) do set re=%%s
+rem get second element and concat
+for /f "tokens=2 delims=," %%s in (%source_line_text%) do set re=%re%,"%%s",
+rem get 3rd element and concat
+for /f "tokens=3 delims=," %%s in (%source_line_text%) do set re=%re%,"%%s",
+endlocal && set %result_env_name%=%re% && exit /b 0
+
 rem @brief csv converter to parse csv at C-Preprocesser
 rem @param %1 input file
 rem @param %2 prefix
+rem @detail exmaple:
+rem ```
+rem csv_convert.bat ships.csv SHIP KCS_CUI/source/ships.csv
+rem ```
+:csv_convert
 setlocal enabledelayedexpansion
 if "%1." == "." goto error
 if "%2." == "." goto error
@@ -23,8 +59,6 @@ echo "invalid argument detect." 1> &2
 exit /b 1
 endlocal
 
-rem subroutine
-
 rem @brief convert line convert
 rem @param source_line_text source line text
 rem @param prefix C-Preprocesser-Macro-Function name
@@ -43,12 +77,10 @@ set source_line_text=%source_line_text:/=.%
 rem replace space
 set source_line_text=%source_line_text: =__space__%
 
-rem get first element
-for /f "tokens=1 delims=," %%s in ("%source_line_text%") do set re=%%s
-rem get second first element and concat
-for /f "tokens=2 delims=," %%s in ("%source_line_text%") do set re=%re%,"%%s",
+rem edit some elements
+call %2 "re" "%source_line_text%"
 
-rem calc 3rd element front pos in `source_line_text`
+rem calc rest elements front pos in `source_line_text`
 call :strlen "third_elem_pos" "%re%"
 set /a third_elem_pos-=2
 
