@@ -23,24 +23,22 @@ function convert_csv(){
         IFS=','
         local elements=($line_string)
         IFS=$IFS_BACKUP
-        local re="${prefix}(,"
+        local elements_len=${#elements[@]}
         local i=0
-        local j=0
-        local e
-        local tmp
+        local j
         echo -en "\rconverting ${input_file}... id ${elements[0]}" >&2
-        for e in "${elements[@]}"; do
+        # sleep 3s
+        for (( j=0; j < elements_len; j++ )); do
           if (( i < need_double_quote_index_len && j == need_double_quote_index[i] )); then
             # ダブルクオートで囲う必要がある時
-            re="${re}\"${e}\","
+            elements[$j]="\"${elements[$j]}\""
             (( i++ ))
           else
-            tmp=$(echo "${e}" | sed -e 's/\//./g')
-            re="${re}${tmp},"
+            elements[$j]=$(echo "${elements[$j]}" | sed -e 's/\//./g')
           fi
-          (( j++ ))
         done
-        echo "${re:0:-1},)"
+        local re="$(IFS=,; echo "${elements[*]}")"
+        echo "${prefix}(,${re:0:-1},)"
     fi
   done < <(iconv -f cp932 -t UTF-8 "${input_file}")
   echo -en "\rconverting ${input_file}...done.\n" >&2
