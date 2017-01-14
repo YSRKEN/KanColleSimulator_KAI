@@ -36,7 +36,6 @@ function convert_csv(){
             re="${re}\"${e}\","
             (( i++ ))
           else
-            read -p "Press [Enter] key to start backup..."
             tmp=$(echo "${e}" | sed -e 's/\//./')
             re="${re}${tmp},"
           fi
