@@ -29,7 +29,7 @@ function convert_csv(){
         local e
         local tmp
         # debug print
-        echo "${line_string}" >&2
+        echo -en "converting id ${elements[0]}\r" >&2
         for e in "${elements[@]}"; do
           if (( i < need_double_quote_index_len && j == need_double_quote_index[i] )); then
             # ダブルクオートで囲う必要がある時
@@ -46,6 +46,8 @@ function convert_csv(){
   done < <(iconv -f cp932 -t UTF-8 "${input_file}")
 }
 echo "converting csv..."
-# convert_csv './ships.csv' 'SHIP' 1 > 'KCS_CUI/source/ships_test.csv'
+echo "ships.csv:"
+convert_csv './ships.csv' 'SHIP' 1 > 'KCS_CUI/source/ships_test.csv'
+echo "slotitems.csv:"
 convert_csv './slotitems.csv' 'WEAPON' 1 2 > 'KCS_CUI/source/slotitems_test.csv'
 echo "done."
