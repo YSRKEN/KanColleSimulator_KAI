@@ -43,6 +43,6 @@ function convert_csv(){
   echo -e "\rconverting ${input_file}..........done." >&2
 }
 echo "converting csv..."
-convert_csv './ships.csv' 'SHIP' 1 > 'KCS_CUI/source/ships_test.csv'
-convert_csv './slotitems.csv' 'WEAPON' 1 2 > 'KCS_CUI/source/slotitems_test.csv'
+convert_csv './ships.csv' 'SHIP' 1 > 'KCS_CUI/source/ships.csv'
+convert_csv './slotitems.csv' 'WEAPON' 1 2 > 'KCS_CUI/source/slotitems.csv'
 echo "done."
