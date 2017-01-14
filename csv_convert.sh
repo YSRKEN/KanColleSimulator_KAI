@@ -19,25 +19,25 @@ function convert_csv(){
       is_first_line=0
       echo "//PREFIX,${line_string:0:-1},POSTFIX"
     else
-        local IFS_BACKUP=$IFS
-        IFS=','
-        local elements=($line_string)
-        IFS=$IFS_BACKUP
-        local elements_len=${#elements[@]}
-        local i=0
-        local j
-        echo -en "\rconverting ${input_file}... id ${elements[0]}" >&2
-        for (( j=0; j < elements_len; j++ )); do
-          if (( i < need_double_quote_index_len && j == need_double_quote_index[i] )); then
-            # ダブルクオートで囲う必要がある時
-            elements[$j]="\"${elements[$j]}\""
-            (( i++ ))
-          else
-            # elements[$j]=$(echo "${elements[$j]}" | sed -e 's/\//./g')
-            elements[$j]=${elements[$j]//\//.}
-          fi
-        done
-        echo "${prefix}(,$(IFS=,; echo "${elements[*]}"),)"
+      local IFS_BACKUP=$IFS
+      IFS=','
+      local elements=($line_string)
+      IFS=$IFS_BACKUP
+      local elements_len=${#elements[@]}
+      local i=0
+      local j
+      echo -en "\rconverting ${input_file}... id ${elements[0]}" >&2
+      for (( j=0; j < elements_len; j++ )); do
+        if (( i < need_double_quote_index_len && j == need_double_quote_index[i] )); then
+          # ダブルクオートで囲う必要がある時
+          elements[$j]="\"${elements[$j]}\""
+          (( i++ ))
+        else
+          # elements[$j]=$(echo "${elements[$j]}" | sed -e 's/\//./g')
+          elements[$j]=${elements[$j]//\//.}
+        fi
+      done
+      echo "${prefix}(,$(IFS=,; echo "${elements[*]}"),)"
     fi
   done < <(iconv -f cp932 -t UTF-8 "${input_file}")
   echo -e "\rconverting ${input_file}..........done." >&2
