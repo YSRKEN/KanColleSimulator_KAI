@@ -19,9 +19,9 @@ function convert_csv(){
       is_first_line=0
       echo "//PREFIX,${line_string:0:-1},POSTFIX"
     else
-        IFS_BACKUP=$IFS
+        local IFS_BACKUP=$IFS
         IFS=','
-        elements=($line_string)
+        local elements=($line_string)
         IFS=$IFS_BACKUP
         local re="${prefix}(,"
         local i=0
@@ -35,7 +35,7 @@ function convert_csv(){
             re="${re}\"${e}\","
             (( i++ ))
           else
-            tmp=$(echo "${e}" | sed -e 's/\//./')
+            tmp=$(echo "${e}" | sed -e 's/\//./g')
             re="${re}${tmp},"
           fi
           (( j++ ))
@@ -43,7 +43,7 @@ function convert_csv(){
         echo "${re:0:-1},)"
     fi
   done < <(iconv -f cp932 -t UTF-8 "${input_file}")
-  echo -e "\rconverting ${input_file}...done." >&2
+  echo -en "\rconverting ${input_file}...done.\n" >&2
 }
 echo "converting csv..."
 convert_csv './ships.csv' 'SHIP' 1 > 'KCS_CUI/source/ships_test.csv'
