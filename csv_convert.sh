@@ -27,21 +27,20 @@ function convert_csv(){
         local i=0
         local j
         echo -en "\rconverting ${input_file}... id ${elements[0]}" >&2
-        # sleep 3s
         for (( j=0; j < elements_len; j++ )); do
           if (( i < need_double_quote_index_len && j == need_double_quote_index[i] )); then
             # ダブルクオートで囲う必要がある時
             elements[$j]="\"${elements[$j]}\""
             (( i++ ))
           else
-            elements[$j]=$(echo "${elements[$j]}" | sed -e 's/\//./g')
+            # elements[$j]=$(echo "${elements[$j]}" | sed -e 's/\//./g')
+            elements[$j]=${elements[$j]//\//.}
           fi
         done
-        local re="$(IFS=,; echo "${elements[*]}")"
-        echo "${prefix}(,${re:0:-1},)"
+        echo "${prefix}(,$(IFS=,; echo "${elements[*]}"),)"
     fi
   done < <(iconv -f cp932 -t UTF-8 "${input_file}")
-  echo -en "\rconverting ${input_file}...done.\n" >&2
+  echo -e "\rconverting ${input_file}..........done." >&2
 }
 echo "converting csv..."
 convert_csv './ships.csv' 'SHIP' 1 > 'KCS_CUI/source/ships_test.csv'
