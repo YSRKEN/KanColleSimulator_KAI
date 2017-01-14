@@ -4,12 +4,12 @@
 # @param need_double_quote_index...
 function convert_csv(){
   # argument
-  readonly input_file=$1
-  readonly prefix=$2
+  local -r input_file=$1
+  local -r prefix=$2
   shift 2
   local need_double_quote_index=($@)
 
-  readonly need_double_quote_index_len=${#need_double_quote_index[@]}
+  local -r need_double_quote_index_len=${#need_double_quote_index[@]}
   #write BOM
   echo -en '\xef\xbb\xbf'
   local line_string
