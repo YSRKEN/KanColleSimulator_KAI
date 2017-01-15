@@ -37,7 +37,9 @@ function convert_csv(){
           elements[$j]=${elements[$j]//\//.}
         fi
       done
-      echo "${prefix}(,$(IFS=,; echo "${elements[*]}"),)"
+      IFS=, eval 'local re=${elements[*]}'
+      echo "${prefix}(,${re},)"
+      # echo "${prefix}(,$(IFS=,; echo "${elements[*]}"),)"
     fi
   done < <(iconv -f cp932 -t UTF-8 "${input_file}")
   echo -e "\rconverting ${input_file}..........done." >&2
