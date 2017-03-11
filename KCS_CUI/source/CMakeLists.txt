@@ -5,10 +5,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON) #...is required...
 set(CMAKE_CXX_EXTENSIONS OFF) #...without compiler extensions like gnu++11
 find_package(Threads REQUIRED)
 
+add_custom_command(
+  OUTPUT ships.csv slotitems.csv
+  DEPENDS ../../ships.csv ../../slotitems.csv
+  COMMAND "./csv_convert.sh"
+	WORKING_DIRECTORY "../../"
+)
+
 ## Set our project name
 project(KCS_CUI)
 
-set(kcs_kai_src 
+set(kcs_kai_src
 	config.cpp
 	exception.cpp
 	fleet.cpp
@@ -20,6 +27,8 @@ set(kcs_kai_src
 	result.cpp
 	simulator.cpp
 	weapon.cpp
+	ships.csv
+	slotitems.csv
 )
 if(MSVC)
   # Force to always compile with W4
