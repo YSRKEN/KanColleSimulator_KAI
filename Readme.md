@@ -1,4 +1,5 @@
-﻿# KanColleSimulator
+﻿
+# KanColleSimulator
 
 [master](https://github.com/YSRKEN/KanColleSimulator_KAI) : [![Run Status](https://api.shippable.com/projects/577cc61f3be4f4faa56be960/badge?branch=master)](https://app.shippable.com/projects/577cc61f3be4f4faa56be960)
 [develop](https://github.com/YSRKEN/KanColleSimulator_KAI/tree/develop): [![Run Status](https://api.shippable.com/projects/577cc61f3be4f4faa56be960/badge?branch=develop)](https://app.shippable.com/projects/577cc61f3be4f4faa56be960)
